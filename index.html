@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Your Name • Links</title>
+  <title>Justin Rogowski</title>
   <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
@@ -297,7 +297,7 @@
       --card-hover: #2a2a2a;
       --link: #1a73e8;
       --link-hover: #1558b0;
-      --sub: #ffaaaa;
+      --sub: #aaaaaa;
       --bord: #333333;
       --shadow: rgba(0, 0, 0, 0.6);
     }
@@ -365,16 +365,28 @@
 
   .container {
     flex-direction: row;
-    align-items: stretch;  /* equal height */
+    align-items:stretch;  /* equal height */
+    padding-left: 10%;
+    padding-right: 10%;
+    gap: 2rem; /* space between columns */
+    
   }
 
-  .content-wrapper,
-  .bookings-wrapper {
+  .content-wrapper{
     flex: 1;               /* share the row */
     display: flex;         /* let inner content flex if you need */
+    max-width: 350px;
+    justify-content: center;
     flex-direction: column;
     /*width:300px;*/
   
+  }
+  .bookings-wrapper {
+    flex: 1;               /* share the row */
+    display: flex;         /* let inner content flex if you need */
+    max-width: 700px;
+    justify-content: center;
+    flex-direction: column;
   }
 }
 /* Calendar Bottom */
@@ -531,13 +543,24 @@
         height: 100%;
         border: none;
       }
-      .trello-board {
-      width: 100%;
-      height: 600px;
-      border: none;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px var(--shadow);
-    }
+        .trello-embed-wrapper {
+    position: relative;
+    /* Adjust the 75% to control aspect-ratio (height/width) */
+    padding-bottom: 75%;
+    height: 0;
+    width:50%;
+    overflow: hidden;
+            border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px var(--shadow);
+  }
+  .trello-embed-wrapper iframe {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    border: 0;
+  }
+
   </style>
 </head>
 
@@ -607,7 +630,7 @@
   </div>
   <!-- CliftonStrengths Grid -->
   <div class="CS-wrapper">
-    <h2 id="CSh2">My CliftonStrengths</h2>
+    <h2 id="CSh2"></h2>
     <div id="CS">
       <!-- CS Summary -->
       <div class="summary">
@@ -773,10 +796,12 @@
     </div>
   </div>
 
-  <blockquote class="trello-board">
-  <a href="https://trello.com/b/2Yp5IKYz">My Public Trello Board</a>
-</blockquote>
-<script src="https://p.trellocdn.com/embed.min.js"></script>
+<div class="trello-embed-wrapper">
+  <iframe
+    src="https://trello.com/b/2Yp5IKYz.html"
+    allowfullscreen
+  ></iframe>
+</div>
 
 
 
