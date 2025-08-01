@@ -336,231 +336,292 @@
     }
 
     /* Layout */
- /* 1. Mobile first: stack panels vertically */
-.container {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
+    /* 1. Mobile first: stack panels vertically */
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
 
-/* make each “card” full‐width on mobile */
-.content-wrapper,
-.bookings-wrapper {
-  width: 100%;
-  background: var(--card);
-  border-radius: 16px;
-  box-shadow: 0 4px 12px var(--shadow);
-  padding: 1rem;
-  transition: background .3s, transform .2s;
-  height: auto; /* let content define height */
-}
+    /* make each “card” full‐width on mobile */
+    .content-wrapper,
+    .bookings-wrapper {
+      width: 100%;
+      background: var(--card);
+      border-radius: 16px;
+      box-shadow: 0 4px 12px var(--shadow);
+      padding: 1rem;
+      transition: background .3s, transform .2s;
+      height: auto;
+      /* let content define height */
+    }
 
-/* 2. Remove those extra margins on your control buttons (the grid gap will handle spacing) */
-.controls button {
-  margin: 0;
-}
+    /* 2. Remove those extra margins on your control buttons (the grid gap will handle spacing) */
+    .controls button {
+      margin: 0;
+    }
 
-/* 3. At tablet+ sizes, switch to two columns */
-@media (min-width: 768px) {
+    /* 3. At tablet+ sizes, switch to two columns */
+    @media (min-width: 768px) {
 
-  .container {
-    flex-direction: row;
-    align-items:stretch;  /* equal height */
-    padding-left: 10%;
-    padding-right: 10%;
-    gap: 2rem; /* space between columns */
-    
-  }
+      .container {
+        flex-direction: row;
+        align-items: stretch;
+        /* equal height */
+        padding-left: 10%;
+        padding-right: 10%;
+        gap: 2rem;
+        /* space between columns */
 
-  .content-wrapper{
-    flex: 1;               /* share the row */
-    display: flex;         /* let inner content flex if you need */
-    max-width: 350px;
-    justify-content: center;
-    flex-direction: column;
-    /*width:300px;*/
-  
-  }
-  .bookings-wrapper {
-    flex: 1;               /* share the row */
-    display: flex;         /* let inner content flex if you need */
-    max-width: 700px;
-    justify-content: center;
-    flex-direction: column;
-  }
-}
-/* Calendar Bottom */
-      .calendar-wrapper {
-        width: 100%;
-        margin: 0 auto 2rem;
       }
 
-      .calendar-wrapper .calendar-widget {
-        position: relative;
-        width: 100%;
-        padding-top: 75%;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 4px 12px var(--shadow);
-      }
-
-      .calendar-wrapper .calendar-widget iframe {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        border: none;
-      }
-
-      .CS-wrapper {
-        width: 80%;
-        margin: 0 auto 2rem;
-      }
-
-      .CS-wrapper .CS-widget {
-        position: relative;
-        width: 100%;
-        padding-top: 100%;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 4px 12px var(--shadow);
-      }
-
-
-      /* Header */
-      header {
-        text-align: center;
-        margin-bottom: 1.5rem;
-      }
-
-      header img {
-        width: 120px;
-        height: 120px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 4px solid var(--link);
-        box-shadow: 0 2px 8px var(--shadow);
-        transition: border-color .3s;
-      }
-
-      header img:hover {
-        border-color: var(--link-hover);
-      }
-
-      header h1 {
-        font-size: 2rem;
-        font-weight: 800;
-        margin-bottom: .25rem;
-      }
-
-      header p {
-        color: var(--sub);
-        font-weight: 600;
-      }
-
-      /* Bio */
-      .bio {
-        color: var(--sub);
-        text-align: center;
-        margin-bottom: 1.5rem;
-        font-size: 1rem;
-      }
-
-      /* Social Icons */
-      .social-icons {
+      .content-wrapper {
+        flex: 1;
+        /* share the row */
         display: flex;
-        gap: 1rem;
+        /* let inner content flex if you need */
+        max-width: 350px;
         justify-content: center;
-        margin-bottom: 2rem;
+        flex-direction: column;
+        /*width:300px;*/
+
       }
 
-      .social-icons a {
-        background: var(--card);
-        border-radius: 50%;
-        padding: .5rem;
-        box-shadow: 0 2px 6px var(--shadow);
-        transition: background .3s, transform .2s;
-      }
-
-      .social-icons a:hover {
-        background: var(--card-hover);
-        transform: scale(1.1);
-      }
-
-      .social-icons svg {
-        fill: var(--link);
-        width: 24px;
-        height: 24px;
-      }
-
-      /* Links */
-      .links {
-        list-style: none;
-        margin-bottom: 2rem;
+      .bookings-wrapper {
+        flex: 1;
+        /* share the row */
         display: flex;
+        /* let inner content flex if you need */
+        max-width: 700px;
         justify-content: center;
-        flex-wrap: wrap;
-        gap: 1rem;
+        flex-direction: column;
       }
+    }
 
-      .links a {
-        background: var(--link);
-        color: #fff;
-        padding: 0.75rem 1rem;
-        border-radius: 999px;
-        text-decoration: none;
-        font-weight: 600;
-        text-align: center;
-        box-shadow: 0 4px 8px var(--shadow);
-        transition: background .3s, transform .2s;
-        width: 200px;
-        /* fixed width for uniform buttons */
-        display: inline-block;
-      }
+    /* Calendar Bottom */
+    .calendar-wrapper {
+      width: 100%;
+      margin: 0 auto 2rem;
+    }
 
-      .links a:hover {
-        background: var(--link-hover);
-        transform: translateY(-2px);
-      }
+    .calendar-wrapper .calendar-widget {
+      position: relative;
+      width: 100%;
+      padding-top: 75%;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px var(--shadow);
+    }
 
-      /* Bookings Widget */
-      .widget-wrapper h2 {
-        margin-bottom: 1rem;
-        font-size: 1.5rem;
-      }
+    .calendar-wrapper .calendar-widget iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
 
-      .bookings-widget {
-        width: 100%;
-        height: 100%;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 4px 12px var(--shadow);
-      }
+    .CS-wrapper {
+      width: 80%;
+      margin: 0 auto 2rem;
+    }
 
-      .bookings-widget iframe {
-        width: 100%;
-        height: 100%;
-        border: none;
-      }
-        .trello-embed-wrapper {
-    position: relative;
-    /* Adjust the 75% to control aspect-ratio (height/width) */
-    padding-bottom: 75%;
-    height: 0;
-    width:50%;
-    overflow: hidden;
-            border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 4px 12px var(--shadow);
-  }
-  .trello-embed-wrapper iframe {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    border: 0;
-  }
+    .CS-wrapper .CS-widget {
+      position: relative;
+      width: 100%;
+      padding-top: 100%;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px var(--shadow);
+    }
 
+
+    /* Header */
+    header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    header img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid var(--link);
+      box-shadow: 0 2px 8px var(--shadow);
+      transition: border-color .3s;
+    }
+
+    header img:hover {
+      border-color: var(--link-hover);
+    }
+
+    header h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: .25rem;
+    }
+
+    header p {
+      color: var(--sub);
+      font-weight: 600;
+    }
+
+    /* Bio */
+    .bio {
+      color: var(--sub);
+      text-align: center;
+      margin-bottom: 1.5rem;
+      font-size: 1rem;
+    }
+
+    /* Social Icons */
+    .social-icons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+
+    .social-icons a {
+      background: var(--card);
+      border-radius: 50%;
+      padding: .5rem;
+      box-shadow: 0 2px 6px var(--shadow);
+      transition: background .3s, transform .2s;
+    }
+
+    .social-icons a:hover {
+      background: var(--card-hover);
+      transform: scale(1.1);
+    }
+
+    .social-icons svg {
+      fill: var(--link);
+      width: 24px;
+      height: 24px;
+    }
+
+    /* Links */
+    .links {
+      list-style: none;
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .links a {
+      background: var(--link);
+      color: #fff;
+      padding: 0.75rem 1rem;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 600;
+      text-align: center;
+      box-shadow: 0 4px 8px var(--shadow);
+      transition: background .3s, transform .2s;
+      width: 200px;
+      /* fixed width for uniform buttons */
+      display: inline-block;
+    }
+
+    .links a:hover {
+      background: var(--link-hover);
+      transform: translateY(-2px);
+    }
+
+    /* Bookings Widget */
+    .widget-wrapper h2 {
+      margin-bottom: 1rem;
+      font-size: 1.5rem;
+    }
+
+    .bookings-widget {
+      width: 100%;
+      height: 100%;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px var(--shadow);
+    }
+
+    .bookings-widget iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .trello-embed-wrapper {
+      position: relative;
+      /* Adjust the 75% to control aspect-ratio (height/width) */
+      padding-bottom: 75%;
+
+      width: 100%;
+      overflow: hidden;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px var(--shadow);
+    }
+
+    .trello-embed-wrapper iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    /* Request Widget */
+    .request-widget {
+      max-width: 400px;
+      width: 100%;
+      padding: 1.5em;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .request-widget h3 {
+      margin-top: 0;
+      font-size: 1.5em;
+      text-align: center;
+    }
+
+    .request-widget label {
+      display: block;
+      margin: 1em 0 0.25em;
+      font-weight: 600;
+    }
+
+    .request-widget input,
+    .request-widget textarea {
+      width: 100%;
+      padding: 0.5em;
+      border: 1px solid #bbb;
+      border-radius: 4px;
+      font-size: 1em;
+    }
+
+    .request-widget button {
+      margin-top: 1.5em;
+      width: 100%;
+      padding: 0.75em;
+      border: none;
+      border-radius: 4px;
+      background: #673AB7;
+      color: #fff;
+      font-size: 1.1em;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .request-widget button:hover {
+      background: #5e35b1;
+    }
   </style>
 </head>
 
@@ -655,7 +716,8 @@
         <div class="list">
           <div class="item top10" data-domain="executing"
             data-desc="Arranger: You excel at organizing and coordinating people and resources to get things done.">
-            <span class="rank">4</span><span class="name">Arranger</span></div>
+            <span class="rank">4</span><span class="name">Arranger</span>
+          </div>
           <div class="item top10" data-domain="executing"
             data-desc="Restorative: You enjoy identifying problems and finding solutions."><span
               class="rank">5</span><span class="name">Restorative</span></div>
@@ -729,7 +791,8 @@
             data-desc="Connectedness: You believe there are few coincidences."><span class="rank">12</span><span
               class="name">Connectedness</span></div>
           <div class="item" data-domain="relationship" data-desc="Positivity: You have enthusiasm and upbeat energy.">
-            <span class="rank">14</span><span class="name">Positivity</span></div>
+            <span class="rank">14</span><span class="name">Positivity</span>
+          </div>
           <div class="item" data-domain="relationship" data-desc="Empathy: You sense and share others’ feelings."><span
               class="rank">18</span><span class="name">Empathy</span></div>
           <div class="item" data-domain="relationship"
@@ -739,7 +802,8 @@
             data-desc="Relator: You enjoy close relationships and deep connections."><span class="rank">22</span><span
               class="name">Relator</span></div>
           <div class="item" data-domain="relationship" data-desc="Harmony: You look for consensus and avoid conflict.">
-            <span class="rank">33</span><span class="name">Harmony</span></div>
+            <span class="rank">33</span><span class="name">Harmony</span>
+          </div>
         </div>
       </section>
 
@@ -751,7 +815,8 @@
             data-desc="Ideation: You are fascinated by ideas and creativity."><span class="rank">1</span><span
               class="name">Ideation</span></div>
           <div class="item top10" data-domain="thinking" data-desc="Strategic: You create alternative ways to proceed.">
-            <span class="rank">2</span><span class="name">Strategic</span></div>
+            <span class="rank">2</span><span class="name">Strategic</span>
+          </div>
           <div class="item top10" data-domain="thinking"
             data-desc="Input: You collect information, ideas, and objects."><span class="rank">3</span><span
               class="name">Input</span></div>
@@ -759,7 +824,8 @@
             data-desc="Intellection: You love intellectual discussions and reflection."><span class="rank">7</span><span
               class="name">Intellection</span></div>
           <div class="item top10" data-domain="thinking" data-desc="Analytical: You search for reasons and causes.">
-            <span class="rank">8</span><span class="name">Analytical</span></div>
+            <span class="rank">8</span><span class="name">Analytical</span>
+          </div>
           <div class="item" data-domain="thinking"
             data-desc="Futuristic: You envision what could be and inspire others."><span class="rank">11</span><span
               class="name">Futuristic</span></div>
@@ -795,16 +861,37 @@
         allowfullscreen title="Todays Schedule"></iframe>
     </div>
   </div>
+  <div class="container">
+    <div class="trello-embed-wrapper">
+      <iframe src="https://trello.com/b/2Yp5IKYz.html" allowfullscreen></iframe>
+    </div>
 
-<div class="trello-embed-wrapper">
-  <iframe
-    src="https://trello.com/b/2Yp5IKYz.html"
-    allowfullscreen
-  ></iframe>
-</div>
+    <div class="request-widget">
+      <h3>Submit a Request</h3>
+      <form action="https://formsubmit.co/justinrogowski1+vnowu7qczgm6cw6e96zn@boards.trello.com>" method="POST">
+        <!-- customize the email subject line in your inbox -->
+        <input type="hidden" name="_subject" value="New site request via widget" />
+        <!-- skip their intermediate “thanks” page -->
+        <input type="hidden" name="_captcha" value="false" />
+        <!-- after submit, redirect here (make sure this exists on your GH Pages) -->
+        <input type="hidden" name="_next" value="https://justinrogo.github.io" />
 
+        <label for="name">Your Name</label>
+        <input type="text" id="name" name="name" required />
 
+        <label for="email">Your Email</label>
+        <input type="email" id="email" name="email" required />
 
+        <label for="subject">Subject</label>
+        <input type="text" id="subject" name="subject" required />
+
+        <label for="details">Details</label>
+        <textarea id="details" name="details" rows="4" required></textarea>
+
+        <button type="submit">Send Request</button>
+      </form>
+    </div>
+  </div>
 
   <footer>Questions? <a href="mailto:justin.rogowski@uconn.edu">Email me</a></footer>
 
