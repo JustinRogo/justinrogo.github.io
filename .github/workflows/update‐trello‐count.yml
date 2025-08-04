@@ -2,18 +2,17 @@ name: Update Trello Card Count
 
 on:
   schedule:
-    - cron: '0 * * * *'      # top of every hour
-  workflow_dispatch:        # manual “Run workflow” too
+    - cron: '0 * * * *'
+  workflow_dispatch:
 
 permissions:
-  contents: write           # allow GITHUB_TOKEN to push
+  contents: write
 
 jobs:
   update-count:
     runs-on: windows-latest
 
     steps:
-      # 1) Checkout your main branch with full history & creds
       - name: Checkout main
         uses: actions/checkout@v3
         with:
@@ -21,13 +20,11 @@ jobs:
           fetch-depth: 0
           persist-credentials: true
 
-      # 2) Ensure data folder exists (won’t error if it already does)
       - name: Ensure data folder exists
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Path data -Force
 
-      # 3) Fetch cards and count them via PowerShell
       - name: Fetch & count cards
         id: cardcount
         shell: pwsh
@@ -36,19 +33,30 @@ jobs:
           TRELLO_TOKEN: ${{ secrets.TRELLO_TOKEN }}
           BOARD:        0YERXDTw
         run: |
-          $url    = "https://api.trello.com/1/boards/$env:BOARD/cards?fields=id&key=$env:TRELLO_KEY&token=$env:TRELLO_TOKEN"
+          # 1) Get all cards with their dueComplete flag
+          $url    = "https://api.trello.com/1/boards/$env:BOARD/cards?fields=id,dueComplete&key=$env:TRELLO_KEY&token=$env:TRELLO_TOKEN"
           $cards  = Invoke-RestMethod -Uri $url -Method Get
-          $count  = $cards.Count
-          "cards_count=$count" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8
 
-      # 4) Write out the JSON file
+          # 2) Compute totals
+          $total     = $cards.Count
+          $completed = ($cards | Where-Object { $_.dueComplete -eq $true }).Count
+
+          # 3) Export both as step outputs
+          "cards_count=$total"     | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8
+          "completed_count=$completed" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+
       - name: Write JSON
         shell: pwsh
         run: |
-          $json = @{ count = ${{ steps.cardcount.outputs.cards_count }} } | ConvertTo-Json
+          # Build a JSON object with both values
+          $json = @{
+            total_count     = ${{ steps.cardcount.outputs.cards_count }}
+            completed_count = ${{ steps.cardcount.outputs.completed_count }}
+          } | ConvertTo-Json
+
+          # Overwrite the file in data/
           $json | Set-Content -Path data/cards_count.json -Encoding utf8
 
-      # 5) Commit & push if there are changes
       - name: Commit & push
         shell: pwsh
         run: |
@@ -56,7 +64,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/cards_count.json
           if (-not (git diff --cached --quiet)) {
-            git commit -m "chore: update Trello card count"
+            git commit -m "chore: update Trello card counts"
             git push origin main
           } else {
             Write-Host "No changes to commit"
