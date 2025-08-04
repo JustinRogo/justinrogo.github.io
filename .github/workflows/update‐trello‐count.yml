@@ -1,0 +1,39 @@
+name: Update Trello Card Count
+
+on:
+  schedule:
+    - cron:  '0 * * * *'   # every hour (adjust as you like)
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Fetch card count
+        id: count
+        env:
+          KEY:   ${{ secrets.TRELLO_KEY }}
+          TOKEN: ${{ secrets.TRELLO_TOKEN }}
+          BOARD: 0YERXDTw
+        run: |
+          # hit Trello, grab IDs only, count them
+          COUNT=$(curl -s \
+            "https://api.trello.com/1/boards/${BOARD}/cards?key=${KEY}&token=${TOKEN}&fields=id" \
+            | jq length)
+          echo "cards_count=$COUNT" >> $GITHUB_OUTPUT
+
+      - name: Write count to JSON
+        run: |
+          mkdir -p docs/data
+          echo "{\"count\": ${{ steps.count.outputs.cards_count }}}" \
+            > docs/data/cards_count.json
+
+      - name: Commit & push data
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/data/cards_count.json
+          git commit -m "chore: update Trello card count" || echo "no changes"
+          git push
