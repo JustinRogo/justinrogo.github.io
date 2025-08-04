@@ -2,18 +2,18 @@ name: Update Trello Card Count
 
 on:
   schedule:
-    - cron: '0 * * * *'      # run at the top of every hour
-  workflow_dispatch:        # allow manual “Run workflow” in the Actions UI
+    - cron: '0 * * * *'      # top of every hour
+  workflow_dispatch:        # manual “Run workflow” too
 
 permissions:
-  contents: write           # let us push commits back
+  contents: write           # allow GITHUB_TOKEN to push
 
 jobs:
   update-count:
     runs-on: windows-latest
 
     steps:
-      # 1) Check out your default branch in a fully-populated repo
+      # 1) Checkout your main branch with full history & creds
       - name: Checkout main
         uses: actions/checkout@v3
         with:
@@ -21,32 +21,43 @@ jobs:
           fetch-depth: 0
           persist-credentials: true
 
-      # 2) Curl Trello for just the IDs, then count them
+      # 2) Ensure data folder exists (won’t error if it already does)
+      - name: Ensure data folder exists
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path data -Force
+
+      # 3) Fetch cards and count them via PowerShell
       - name: Fetch & count cards
         id: cardcount
+        shell: pwsh
         env:
-          KEY:   ${{ secrets.TRELLO_KEY }}
-          TOKEN: ${{ secrets.TRELLO_TOKEN }}
-          BOARD: 0YERXDTw
+          TRELLO_KEY:   ${{ secrets.TRELLO_KEY }}
+          TRELLO_TOKEN: ${{ secrets.TRELLO_TOKEN }}
+          BOARD:        0YERXDTw
         run: |
-          COUNT=$(curl -s \
-            "https://api.trello.com/1/boards/${BOARD}/cards?key=${KEY}&token=${TOKEN}&fields=id" \
-            | jq length)
-          echo "cards_count=$COUNT" >> $GITHUB_OUTPUT
-        shell: bash
+          $url    = "https://api.trello.com/1/boards/$env:BOARD/cards?fields=id&key=$env:TRELLO_KEY&token=$env:TRELLO_TOKEN"
+          $cards  = Invoke-RestMethod -Uri $url -Method Get
+          $count  = $cards.Count
+          "cards_count=$count" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8
 
-      # 3) Write out a tiny JSON file in a /data folder
+      # 4) Write out the JSON file
       - name: Write JSON
+        shell: pwsh
         run: |
-          mkdir -p data
-          echo "{\"count\":${{ steps.cardcount.outputs.cards_count }}}" \
-            > data/cards_count.json
+          $json = @{ count = ${{ steps.cardcount.outputs.cards_count }} } | ConvertTo-Json
+          $json | Set-Content -Path data/cards_count.json -Encoding utf8
 
-      # 4) Commit & push it back to main
+      # 5) Commit & push if there are changes
       - name: Commit & push
+        shell: pwsh
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/cards_count.json
-          git commit -m "chore: update Trello card count" || echo "🔄 no changes to commit"
-          git push origin main
+          if (-not (git diff --cached --quiet)) {
+            git commit -m "chore: update Trello card count"
+            git push origin main
+          } else {
+            Write-Host "No changes to commit"
+          }
