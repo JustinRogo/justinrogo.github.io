@@ -33,6 +33,7 @@ jobs:
             "https://api.trello.com/1/boards/${BOARD}/cards?key=${KEY}&token=${TOKEN}&fields=id" \
             | jq length)
           echo "cards_count=$COUNT" >> $GITHUB_OUTPUT
+        shell: bash
 
       # 3) Write out a tiny JSON file in a /data folder
       - name: Write JSON
