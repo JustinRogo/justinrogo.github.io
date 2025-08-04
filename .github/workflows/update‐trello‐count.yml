@@ -2,27 +2,28 @@ name: Update Trello Card Count
 
 on:
   schedule:
-    - cron: '0 * * * *'    # every hour
-  workflow_dispatch:      # allows manual runs
+    - cron: '0 * * * *'      # run at the top of every hour
+  workflow_dispatch:        # allow manual “Run workflow” in the Actions UI
 
-# 1) Grant write access so the built-in GITHUB_TOKEN can push
 permissions:
-  contents: write
+  contents: write           # let us push commits back
 
 jobs:
-  build:
+  update-count:
     runs-on: ubuntu-latest
+
     steps:
-      # 2) Checkout your default branch, not just a detached commit
-      - name: Check out code
+      # 1) Check out your default branch in a fully-populated repo
+      - name: Checkout main
         uses: actions/checkout@v3
         with:
-          ref: main            # <-- change if your Pages lives on a different branch
-          fetch-depth: 0       # full history so git can set upstream
+          ref: main
+          fetch-depth: 0
           persist-credentials: true
 
-      - name: Fetch card count
-        id: count
+      # 2) Curl Trello for just the IDs, then count them
+      - name: Fetch & count cards
+        id: cardcount
         env:
           KEY:   ${{ secrets.TRELLO_KEY }}
           TOKEN: ${{ secrets.TRELLO_TOKEN }}
@@ -33,19 +34,18 @@ jobs:
             | jq length)
           echo "cards_count=$COUNT" >> $GITHUB_OUTPUT
 
-      - name: Write count to JSON
+      # 3) Write out a tiny JSON file in a /data folder
+      - name: Write JSON
         run: |
-          mkdir -p docs/data
-          echo "{\"count\": ${{ steps.count.outputs.cards_count }}}" \
-            > docs/data/cards_count.json
+          mkdir -p data
+          echo "{\"count\":${{ steps.cardcount.outputs.cards_count }}}" \
+            > data/cards_count.json
 
+      # 4) Commit & push it back to main
       - name: Commit & push
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          # ensure we’re on the branch
-          git checkout main  
-          git add docs/data/cards_count.json
-          git commit -m "chore: update Trello card count" || echo "🔄 no changes"
-          # explicitly push to origin/main
+          git add data/cards_count.json
+          git commit -m "chore: update Trello card count" || echo "🔄 no changes to commit"
           git push origin main
