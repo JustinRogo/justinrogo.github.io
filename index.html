@@ -539,33 +539,36 @@
       height: 24px;
     }
 
-#trello-widget .container {
-  display: flex;
-  flex-direction: row;
-  align-items: stretch; /* Ensures children match height */
-  gap: 2rem;
-  width: 100%;
-}
-
-#trello-widget iframe {
-  flex: 2 1 0;
-  min-width: 300px;
-  max-width: 60vw;
-  height: 70vh;
-  border-radius: 8px;
-  border: none;
-}
-
-#trello-widget .request-widget {
-  flex: 1 1 0;
-  min-width: 250px;
-  max-width: 400px;
-  height: 70vh; /* Match iframe height */
-  display: flex;
-  flex-direction: column;
-  justify-content: center; /* Optional: center form vertically */
-}
+    #trello-widget .container {
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      /* Ensures children match height */
+      gap: 2rem;
+      width: 100%;
     }
+
+    #trello-widget iframe {
+      flex: 2 1 0;
+      min-width: 300px;
+      max-width: 60vw;
+      height: 70vh;
+      border-radius: 8px;
+      border: none;
+    }
+
+    #trello-widget .request-widget {
+      flex: 1 1 0;
+      min-width: 250px;
+      max-width: 400px;
+      height: 70vh;
+      /* Match iframe height */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      /* Optional: center form vertically */
+    }
+
 
     @media(max-width: 600px) {
       body {
@@ -855,6 +858,15 @@
   </main>
 
   <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const subjectInput = document.getElementById("subject");
+      const hiddenSubject = document.querySelector('input[name="_subject"]');
+      if (subjectInput && hiddenSubject) {
+        subjectInput.addEventListener("input", () => {
+          hiddenSubject.value = subjectInput.value;
+        });
+      }
+    });
     // Theme toggle
     const themeToggle = document.getElementById('themeToggle');
     themeToggle.addEventListener('click', () => {
