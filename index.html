@@ -569,6 +569,64 @@
       /* Optional: center form vertically */
     }
 
+    /* CS paragraph card */
+    .card {
+      background: var(--card-bg);
+      padding: var(--spacing);
+      border: 1px solid #ddd;
+      border-radius: var(--radius);
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      margin: auto;
+      width: 70vw;
+      max-width: 700px;
+      overflow: hidden;
+    }
+
+    .toggle-buttons {
+      display: flex;
+      justify-content: space-around;
+      background: #e0e7ff;
+    }
+
+    .toggle-buttons button {
+      flex: 1;
+      padding: 1rem;
+      font-size: 1rem;
+      font-weight: bold;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .toggle-buttons button.active {
+      background: #4f46e5;
+      color: white;
+    }
+
+    .content {
+      padding: 2rem;
+      display: none;
+      animation: fadeIn 0.4s ease-in;
+    }
+
+    .content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
 
     @media(max-width: 600px) {
       body {
@@ -626,10 +684,7 @@
     <a href="https://libguides.law.uconn.edu/">Research Guides</a>
   </nav>
 
-<div id="trello-count-widget" style="text-align:center; font-family:sans-serif;">
-  <p>📋 Total:     <strong id="trello-total">0</strong></p>
-  <p>✅ Completed: <strong id="trello-completed">0</strong></p>
-</div>
+
 
   <!-- Widget toggle buttons -->
   <div class="widget-controls">
@@ -651,7 +706,15 @@
         title="Book Meeting"></iframe>
     </section>
     <section id="trello-widget" class="widget">
+      <div class="card">
+        <div id="trello-count-widget" style="text-align:center; font-family:sans-serif;">
+          <p>📋 Total: <strong id="trello-total">0</strong></p>
+          <p>✅ Completed: <strong id="trello-completed">0</strong></p>
+        </div>
+      </div>
+    </br>
       <div class="container">
+
         <iframe src="https://trello.com/b/2Yp5IKYz.html" allowfullscreen></iframe>
         <div class="request-widget">
           <h3>Submit a Request</h3>
@@ -698,6 +761,34 @@
               <button data-limit="5">Top 5</button>
               <button data-limit="10">Top 10</button>
               <button data-limit="all">Show All</button>
+            </div>
+          </div>
+          </br>
+          <div class="card">
+            <div class="toggle-buttons">
+              <button class="active" onclick="showContent('best')">When I'm at my best 🌞</button>
+              <button onclick="showContent('overextended')">When I'm overextended 🌧️</button>
+            </div>
+            <div id="best" class="content active">
+              <p>I thrive on connecting ideas in unexpected ways, constantly generating new concepts and creative
+                approaches to problems. My mind is always in motion, scanning for patterns and possibilities. I think
+                several steps ahead, intuitively sensing the most effective path forward and adjusting my plans as I go.
+                I love to learn and collect information—not just for the sake of knowing, but because I see the
+                potential in every detail to spark something greater. I’m energized by bringing order to chaos, juggling
+                moving parts, and organizing people or projects for maximum impact. Challenges don’t intimidate me—in
+                fact, I’m driven to fix what’s broken, improve systems, and restore what isn’t working to a better
+                state. I’m at my best when I’m solving complex problems with flexibility, insight, and a deep toolbox of
+                ideas and resources.</p>
+            </div>
+            <div id="overextended" class="content">
+              <p>I sometimes get so caught up in chasing new ideas that I lose focus or leave others behind who need
+                more structure. My mind is constantly running through possibilities, which can make me seem scattered or
+                hard to follow. I gather information endlessly, but I don’t always pause to use or share what I’ve
+                collected—and I can become a bottleneck, hoarding ideas or over-researching. My desire to optimize and
+                rearrange everything can come across as controlling or impatient, especially when others prefer
+                consistency. And while I’m driven to solve problems, I can focus so heavily on what’s broken that I
+                overlook what’s already working, or become critical instead of constructive. I want things to be
+                better—but if I’m not careful, I might overwhelm others or myself in the process.</p>
             </div>
           </div>
 
@@ -872,38 +963,38 @@
     // Counter animation
 
     // Animate a number from `start` → `end` over `duration`ms
-      // Animate a number from `start` → `end` over `duration`ms
-  function animateValue(element, start, end, duration) {
-    let startTimestamp = null;
-    const step = (timestamp) => {
-      if (!startTimestamp) startTimestamp = timestamp;
-      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-      const value = Math.floor(progress * (end - start) + start);
-      element.textContent = value;
-      if (progress < 1) {
-        requestAnimationFrame(step);
-      }
-    };
-    requestAnimationFrame(step);
-  }
-
-  // Fetch the counts, then animate both elements
-  (async () => {
-    try {
-      const res  = await fetch('https://justinrogo.github.io/data/cards_count.json');
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const { total_count, completed_count } = await res.json();
-
-      const totalEl     = document.getElementById('trello-total');
-      const completedEl = document.getElementById('trello-completed');
-
-      animateValue(totalEl,     0, total_count,     500);
-      animateValue(completedEl, 0, completed_count, 500);
-
-    } catch (err) {
-      console.error('Could not load Trello counts:', err);
+    // Animate a number from `start` → `end` over `duration`ms
+    function animateValue(element, start, end, duration) {
+      let startTimestamp = null;
+      const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        const value = Math.floor(progress * (end - start) + start);
+        element.textContent = value;
+        if (progress < 1) {
+          requestAnimationFrame(step);
+        }
+      };
+      requestAnimationFrame(step);
     }
-  })();
+
+    // Fetch the counts, then animate both elements
+    (async () => {
+      try {
+        const res = await fetch('https://justinrogo.github.io/data/cards_count.json');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const { total_count, completed_count } = await res.json();
+
+        const totalEl = document.getElementById('trello-total');
+        const completedEl = document.getElementById('trello-completed');
+
+        animateValue(totalEl, 0, total_count, 500);
+        animateValue(completedEl, 0, completed_count, 500);
+
+      } catch (err) {
+        console.error('Could not load Trello counts:', err);
+      }
+    })();
 
     // Widget toggle functionality
     const widgetButtons = document.querySelectorAll('.widget-btn');
@@ -974,6 +1065,14 @@
         document.getElementById('trello-total').textContent = 'Err';
         document.getElementById('trello-completed').textContent = 'Err';
       });
+    //CS Paragraph
+    function showContent(id) {
+      document.querySelectorAll('.content').forEach(div => div.classList.remove('active'));
+      document.querySelectorAll('.toggle-buttons button').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      const index = id === 'best' ? 0 : 1;
+      document.querySelectorAll('.toggle-buttons button')[index].classList.add('active');
+    }
   </script>
 </body>
 
