@@ -625,16 +625,11 @@
 
     <a href="https://libguides.law.uconn.edu/">Research Guides</a>
   </nav>
-  <!-- <div class="stats">
-    <div class="stat">
-      <div class="stat-number counter" data-target="1500">0</div>
-      <div class="stat-label">Followers</div>
-    </div>
-    <div class="stat">
-      <div class="stat-number counter" data-target="300">0</div>
-      <div class="stat-label">Projects</div>
-    </div>
-  </div>-->
+
+<div id="trello-count-widget" style="text-align:center; font-family:sans-serif;">
+  <p>📋 Total:     <strong id="trello-total">0</strong></p>
+  <p>✅ Completed: <strong id="trello-completed">0</strong></p>
+</div>
 
   <!-- Widget toggle buttons -->
   <div class="widget-controls">
@@ -651,11 +646,9 @@
         allowfullscreen title="Todays Schedule"></iframe>
     </section>
     <section id="bookings-widget" class="widget">
-
       <iframe
         src="https://outlook.office.com/bookwithme/user/3ca52ff81f8a440699723f09efe5d298%40uconn.edu?anonymous&ismsaljsauthenabled=true"
         title="Book Meeting"></iframe>
-
     </section>
     <section id="trello-widget" class="widget">
       <div class="container">
@@ -855,6 +848,7 @@
 
 
     </section>
+
   </main>
 
   <script>
@@ -876,20 +870,40 @@
     });
 
     // Counter animation
-    document.querySelectorAll('.counter').forEach(counter => {
-      const updateCount = () => {
-        const target = +counter.getAttribute('data-target');
-        const current = +counter.innerText;
-        const increment = target / 200;
-        if (current < target) {
-          counter.innerText = Math.ceil(current + increment);
-          setTimeout(updateCount, 10);
-        } else {
-          counter.innerText = target;
-        }
-      };
-      updateCount();
-    });
+
+    // Animate a number from `start` → `end` over `duration`ms
+      // Animate a number from `start` → `end` over `duration`ms
+  function animateValue(element, start, end, duration) {
+    let startTimestamp = null;
+    const step = (timestamp) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+      const value = Math.floor(progress * (end - start) + start);
+      element.textContent = value;
+      if (progress < 1) {
+        requestAnimationFrame(step);
+      }
+    };
+    requestAnimationFrame(step);
+  }
+
+  // Fetch the counts, then animate both elements
+  (async () => {
+    try {
+      const res  = await fetch('https://justinrogo.github.io/data/cards_count.json');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const { total_count, completed_count } = await res.json();
+
+      const totalEl     = document.getElementById('trello-total');
+      const completedEl = document.getElementById('trello-completed');
+
+      animateValue(totalEl,     0, total_count,     500);
+      animateValue(completedEl, 0, completed_count, 500);
+
+    } catch (err) {
+      console.error('Could not load Trello counts:', err);
+    }
+  })();
 
     // Widget toggle functionality
     const widgetButtons = document.querySelectorAll('.widget-btn');
@@ -948,6 +962,18 @@
         if (e.target === modal) modal.style.display = "none";
       });
     });
+    //Trello Cards Count
+    fetch('https://justinrogo.github.io/data/cards_count.json')
+      .then(res => res.json())
+      .then(json => {
+        document.getElementById('trello-total').textContent = json.total_count;
+        document.getElementById('trello-completed').textContent = json.completed_count;
+      })
+      .catch(err => {
+        console.error(err);
+        document.getElementById('trello-total').textContent = 'Err';
+        document.getElementById('trello-completed').textContent = 'Err';
+      });
   </script>
 </body>
 
