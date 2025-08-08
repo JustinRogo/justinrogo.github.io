@@ -426,13 +426,13 @@
     }
 
     .item {
-      background: var(--bg-white);
+      background: transparent;
       border-radius: var(--radius);
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 2px var(--bg-white);
       text-align: center;
       padding: var(--spacing) 0;
       position: relative;
-      transition: transform 0.3s, box-shadow 0.3s;
+      transition: transform 0.2s, box-shadow 0.2s;
       cursor: pointer;
       color: var(--text-dark);
     }
@@ -440,6 +440,7 @@
     .item:hover {
       transform: translateY(-4px) scale(1.03);
       box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+
     }
 
     .item::after {
@@ -466,30 +467,44 @@
 
     /* Default pastel backgrounds */
     .item[data-domain="executing"] {
-      background: var(--purple-light);
+      border: var(--purple-light);
+      outline: 0.2em solid var(--purple);
+      background: transparent;
+      color: var(--text)
     }
 
     .item[data-domain="influencing"] {
       background: var(--orange-light);
+      outline: 0.2em solid var(--orange);
+      background: transparent;
+      color: var(--text)
     }
 
     .item[data-domain="relationship"] {
-      background: var(--blue-light);
+
+      outline: 0.2em solid var(--blue);
+      background: transparent;
+      color: var(--text)
     }
 
     .item[data-domain="thinking"] {
       background: var(--green-light);
+      outline: 0.2em solid var(--green);
+      background: transparent;
+      color: var(--text)
     }
 
     /* Top10 override */
     .item.top10[data-domain="executing"] {
       background: var(--purple);
       color: #fff;
+
     }
 
     .item.top10[data-domain="influencing"] {
       background: var(--orange);
       color: #fff;
+
     }
 
     .item.top10[data-domain="relationship"] {
@@ -505,16 +520,22 @@
     .item.top10 .rank,
     .item.top10 .name {
       color: #fff;
+      font-size: 1em;
+    }
+
+    .item.top10 .rank {
+      font-size: 1.5em
     }
 
     .rank {
-      font-size: 1.4em;
+      font-size: 1em;
+      margin: 0.2em;
       font-weight: bold;
     }
 
     .name {
       display: block;
-      margin-top: 4px;
+      margin: 0.2em;
       font-size: 0.9em;
     }
 
@@ -638,7 +659,7 @@
     }
 
     .content {
-      padding: 2rem;
+      padding: 1em;
       display: none;
       animation: fadeIn 0.4s ease-in;
     }
@@ -866,7 +887,7 @@
     }
 
     /* Apply glass to common surfaces */
-    :where(.card, .widget, .tray, .navbar, .footer, .controls, .toggle-buttons, .search, .links, .panel, .modal, .pill, .btn, .link) {
+    :where(.card, .widget, .item, .tray, .navbar, .footer, .controls, .toggle-buttons, .search, .links, .panel, .modal, .pill, .btn, .link) {
       border-radius: 16px;
       overflow: hidden;
     }
@@ -1086,15 +1107,12 @@
           <button class="tab" data-target="#book">Book a Meeting</button>
           <button class="tab" data-target="#trello">Submit a Request</button>
           <button class="tab" data-target="#cs">My CliftonStrengths</button>
-        <div class="donate-container">
-        <a class="btn donate-btn"
-          href="https://giving.uconn.edu/campaigns/60852/donations/new?designation=LawLibraryEndowmentFund&amp;"
-          rel="noopener noreferrer"
-          style="display:inline-block; padding:12px 20px; margin-top:20px; background:linear-gradient(to bottom right, rgba(233,139,42,.85), rgba(233,139,42,.65)); color:#fff; border-radius:12px; text-decoration:none; font-weight:bold; box-shadow:0 4px 16px rgba(0,0,0,.25);"
-          target="_blank">
-          Donate to the Law Library
-        </a>
-      </div>
+          <button class="tab"
+            onclick="window.location.href='https://giving.uconn.edu/campaigns/60852/donations/new?designation=LawLibraryEndowmentFund'">
+            🧡 Donate to the Law Library
+          </button>
+
+
         </div>
         <div class="card row cs-frame widget" id="cal">
           <iframe class="embed"
@@ -1433,13 +1451,13 @@
         <div class="card" id="countsCard">
           <div class="pill">Requests</div>
           <div><strong id="trelloTotal">—</strong> total · <strong id="trelloDone">—</strong> completed</div>
-          <div class="note">Counts update hourly from GitHub Pages.</div>
+          <div class="note">Trello</div>
         </div>
       </aside>
     </section>
     <footer class="row" style="opacity:.75; margin:24px 0; text-align:center">Built with ✨ by Justin · <span
         id="year"></span>
-     
+
     </footer>
   </div>
   <!-- Floating quick contact -->
@@ -1466,11 +1484,7 @@
       </svg>
     </a>
 
-    <a aria-label="Donate to the Law Library" class="quickbar-btn donate-btn"
-      href="https://giving.uconn.edu/campaigns/60852/donations/new?designation=LawLibraryEndowmentFund&amp;"
-      rel="noopener noreferrer" target="_blank" title="Donate to the Law Library">
-      💝
-    </a>
+
   </nav>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -1572,7 +1586,7 @@
             const code = (c.weather_code ?? c.weathercode) || 0;
             const temp = Math.round(c.temperature_2m ?? c.temperature ?? 0);
             wxEl.textContent = `${WEMOJI[code] || ''} ${WMAP[code] || 'Weather'} · ${temp}°F`;
-            wxNote.textContent = 'Data: Open-Meteo';
+            wxNote.textContent = '';
           })
           .catch(() => { wxEl.textContent = 'Weather unavailable'; wxNote.textContent = ''; });
       })();
@@ -1862,6 +1876,14 @@
           if (toggles[index]) toggles[index].classList.add('active');
         };
       })();
+              // ===== Pull request counts (from your existing JSON on GitHub Pages)
+        fetch('https://justinrogo.github.io/data/cards_count.json')
+            .then(r => r.json())
+            .then(({ total_count, completed_count }) => {
+                document.getElementById('trelloTotal').textContent = total_count;
+                document.getElementById('trelloDone').textContent = completed_count;
+            })
+            .catch(() => { });
 
       // ===== Tabs for site widgets (only if your .tray exists)
       (function () {
