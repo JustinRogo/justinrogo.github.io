@@ -1,12 +1,38 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Link in Bio</title>
+  <meta charset="utf-8" />
+  <meta name="theme-color" content="#000E2F" />
+  <meta name="color-scheme" content="dark light" />
+  <meta name="description"
+    content="Justin Rogowski — Library Information Coordinator · UConn School of Law. Quick links, calendar, requests, and CliftonStrengths." />
+  <meta property="og:title" content="Justin Rogowski — Link in Bio" />
+  <meta property="og:description" content="Quick links, calendar, requests, and CliftonStrengths." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image"
+    content="https://law.media.uconn.edu/wp-content/uploads/sites/3082/2021/07/rogowski-360x360-1.png" />
+  <meta property="og:url" content="https://justinrogo.github.io/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Justin Rogowski — Link in Bio</title>
   <style>
     :root {
+      --bg: #0b0f14;
+      /* page bg */
+      --bg-elev: #111827;
+      /* card bg */
+      --bg-glass: rgba(17, 24, 39, .6);
+      --text: #d7e0ea;
+      /* body text */
+      --muted: #93a3b8;
+      /* subtext */
+      --brand: #7dd3fc;
+      /* accents */
+      --brand-2: #fabd8b;
+      --ok: #22c55e;
+      /* success */
+      --warn: #f59e0b;
       --bg-color: #0d1117;
       --text-color: #c9d1d9;
       --accent-color: #79c0ff;
@@ -28,233 +54,302 @@
       --link-hover: #1976D2;
       --sub: #666;
       --card: #f9f9f9;
-      --transition-speed: 0.3s;
+      --gradient: linear-gradient(180deg, rgba(255, 255, 255, .04), rgba(255, 255, 255, .02));
+
+      --radius: 16px;
+      --shadow: 0 10px 30px rgba(0, 0, 0, .35);
+      --shadow-sm: 0 6px 18px rgba(0, 0, 0, .28);
+      --ring: 0 0 0 2px rgba(125, 211, 252, .25), 0 20px 50px rgba(0, 0, 0, .35);
+      --speed: .28s;
     }
 
-    body.light-mode {
-      --bg-color: #f5f5f5;
-      --text-color: #24292e;
-      --accent-color: #0969da;
-      --card-bg: #ffffff;
-      --card-hover: #e1e4e8;
+    body.light {
+      /* light mode tokens */
+      --bg: #f5f7fb;
+      --bg-elev: #ffffff;
+      --bg-glass: rgba(255, 255, 255, .65);
+      --text: #1e2430;
+      --muted: #516177;
+      --brand: #0ea5e9;
+      --brand-2: #d95a28;
+      --gradient: linear-gradient(180deg, rgba(17, 15, 15, 0.04), rgba(70, 70, 70, 0.02));
+      --shadow: 0 10px 24px rgba(18, 34, 68, .14);
+      --shadow-sm: 0 6px 16px rgba(18, 34, 68, .12);
+      --ring: 0 0 0 2px rgba(14, 165, 233, .18), 0 20px 40px rgba(18, 34, 68, .14);
     }
 
     * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+      box-sizing: border-box
+    }
+
+    html,
+    body {
+      height: 100%
     }
 
     body {
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      font-family: 'Segoe UI', Tahoma, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      transition: background-color var(--transition-speed), color var(--transition-speed);
-      padding: 2rem;
+      margin: 0;
+      font-family: ui-sans-serif, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color: var(--text);
+      background: radial-gradient(1200px 1200px at 10% -10%, rgba(167, 139, 250, .15), transparent 60%),
+        radial-gradient(1000px 1000px at 110% 10%, rgba(125, 211, 252, .15), transparent 60%),
+        var(--bg);
+      transition: background-color var(--speed), color var(--speed);
     }
 
-    .theme-toggle {
+    .donate-btn-floating {
       position: fixed;
-      top: 1rem;
-      right: 1rem;
-      background: var(--card-bg);
-      border: none;
-      padding: 0.5rem 1rem;
-      color: var(--text-color);
-      cursor: pointer;
-      border-radius: 2rem;
-      transition: background var(--transition-speed);
-    }
-
-    .theme-toggle:hover {
-      background: var(--card-hover);
-    }
-
-    header {
+      bottom: 90px;
+      /* adjust to be above existing icons */
+      right: 20px;
+      background: linear-gradient(to bottom right, rgba(233, 139, 42, .95), rgba(233, 139, 42, .75));
+      color: #fff;
+      font-size: 24px;
+      line-height: 48px;
+      width: 48px;
+      height: 48px;
       text-align: center;
-      margin-bottom: 2rem;
-    }
-
-    header img {
-      width: 120px;
-      height: 120px;
       border-radius: 50%;
-      border: 3px solid var(--accent-color);
-      transition: transform var(--transition-speed);
-    }
-
-    header img:hover {
-      transform: scale(1.05);
-    }
-
-    header h1 {
-      margin-top: 1rem;
-      font-size: 2rem;
-      color: var(--accent-color);
-    }
-
-    nav.links {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
-      width: 100%;
-      max-width: 600px;
-      margin-bottom: 2rem;
-    }
-
-    .links a {
-      display: block;
       text-decoration: none;
-      background: var(--card-bg);
-      padding: 1rem;
-      text-align: center;
-      border-radius: 8px;
-      color: var(--text-color);
-      transition: background var(--transition-speed), transform var(--transition-speed);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, .35);
+      z-index: 9999;
+      transition: transform .2s ease, box-shadow .2s ease;
     }
 
-    .links a:hover {
-      background: var(--card-hover);
-      transform: translateY(-5px);
+    .donate-btn-floating:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, .45);
     }
 
-    .stats {
+    /* ====== Layout ====== */
+    .wrap {
+      max-width: 1100px;
+      margin: auto;
+      padding: 2em;
+    }
+
+    header.site {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 20px;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .avatar {
+      width: 108px;
+      height: 108px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, var(--brand), var(--brand-2));
+      padding: 3px;
+      box-shadow: var(--shadow-sm)
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      display: block
+    }
+
+    .title h1 {
+      margin: 0;
+      font-size: clamp(1.6rem, 2.2vw + 1rem, 2.2rem);
+      line-height: 1.1
+    }
+
+    .title p {
+      margin: .35rem 0 0;
+      color: var(--muted)
+    }
+
+    .actions {
       display: flex;
-      gap: 2rem;
-      margin-bottom: 2rem;
+      gap: 10px;
+      align-items: center
     }
 
-    .stat {
-      text-align: center;
-    }
-
-    .stat-number {
-      font-size: 1.5rem;
-      color: var(--accent-color);
-    }
-
-    /* Widget Controls */
-    .widget-controls {
-      display: flex;
-      gap: 1rem;
-      margin-bottom: 1rem;
-    }
-
-    .widget-btn {
-      background: var(--link);
-      border: none;
-      padding: 0.5rem 1rem;
-      color: var(--bg-white);
+    .btn {
+      border: 0;
+      border-radius: 999px;
+      padding: .65rem 1rem;
+      background: var(--bg-elev);
+      color: var(--text);
+      box-shadow: var(--shadow-sm);
       cursor: pointer;
-      border-radius: 4px;
-      transition: background var(--transition-speed), color var(--transition-speed);
+      transition: transform var(--speed), box-shadow var(--speed), background var(--speed)
     }
 
-    .widget-btn.active {
-      background: var(--card);
-      color: var(--blue);
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--ring)
     }
 
-    /* Flexible widget containers, hidden by default */
-    main {
+
+    /* ====== Cards & Grid ====== */
+    .grid {
+      display: grid;
+      gap: 2em;
+      grid-template-columns: repeat(12, 1fr);
+      padding-top: 1em;
+    }
+
+    .card {
+      background: var(--bg-glass);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, .06);
+      border-radius: var(--radius);
+      padding: 1em;
+      box-shadow: var(--shadow);
+      transition: transform var(--speed), box-shadow var(--speed), background var(--speed)
+    }
+
+    .card link {
+      color: var(--brand-2)
+    }
+
+    .card:hover {
+      transform: translateY(-2px)
+    }
+
+    /* quick info cards */
+    .card.info {
+      display: flex;
+      gap: 1em;
+      align-items: center
+    }
+
+    .pill {
+      font-size: .8rem;
+      padding: .25rem .6rem;
+      border-radius: 999px;
+      background: rgba(125, 211, 252, .12);
+      color: var(--brand)
+    }
+
+    /* links */
+    .links {
+      grid-column: span 8
+    }
+
+    .links .tools {
+      display: flex;
+      gap: 2em;
+      margin-bottom: 1em;
+      align-items: center;
+      color: var(--brand-2);
+    }
+
+    .search {
+      flex: 1;
+      display: flex;
+      padding: 1em;
+      gap: 1em;
+    }
+
+    .search input {
+      flex: 1;
+      border: 1px solid rgba(255, 255, 255, .08);
+      background: var(--bg-elev);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 1em;
+      outline: none
+    }
+
+    .link-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr))
+    }
+
+    .link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px;
+      border-radius: 12px;
+      text-decoration: none;
+      color: var(--text);
+      background: var(--gradient);
+      border: 1px solid rgba(255, 255, 255, .06)
+    }
+
+    .link:hover {
+      box-shadow: var(--ring)
+    }
+
+    .link .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--orange)
+    }
+
+    /* widgets */
+    .widgets {
+      grid-column: span 4;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      width: 100%;
+      gap: 18px;
+
     }
 
     .widget {
-      display: none;
-      /* hidden until activated */
-      width: auto;
-      max-width: 100%;
-      background: var(--card-bg);
-      padding: 1rem;
-      margin: 1rem;
-      border-radius: 8px;
-      transition: background var(--transition-speed);
+      display: none
     }
 
     .widget.active {
-      display: inline-block;
+      display: block
     }
 
-    .widget:hover {
-      background: var(--card-hover);
+    /* widget tray */
+    .tray {
+      grid-column: span 12;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px
     }
 
-    /* Responsive embeds */
-    .widget iframe,
-    .widget embed,
-    .widget object,
-    .widget video {
-      width: 80vw;
-      height: 80vh;
-      display: block;
-    }
-
-    .request-widget {
-      max-width: 400px;
-      width: 100%;
-      padding: 1.5em;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      background: var(--card-bg);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    }
-
-    .request-widget h3 {
-      margin-top: 0;
-      font-size: 1.5em;
-      text-align: center;
-    }
-
-    .request-widget label {
-      display: block;
-      margin: 1em 0 0.25em;
-      font-weight: 600;
-    }
-
-    .request-widget input,
-    .request-widget textarea {
-      width: 100%;
-      padding: 0.5em;
-      border: 1px solid #bbb;
-      border-radius: 4px;
-      font-size: 1em;
-    }
-
-    .request-widget button {
-      margin-top: 1.5em;
-      width: 100%;
-      padding: 0.75em;
-      border: none;
-      border-radius: 4px;
-      background: var(--link);
-      color: #fff;
-      font-size: 1.1em;
+    .tray .tab {
+      background: var(--bg-glass);
+      border: 1px solid rgba(255, 255, 255, .06);
+      padding: .6rem .9rem;
+      border-radius: 12px;
       cursor: pointer;
-      transition: background 0.2s ease;
+      color: var(--accent-color);
     }
 
-    .request-widget button:hover {
-      background: var(--link-hover);
+    .tray .tab.active {
+      outline: 2px solid rgba(125, 211, 252, .35);
+      color: var(--text);
     }
 
-    .container {
-      flex-direction: row;
-      align-items: stretch;
-      /* equal height */
-      padding-left: 10%;
-      padding-right: 10%;
-      gap: 2rem;
-      /* space between columns */
-
+    /* embeds */
+    .embed {
+      width: 100%;
+      height: 72vh;
+      border: 0;
+      border-radius: 12px;
+      background: var(--bg-elev)
     }
+
+    .note {
+      color: var(--muted);
+      font-size: .92rem
+    }
+
+    /* CliftonStrengths container keeps old widget but nicer frame */
+    .cs-frame {
+      padding: 0;
+      overflow: hidden
+    }
+
+    .cs-inner {
+      padding: 16px
+    }
+
+    /*CS STYLING */
 
     .CS-wrapper {
       width: 80vw;
@@ -280,8 +375,8 @@
     }
 
     .controls button {
-      background: var(--link);
-      color: var(--bg-white);
+      background: var(--bg);
+      color: var(--text);
       border: none;
       border-radius: var(--radius);
       padding: 0.6em 1.2em;
@@ -294,12 +389,13 @@
     }
 
     .controls button:hover {
-      background: var(--blue);
+      background: var(--bg-elev);
       transform: translateY(-2px);
     }
 
     .controls button.active {
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      background: var(--accent-color)
     }
 
     h2 {
@@ -505,72 +601,8 @@
       background: var(--orange);
     }
 
-    /* Reset & Base */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    /* Social Icons */
-    .social-icons {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      margin-bottom: 2rem;
-    }
-
-    .social-icons a {
-      background: var(--card-bg);
-      border-radius: 50%;
-      padding: .5rem;
-      box-shadow: 0 2px 6px var(--shadow);
-      transition: background .3s, transform .2s;
-    }
-
-    .social-icons a:hover {
-      background: var(--card-hover);
-      transform: scale(1.1);
-    }
-
-    .social-icons svg {
-      fill: var(--link);
-      width: 24px;
-      height: 24px;
-    }
-
-    #trello-widget .container {
-      display: flex;
-      flex-direction: row;
-      align-items: stretch;
-      /* Ensures children match height */
-      gap: 2rem;
-      width: 100%;
-    }
-
-    #trello-widget iframe {
-      flex: 2 1 0;
-      min-width: 300px;
-      max-width: 60vw;
-      height: 70vh;
-      border-radius: 8px;
-      border: none;
-    }
-
-    #trello-widget .request-widget {
-      flex: 1 1 0;
-      min-width: 250px;
-      max-width: 400px;
-      height: 70vh;
-      /* Match iframe height */
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      /* Optional: center form vertically */
-    }
-
     /* CS paragraph card */
-    .card {
+    .CScard {
       background: var(--card-bg);
       padding: var(--spacing);
       border: 1px solid #ddd;
@@ -597,7 +629,7 @@
       background: transparent;
       border: none;
       cursor: pointer;
-      transition: background 0.3s;
+
     }
 
     .toggle-buttons button.active {
@@ -627,125 +659,968 @@
       }
     }
 
+    /* utilities */
+    .row {
+      grid-column: span 12
+    }
 
-    @media(max-width: 600px) {
-      body {
-        padding: 1rem;
+    .col-6 {
+      grid-column: span 6
+    }
+
+    .col-8 {
+      grid-column: span 8
+    }
+
+    .col-4 {
+      grid-column: span 4
+    }
+
+    /* floating quick contact */
+    .quickbar {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 50
+    }
+
+    .fab {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--bg-elev);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, .06)
+    }
+
+    .fab:hover {
+      box-shadow: var(--ring)
+    }
+
+    .fab svg {
+      width: 22px;
+      height: 22px;
+      fill: var(--brand)
+    }
+
+    /* small screens */
+    @media (max-width: 900px) {
+      header.site {
+        grid-template-columns: auto 1fr;
+        grid-auto-rows: auto
       }
+
+      .actions {
+        grid-column: 1 / -1
+      }
+
+      .links {
+        grid-column: span 12
+      }
+
+      .widgets {
+        grid-column: span 12
+      }
+
+      .embed {
+        height: 64vh
+      }
+    }
+  </style>
+  <!-- Navy & Orange Theme Override -->
+  <style id="navy-orange-theme">
+    :root {
+      --navy: #000E2F;
+      --navy-2: #0A1E4A;
+      --navy-3: #122a63;
+      --orange: #E98B2A;
+      --orange-2: #C7741F;
+      --bg: var(--navy);
+      --bg-elev: var(--navy-2);
+      --bg-glass: rgba(10, 30, 74, .55);
+      --text: #e7edf6;
+      --muted: #A9B6CE;
+      --brand: var(--orange);
+      --brand-2: var(--navy-3);
+      --link: var(--orange);
+      --link-hover: var(--orange-2);
+      --accent-color: var(--orange);
+      --card-bg: rgba(10, 30, 74, .65);
+      --card-hover: rgba(10, 30, 74, .75);
+      --ring: 0 0 0 2px rgba(233, 139, 42, .28), 0 20px 50px rgba(0, 0, 0, .35);
+    }
+
+
+    body {
+      background:
+        radial-gradient(900px 900px at 15% -10%, rgba(233, 139, 42, .10), transparent 60%),
+        radial-gradient(900px 900px at 110% 0%, rgba(18, 42, 99, .35), transparent 60%),
+        var(--bg);
+    }
+
+    body.light {
+      --bg: #f7f9fd;
+      --bg-elev: #ffffff;
+      --bg-glass: rgba(255, 255, 255, .70);
+      --text: #101728;
+      --muted: #55657f;
+      --brand: #C86F18;
+      --brand-2: #00143B;
+      --accent-color: var(--brand);
+      --ring: 0 0 0 2px rgba(200, 111, 24, .24), 0 20px 40px rgba(18, 34, 68, .14);
+    }
+
+    /* Avatars & pills pick up the new palette */
+    .avatar {
+      background: linear-gradient(145deg, var(--brand-2), var(--brand));
+    }
+
+    .pill {
+      background: rgba(233, 139, 42, .14);
+      color: var(--brand);
+    }
+
+    /* Tabs & active states */
+    .tray .tab {
+      color: var(--brand);
+    }
+
+    .tray .tab.active {
+      outline: 2px solid rgba(233, 139, 42, .40);
+      color: var(--text);
+    }
+
+    /* Links grid accent dot uses orange */
+    .link .dot {
+      background: var(--brand);
+    }
+
+    /* Buttons keep subtle orange focus/hover */
+    .btn:hover {
+      box-shadow: var(--ring);
+    }
+
+    /* Widget toggle buttons tuned to the palette */
+    .toggle-buttons {
+      background: rgba(0, 14, 47, .35);
+    }
+
+    .toggle-buttons button.active {
+      background: var(--navy);
+      color: #fff;
+      border-radius: 10px;
+    }
+
+    /* Inputs blend with navy surfaces */
+    .search input {
+      border-color: rgba(255, 255, 255, .08);
+      background: var(--bg-elev);
+    }
+
+    /* Cards slightly stronger border on navy */
+    .card {
+      border-color: rgba(255, 255, 255, .06);
+      background: var(--bg-glass);
+    }
+  </style>
+  <!-- Glassmorphism Enhancement -->
+  <style id="navy-orange-glassmorphism">
+    :root {
+      --glass-bg: rgba(10, 20, 45, .35);
+      --glass-bg-strong: rgba(10, 20, 45, .45);
+      --glass-border: rgba(255, 255, 255, .22);
+      --glass-highlight: rgba(255, 255, 255, .35);
+      --glass-shadow: 0 10px 30px rgba(0, 0, 0, .35), 0 1px 0 rgba(255, 255, 255, .06) inset;
+    }
+
+    body {
+      /* Slightly more depth in the hero gradients for a glassy backdrop */
+      background:
+        radial-gradient(1100px 800px at 12% -10%, rgba(233, 139, 42, .12), transparent 60%),
+        radial-gradient(1100px 1000px at 120% -10%, rgba(0, 14, 47, .55), transparent 55%),
+        var(--bg);
+      background-attachment: fixed;
+    }
+
+    /* Generic glass utility */
+    .glass {
+      background: linear-gradient(to bottom right,
+          rgba(255, 255, 255, .10),
+          rgba(255, 255, 255, .04)), var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      backdrop-filter: blur(14px) saturate(125%);
+      -webkit-backdrop-filter: blur(14px) saturate(125%);
+    }
+
+    /* Hover lift */
+    .glass:hover {
+      transform: translateY(-2px);
+      transition: transform .2s ease, box-shadow .2s ease;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, .42), 0 1px 0 rgba(255, 255, 255, .08) inset;
+    }
+
+    /* Apply glass to common surfaces */
+    :where(.card, .widget, .tray, .navbar, .footer, .controls, .toggle-buttons, .search, .links, .panel, .modal, .pill, .btn, .link) {
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    :where(.card, .widget, .tray, .navbar, .footer, .controls, .panel, .modal) {
+      background: linear-gradient(to bottom right,
+          rgba(255, 255, 255, .08),
+          rgba(255, 255, 255, .03)), var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      backdrop-filter: blur(12px) saturate(120%);
+      -webkit-backdrop-filter: blur(12px) saturate(120%);
+    }
+
+    /* Cards stronger when active/hover */
+    .card:hover {
+      background: linear-gradient(to bottom right, rgba(255, 255, 255, .12), rgba(255, 255, 255, .05)), var(--glass-bg-strong);
+    }
+
+    /* Buttons with glass + orange focus ring */
+    .btn,
+    button,
+    .toggle-buttons button {
+      background: linear-gradient(to bottom right, rgba(255, 255, 255, .12), rgba(255, 255, 255, .04)), var(--glass-bg);
+      border: 1px solid rgba(255, 255, 255, .20);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, .25);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+
+    .btn:focus,
+    button:focus,
+    .toggle-buttons button:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(233, 139, 42, .35), 0 12px 28px rgba(0, 0, 0, .35);
+    }
+
+    .toggle-buttons {
+      background: linear-gradient(to bottom right, rgba(255, 255, 255, .04), rgba(255, 255, 255, .02)), var(--glass-bg);
+      border: 1px solid rgba(255, 255, 255, .18);
+    }
+
+    /* Active state keeps brand color but glass base */
+    .toggle-buttons button.active {
+      background: linear-gradient(to bottom right, rgba(233, 139, 42, .18), rgba(233, 139, 42, .06)), var(--glass-bg);
+      color: #fff;
+      border: 1px solid rgba(233, 139, 42, .45);
+    }
+
+    /* Inputs */
+    input,
+    textarea,
+    select {
+      background: linear-gradient(to bottom right, rgba(255, 255, 255, .12), rgba(255, 255, 255, .05)), var(--glass-bg);
+      border: 1px solid rgba(255, 255, 255, .22);
+      color: var(--text);
+      border-radius: .75em;
+      height: 3em;
+      width: 100%;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    textarea {
+      height: 20vh;
+
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: rgba(231, 237, 246, .6);
+    }
+
+    /* Pills and chips */
+    .pill {
+      background: linear-gradient(to bottom right, rgba(233, 139, 42, .16), rgba(233, 139, 42, .04)), var(--glass-bg);
+      border: 1px solid rgba(233, 139, 42, .38);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, .20);
+      color: var(--text);
+    }
+
+    /* Link cards */
+    .link {
+      background: linear-gradient(to bottom right, rgba(255, 255, 255, .08), rgba(255, 255, 255, .03)), var(--glass-bg);
+      border: 1px solid rgba(255, 255, 255, .20);
+      box-shadow: var(--glass-shadow);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .link .dot {
+      box-shadow: 0 0 0 4px rgba(233, 139, 42, .25);
+    }
+
+    /* Light mode tuning */
+    body.light {
+      --glass-bg: rgba(255, 255, 255, .55);
+      --glass-bg-strong: rgba(255, 255, 255, .70);
+      --glass-border: rgba(0, 0, 0, .06);
+      --glass-shadow: 0 8px 24px rgba(0, 0, 0, .08), 0 1px 0 rgba(255, 255, 255, .65) inset;
+    }
+
+    body.light .pill {
+      color: var(--text);
+      border-color: rgba(200, 111, 24, .35);
+      background: linear-gradient(to bottom right, rgba(200, 111, 24, .18), rgba(200, 111, 24, .05)), var(--glass-bg);
+    }
+
+    /* Optional helper if you want to force glass to a specific element via class */
+    .force-glass {
+      background: linear-gradient(to bottom right, rgba(255, 255, 255, .10), rgba(255, 255, 255, .04)), var(--glass-bg) !important;
+      border: 1px solid var(--glass-border) !important;
+      box-shadow: var(--glass-shadow) !important;
+      backdrop-filter: blur(14px) saturate(125%) !important;
+      -webkit-backdrop-filter: blur(14px) saturate(125%) !important;
+    }
+  </style>
+
+  <style id="donate-quickbar-style">
+    /* Style for donate button when placed inside .quickbar */
+    .tab .donate-btn {
+      background: linear-gradient(to bottom right, rgba(233, 139, 42, .95), rgba(233, 139, 42, .75));
+      color: #fff;
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, .30);
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .tab .donate-btn:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, .40);
+    }
+
+    /* Fallback: if there's no .quickbar, keep it floating but offset to avoid overlap */
+    .donate-btn-fallback {
+      position: fixed;
+      bottom: 20px;
+      right: 84px;
+      /* shift left to avoid the quickbar area */
+      background: linear-gradient(to bottom right, rgba(233, 139, 42, .95), rgba(233, 139, 42, .75));
+      color: #fff;
+      font-size: 24px;
+      line-height: 48px;
+      width: 48px;
+      height: 48px;
+      text-align: center;
+      border-radius: 50%;
+      text-decoration: none;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, .35);
+      z-index: 9999;
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .donate-btn-fallback:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, .45);
     }
   </style>
 </head>
 
 <body>
-  <button class="theme-toggle" id="themeToggle">Toggle Light Mode</button>
-  <header>
-    <img src="https://law.media.uconn.edu/wp-content/uploads/sites/3082/2021/07/rogowski-360x360-1.png" alt="Your Name">
-    <h1>Justin Rogowski</h1>
-    <p>Library Information Coordinator</p>
-  </header>
-  <p class="bio"></p>
-  <div class="social-icons">
-    <a href="tel:+18605705109" aria-label="Phone"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-        fill="currentColor" class="bi bi-telephone-fill" viewBox="0 0 16 16">
-        <path fill-rule="evenodd"
-          d="M1.885.511a1.745 1.745 0 0 1 2.61.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.68.68 0 0 0 .178.643l2.457 2.457a.68.68 0 0 0 .644.178l2.189-.547a1.75 1.75 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.6 18.6 0 0 1-7.01-4.42 18.6 18.6 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877z" />
-      </svg></a>
-    <a href="mailto:justin.rogowski@uconn.edu" aria-label="Email"><svg xmlns="http://www.w3.org/2000/svg" width="16"
-        height="16" fill="currentColor" class="bi bi-envelope-at-fill" viewBox="0 0 16 16">
-        <path
-          d="M2 2A2 2 0 0 0 .05 3.555L8 8.414l7.95-4.859A2 2 0 0 0 14 2zm-2 9.8V4.698l5.803 3.546zm6.761-2.97-6.57 4.026A2 2 0 0 0 2 14h6.256A4.5 4.5 0 0 1 8 12.5a4.49 4.49 0 0 1 1.606-3.446l-.367-.225L8 9.586zM16 9.671V4.697l-5.803 3.546.338.208A4.5 4.5 0 0 1 12.5 8c1.414 0 2.675.652 3.5 1.671" />
-        <path
-          d="M15.834 12.244c0 1.168-.577 2.025-1.587 2.025-.503 0-1.002-.228-1.12-.648h-.043c-.118.416-.543.643-1.015.643-.77 0-1.259-.542-1.259-1.434v-.529c0-.844.481-1.4 1.26-1.4.585 0 .87.333.953.63h.03v-.568h.905v2.19c0 .272.18.42.411.42.315 0 .639-.415.639-1.39v-.118c0-1.277-.95-2.326-2.484-2.326h-.04c-1.582 0-2.64 1.067-2.64 2.724v.157c0 1.867 1.237 2.654 2.57 2.654h.045c.507 0 .935-.07 1.18-.18v.731c-.219.1-.643.175-1.237.175h-.044C10.438 16 9 14.82 9 12.646v-.214C9 10.36 10.421 9 12.485 9h.035c2.12 0 3.314 1.43 3.314 3.034zm-4.04.21v.227c0 .586.227.8.581.8.31 0 .564-.17.564-.743v-.367c0-.516-.275-.708-.572-.708-.346 0-.573.245-.573.791" />
-      </svg></a>
-    <a href="https://teams.microsoft.com/l/chat/0/0?users=justin.rogowski@uconn.edu" aria-label="Teams Chat"><svg
-        xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-microsoft-teams"
-        viewBox="0 0 16 16">
-        <path
-          d="M9.186 4.797a2.42 2.42 0 1 0-2.86-2.448h1.178c.929 0 1.682.753 1.682 1.682zm-4.295 7.738h2.613c.929 0 1.682-.753 1.682-1.682V5.58h2.783a.7.7 0 0 1 .682.716v4.294a4.197 4.197 0 0 1-4.093 4.293c-1.618-.04-3-.99-3.667-2.35Zm10.737-9.372a1.674 1.674 0 1 1-3.349 0 1.674 1.674 0 0 1 3.349 0m-2.238 9.488-.12-.002a5.2 5.2 0 0 0 .381-2.07V6.306a1.7 1.7 0 0 0-.15-.725h1.792c.39 0 .707.317.707.707v3.765a2.6 2.6 0 0 1-2.598 2.598z" />
-        <path
-          d="M.682 3.349h6.822c.377 0 .682.305.682.682v6.822a.68.68 0 0 1-.682.682H.682A.68.68 0 0 1 0 10.853V4.03c0-.377.305-.682.682-.682Zm5.206 2.596v-.72h-3.59v.72h1.357V9.66h.87V5.945z" />
-      </svg></a>
-    <a href="https://www.linkedin.com/in/justin-rogowski/" aria-label="LinkedIn"><svg xmlns="http://www.w3.org/2000/svg"
-        width="16" height="16" fill="currentColor" class="bi bi-linkedin" viewBox="0 0 16 16">
-        <path
-          d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854zm4.943 12.248V6.169H2.542v7.225zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248S2.4 3.226 2.4 3.934c0 .694.521 1.248 1.327 1.248zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016l.016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225z" />
-      </svg></a>
-    <a href="https://www.instagram.com/jjrogo" aria-label="Instagram"><svg xmlns="http://www.w3.org/2000/svg" width="16"
-        height="16" fill="currentColor" class="bi bi-instagram" viewBox="0 0 16 16">
-        <path
-          d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.9 3.9 0 0 0-1.417.923A3.9 3.9 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.9 3.9 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.9 3.9 0 0 0-.923-1.417A3.9 3.9 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599s.453.546.598.92c.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.5 2.5 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.5 2.5 0 0 1-.92-.598 2.5 2.5 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233s.008-2.388.046-3.231c.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92s.546-.453.92-.598c.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92m-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217m0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334" />
-      </svg></a>
-  </div>
-  <nav class="links">
-    <a href="https://library.law.uconn.edu/">UConn Law Library</a>
-    <a href="https://uconn.atlassian.net/wiki/x/IgHzNwY">Confluence</a>
-    <a href="https://law.uconn.edu/student-life/student-services/#collapsepanel-3874-1-0-05">IT Help Desk</a>
+  <a href="#linkGrid" class="skip-link"
+    style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;">Skip to links</a>
+  <div class="wrap">
+    <!-- ===== HEADER ===== -->
+    <header class="site card">
+      <div aria-hidden="true" class="avatar">
+        <img alt="Portrait of Justin Rogowski"
+          src="https://law.media.uconn.edu/wp-content/uploads/sites/3082/2021/07/rogowski-360x360-1.png" />
+      </div>
+      <div class="title">
+        <h1>Justin Rogowski</h1>
+        <p>Library Information Coordinator · University of Connecticut School of Law</p>
+        <p class="note" id="tagline">Connecting people to information, tools, and good vibes.</p>
+      </div>
+      <div class="actions">
+        <button class="btn" id="shareBtn" title="Share this page">Share</button>
+        <button class="btn" id="theme" title="Toggle theme">Toggle Theme</button>
+        <a class="btn" href="mailto:justin.rogowski@uconn.edu">Email</a>
+        <a class="btn"
+          href="https://outlook.office.com/bookwithme/user/3ca52ff81f8a440699723f09efe5d298%40uconn.edu?anonymous&amp;ismsaljsauthenabled=true">Book
+          a Meeting</a>
+      </div>
+    </header>
+    <!-- ===== ROW: INFO CARDS ===== -->
+    <section class="grid row">
+      <div aria-live="polite" class="card info col-6" id="clockCard">
+        <div class="pill">Time</div>
+        <div>
+          <div id="time" style="font-weight:600"></div>
+          <div class="note">Hartford, CT (ET)</div>
+        </div>
+      </div>
+      <div class="card info col-6" id="wxCard">
+        <div class="pill">Weather</div>
+        <div>
+          <div id="wx" style="font-weight:600">Loading…</div>
+          <div class="note" id="wxNote">—</div>
+        </div>
+      </div>
+    </section>
+    <!-- ===== ROW: LINKS + WIDGETS ===== -->
+    <section class="grid row">
+      <!-- ===== ROW: WIDGET TABS ===== -->
+      <section class="grid row">
+        <div class="tray card">
 
-    <a href="https://libguides.law.uconn.edu/">Research Guides</a>
+          <button class="tab" data-target="#cal">My Calendar</button>
+          <button class="tab" data-target="#book">Book a Meeting</button>
+          <button class="tab" data-target="#trello">Submit a Request</button>
+          <button class="tab" data-target="#cs">My CliftonStrengths</button>
+        <div class="donate-container">
+        <a class="btn donate-btn"
+          href="https://giving.uconn.edu/campaigns/60852/donations/new?designation=LawLibraryEndowmentFund&amp;"
+          rel="noopener noreferrer"
+          style="display:inline-block; padding:12px 20px; margin-top:20px; background:linear-gradient(to bottom right, rgba(233,139,42,.85), rgba(233,139,42,.65)); color:#fff; border-radius:12px; text-decoration:none; font-weight:bold; box-shadow:0 4px 16px rgba(0,0,0,.25);"
+          target="_blank">
+          Donate to the Law Library
+        </a>
+      </div>
+        </div>
+        <div class="card row cs-frame widget" id="cal">
+          <iframe class="embed"
+            data-src="https://outlook.office365.com/calendar/published/3ca52ff81f8a440699723f09efe5d298@uconn.edu/66bd7da89640440591f449ae5ce4fcc514733372329545515702/calendar.html"
+            title="Today's Schedule"></iframe>
+        </div>
+        <div class="card row widget" id="book">
+          <iframe class="embed"
+            data-src="https://outlook.office.com/bookwithme/user/3ca52ff81f8a440699723f09efe5d298%40uconn.edu?anonymous&amp;ismsaljsauthenabled=true"
+            title="Book Meeting"></iframe>
+        </div>
+        <div class="card row widget" id="trello">
+          <div class="grid" style="grid-template-columns: repeat(12,1fr); gap:18px">
+            <div class="col-8">
+              <iframe class="embed" data-src="https://trello.com/b/2Yp5IKYz.html" title="Public Trello Board"></iframe>
+            </div>
+            <div class="col-4">
+              <div class="card" style="height:100%">
+                <h3 style="margin-top:0">Submit a Request</h3>
+                <form action="https://formsubmit.co/justinrogowski1+vnowu7qczgm6cw6e96zn@boards.trello.com"
+                  method="POST">
+                  <input name="_captcha" type="hidden" value="false" />
+                  <input name="_next" type="hidden" value="https://justinrogo.github.io" />
+                  <label>Name<br /><input name="name" required="" /></label><br /><br />
+                  <label>Email<br /><input name="email" required="" type="email" /></label><br /><br />
+                  <label>Subject<br /><input name="subject" required="" /></label><br /><br />
+                  <label>Details<br /><textarea name="details" required="" rows="6"></textarea></label><br />
+                  <button class="btn" style="width:100%" type="submit">Send Request</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card row widget cs-frame" id="cs">
+          <div class="cs-inner" id="csMount">Loading CliftonStrengths…</div>
+        </div>
+      </section>
+      <!-- Links -->
+      <div class="links">
+        <div class="tools">
+
+          <div class="wrap" role="region" aria-label="UConn Law Library Search">
+            <!-- Tabs -->
+
+            <!-- UConn Law Library Search Widget (navy/orange, clash-proof, relative sizing) -->
+            <section class="ulsw" data-ulsw>
+              <style>
+                /* ==== Navy + Orange Theme ==== */
+                .ulsw {
+                  --navy: #000E2F;
+                  /* your navy */
+                  --orange: #FF7A00;
+                  /* swap if you have a specific orange */
+                  --bg: var(--navy);
+                  --fg: #FFFFFF;
+                  --muted: #C9D1D9;
+                  --accent: var(--orange);
+                  --accent-2: #FFB066;
+                  /* focus ring (lighter orange) */
+                  --card: rgba(255, 255, 255, 0.06);
+                  --border: rgba(255, 255, 255, 0.14);
+                  --radius: 0.875rem;
+                  /* ~14px */
+                  --shadow: 0 0.625rem 1.875rem rgba(0, 0, 0, 0.45);
+                  /* ~10px 30px */
+                  --inset: inset 0 0.0625rem rgba(255, 255, 255, 0.05);
+                  /* ~1px */
+                  font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+                  font-size: 1rem;
+                  /* scale the whole widget by changing this */
+                  color: var(--fg);
+                }
+
+                /* ==== Container ==== */
+                .ulsw .wrap {
+                  background: var(--card);
+                  border: 0.0625rem solid var(--border);
+                  border-radius: var(--radius);
+                  box-shadow: var(--shadow), var(--inset);
+                  overflow: clip;
+                }
+
+                /* ==== Tabs ==== */
+                .ulsw .tabs {
+                  display: flex;
+                  gap: 0.125rem;
+                  /* ~2px */
+                  padding: 0.375rem;
+                  /* ~6px */
+                  background: linear-gradient(0deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.04));
+                }
+
+                .ulsw [role="tab"] {
+                  border: 0.0625rem solid var(--border);
+                  background: transparent;
+                  color: var(--muted);
+                  padding: 0.625rem 0.875rem;
+                  /* ~10px 14px */
+                  border-radius: 0.625rem;
+                  /* ~10px */
+                  cursor: pointer;
+                  font-weight: 600;
+                  letter-spacing: 0.0125em;
+                  transition: transform .08s ease, background .2s ease, color .2s ease, border-color .2s ease;
+                }
+
+                .ulsw [role="tab"][aria-selected="true"] {
+                  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(0, 0, 0, 0.18));
+                  color: var(--fg);
+                  border-color: rgba(255, 255, 255, 0.22);
+                  transform: translateY(-0.0625rem);
+                  /* ~1px */
+                }
+
+                .ulsw [role="tab"]:hover {
+                  color: var(--fg);
+                  border-color: var(--accent);
+                }
+
+                .ulsw [role="tab"]:focus-visible {
+                  outline: 0.1875rem solid var(--accent-2);
+                  /* ~3px */
+                  outline-offset: 0.125rem;
+                  /* ~2px */
+                }
+
+                /* ==== Panels (clash-proof) ==== */
+                .ulsw .ulsw-panel {
+                  display: none;
+                  padding: 1rem;
+                  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.1));
+                }
+
+                .ulsw .ulsw-panel[data-active="true"] {
+                  display: block;
+                }
+
+                /* ==== Form UI ==== */
+                .ulsw .search-row {
+                  display: grid;
+                  grid-template-columns: 1fr auto;
+                  gap: 0.625rem;
+                  /* ~10px */
+                  align-items: center;
+                  max-width: 48.75rem;
+                  /* ~780px */
+                }
+
+                .ulsw input[type="text"] {
+                  width: 100%;
+                  padding: 0.75rem 0.875rem;
+                  /* ~12px 14px */
+                  border-radius: 0.625rem;
+                  border: 0.0625rem solid var(--border);
+                  background: rgba(0, 0, 0, 0.35);
+                  color: var(--fg);
+                  font-size: 1rem;
+                }
+
+                .ulsw input[type="text"]::placeholder {
+                  color: #9aa4b2;
+                }
+
+                .ulsw .btn {
+                  padding: 0.75rem 1rem;
+                  /* ~12px 16px */
+                  border-radius: 0.625rem;
+                  border: 0.0625rem solid var(--border);
+                  background: linear-gradient(0deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.08));
+                  color: var(--fg);
+                  cursor: pointer;
+                  font-weight: 700;
+                  font-size: 1rem;
+                }
+
+                .ulsw .btn:hover {
+                  border-color: var(--accent);
+                }
+
+                .ulsw .links {
+                  text-align: right;
+                  font-size: 0.875rem;
+                  /* ~14px */
+                  margin: 0.625rem 1rem 1rem;
+                }
+
+                .ulsw .links a {
+                  color: var(--fg);
+                  text-underline-offset: 0.1875rem;
+                }
+
+                .ulsw .helper {
+                  color: var(--muted);
+                  font-size: 0.75rem;
+                  margin-top: 0.5rem;
+                }
+              </style>
+
+              <div class="wrap" role="region" aria-label="UConn Law Library Search">
+                <!-- Tabs -->
+                <div class="tabs" role="tablist" aria-label="Search types">
+                  <button role="tab" aria-selected="true" aria-controls="ulsw-tab-books" id="ulsw-tabbtn-books">Books
+                    &amp; More</button>
+                  <button role="tab" aria-selected="false" aria-controls="ulsw-tab-journals" id="ulsw-tabbtn-journals"
+                    tabindex="-1">Journals</button>
+                  <button role="tab" aria-selected="false" aria-controls="ulsw-tab-databases" id="ulsw-tabbtn-databases"
+                    tabindex="-1">Databases</button>
+                  <button role="tab" aria-selected="false" aria-controls="ulsw-tab-reserves" id="ulsw-tabbtn-reserves"
+                    tabindex="-1">Reserves</button>
+                  <button role="tab" aria-selected="false" aria-controls="ulsw-tab-research" id="ulsw-tabbtn-research"
+                    tabindex="-1">Research</button>
+                </div>
+
+                <!-- Panels -->
+                <div id="ulsw-tab-books" class="ulsw-panel" role="tabpanel" aria-labelledby="ulsw-tabbtn-books"
+                  data-active="true">
+                  <form name="catalogSearchForm" method="get"
+                    action="https://uconn-law.primo.exlibrisgroup.com/discovery/search" onsubmit="return false">
+                    <input type="hidden" name="vid" value="01UCT_LAW:01UCT_LAW">
+                    <input type="hidden" name="tab" value="Everything">
+                    <input type="hidden" name="search_scope" value="MyInst_and_CI">
+                    <input type="hidden" name="mode" value="simple">
+                    <input type="hidden" name="query" data-query-target>
+                    <div class="search-row">
+                      <input type="text" placeholder="Search Library Catalog" data-query-input>
+                      <button class="btn" data-submit>Search</button>
+                    </div>
+                    <div class="helper">Tip: commas are treated as spaces.</div>
+                  </form>
+                </div>
+
+                <div id="ulsw-tab-journals" class="ulsw-panel" role="tabpanel" aria-labelledby="ulsw-tabbtn-journals">
+                  <form name="journalsSearchForm" method="get"
+                    action="https://uconn-law.primo.exlibrisgroup.com/discovery/search" onsubmit="return false">
+                    <input type="hidden" name="vid" value="01UCT_LAW:01UCT_LAW">
+                    <input type="hidden" name="tab" value="Everything">
+                    <input type="hidden" name="search_scope" value="EJOURNALS">
+                    <input type="hidden" name="mode" value="simple">
+                    <input type="hidden" name="query" data-query-target>
+                    <div class="search-row">
+                      <input type="text" placeholder="Search the Library's E-Journals" data-query-input>
+                      <button class="btn" data-submit>Search</button>
+                    </div>
+                  </form>
+                </div>
+
+                <div id="ulsw-tab-databases" class="ulsw-panel" role="tabpanel" aria-labelledby="ulsw-tabbtn-databases">
+                  <form name="databasesSearchForm" method="get"
+                    action="https://uconn-law.primo.exlibrisgroup.com/discovery/search" onsubmit="return false">
+                    <input type="hidden" name="vid" value="01UCT_LAW:01UCT_LAW">
+                    <input type="hidden" name="tab" value="Everything">
+                    <input type="hidden" name="search_scope" value="DATABASES">
+                    <input type="hidden" name="mode" value="simple">
+                    <input type="hidden" name="query" data-query-target>
+                    <div class="search-row">
+                      <input type="text" placeholder="Search the Library's Databases" data-query-input>
+                      <button class="btn" data-submit>Search</button>
+                    </div>
+                  </form>
+                </div>
+
+                <div id="ulsw-tab-reserves" class="ulsw-panel" role="tabpanel" aria-labelledby="ulsw-tabbtn-reserves">
+                  <form name="searchFormCR" method="get"
+                    action="https://uconn-law.primo.exlibrisgroup.com/discovery/search" onsubmit="return false">
+                    <input type="hidden" name="vid" value="01UCT_LAW:01UCT_LAW">
+                    <input type="hidden" name="tab" value="Everything">
+                    <input type="hidden" name="search_scope" value="CourseReserves">
+                    <input type="hidden" name="mode" value="simple">
+                    <input type="hidden" name="query" data-query-target>
+                    <div class="search-row">
+                      <input type="text" placeholder="Search Course Reserves" data-query-input>
+                      <button class="btn" data-submit>Search</button>
+                    </div>
+                  </form>
+                </div>
+
+                <div id="ulsw-tab-research" class="ulsw-panel" role="tabpanel" aria-labelledby="ulsw-tabbtn-research">
+                  <form role="search" method="GET" action="https://libguides.law.uconn.edu/srch.php" target="_blank">
+                    <div class="search-row">
+                      <input class="s-lg-form-control" name="q" size="30" maxlength="125" type="text"
+                        placeholder="Search LibGuides">
+                      <button class="btn" type="submit">Search</button>
+                    </div>
+                  </form>
+                </div>
+
+                <!-- Quick links -->
+                <div class="links">
+                  <a href="https://uconn-law.primo.exlibrisgroup.com/discovery/search?mode=advanced&vid=01UCT_LAW:01UCT_LAW"
+                    target="_blank" rel="noopener">Advanced Keyword Search</a> ·
+                  <a href="https://uconn-law.primo.exlibrisgroup.com/discovery/account?vid=01UCT_LAW:01UCT_LAW"
+                    target="_blank" rel="noopener">My Library Account</a>
+                </div>
+              </div>
+
+
+            </section>
+
+
+
+
+
+
+
+
+
+
+
+
+          </div>
+        </div>
+        <div class="link-grid" id="linkGrid">
+          <a class="link" href="https://library.law.uconn.edu/"><span class="dot"></span>UConn Law Library</a>
+          <a class="link" href="https://uconn.atlassian.net/wiki/x/IgHzNwY"><span class="dot"></span>Confluence</a>
+          <a class="link" href="https://law.uconn.edu/student-life/student-services/#collapsepanel-3874-1-0-05"><span
+              class="dot"></span>IT Help Desk</a>
+          <a class="link" href="https://libguides.law.uconn.edu/"><span class="dot"></span>Research Guides</a>
+          <a class="link" href="https://teams.microsoft.com/l/chat/0/0?users=justin.rogowski@uconn.edu"><span
+              class="dot"></span>Start a Teams Chat</a>
+          <a class="link" href="tel:+18605705109"><span class="dot"></span>Call Justin</a>
+          <a class="link" href="https://www.linkedin.com/in/justin-rogowski/"><span class="dot"></span>LinkedIn</a>
+          <a class="link" href="https://justinrogo.github.io/"><span class="dot"></span>Home</a>
+        </div>
+      </div>
+      <!-- Sidebar widgets (auto cards) -->
+      <aside class="widgets">
+        <div class="card" id="eventsCard">
+          <div class="pill">UConn Law Events</div>
+          <div class="note" id="eventsList">Loading upcoming events…</div>
+        </div>
+        <div class="card" id="statusCard">
+          <div class="pill">Now Working On</div>
+          <div class="note" id="status">Tending plants · Cleaning data for Power BI · Prepping centennial swag
+          </div>
+        </div>
+        <div class="card" id="countsCard">
+          <div class="pill">Requests</div>
+          <div><strong id="trelloTotal">—</strong> total · <strong id="trelloDone">—</strong> completed</div>
+          <div class="note">Counts update hourly from GitHub Pages.</div>
+        </div>
+      </aside>
+    </section>
+    <footer class="row" style="opacity:.75; margin:24px 0; text-align:center">Built with ✨ by Justin · <span
+        id="year"></span>
+     
+    </footer>
+  </div>
+  <!-- Floating quick contact -->
+  <nav aria-label="Quick contact" class="quickbar">
+    <a aria-label="Call" class="fab" href="tel:+18605705109" title="Call">
+      <svg viewbox="0 0 24 24">
+        <path
+          d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V21a1 1 0 0 1-1 1C10.85 22 2 13.15 2 2a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.24.2 2.45.57 3.57a1 1 0 0 1-.25 1.02l-2.2 2.2z">
+        </path>
+      </svg>
+    </a>
+    <a aria-label="Start Teams chat" class="fab"
+      href="https://teams.microsoft.com/l/chat/0/0?users=justin.rogowski@uconn.edu" title="Teams">
+      <svg viewbox="0 0 24 24">
+        <path
+          d="M9 7a3 3 0 1 0-2 2.83V16a4 4 0 0 0 4 4h3a6 6 0 0 0 6-6v-3a1 1 0 0 0-1-1h-2v4a4 4 0 0 1-4 4h-2a2 2 0 0 1-2-2V9.83A3 3 0 0 0 9 7zm9-3a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM4 6h5v2H7v8H5V8H4V6z">
+        </path>
+      </svg>
+    </a>
+    <a aria-label="Email" class="fab" href="mailto:justin.rogowski@uconn.edu" title="Email">
+      <svg viewbox="0 0 24 24">
+        <path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z">
+        </path>
+      </svg>
+    </a>
+
+    <a aria-label="Donate to the Law Library" class="quickbar-btn donate-btn"
+      href="https://giving.uconn.edu/campaigns/60852/donations/new?designation=LawLibraryEndowmentFund&amp;"
+      rel="noopener noreferrer" target="_blank" title="Donate to the Law Library">
+      💝
+    </a>
   </nav>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // ===== Widget init (safe even if widget isn't on this page)
+      (function initULSW(root) {
+        if (!root) return;
+        const tabButtons = root.querySelectorAll('[role="tab"]');
+        const panels = root.querySelectorAll('.ulsw-panel');
 
+        // ensure exactly one active panel at load
+        let active = Array.from(panels).find(p => p.dataset.active === 'true') || panels[0];
+        panels.forEach(p => p.dataset.active = 'false');
+        if (active) active.dataset.active = 'true';
+        tabButtons.forEach(b => {
+          const isActive = b.getAttribute('aria-controls') === active.id;
+          b.setAttribute('aria-selected', isActive ? 'true' : 'false');
+          b.tabIndex = isActive ? 0 : -1;
+        });
 
+        function activate(id, btn) {
+          panels.forEach(p => p.dataset.active = (p.id === id) ? 'true' : 'false');
+          tabButtons.forEach(b => {
+            const on = (b === btn);
+            b.setAttribute('aria-selected', on ? 'true' : 'false');
+            b.tabIndex = on ? 0 : -1;
+          });
+          btn.focus();
+        }
 
-  <!-- Widget toggle buttons -->
-  <div class="widget-controls">
-    <button class="widget-btn" data-widget="calendar-widget">My Calendar</button>
-    <button class="widget-btn" data-widget="bookings-widget">Book a Meeting</button>
-    <button class="widget-btn" data-widget="trello-widget">Submit a Request</button>
-    <button class="widget-btn" data-widget="clifton-strengths">My CliftonStrengths</button>
-  </div>
+        tabButtons.forEach(btn => {
+          btn.addEventListener('click', () => activate(btn.getAttribute('aria-controls'), btn));
+          btn.addEventListener('keydown', (e) => {
+            const idx = Array.from(tabButtons).indexOf(btn);
+            if (e.key === 'ArrowRight') { e.preventDefault(); tabButtons[(idx + 1) % tabButtons.length].click(); }
+            if (e.key === 'ArrowLeft') { e.preventDefault(); tabButtons[(idx - 1 + tabButtons.length) % tabButtons.length].click(); }
+            if (e.key === 'Home') { e.preventDefault(); tabButtons[0].click(); }
+            if (e.key === 'End') { e.preventDefault(); tabButtons[tabButtons.length - 1].click(); }
+          });
+        });
 
-  <main>
-    <section id="calendar-widget" class="widget">
-      <iframe
-        src="https://outlook.office365.com/calendar/published/3ca52ff81f8a440699723f09efe5d298@uconn.edu/66bd7da89640440591f449ae5ce4fcc514733372329545515702/calendar.html"
-        allowfullscreen title="Todays Schedule"></iframe>
-    </section>
-    <section id="bookings-widget" class="widget">
-      <iframe
-        src="https://outlook.office.com/bookwithme/user/3ca52ff81f8a440699723f09efe5d298%40uconn.edu?anonymous&ismsaljsauthenabled=true"
-        title="Book Meeting"></iframe>
-    </section>
-    <section id="trello-widget" class="widget">
-      <div class="card">
-        <div id="trello-count-widget" style="text-align:center; font-family:sans-serif;">
-          <p>📋 Total: <strong id="trello-total">0</strong></p>
-          <p>✅ Completed: <strong id="trello-completed">0</strong></p>
-        </div>
-      </div>
-    </br>
-      <div class="container">
+        // Wire Primo-style forms: build "any,contains,<query>" and submit
+        root.querySelectorAll('form').forEach(form => {
+          const input = form.querySelector('[data-query-input]');
+          const hidden = form.querySelector('[data-query-target]');
+          const submitBtn = form.querySelector('[data-submit]');
+          if (submitBtn && input && hidden) {
+            const doSubmit = () => {
+              const cleaned = (input.value || '').replace(/[,]/g, ' ');
+              hidden.value = "any,contains," + cleaned;
+              form.submit();
+            };
+            submitBtn.addEventListener('click', doSubmit);
+            form.addEventListener('submit', e => { e.preventDefault(); doSubmit(); });
+          }
+        });
+      })(document.querySelector('[data-ulsw]'));
 
-        <iframe src="https://trello.com/b/2Yp5IKYz.html" allowfullscreen></iframe>
-        <div class="request-widget">
-          <h3>Submit a Request</h3>
-          <form action="https://formsubmit.co/justinrogowski1+vnowu7qczgm6cw6e96zn@boards.trello.com" method="POST">
-            <!-- customize the email subject line in your inbox -->
-            <input type="hidden" name="_subject" value="New site request via widget" />
-            <!-- skip their intermediate “thanks” page -->
-            <input type="hidden" name="_captcha" value="false" />
-            <!-- after submit, redirect here (make sure this exists on your GH Pages) -->
-            <input type="hidden" name="_next" value="https://justinrogo.github.io" />
+      // ===== Theme toggle with persistence
+      (function () {
+        const body = document.body;
+        const themeBtn = document.getElementById('theme');
+        if (!themeBtn) return;
+        const stored = localStorage.getItem('theme');
+        if (stored === 'light') body.classList.add('light');
+        themeBtn.addEventListener('click', () => {
+          body.classList.toggle('light');
+          localStorage.setItem('theme', body.classList.contains('light') ? 'light' : 'dark');
+        });
+      })();
 
-            <label for="name">Your Name</label>
-            <input type="text" id="name" name="name" required />
+      // ===== Clock (ET)
+      (function () {
+        const timeEl = document.getElementById('time');
+        if (!timeEl) return;
+        function tick() {
+          const now = new Date();
+          timeEl.textContent = now.toLocaleString('en-US', {
+            timeZone: 'America/New_York',
+            hour: '2-digit', minute: '2-digit', second: '2-digit',
+            weekday: 'short', month: 'short', day: '2-digit'
+          });
+        }
+        tick(); setInterval(tick, 1000);
+        const yearEl = document.getElementById('year');
+        if (yearEl) yearEl.textContent = new Date().getFullYear();
+      })();
 
-            <label for="email">Your Email</label>
-            <input type="email" id="email" name="email" required />
+      // ===== Weather (Hartford) via Open-Meteo (no API key)
+      (function () {
+        const wxEl = document.getElementById('wx');
+        const wxNote = document.getElementById('wxNote');
+        if (!wxEl || !wxNote) return;
+        const WMAP = { 0: 'Clear', 1: 'Mainly clear', 2: 'Partly cloudy', 3: 'Overcast', 45: 'Fog', 48: 'Rime fog', 51: 'Drizzle', 53: 'Drizzle', 55: 'Drizzle', 61: 'Rain', 63: 'Rain', 65: 'Rain', 66: 'Freezing rain', 67: 'Freezing rain', 71: 'Snow', 73: 'Snow', 75: 'Snow', 80: 'Rain showers', 81: 'Rain showers', 82: 'Rain showers', 95: 'Thunderstorm' };
+        const WEMOJI = { 0: '☀️', 1: '🌤️', 2: '⛅', 3: '☁️', 45: '🌫️', 48: '🌫️', 51: '🌦️', 53: '🌦️', 55: '🌦️', 61: '🌧️', 63: '🌧️', 65: '🌧️', 66: '🌧️', 67: '🌧️', 71: '❄️', 73: '❄️', 75: '❄️', 80: '🌧️', 81: '🌧️', 82: '🌧️', 95: '⛈️' };
+        fetch('https://api.open-meteo.com/v1/forecast?latitude=41.76&longitude=-72.67&current=temperature_2m,apparent_temperature,weather_code&temperature_unit=fahrenheit&timezone=America%2FNew_York')
+          .then(r => r.json())
+          .then(d => {
+            const c = d.current || d.current_weather || {};
+            const code = (c.weather_code ?? c.weathercode) || 0;
+            const temp = Math.round(c.temperature_2m ?? c.temperature ?? 0);
+            wxEl.textContent = `${WEMOJI[code] || ''} ${WMAP[code] || 'Weather'} · ${temp}°F`;
+            wxNote.textContent = 'Data: Open-Meteo';
+          })
+          .catch(() => { wxEl.textContent = 'Weather unavailable'; wxNote.textContent = ''; });
+      })();
 
-            <label for="subject">Subject</label>
-            <input type="text" id="subject" name="subject" required />
+      // ===== Live search over links
+      (function () {
+        const search = document.getElementById('search');
+        const linkGrid = document.getElementById('linkGrid');
+        if (!search || !linkGrid) return;
+        search.addEventListener('input', e => {
+          const q = e.target.value.toLowerCase();
+          [...linkGrid.querySelectorAll('.link')].forEach(a => {
+            const show = a.textContent.toLowerCase().includes(q);
+            a.style.display = show ? 'flex' : 'none';
+          });
+        });
+      })();
 
-            <label for="details">Details</label>
-            <textarea id="details" name="details" rows="4" required></textarea>
+      // ===== Events RSS (graceful fallback if CORS blocks)
+      (function () {
+        const eventsList = document.getElementById('eventsList');
+        if (!eventsList) return;
+        const FEED = 'https://events.uconn.edu/live/rss/events/group/Law%20School/categories_campus/UConn%20Law/header/All%20Events';
+        fetch(FEED)
+          .then(r => r.text())
+          .then(xml => {
+            const doc = new DOMParser().parseFromString(xml, 'text/xml');
+            const items = [...doc.querySelectorAll('item')].slice(0, 5).map(n => ({
+              title: n.querySelector('title')?.textContent?.trim(),
+              link: n.querySelector('link')?.textContent?.trim(),
+              date: new Date(n.querySelector('pubDate')?.textContent || Date.now()),
+              desc: (n.querySelector('description')?.textContent || '').replace(/<[^>]+>/g, '').trim()
+            }));
+            if (!items.length) throw new Error('No items');
+            eventsList.innerHTML = items.map(i =>
+              `<div style="margin:.4rem 0"><a href="${i.link}" target="_blank">${i.title}</a><div class="note">${i.date.toLocaleDateString()} · ${i.desc?.slice(0, 90)}${i.desc.length > 90 ? '…' : ''}</div></div>`
+            ).join('');
+          })
+          .catch(() => {
+            eventsList.innerHTML = `<span class="note">Can’t load events here (CORS). <a href="${FEED}" target="_blank">Open feed</a>.</span>`;
+          });
+      })();
 
-            <button type="submit">Send Request</button>
-          </form>
-        </div>
-      </div>
-    </section>
-    <section id="clifton-strengths" class="widget">
-      <div class="CS-wrapper">
-        <h2 id="CSh2"></h2>
+      // ===== Mount CliftonStrengths + controls (only if csMount exists)
+      (function () {
+        const mount = document.getElementById('csMount');
+        if (!mount) return;
+        const html = `<h2 id="CSh2"></h2>
         <div id="CS">
           <!-- CS Summary -->
           <div class="summary">
@@ -760,14 +1635,14 @@
             <div class="controls">
               <button data-limit="5">Top 5</button>
               <button data-limit="10">Top 10</button>
-              <button data-limit="all">Show All</button>
+              <button data-limit="all" >Show All</button>
             </div>
           </div>
           </br>
           <div class="card">
-            <div class="toggle-buttons">
-              <button class="active" onclick="showContent('best')">When I'm at my best 🌞</button>
-              <button onclick="showContent('overextended')">When I'm overextended 🌧️</button>
+            <div class="toggle-buttons" >
+              <button class="active" onclick="showContent('best')"style="color:var(--text);">When I'm at my best 🌞</button>
+              <button onclick="showContent('overextended')"style="color:var(--text);">When I'm overextended 🌧️</button>
             </div>
             <div id="best" class="content active">
               <p>I thrive on connecting ideas in unexpected ways, constantly generating new concepts and creative
@@ -935,145 +1810,182 @@
           <h3 id="modal-title"></h3>
           <p id="modal-desc"></p>
         </div>
-      </div>
+        </div>`; // (keep your long CS HTML here)
+        mount.innerHTML = html;
 
+        // controls + modal
+        const buttons = mount.querySelectorAll(".controls button");
+        const modal = mount.querySelector("#modal");
+        const title = mount.querySelector("#modal-title");
+        const desc = mount.querySelector("#modal-desc");
+        const close = modal?.querySelector(".close");
 
-    </section>
-
-  </main>
-
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const subjectInput = document.getElementById("subject");
-      const hiddenSubject = document.querySelector('input[name="_subject"]');
-      if (subjectInput && hiddenSubject) {
-        subjectInput.addEventListener("input", () => {
-          hiddenSubject.value = subjectInput.value;
-        });
-      }
-    });
-    // Theme toggle
-    const themeToggle = document.getElementById('themeToggle');
-    themeToggle.addEventListener('click', () => {
-      document.body.classList.toggle('light-mode');
-      themeToggle.innerText = document.body.classList.contains('light-mode')
-        ? 'Toggle Dark Mode' : 'Toggle Light Mode';
-    });
-
-    // Counter animation
-
-    // Animate a number from `start` → `end` over `duration`ms
-    // Animate a number from `start` → `end` over `duration`ms
-    function animateValue(element, start, end, duration) {
-      let startTimestamp = null;
-      const step = (timestamp) => {
-        if (!startTimestamp) startTimestamp = timestamp;
-        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-        const value = Math.floor(progress * (end - start) + start);
-        element.textContent = value;
-        if (progress < 1) {
-          requestAnimationFrame(step);
+        function filterStrengths(limit) {
+          mount.querySelectorAll(".item").forEach(item => {
+            const rank = parseInt(item.querySelector(".rank").textContent, 10);
+            item.style.display = (limit === "all" || rank <= limit) ? "" : "none";
+          });
         }
-      };
-      requestAnimationFrame(step);
-    }
 
-    // Fetch the counts, then animate both elements
-    (async () => {
-      try {
-        const res = await fetch('https://justinrogo.github.io/data/cards_count.json');
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const { total_count, completed_count } = await res.json();
+        if (buttons.length) {
+          buttons.forEach(btn => {
+            btn.addEventListener("click", () => {
+              const limit = btn.dataset.limit === "all" ? "all" : parseInt(btn.dataset.limit, 10);
+              filterStrengths(limit);
+              buttons.forEach(b => b.classList.remove("active"));
+              btn.classList.add("active");
+            });
+          });
+          const allBtn = mount.querySelector('.controls button[data-limit="all"]');
+          if (allBtn) { allBtn.classList.add("active"); filterStrengths("all"); }
+        }
 
-        const totalEl = document.getElementById('trello-total');
-        const completedEl = document.getElementById('trello-completed');
+        if (modal && title && desc) {
+          mount.querySelectorAll(".item").forEach(item => {
+            item.addEventListener("click", () => {
+              title.textContent = item.querySelector(".name").textContent;
+              desc.textContent = item.dataset.desc;
+              modal.style.display = "flex";
+            });
+          });
+          if (close) close.addEventListener("click", () => modal.style.display = "none");
+          modal.addEventListener("click", e => { if (e.target === modal) modal.style.display = "none"; });
+        }
 
-        animateValue(totalEl, 0, total_count, 500);
-        animateValue(completedEl, 0, completed_count, 500);
+        window.showContent = function (id) {
+          mount.querySelectorAll('.content').forEach(div => div.classList.remove('active'));
+          mount.querySelectorAll('.toggle-buttons button').forEach(btn => btn.classList.remove('active'));
+          const panel = mount.querySelector('#' + id);
+          if (panel) panel.classList.add('active');
+          const index = id === 'best' ? 0 : 1;
+          const toggles = mount.querySelectorAll('.toggle-buttons button');
+          if (toggles[index]) toggles[index].classList.add('active');
+        };
+      })();
 
-      } catch (err) {
-        console.error('Could not load Trello counts:', err);
-      }
-    })();
+      // ===== Tabs for site widgets (only if your .tray exists)
+      (function () {
+        const tabs = document.querySelectorAll('.tray .tab');
+        const widgets = document.querySelectorAll('.widget');
+        if (!tabs.length || !widgets.length) return;
+        let openId = null;
 
-    // Widget toggle functionality
-    const widgetButtons = document.querySelectorAll('.widget-btn');
-    widgetButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        // deactivate all
-        document.querySelectorAll('.widget').forEach(w => w.classList.remove('active'));
-        widgetButtons.forEach(b => b.classList.remove('active'));
-        // activate selected
-        const widgetId = btn.getAttribute('data-widget');
-        document.getElementById(widgetId).classList.add('active');
-        btn.classList.add('active');
-      });
+        function activateWidget(btn, target) {
+          target.querySelectorAll('iframe[data-src]').forEach(f => {
+            if (!f.hasAttribute('data-loaded')) {
+              f.src = f.getAttribute('data-src');
+              f.setAttribute('data-loaded', 'true');
+            }
+          });
+          localStorage.setItem('openTab', btn.dataset.target);
+          if (target.classList.contains('active')) {
+            history.replaceState(null, '', btn.dataset.target);
+          } else {
+            history.replaceState(null, '', ' ');
+          }
+        }
+
+        tabs.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const target = document.querySelector(btn.dataset.target);
+            if (!target) return;
+            const id = btn.dataset.target;
+            if (openId === id) {
+              target.classList.remove('active');
+              btn.classList.remove('active');
+              openId = null;
+              history.replaceState(null, '', ' ');
+              return;
+            }
+            widgets.forEach(w => w.classList.remove('active'));
+            tabs.forEach(t => t.classList.remove('active'));
+            target.classList.add('active');
+            btn.classList.add('active');
+            openId = id;
+            activateWidget(btn, target);
+          });
+        });
+
+        function openFromHashOrMemory() {
+          const hash = location.hash?.trim();
+          const remembered = localStorage.getItem('openTab');
+          const targetSel = hash || remembered;
+          if (targetSel) {
+            const btn = document.querySelector(`.tray .tab[data-target="${targetSel}"]`);
+            const target = document.querySelector(targetSel);
+            if (btn && target) {
+              widgets.forEach(w => w.classList.remove('active'));
+              tabs.forEach(t => t.classList.remove('active'));
+              target.classList.add('active');
+              btn.classList.add('active');
+              openId = targetSel;
+              activateWidget(btn, target);
+            }
+          }
+        }
+        window.addEventListener('hashchange', openFromHashOrMemory);
+        openFromHashOrMemory();
+
+        // Keyboard shortcuts
+        const themeBtn = document.getElementById('theme');
+        const search = document.getElementById('search');
+        const tabOrder = ['#cal', '#book', '#trello', '#cs'];
+        document.addEventListener('keydown', (e) => {
+          if (e.key === '/' && search) { e.preventDefault(); search.focus(); }
+          if (e.key === 'Escape' && openId) {
+            const btn = document.querySelector(`.tray .tab[data-target="${openId}"]`);
+            const target = document.querySelector(openId);
+            if (target) target.classList.remove('active');
+            btn?.classList.remove('active');
+            openId = null; history.replaceState(null, '', ' ');
+          }
+
+          if (/^[1-4]$/.test(e.key)) {
+            const idx = parseInt(e.key, 10) - 1;
+            const sel = tabOrder[idx];
+            const btn = document.querySelector(`.tray .tab[data-target="${sel}"]`);
+            btn?.click();
+          }
+        });
+      })();
+
+      // ===== Fun: local visit counter (only if footer exists)
+      (function () {
+        const footer = document.querySelector('footer.row');
+        if (!footer) return;
+        const visits = (parseInt(localStorage.getItem('visits') || '0', 10) + 1);
+        localStorage.setItem('visits', String(visits));
+        const span = document.createElement('span');
+        span.style.marginLeft = '8px';
+        span.style.opacity = .75;
+        span.textContent = `· visits on this device: ${visits}`;
+        footer.appendChild(span);
+      })();
+
+      // ===== Web Share API (only if shareBtn exists)
+      (function () {
+        const shareBtn = document.getElementById('shareBtn');
+        if (!shareBtn) return;
+        shareBtn.addEventListener('click', async () => {
+          const shareData = { title: document.title, text: "Check out Justin's page", url: location.href };
+          try {
+            if (navigator.share) {
+              await navigator.share(shareData);
+            } else {
+              await navigator.clipboard.writeText(location.href);
+              shareBtn.textContent = 'Link copied ✓';
+              setTimeout(() => shareBtn.textContent = 'Share', 1400);
+            }
+          } catch { }
+        });
+      })();
     });
-    document.addEventListener("DOMContentLoaded", () => {
-      // --- FILTER BUTTONS + MODAL ---
-      const buttons = document.querySelectorAll(".controls button");
-      const modal = document.getElementById("modal");
-      const title = document.getElementById("modal-title");
-      const desc = document.getElementById("modal-desc");
-      const close = modal.querySelector(".close");
-
-      function filterStrengths(limit) {
-        document.querySelectorAll(".item").forEach(item => {
-          const rank = parseInt(item.querySelector(".rank").textContent, 10);
-          item.style.display = (limit === "all" || rank <= limit) ? "" : "none";
-        });
-      }
-
-      buttons.forEach(btn => {
-        btn.addEventListener("click", () => {
-          const limit = btn.dataset.limit === "all"
-            ? "all"
-            : parseInt(btn.dataset.limit, 10);
-          filterStrengths(limit);
-          buttons.forEach(b => b.classList.remove("active"));
-          btn.classList.add("active");
-        });
-      });
-
-      // activate “Show All” on load
-      const allBtn = document.querySelector('.controls button[data-limit="all"]');
-      allBtn.classList.add("active");
-      filterStrengths("all");
-
-      // wire up modal pop-up
-      document.querySelectorAll(".item").forEach(item => {
-        item.addEventListener("click", () => {
-          title.textContent = item.querySelector(".name").textContent;
-          desc.textContent = item.dataset.desc;
-          modal.style.display = "flex";
-        });
-      });
-      close.addEventListener("click", () => modal.style.display = "none");
-      modal.addEventListener("click", e => {
-        if (e.target === modal) modal.style.display = "none";
-      });
-    });
-    //Trello Cards Count
-    fetch('https://justinrogo.github.io/data/cards_count.json')
-      .then(res => res.json())
-      .then(json => {
-        document.getElementById('trello-total').textContent = json.total_count;
-        document.getElementById('trello-completed').textContent = json.completed_count;
-      })
-      .catch(err => {
-        console.error(err);
-        document.getElementById('trello-total').textContent = 'Err';
-        document.getElementById('trello-completed').textContent = 'Err';
-      });
-    //CS Paragraph
-    function showContent(id) {
-      document.querySelectorAll('.content').forEach(div => div.classList.remove('active'));
-      document.querySelectorAll('.toggle-buttons button').forEach(btn => btn.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-      const index = id === 'best' ? 0 : 1;
-      document.querySelectorAll('.toggle-buttons button')[index].classList.add('active');
-    }
   </script>
+
+
+  <style>
+
+  </style>
 </body>
 
 </html>
