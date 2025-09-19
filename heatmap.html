@@ -86,6 +86,13 @@
   gap: 0.5rem;
   flex: 1;
 }
+.notes-wrap{display:flex;flex-direction:column;min-width:260px;flex:1}
+#notes{
+  resize:vertical; min-height:44px; max-height:160px;
+  background:#0b1226;border:1px solid #26324d;color:#e5e7eb;border-radius:8px;
+  padding:.5rem .6rem;font:14px system-ui;
+}
+
 
 
         .tab {
@@ -171,7 +178,12 @@
         <button id="undo" disabled>Undo</button>
         <button id="clear" disabled>Clear this floor</button>
             <button id="resetAll">Reset all floors</button>
-        <div style="font-size: 1.5em;"><strong>Total Count:</strong> <span id="totalCount">0</span></div>       
+        <div style="font-size: 1.5em;"><strong>Total Count:</strong> <span id="totalCount">0</span></div>   
+        <label class="notes-wrap">
+  Notes
+  <textarea id="notes" rows="2" placeholder="Optional note for this submission"></textarea>
+</label>
+    
         </div>
 
 
@@ -243,6 +255,8 @@
             const includeSessionsEl = document.getElementById('includeSessions');
             // Put near top with other config
             const FLOW_URL = "https://default17f1a87e2a254eaab9df9d439034b0.80.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/8a4d2abd61de4fceb5cb6d2a4b2b31a8/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=EhX0b_ECMsXs08oSiwPJKO3H5KMRI3O0l3V1lLtdM6Q";
+            const notesEl = document.getElementById('notes');
+
 
             // Tabs with counters
             const tabs = document.getElementById('tabs');
@@ -310,30 +324,34 @@
                 return r; // many flows return empty 202/200
             }
 
-            submitBtn.onclick = async () => {
-                const payload = {
-                    submitted_at: new Date().toISOString(),
-                    floors: FLOORS.map(fl => ({
-                        id: fl.id,
-                        image_data_url: fl.img.naturalWidth ? fl.img.src : null,
-                        image_size: fl.img.naturalWidth ? { w: fl.img.naturalWidth, h: fl.img.naturalHeight } : null,
-                        points: fl.points
-                    }))
-                };
+  submitBtn.onclick = async () => {
+  const payload = {
+    submitted_at: new Date().toISOString(),
+    note: (notesEl?.value || "").trim(),              // <— add this line
+    floors: FLOORS.map(fl => ({
+      id: fl.id,
+      image_data_url: fl.img.naturalWidth ? fl.img.src : null,
+      image_size: fl.img.naturalWidth ? { w: fl.img.naturalWidth, h: fl.img.naturalHeight } : null,
+      points: fl.points
+    }))
+  };
 
-                statusEl.textContent = "Sending to OneDrive via Flow…";
-                try {
-                    await sendToFlow(payload);
-                    statusEl.textContent = "Saved to OneDrive via Flow.";
+  statusEl.textContent = "Sending to OneDrive via Flow…";
+  try {
+    await sendToFlow(payload);                         // your existing uploader
+    statusEl.textContent = "Saved to OneDrive via Flow.";
 
-                    // ---- reset everything after save ----
-                    FLOORS.forEach(fl => fl.points = []);
-                    persist();
-                    redraw();
-                } catch (e) {
-                    statusEl.textContent = `Flow error: ${e.message}`;
-                }
-            };
+    // reset points only
+    FLOORS.forEach(fl => fl.points = []);
+    persist(); redraw();
+
+    // clear note
+    if (notesEl) notesEl.value = "";
+  } catch (e) {
+    statusEl.textContent = `Flow error: ${e.message}`;
+  }
+};
+
 
 
             // Load a single JSON
