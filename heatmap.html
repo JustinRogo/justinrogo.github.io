@@ -38,7 +38,8 @@
         footer {
             border-top: 1px solid var(--line);
             border-bottom: none;
-            justify-content: space-between
+            justify-content:space-around
+            
         }
 
 
@@ -59,8 +60,9 @@
 
         .row {
             display: flex;
-            gap: .5rem;
-            flex-wrap: wrap
+            gap: 1rem;
+            flex-wrap: wrap;
+           
         }
 
         #wrap {
@@ -95,13 +97,14 @@
         .notes-wrap {
             display: flex;
             flex-direction: column;
-            min-width: 260px;
+            width:550px;
+            min-width: 240px;
             flex: 1
         }
 
         #notes {
-            resize: vertical;
-            min-height: 44px;
+            resize: horizontal;
+            min-height: 40px;
             max-height: 160px;
             background: #0b1226;
             border: 1px solid #26324d;
@@ -204,9 +207,10 @@
         <button id="menuBtn" type="button" class="iconbtn" aria-expanded="false"
             aria-controls="controlsPanel">☰</button>
         <div class="tabs" id="tabs"></div>
+<div style="font-size: 1.5em;"><strong>Total Count:</strong> <span id="totalCount">0</span></div>
 
-
-        <button id="submit" class="submitbtn">Submit & Save<small id="status"></small></button>
+     
+        
 
 
     </header>
@@ -221,12 +225,12 @@
             <button id="undo" disabled>Undo</button>
             <button id="clear" disabled>Clear this floor</button>
             <button id="resetAll">Reset all floors</button>
-            <div style="font-size: 1.5em;"><strong>Total Count:</strong> <span id="totalCount">0</span></div>
+            
             <label class="notes-wrap">
                 Notes
                 <textarea id="notes" rows="2" placeholder="Optional note for this submission"></textarea>
             </label>
-
+   <button id="submit" class="submitbtn">Submit & Save<small id="status"></small></button>
         </div>
 
 
