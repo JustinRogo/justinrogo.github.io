@@ -1,218 +1,375 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Multi-Floor Occupancy Heatmap (Embedded Images)</title>
+    <title>Occupancy Heatmap | Dashboard</title>
     <style>
         :root {
-            --bg: #0b1020;
-            --panel: #0b1226;
-            --line: #1e293b
+            /* Modern Dark Palette */
+            --bg-body: #0f172a;       /* Slate 900 */
+            --bg-panel: rgba(30, 41, 59, 0.85); /* Slate 800 with alpha */
+            --bg-element: #334155;    /* Slate 700 */
+            --primary: #3b82f6;       /* Blue 500 */
+            --primary-hover: #2563eb; /* Blue 600 */
+            --danger: #ef4444;        /* Red 500 */
+            --text-main: #f1f5f9;     /* Slate 100 */
+            --text-muted: #94a3b8;    /* Slate 400 */
+            --border: #1e293b;        /* Slate 800 */
+            --radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
 
-        [hidden] {
-            display: none !important;
-        }
-
+        * { box-sizing: border-box; }
 
         body {
             margin: 0;
-            background: var(--bg);
-            color: #e5e7eb;
-            font: 14px system-ui, Segoe UI, Roboto, Helvetica, Arial
+            background: var(--bg-body);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden; /* Prevent body scroll, handle inside wrap */
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
         }
 
-        header,
-        footer {
+        /* --- Header --- */
+        header {
             display: flex;
-            gap: .5rem;
             align-items: center;
-            padding: .65rem;
-            border-bottom: 1px solid var(--line);
-            background: var(--panel);
-            flex-wrap: wrap
-        }
-
-        footer {
-            border-top: 1px solid var(--line);
-            border-bottom: none;
-            justify-content:space-around
-            
-        }
-
-
-        button,
-        label,
-        input[type="range"],
-        select {
-            background: #121b33;
-            border: 1px solid #26324d;
-            color: #e5e7eb;
-            border-radius: 8px;
-            padding: .4rem .6rem
-        }
-
-        button:disabled {
-            opacity: .5
-        }
-
-        .row {
-            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            background: var(--bg-panel);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            z-index: 20;
             gap: 1rem;
-            flex-wrap: wrap;
-           
         }
 
-        #wrap {
-            position: relative;
-            width: 100%;
-            height: calc(100dvh - 152px);
-            touch-action: none
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex: 1;
+            min-width: 0; /* allows flex children to shrink */
         }
 
-        #floor,
-        #heat {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: block
+        .logo-area {
+            font-weight: 700;
+            font-size: 1.1rem;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+        }
+        
+        .stat-badge {
+            background: var(--bg-element);
+            padding: 0.25rem 0.75rem;
+            border-radius: 99px;
+            font-size: 0.9rem;
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            white-space: nowrap;
         }
 
-        #heat {
-            pointer-events: none
+        /* --- Scrollable Tabs --- */
+        .tabs-container {
+            flex: 1;
+            overflow-x: auto;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none;  /* IE */
+            mask-image: linear-gradient(to right, transparent, black 10px, black 90%, transparent);
+            -webkit-mask-image: linear-gradient(to right, transparent, black 10px, black 90%, transparent);
         }
+        .tabs-container::-webkit-scrollbar { display: none; }
 
         .tabs {
             display: flex;
-            flex-wrap: nowrap;
-            /* prevent wrapping */
             gap: 0.5rem;
-            flex: 1;
+            padding: 0 10px;
         }
-
-        .notes-wrap {
-            display: flex;
-            flex-direction: column;
-            width:550px;
-            min-width: 240px;
-            flex: 1
-        }
-
-        #notes {
-            resize: horizontal;
-            min-height: 40px;
-            max-height: 160px;
-            background: #0b1226;
-            border: 1px solid #26324d;
-            color: #e5e7eb;
-            border-radius: 8px;
-            padding: .5rem .6rem;
-            font: 14px system-ui;
-        }
-
-
 
         .tab {
-            flex: 1;
-            /* let them grow evenly */
-            text-align: center;
-            font-size: 1.1rem;
-            /* larger text */
-            font-weight: 600;
-            padding: 0.75rem 1.25rem;
-            /* larger hit area */
-            border-radius: 10px;
-            border: 1px solid #26324d;
-            background: #1b2550;
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid transparent;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
             cursor: pointer;
-            transition: background 0.2s;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .tab:hover {
-            background: #243074;
+            background: rgba(255,255,255,0.05);
+            color: var(--text-main);
         }
 
         .tab.active {
-            background: #2563eb;
-            /* bright blue like submit */
-            border-color: #1e40af;
-            color: #fff;
+            background: var(--bg-element);
+            color: var(--primary);
+            border-color: var(--border);
+            box-shadow: var(--shadow);
         }
 
-
-
-        .badge {
-            margin-left: .35rem;
-            padding: .05rem .4rem;
-            border-radius: 999px;
-            background: #243152;
-            border: 1px solid #3a4b73;
-            font-size: 12px
+        .tab .badge {
+            background: rgba(0,0,0,0.3);
+            font-size: 0.75rem;
+            padding: 0.1rem 0.4rem;
+            border-radius: 99px;
+            color: var(--text-muted);
+        }
+        .tab.active .badge {
+            background: var(--primary);
+            color: white;
         }
 
-        small {
-            opacity: .7
+        /* --- Main Canvas Area --- */
+        #wrap {
+            position: relative;
+            flex: 1;
+            background-image: radial-gradient(var(--bg-element) 1px, transparent 1px);
+            background-size: 20px 20px; /* Grid pattern effect */
+            overflow: hidden;
+            touch-action: none;
+            cursor: crosshair;
         }
 
-        .submitbtn {
-            margin-left: auto;
-            /* pushes it to the far right */
-            font-size: 1.1rem;
-            /* bigger text */
-            padding: 0.75rem 1.5rem;
-            /* larger click area */
-            background: #2563eb;
-            /* bright blue background */
-            border-color: #1e40af;
-            font-weight: 600;
+        #floor, #heat {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: block;
+        }
+        #heat { pointer-events: none; }
+
+        /* --- Footer / Controls --- */
+        footer {
+            background: var(--bg-panel);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid var(--border);
+            padding: 0.75rem 1rem;
+            display: grid;
+            grid-template-columns: auto 1fr auto; /* Tools | Notes | Submit */
+            gap: 1rem;
+            align-items: center;
+            z-index: 20;
         }
 
-        .submitbtn:hover {
-            background: #1d4ed8;
+        .toolbar-group {
+            display: flex;
+            gap: 0.5rem;
         }
 
-        .iconbtn {
-            margin-left: auto;
+        /* Buttons */
+        button {
+            border: 1px solid var(--border);
+            background: var(--bg-element);
+            color: var(--text-main);
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        button:hover:not(:disabled) {
+            background: #475569;
+        }
+        button:active:not(:disabled) {
+            transform: scale(0.97);
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        button.icon-only {
+            padding: 0.6rem;
             font-size: 1.2rem;
-            padding: .4rem .6rem
+            line-height: 1;
         }
 
-        .panel {
-            position: fixed;
-            top: 56px;
-            right: 12px;
-            z-index: 10;
+        /* Submit Button Special Styling */
+        .submitbtn {
+            background: var(--primary);
+            border-color: var(--primary-hover);
+            color: white;
+            font-weight: 600;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
+        .submitbtn:hover:not(:disabled) {
+            background: var(--primary-hover);
+        }
+
+        /* Textarea styling */
+        .notes-wrap {
             display: flex;
             flex-direction: column;
-            gap: .5rem;
-            background: #0b1226;
-            border: 1px solid #26324d;
-            border-radius: 10px;
-            padding: .6rem .8rem;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, .35);
+            width: 100%;
+            position: relative;
+        }
+        
+        #notes {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            border-radius: 8px;
+            padding: 0.6rem;
+            font-family: inherit;
+            font-size: 0.9rem;
+            resize: none;
+            width: 100%;
+            height: 42px; /* Compact by default */
+            transition: height 0.2s, border-color 0.2s;
+        }
+        #notes:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(0,0,0,0.3);
+            height: 80px; /* Expands on focus */
+            position: absolute;
+            bottom: 0;
+            z-index: 30;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.2);
         }
 
-        .panel label {
-            white-space: nowrap
+        /* --- Settings Panel --- */
+        .panel {
+            position: fixed;
+            top: 70px;
+            right: 1rem;
+            width: 300px;
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            backdrop-filter: blur(12px);
+            z-index: 50;
+            transform-origin: top right;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+        
+        .panel[hidden] {
+            display: flex !important; /* Override default hidden display */
+            transform: scale(0.95);
+            opacity: 0;
+            pointer-events: none;
+            visibility: hidden;
+        }
+
+        .panel h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        .control-row {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+        .control-row label {
+            font-size: 0.85rem;
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-muted);
+        }
+        
+        /* Custom Range Inputs */
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type="range"]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            background: var(--bg-element);
+            border-radius: 3px;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: var(--primary);
+            margin-top: -5px;
+            cursor: pointer;
+            box-shadow: 0 0 5px rgba(0,0,0,0.3);
+        }
+        
+        /* File Inputs */
+        input[type="file"] {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        input[type="file"]::file-selector-button {
+            border: 1px solid var(--border);
+            background: var(--bg-element);
+            color: var(--text-main);
+            border-radius: 4px;
+            padding: 0.2rem 0.5rem;
+            margin-right: 0.5rem;
+            cursor: pointer;
+        }
+
+        /* --- Mobile Tweaks --- */
+        @media (max-width: 768px) {
+            footer {
+                grid-template-columns: 1fr 1fr; /* Two columns */
+                grid-template-areas: 
+                    "tools submit"
+                    "notes notes";
+            }
+            .toolbar-group { grid-area: tools; }
+            .submitbtn { grid-area: submit; width: 100%; }
+            .notes-wrap { grid-area: notes; margin-top: 0.5rem; }
+            
+            #notes:focus {
+                position: static; /* Don't pop up on mobile, keeps flow */
+                height: 60px;
+            }
         }
     </style>
 </head>
 
 <body>
-    <header class="row">
-        <button id="menuBtn" type="button" class="iconbtn" aria-expanded="false"
-            aria-controls="controlsPanel">☰</button>
-        <div class="tabs" id="tabs"></div>
-<div style="font-size: 1.5em;"><strong>Total Count:</strong> <span id="totalCount">0</span></div>
+    <header>
+        <div class="header-left">
+            <button id="menuBtn" type="button" class="icon-only" aria-label="Menu" aria-expanded="false" aria-controls="controlsPanel">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12h18M3 6h18M3 18h18"/></svg>
+            </button>
+            
+            <div class="tabs-container">
+                <div class="tabs" id="tabs"></div>
+            </div>
+        </div>
 
-     
-        
-
-
+        <div class="stat-badge">
+            Total: <strong id="totalCount" style="color: var(--primary); margin-left:4px;">0</strong>
+        </div>
     </header>
 
     <div id="wrap">
@@ -221,41 +378,76 @@
     </div>
 
     <footer>
-        <div class="row">
-            <button id="undo" disabled>Undo</button>
-            <button id="clear" disabled>Clear this floor</button>
-            <button id="resetAll">Reset all floors</button>
-            
-            <label class="notes-wrap">
-                Notes
-                <textarea id="notes" rows="2" placeholder="Optional note for this submission"></textarea>
-            </label>
-   <button id="submit" class="submitbtn">Submit & Save<small id="status"></small></button>
+        <div class="toolbar-group">
+            <button id="undo" disabled title="Undo last point">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+                Undo
+            </button>
+            <button id="clear" disabled title="Clear points on this floor">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                Clear
+            </button>
         </div>
 
-
-        <!-- header stays, without the slider labels -->
-
-        <div id="controlsPanel" class="panel" hidden>
-            <label>Radius <input id="radius" type="range" min="8" max="80" value="50"></label>
-            <label>Intensity <input id="intensity" type="range" min="5" max="200" value="150"></label>
-            <label>Opacity <input id="opacity" type="range" min="10" max="100" value="80"></label>
-            <label>Blur <input id="blur" type="range" min="0" max="30" value="8"></label>
-            <div class="row">
-                <label>Load JSON <input id="loadJSON" type="file" accept="application/json"></label>
-                <label>Load JSONs <input id="loadMany" type="file" accept="application/json" multiple></label>
-                <label>From <input id="from" type="datetime-local"></label>
-                <label>To <input id="to" type="datetime-local"></label>
-                <label><input id="includeSessions" type="checkbox" checked> Include loaded</label>
-
-
-            </div>
+        <div class="notes-wrap">
+            <textarea id="notes" placeholder="Add optional notes here..."></textarea>
         </div>
 
+        <button id="submit" class="submitbtn">
+            Submit
+            <span id="status" style="font-weight: 400; font-size: 0.8em; opacity: 0.8;"></span>
+        </button>
     </footer>
 
-    <script>
+    <div id="controlsPanel" class="panel" hidden>
+        <h3>Visualization</h3>
+        <div class="control-row">
+            <label>Radius <span id="val-radius">50</span></label>
+            <input id="radius" type="range" min="8" max="80" value="50" oninput="document.getElementById('val-radius').innerText=this.value">
+        </div>
+        <div class="control-row">
+            <label>Intensity <span id="val-inten">150</span></label>
+            <input id="intensity" type="range" min="5" max="200" value="150" oninput="document.getElementById('val-inten').innerText=this.value">
+        </div>
+        <div class="control-row">
+            <label>Opacity <span id="val-opac">80%</span></label>
+            <input id="opacity" type="range" min="10" max="100" value="80" oninput="document.getElementById('val-opac').innerText=this.value+'%'">
+        </div>
+        <div class="control-row">
+            <label>Blur <span id="val-blur">8px</span></label>
+            <input id="blur" type="range" min="0" max="30" value="8" oninput="document.getElementById('val-blur').innerText=this.value+'px'">
+        </div>
 
+        <h3>Data Management</h3>
+        <div class="control-row">
+            <button id="resetAll" style="width:100%; border-color:var(--danger); color:var(--danger);">Reset All Floors</button>
+        </div>
+        
+        <h3>Load History</h3>
+        <div class="control-row">
+            <label>Single JSON</label>
+            <input id="loadJSON" type="file" accept="application/json">
+        </div>
+        <div class="control-row">
+            <label>Trend Analysis (Batch)</label>
+            <input id="loadMany" type="file" accept="application/json" multiple>
+        </div>
+        
+        <div class="control-row">
+            <label>Filter Start</label>
+            <input id="from" type="datetime-local" style="background:var(--bg-body); border:1px solid var(--border); color:white; padding:4px; border-radius:4px;">
+        </div>
+        <div class="control-row">
+            <label>Filter End</label>
+            <input id="to" type="datetime-local" style="background:var(--bg-body); border:1px solid var(--border); color:white; padding:4px; border-radius:4px;">
+        </div>
+        <div class="control-row" style="flex-direction:row; align-items:center;">
+             <input id="includeSessions" type="checkbox" checked style="width:auto;">
+             <label for="includeSessions" style="margin-left:0.5rem; margin-bottom:0;">Include loaded sessions</label>
+        </div>
+    </div>
+
+    <script>
         (() => {
             // --- Embedded floor images (replace placeholders) ------------------------
             const EMBEDDED = {
@@ -277,7 +469,7 @@
             let current = 0;
 
             // Sessions loaded for trend review
-            const SESSIONS = []; // {ts: Date, floors:[{id, image_data_url?, points:[]}]} 
+            const SESSIONS = []; 
 
             // --- Elements -------------------------------------------------------------
             const wrap = document.getElementById('wrap');
@@ -287,7 +479,6 @@
             const hctx = heat.getContext('2d');
             const undoBtn = document.getElementById('undo');
             const clearBtn = document.getElementById('clear');
-            const exportCSV = document.getElementById('exportCSV');
             const resetAll = document.getElementById('resetAll');
             const submitBtn = document.getElementById('submit');
             const statusEl = document.getElementById('status');
@@ -300,23 +491,27 @@
             const fromEl = document.getElementById('from');
             const toEl = document.getElementById('to');
             const includeSessionsEl = document.getElementById('includeSessions');
-            // Put near top with other config
-            const FLOW_URL = "https://default17f1a87e2a254eaab9df9d439034b0.80.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/8a4d2abd61de4fceb5cb6d2a4b2b31a8/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=EhX0b_ECMsXs08oSiwPJKO3H5KMRI3O0l3V1lLtdM6Q";
             const notesEl = document.getElementById('notes');
-
+            const FLOW_URL = "https://default17f1a87e2a254eaab9df9d439034b0.80.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/8a4d2abd61de4fceb5cb6d2a4b2b31a8/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=EhX0b_ECMsXs08oSiwPJKO3H5KMRI3O0l3V1lLtdM6Q";
 
             // Tabs with counters
             const tabs = document.getElementById('tabs');
             FLOORS.forEach((fl, i) => {
                 const b = document.createElement('button');
                 b.className = 'tab' + (i === 0 ? ' active' : '');
-                b.innerHTML = `${fl.label} <span class="badge" id="count-${fl.id}">0</span>`;
+                // Using div to allow flex styling
+                b.innerHTML = `<span>${fl.label}</span> <span class="badge" id="count-${fl.id}">0</span>`;
                 b.onclick = () => { current = i; updateTabs(); fitCanvas(); redraw(); };
                 tabs.appendChild(b);
             });
             function updateTabs() {
-                tabs.querySelectorAll('.tab').forEach((el, idx) =>
-                    el.classList.toggle('active', idx === current));
+                tabs.querySelectorAll('.tab').forEach((el, idx) => {
+                    el.classList.toggle('active', idx === current);
+                    // scroll into view if needed
+                    if (idx === current) {
+                        el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                    }
+                });
             }
 
             // Preload embedded images
@@ -325,7 +520,6 @@
                     fl.imgSrc = EMBEDDED[fl.id];
                     fl.img.src = EMBEDDED[fl.id];
                 }
-                // also update when images decode
                 fl.img.onload = () => { if (FLOORS[current] === fl) { fitCanvas(); redraw(); } persist(); };
             });
 
@@ -352,14 +546,12 @@
             undoBtn.onclick = () => { FLOORS[current].points.pop(); persist(); redraw(); };
             clearBtn.onclick = () => { FLOORS[current].points = []; persist(); redraw(); };
 
-
-
             resetAll.onclick = () => {
-                FLOORS.forEach(fl => fl.points = []);
-                persist(); redraw();
+                if(confirm("Are you sure you want to clear all data from ALL floors?")) {
+                    FLOORS.forEach(fl => fl.points = []);
+                    persist(); redraw();
+                }
             };
-
-
 
             async function sendToFlow(payload) {
                 const r = await fetch(FLOW_URL, {
@@ -368,27 +560,37 @@
                     body: JSON.stringify(payload)
                 });
                 if (!r.ok) throw new Error(`${r.status} ${await r.text().catch(() => "")}`);
-                return r; // many flows return empty 202/200
+                return r; 
             }
 
             submitBtn.onclick = async () => {
                 const payload = {
                     submitted_at: new Date().toISOString(),
-                    note: (notesEl?.value || "").trim(),              // <— add this line
+                    note: (notesEl?.value || "").trim(),
                     floors: FLOORS.map(fl => ({
                         id: fl.id,
                         image_data_url: fl.img.naturalWidth ? fl.img.src : null,
                         image_size: fl.img.naturalWidth ? { w: fl.img.naturalWidth, h: fl.img.naturalHeight } : null,
                         points: fl.points
-                      
                     })),
                     TotalCount: computeTotalCount()
                 };
 
+                const originalText = submitBtn.innerHTML;
+                submitBtn.disabled = true;
                 statusEl.textContent = " (Sending...)";
+                
                 try {
-                    await sendToFlow(payload);                         // your existing uploader
-                    statusEl.textContent = " (Submitted!)";
+                    await sendToFlow(payload);
+                    statusEl.textContent = " (Done!)";
+                    
+                    // Visual feedback success
+                    submitBtn.style.background = "#10b981"; // Green
+                    setTimeout(() => {
+                        submitBtn.style.background = ""; // Reset
+                        statusEl.textContent = "";
+                        submitBtn.disabled = false;
+                    }, 2000);
 
                     // reset points only
                     FLOORS.forEach(fl => fl.points = []);
@@ -397,11 +599,11 @@
                     // clear note
                     if (notesEl) notesEl.value = "";
                 } catch (e) {
-                    statusEl.textContent = `Flow error: ${e.message}`;
+                    statusEl.textContent = " Error";
+                    alert(`Flow error: ${e.message}`);
+                    submitBtn.disabled = false;
                 }
             };
-
-
 
             // Load a single JSON
             loadJSON.onchange = e => {
@@ -417,12 +619,12 @@
                             if (fl.image_data_url) { FLOORS[i].imgSrc = fl.image_data_url; FLOORS[i].img.src = fl.image_data_url; }
                         });
                         current = 0; updateTabs(); fitCanvas(); redraw();
-                        statusEl.textContent = `Loaded ${f.name} (timestamp ${data.submitted_at || "n/a"})`;
+                        alert(`Loaded ${f.name}`);
                     } catch (err) { alert("Invalid JSON file"); console.error(err); }
                 });
             };
 
-            // Load many JSONs for trend review
+            // Load many JSONs
             loadMany.onchange = async e => {
                 const files = Array.from(e.target.files || []);
                 if (!files.length) return;
@@ -440,21 +642,25 @@
                 if (isFinite(+min) && isFinite(+max)) { fromEl.value = toLocalDT(min); toEl.value = toLocalDT(max); }
                 redraw();
             };
+            
+            // Listeners for sliders that trigger redraw
+            [radiusEl, intenEl, opacEl, blurEl].forEach(el => el.addEventListener('input', redraw));
             [fromEl, toEl, includeSessionsEl].forEach(el => el.addEventListener('input', redraw));
 
             // --- Helpers --------------------------------------------------------------
             function computeTotalCount() {
-  let total = 0;
-  FLOORS.forEach(fl => {
-    let n = fl.points.length;
-    for (const sess of filteredSessions()) {
-      const sf = (sess.floors || []).find(f => f.id === fl.id);
-      if (sf && Array.isArray(sf.points)) n += sf.points.length;
-    }
-    total += n;
-  });
-  return total;
-}
+                let total = 0;
+                FLOORS.forEach(fl => {
+                    let n = fl.points.length;
+                    for (const sess of filteredSessions()) {
+                        const sf = (sess.floors || []).find(f => f.id === fl.id);
+                        if (sf && Array.isArray(sf.points)) n += sf.points.length;
+                    }
+                    total += n;
+                });
+                return total;
+            }
+
             function fitCanvas() {
                 const rect = wrap.getBoundingClientRect();
                 floor.width = Math.max(1, Math.floor(rect.width));
@@ -482,28 +688,23 @@
             function redraw() {
                 const fl = FLOORS[current];
 
-                // aggregate: current points + filtered sessions
                 const aggPoints = [...fl.points];
                 for (const sess of filteredSessions()) {
                     const sf = (sess.floors || []).find(f => f.id === fl.id);
                     if (sf && Array.isArray(sf.points)) aggPoints.push(...sf.points);
                 }
 
-                // buttons state
                 undoBtn.disabled = fl.points.length === 0;
                 clearBtn.disabled = fl.points.length === 0;
 
-                // clear canvases
                 fctx.clearRect(0, 0, floor.width, floor.height);
                 hctx.clearRect(0, 0, heat.width, heat.height);
 
                 if (!fl.img.naturalWidth) { updateCounts(); return; }
 
-                // aspect-fit rect and scales
                 const fit = imageFitRect(fl.img.naturalWidth, fl.img.naturalHeight, floor.width, floor.height);
                 fctx.drawImage(fl.img, 0, 0, fl.img.naturalWidth, fl.img.naturalHeight, fit.x, fit.y, fit.w, fit.h);
 
-                // heat accumulation on downscaled buffer
                 const down = 0.5;
                 const hw = Math.max(1, (fit.w * down) | 0);
                 const hh = Math.max(1, (fit.h * down) | 0);
@@ -514,14 +715,12 @@
 
                 const R = +radiusEl.value, I = +intenEl.value, k = down;
 
-                // kernel sprite
                 const spr = makeKernelSprite(R);
                 const sR = Math.max(2, Math.round(R * k));
                 const sprScaled = document.createElement('canvas');
                 sprScaled.width = sR * 2; sprScaled.height = sR * 2;
                 sprScaled.getContext('2d').drawImage(spr, 0, 0, sprScaled.width, sprScaled.height);
 
-                // map each point into fitted rect
                 const iw = fl.img.naturalWidth, ih = fl.img.naturalHeight;
                 const sx = fit.w / iw, sy = fit.h / ih;
 
@@ -532,7 +731,6 @@
                     actx.drawImage(sprScaled, x - sR, y - sR);
                 }
 
-                // colorize
                 const imgData = actx.getImageData(0, 0, hw, hh);
                 const data = imgData.data;
                 for (let i = 0; i < data.length; i += 4) {
@@ -543,7 +741,6 @@
                 }
                 actx.putImageData(imgData, 0, 0);
 
-                // blur
                 const blurPx = +blurEl.value;
                 if (blurPx > 0) {
                     const tmp = document.createElement('canvas'); tmp.width = hw; tmp.height = hh;
@@ -551,15 +748,16 @@
                     actx.clearRect(0, 0, hw, hh); actx.drawImage(tmp, 0, 0);
                 }
 
-                // composite to display
                 hctx.drawImage(acc, 0, 0, hw, hh, fit.x, fit.y, fit.w, fit.h);
 
-                // QA markers
-                fctx.fillStyle = '#111827';
+                // QA markers - improved visibility
+                fctx.fillStyle = '#0f172a'; // dark center
+                fctx.strokeStyle = '#3b82f6'; // blue ring
+                fctx.lineWidth = 1.5;
                 for (const p of aggPoints) {
                     const mx = fit.x + p.x * sx;
                     const my = fit.y + p.y * sy;
-                    fctx.beginPath(); fctx.arc(mx, my, 2.5, 0, Math.PI * 2); fctx.fill();
+                    fctx.beginPath(); fctx.arc(mx, my, 3, 0, Math.PI * 2); fctx.fill(); fctx.stroke();
                 }
 
                 updateCounts();
@@ -577,38 +775,26 @@
             }
 
             function ramp(t) {
-                // t in [0,1] from accumulated alpha. Optional easing to keep more green:
                 let x = Math.max(0, Math.min(1, t));
-                x = Math.pow(x, 1); // lower -> more green time
-
-                // Anchors: 0=green, 0.5=yellow, 0.75=orange, 1=red
+                x = Math.pow(x, 1);
                 const G = [0, 255, 0];
                 const Y = [255, 255, 0];
                 const O = [255, 165, 0];
                 const R = [255, 0, 0];
 
                 const lerp = (a, b, p) => Math.round(a + (b - a) * p);
-
                 let c;
                 if (x < 0.5) {
-                    const p = x / 0.5;           // 0..1
+                    const p = x / 0.5; 
                     c = [lerp(G[0], Y[0], p), lerp(G[1], Y[1], p), lerp(G[2], Y[2], p)];
                 } else if (x < 0.75) {
-                    const p = (x - 0.5) / 0.25;  // 0..1
+                    const p = (x - 0.5) / 0.25;
                     c = [lerp(Y[0], O[0], p), lerp(Y[1], O[1], p), lerp(Y[2], O[2], p)];
                 } else {
-                    const p = (x - 0.75) / 0.25; // 0..1
+                    const p = (x - 0.75) / 0.25;
                     c = [lerp(O[0], R[0], p), lerp(O[1], R[1], p), lerp(O[2], R[2], p)];
                 }
                 return c;
-            }
-
-            function clamp(v) { return Math.max(0, Math.min(255, v)); }
-
-            function download(data, name, type) {
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(new Blob([data], { type: type }));
-                a.download = name; a.click();
             }
 
             function updateCounts() {
@@ -643,12 +829,13 @@
                 return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
             }
 
-            // init
             restore();
             fitCanvas();
             redraw();
         })();
-        const menuBtn = document.getElementById('menuBtn');      // <button id="menuBtn" …>
+
+        // --- Panel Toggle Logic ---
+        const menuBtn = document.getElementById('menuBtn');
         const controlsPanel = document.getElementById('controlsPanel');
 
         function openPanel() { controlsPanel.removeAttribute('hidden'); menuBtn.setAttribute('aria-expanded', 'true'); }
@@ -656,7 +843,7 @@
 
         menuBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            const willHide = !controlsPanel.hasAttribute('hidden'); // panel is open -> hide
+            const willHide = !controlsPanel.hasAttribute('hidden');
             controlsPanel.toggleAttribute('hidden', willHide);
             menuBtn.setAttribute('aria-expanded', String(!willHide));
         });
@@ -670,9 +857,6 @@
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && !controlsPanel.hasAttribute('hidden')) closePanel();
         });
-
-
     </script>
 </body>
-
 </html>
