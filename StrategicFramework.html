@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strategic Framework - UConn Law Library</title>
+    <style>
+        :root {
+            --uconn-navy: #000E2F;
+            --uconn-blue: #000E2F;
+            --uconn-grey: #7C878E;
+            --white: #ffffff;
+            --off-white: #f4f4f4;
+            --text-dark: #333333;
+            --accent-blue: #0077c8; /* Lighter blue for interactive elements */
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: var(--text-dark);
+            background-color: var(--off-white);
+            line-height: 1.6;
+        }
+
+        /* Hero Section */
+        header {
+            background-color: var(--uconn-navy);
+            color: var(--white);
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .vision-statement {
+            font-size: 1.25rem;
+            font-weight: 300;
+            max-width: 800px;
+            margin: 0 auto;
+            opacity: 0.9;
+            font-style: italic;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: -30px auto 50px;
+            padding: 0 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Grid Layout */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Slightly wider min-width */
+            gap: 20px;
+            align-items: start; /* Prevents cards from stretching weirdly when one opens */
+        }
+
+        /* Cards */
+        .card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-top: 5px solid var(--uconn-navy);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            color: var(--uconn-navy);
+            font-size: 2rem;
+            margin-top: 0;
+            margin-bottom: 0.2rem;
+            text-transform: uppercase;
+        }
+
+        .card h3 {
+            color: var(--uconn-grey);
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 1rem;
+        }
+
+        /* Hidden Content Section */
+        .details-content {
+            display: none; /* Hidden by default */
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px dashed #ddd;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .details-content h4 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: var(--uconn-navy);
+            margin-bottom: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .details-content p {
+            font-size: 0.95rem;
+            color: #444;
+            margin-bottom: 1rem;
+            font-style: italic;
+        }
+
+        .details-content ul {
+            padding-left: 1.2rem;
+            margin: 0;
+        }
+
+        .details-content li {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            color: #555;
+        }
+
+        /* Toggle Button */
+        .toggle-btn {
+            background: none;
+            border: 2px solid var(--uconn-navy);
+            color: var(--uconn-navy);
+            padding: 0.6rem 1.2rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            margin-top: auto; /* Pushes button to bottom if flex container has height */
+            align-self: flex-start;
+            transition: all 0.2s;
+        }
+
+        .toggle-btn:hover {
+            background-color: var(--uconn-navy);
+            color: var(--white);
+        }
+
+        /* Active State styling (optional) */
+        .card.active .toggle-btn {
+            background-color: var(--uconn-navy);
+            color: var(--white);
+        }
+
+        /* Values Banner */
+        .values-section {
+            background-color: var(--white);
+            padding: 3rem 2rem;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            margin-top: 3rem;
+        }
+
+        .values-title {
+            text-transform: uppercase;
+            color: var(--uconn-grey);
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            margin-bottom: 1.5rem;
+        }
+
+        .values-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .value-tag {
+            background-color: var(--off-white);
+            color: var(--uconn-navy);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+        
+        .value-tag:hover {
+            background-color: var(--uconn-navy);
+            color: var(--white);
+            cursor: default;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            font-size: 0.8rem;
+            color: var(--uconn-grey);
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Our Strategic Framework</h1>
+        <p class="vision-statement">
+            "Creativity supported. Collaboration fueled. Process shaped with intention."
+        </p>
+    </header>
+
+    <div class="container">
+        <div class="grid">
+            
+            <div class="card" id="card-1">
+                <h2>Access</h2>
+                <h3>Evolving Resources</h3>
+                <button class="toggle-btn" onclick="toggleCard('card-1')">View Strategy</button>
+                
+                <div class="details-content">
+                    <h4>Strategic Direction</h4>
+                    <p>Provide accessible, relevant resources that support the needs of the law school community and address the changing landscape of legal information and the legal profession.</p>
+                    
+                    <h4>Our Goals</h4>
+                    <ul>
+                        <li>Curate and preserve a collection that supports research, scholarship, and curricular needs.</li>
+                        <li>Enhance accessibility and discovery of electronic and print resources.</li>
+                        <li>Promote visibility of the law library and technology departments.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card" id="card-2">
+                <h2>Prepare</h2>
+                <h3>Student Success</h3>
+                <button class="toggle-btn" onclick="toggleCard('card-2')">View Strategy</button>
+
+                <div class="details-content">
+                    <h4>Strategic Direction</h4>
+                    <p>Educate the law school community through formal and informal instruction, supporting student success while preparing them for modern legal practice.</p>
+                    
+                    <h4>Our Goals</h4>
+                    <ul>
+                        <li>Lead curricular development in legal technology and research.</li>
+                        <li>Develop specialized instruction and leverage innovative ed-tech solutions.</li>
+                        <li>Align instructional services and resources to support student success.</li>
+                        <li>Integrate information literacy and critical thinking competencies.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card" id="card-3">
+                <h2>Discover</h2>
+                <h3>Advancing Scholarship</h3>
+                <button class="toggle-btn" onclick="toggleCard('card-3')">View Strategy</button>
+
+                <div class="details-content">
+                    <h4>Strategic Direction</h4>
+                    <p>Create a culture of inquiry and critical thinking by supporting, contributing to, and engaging in research and scholarship.</p>
+                    
+                    <h4>Our Goals</h4>
+                    <ul>
+                        <li>Support discovery by making faculty and student scholarship available online.</li>
+                        <li>Strengthen support for scholarly research through training and technical resources.</li>
+                        <li>Identify new opportunities to engage with the law school community.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card" id="card-4">
+                <h2>Connect</h2>
+                <h3>Community & Justice</h3>
+                <button class="toggle-btn" onclick="toggleCard('card-4')">View Strategy</button>
+
+                <div class="details-content">
+                    <h4>Strategic Direction</h4>
+                    <p>Serve as a welcoming community hub that supports the academic mission of the law school and the legal information needs of Connecticut communities.</p>
+                    
+                    <h4>Our Goals</h4>
+                    <ul>
+                        <li>Assess user experience to continually improve services.</li>
+                        <li>Promote access to justice by honoring our commitment to serve the public.</li>
+                        <li>Create, promote, and host events that bring the community together.</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="values-section">
+        <div class="values-title">Driven By Our Core Values</div>
+        <div class="values-cloud">
+            <span class="value-tag">Excellence</span>
+            <span class="value-tag">Innovation</span>
+            <span class="value-tag">Collaboration</span>
+            <span class="value-tag">Agility</span>
+            <span class="value-tag">Accountability</span>
+            <span class="value-tag">Integrity</span>
+            <span class="value-tag">Reflection</span>
+            <span class="value-tag">Equity & Inclusion</span>
+            <span class="value-tag">Well-being</span>
+        </div>
+    </div>
+
+    <footer>
+        <p>University of Connecticut School of Law Library & Technology Departments</p>
+    </footer>
+
+    <script>
+        function toggleCard(cardId) {
+            const card = document.getElementById(cardId);
+            const content = card.querySelector('.details-content');
+            const btn = card.querySelector('.toggle-btn');
+            
+            if (content.style.display === "block") {
+                content.style.display = "none";
+                btn.textContent = "View Strategy";
+                card.classList.remove('active');
+            } else {
+                content.style.display = "block";
+                btn.textContent = "Close Strategy";
+                card.classList.add('active');
+            }
+        }
+    </script>
+
+</body>
+</html>
