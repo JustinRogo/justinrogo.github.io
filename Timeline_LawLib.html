@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UConn School of Law Library Centennial Timeline</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&family=Open+Sans:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --uconn-navy: #000E2F;
+            --uconn-blue: #314882;
+            --uconn-gold: #FFC40D;
+            --uconn-grey: #F5F5F5;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: var(--uconn-grey);
+            color: #333;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Merriweather', serif;
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: #cbd5e1;
+            transform: translateX(-50%);
+            z-index: 0;
+        }
+
+        /* Card animations */
+        .timeline-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            z-index: 10;
+        }
+
+        .timeline-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        /* Expansion styles */
+        .details-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, opacity 0.5s ease-out;
+            opacity: 0;
+        }
+
+        .timeline-card.expanded .details-content {
+          max-height:fit-content;
+            /* Large height for expanded content */
+            opacity: 1;
+            transition:max-height 1s ease-in, opacity 0.5s ease-in;
+        }
+
+        .chevron {
+            transition: transform 0.3s ease;
+        }
+
+        .timeline-card.expanded .chevron {
+            transform: rotate(180deg);
+        }
+
+        /* Lightbox Styles */
+        #lightbox {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            backdrop-filter: blur(5px);
+        }
+
+        #lightbox.active {
+            display: flex;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        #lightbox img {
+            max-width: 90%;
+            max-height: 80vh;
+            object-fit: contain;
+            border: 2px solid white;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border-radius: 4px;
+        }
+
+        #lightbox-caption {
+            color: #f1f5f9;
+            margin-top: 1.5rem;
+            font-family: 'Merriweather', serif;
+            text-align: center;
+            max-width: 80%;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px 20px;
+            border-radius: 20px;
+        }
+
+        #lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: #94a3b8;
+            font-size: 40px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        #lightbox-close:hover {
+            color: white;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Mobile adjustments */
+        @media (max-width: 768px) {
+            .timeline-line {
+                left: 20px;
+            }
+        }
+
+        /* Replace the grid with a nested timeline list */
+        .gallery-grid {
+            display: block;
+            width: 100%;
+            /* override the grid */
+            margin-top: 1rem;
+        }
+
+        .gallery-timeline {
+            position: relative;
+            margin-top: 0.75rem;
+            padding-left: 1.25rem;
+        }
+
+        .gallery-timeline::before {
+            content: "";
+            position: absolute;
+            left: 0.4rem;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e2e8f0;
+            border-radius: 999px;
+        }
+
+        .gallery-timeline-item {
+            position: relative;
+            padding-left: 2.25rem;
+            /* room for badge */
+        }
+
+        /* Date badge lives on the rail */
+        .gallery-timeline-item::before {
+            content: attr(data-date);
+            position: absolute;
+            left: -1.2rem;
+            /* aligns over the rail */
+            top: 0.75rem;
+
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            min-width: 44px;
+            height: 24px;
+            padding: 0 10px;
+
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+
+            color: #0b0f1a;
+            background: var(--uconn-gold);
+            border-radius: 999px;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+            white-space: nowrap;
+            z-index: 2;
+        }
+
+
+        /* Make gallery items look like timeline cards */
+        .gallery-item {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+            align-items: start;
+            cursor: zoom-in;
+            background: #f8fafc;
+            border-radius: 0.5rem;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            z-index: 20;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 0.5rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .gallery-caption {
+            padding: 0.75rem;
+            font-size: 0.875rem;
+            color: #475569;
+            line-height: 1.45;
+        }
+
+        @media (min-width: 900px) {
+            .gallery-item {
+                grid-template-columns: 1fr;
+            }
+
+            .gallery-item img {
+                width: 90%;
+                height: 30vh;
+                align-items: center;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .gallery-item {
+                grid-template-columns: 1fr;
+            }
+
+            .gallery-timeline {
+                padding-left: 1.1rem;
+            }
+        }
+
+        .date-badge {
+            display: inline-flex;
+            align-items: center;
+            height: 22px;
+            padding: 0 10px;
+            margin-right: 8px;
+
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+
+            color: #0b0f1a;
+            background: var(--uconn-gold);
+            border-radius: 999px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.10);
+            white-space: nowrap;
+        }
+
+        .timeline-card:focus-visible,
+        .gallery-item:focus-visible {
+            outline: 3px solid var(--uconn-gold);
+            outline-offset: 3px;
+        }
+    </style>
+</head>
+
+<body class="overflow-x-hidden">
+
+    <!-- Header -->
+    <header class="bg-[#000E2F] text-white py-16 px-6 overflow-hidden">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-10">
+
+            <!-- Text block (fade in + slide up) -->
+            <div class="md:w-1/2 text-center md:text-left opacity-0 translate-y-3"
+                style="animation: fadeUp 700ms ease-out 80ms forwards;">
+                <h1 class="text-4xl md:text-5xl font-bold mb-4">
+                    A Century of Legal Knowledge
+                </h1>
+
+                <p class="text-xl md:text-2xl text-[#FFC40D] font-light">
+                    University of Connecticut School of Law Library (1921&ndash;Present)
+                </p>
+
+                <div class="mt-6 w-24 h-1 bg-[#FFC40D] mx-auto md:mx-0 rounded-full"></div>
+                <p class="mt-4 text-sm text-gray-300 italic"></p>
+            </div>
+
+            <!-- Image block (fade in + slide in from right, constrained height) -->
+            <div class="md:w-1/2 flex justify-center md:justify-end opacity-0 translate-x-4"
+                style="animation: fadeRight 800ms ease-out 140ms forwards;">
+                <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/LawLibCentennialLogo.png"
+                    alt="UConn Law Library Centennial Logo"
+                    class="w-full max-w-xs md:max-w-sm max-h-[150px] md:max-h-[200px] object-contain drop-shadow-lg"
+                    data-priority="true" />
+            </div>
+
+        </div>
+
+        <style>
+            @keyframes fadeUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(12px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes fadeRight {
+                from {
+                    opacity: 0;
+                    transform: translateX(16px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+                [style*="animation:"] {
+                    animation: none !important;
+                    opacity: 1 !important;
+                    transform: none !important;
+                }
+            }
+        </style>
+    </header>
+
+
+    <!-- Timeline Container -->
+    <main class="max-w-6xl mx-auto py-12 px-4 relative">
+
+        <!-- Central Line -->
+        <div class="timeline-line hidden md:block"></div>
+
+        <!-- 1921: Founding Era -->
+        <div class="relative mb-12 md:mb-24 timeline-item">
+            <div class="md:flex items-start justify-between w-full">
+                <div class="w-full md:w-5/12 order-1 md:order-1">
+                    <div class="bg-white p-6 rounded-lg shadow-lg timeline-card border-t-4 border-[#314882]"
+                        onclick="toggleCard(event, this)">
+                        <div class="flex justify-between items-start">
+                            <span
+                                class="inline-block px-3 py-1 bg-[#000E2F] text-white text-sm font-bold rounded mb-2">1921
+                                - 1931</span>
+                            <i class="fas fa-chevron-down text-[#314882] chevron text-xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-[#000E2F] mb-2">The Early Years: Downtown Hartford</h3>
+                        <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/94_Allyn_Street_Hartford_Wire_Works_Co..jpg"
+                            alt="94 Allyn Street" class="w-full h-48 object-cover rounded mb-4 border border-gray-200">
+                        <p class="text-gray-600 mb-3">From rented rooms at 94 Allyn Street to space in the Hartford
+                            Trust Building and Chapel Street. The college began with no library, relying on the Bar
+                            Library.</p>
+
+                        <!-- Hidden Content -->
+                        <div class="details-content mt-4 pt-4 border-t border-gray-200">
+                            <h4 class="font-bold text-[#314882] mb-3 text-sm uppercase">Highlights</h4>
+                            <div class="gallery-grid">
+                                <div class="gallery-timeline">
+
+                                    <div class="gallery-timeline-item" data-date="1921">
+                                        <!-- 94 Allyn Street -->
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/94_Allyn_Street_Hartford_Wire_Works_Co..jpg"
+                                                alt="94 Allyn Street">
+                                            <div class="gallery-caption">The college's first location at 94 Allyn
+                                                Street, rented space in the Hartford Wire Works Company building.</div>
+                                        </div>
+                                    </div>
+                                    <!-- Display Ad -->
+                                    <div class="gallery-timeline-item" data-date="1921">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Hartford_College_for_Law_1_.PNG"
+                                                alt="Ad">
+                                            <div class="gallery-caption">Display Advertisement in the Hartford Courant,
+                                                October 30, 1921.</div>
+                                        </div>
+                                    </div>
+                                    <!-- 1922 Catalog -->
+                                    <div class="gallery-timeline-item" data-date="1922">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/1922_1923_course_catalog_page_shortened_version.png"
+                                                alt="Catalog">
+                                            <div class="gallery-caption">1922-1923 Course Catalog page.</div>
+                                        </div>
+                                    </div>
+                                    <!-- Catalog Blurb -->
+                                    <div class="gallery-timeline-item" data-date="1922">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/blurb_1922_course_catalog_on_Hartford_as_location.png"
+                                                alt="Catalog Blurb">
+                                            <div class="gallery-caption">Excerpt from 1922 Catalog on Hartford location.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 750 Main Street -->
+                                    <div class="gallery-timeline-item" data-date="1923">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/750_Main_Street_Our_3rd_floor_Home_1922_B-3_005.373.jpg"
+                                                alt="750 Main">
+                                            <div class="gallery-caption">750 Main Street, Hartford Connecticut Trust
+                                                Building (1923-1926).</div>
+                                        </div>
+                                    </div>
+                                    <!-- Gladys Judd Day -->
+                                    <div class="gallery-timeline-item" data-date="1926">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/GJD_special_course_1926_catalog.png"
+                                                alt="Gladys Judd Day">
+                                            <div class="gallery-caption">Gladys Judd Day, Hartford Bar Librarian, listed
+                                                as faculty in 1926 for "law books and their use."</div>
+                                        </div>
+                                    </div>
+                                    <!-- Courant Article -->
+                                    <div class="gallery-timeline-item" data-date="1926">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/College_Moves_into_New_Home_on_Chapel_Street_Spt_8_1926_SAVE.jpg"
+                                                alt="Article">
+                                            <div class="gallery-caption">Hartford Courant article (Sept 8, 1926) noting
+                                                the move to 51 Chapel Street.</div>
+                                        </div>
+                                    </div>
+                                    <!-- 51 Chapel Street -->
+                                    <div class="gallery-timeline-item" data-date="1926">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/51_Chapel_Street_cropped.jpg"
+                                                alt="51 Chapel">
+                                            <div class="gallery-caption">51 Chapel Street (1926-1931), first location
+                                                with space dedicated to a 'library'.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div
+                class="hidden md:flex absolute left-1/2 transform -translate-x-1/2 mt-6 justify-center items-center w-12 h-12 bg-[#FFC40D] rounded-full border-4 border-white shadow-xl z-20">
+                <i class="fas fa-landmark text-[#000E2F]"></i>
+            </div>
+            <div class="w-full md:w-5/12 order-1 md:order-2"></div>
+        </div>
+
+        <!-- 1931-1940: Niles Street -->
+        <div class="relative mb-12 md:mb-24 timeline-item">
+            <div class="md:flex items-start justify-between w-full">
+                <div class="w-full md:w-5/12 order-1 md:order-2">
+                    <div class="bg-white p-6 rounded-lg shadow-lg timeline-card border-t-4 border-[#314882]"
+                        onclick="toggleCard(event, this)">
+                        <div class="flex justify-between items-start">
+                            <span
+                                class="inline-block px-3 py-1 bg-[#000E2F] text-white text-sm font-bold rounded mb-2">1931
+                                - 1940</span>
+                            <i class="fas fa-chevron-down text-[#314882] chevron text-xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-[#000E2F] mb-2">44 Niles Street: Growth Begins</h3>
+                        <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/44_Niles_Street_with_arch_etching_blacked_out_005.365.jpg"
+                            alt="44 Niles Street" class="w-full h-48 object-cover rounded mb-4 border border-gray-200">
+                        <p class="text-gray-600">The move to Niles Street provided space for the library to expand.
+                            Accreditation followed shortly after.</p>
+
+                        <!-- Hidden Content -->
+                        <div class="details-content mt-4 pt-4 border-t border-gray-200">
+                            <h4 class="font-bold text-[#314882] mb-3 text-sm uppercase">Highlights</h4>
+                            <div class="gallery-grid">
+                                <div class="gallery-timeline">
+
+                                    <div class="gallery-timeline-item" data-date="1931">
+                                        <!-- 44 Niles Arch -->
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/44_Niles_Street_with_arch_etching_blacked_out_005.365.jpg"
+                                                alt="44 Niles">
+                                            <div class="gallery-caption">44 Niles Street facade.</div>
+                                        </div>
+                                    </div>
+                                    <!-- Catalog Cover -->
+                                    <div class="gallery-timeline-item" data-date="1932">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/1932-1933_catalog_cover_of_44_Niles.png"
+                                                alt="Catalog Cover">
+                                            <div class="gallery-caption">1932-1933 Catalog cover featuring 44 Niles
+                                                Street.</div>
+                                        </div>
+                                    </div>
+                                    <!-- Accreditation -->
+                                    <div class="gallery-timeline-item" data-date="1934">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/ABA_Accreditation_1934-1935_catalog.png"
+                                                alt="Accreditation">
+                                            <div class="gallery-caption">ABA Accreditation notice, 1934-1935 Catalog.
+                                            </div>
+                                        </div>
+                                        <!-- Birdseye Case -->
+                                        <div class="gallery-timeline-item" data-date="1934">
+                                            <div class="gallery-item" onclick="openLightbox(event, this)">
+                                                <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Birdseye_Case_listed_as_Librarian_1934_catalog.png"
+                                                    alt="Birdseye Case">
+                                                <div class="gallery-caption">Birdseye Case listed as the first Law
+                                                    Library Director in 1934.</div>
+                                            </div>
+                                        </div>
+                                        <!-- Library Facilities -->
+                                        <div class="gallery-timeline-item" data-date="1934">
+                                            <div class="gallery-item" onclick="openLightbox(event, this)">
+                                                <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Library_facilities_1934_text_from_catalog.png"
+                                                    alt="Facilities">
+                                                <div class="gallery-caption">Description of Library Facilities, 1934.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Birdseye Case Portrait -->
+                                        <div class="gallery-timeline-item" data-date="1934">
+                                            <div class="gallery-item" onclick="openLightbox(event, this)">
+                                                <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Birdseye_Case_F6_001.543.jpg"
+                                                    alt="Birdseye Case Portrait">
+                                                <div class="gallery-caption">Birdseye Case, librarian from 1934-1943.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Day Division -->
+                                        <div class="gallery-timeline-item" data-date="1935">
+                                            <div class="gallery-item" onclick="openLightbox(event, this)">
+                                                <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Day_Division_added_1934-1935_Catalog_p._4.png"
+                                                    alt="Day Division">
+                                                <div class="gallery-caption">Day Division Announced in 1935.</div>
+                                            </div>
+                                        </div>
+                                        <!-- Valuable Gift -->
+                                        <div class="gallery-timeline-item" data-date="1939">
+                                            <div class="gallery-item" onclick="openLightbox(event, this)">
+                                                <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Valuable_Gift_Received_January_31_1939__Edit.jpg"
+                                                    alt="Gift">
+                                                <div class="gallery-caption">Article: Valuable Gift of Books Received
+                                                    (Jan 31, 1939).</div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Trustees Minutes -->
+                                        <div class="gallery-timeline-item" data-date="1939">
+                                            <div class="gallery-item" onclick="openLightbox(event, this)">
+                                                <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Trustees__minutes_on_librarian_duties.png"
+                                                    alt="Minutes">
+                                                <div class="gallery-caption">Trustees' minutes outlining librarian
+                                                    duties (1939).</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div
+                    class="hidden md:flex absolute left-1/2 transform -translate-x-1/2 mt-6 justify-center items-center w-12 h-12 bg-[#314882] rounded-full border-4 border-white shadow-xl z-20">
+                    <i class="fas fa-university text-white"></i>
+                </div>
+                <div class="w-full md:w-5/12 order-1 md:order-1"></div>
+            </div>
+        </div>
+
+        <!-- 1940-1964: Woodland Street -->
+        <div class="relative mb-12 md:mb-24 timeline-item">
+            <div class="md:flex items-start justify-between w-full">
+                <div class="w-full md:w-5/12 order-1 md:order-1">
+                    <div class="bg-white p-6 rounded-lg shadow-lg timeline-card border-t-4 border-[#314882]"
+                        onclick="toggleCard(event, this)">
+                        <div class="flex justify-between items-start">
+                            <span
+                                class="inline-block px-3 py-1 bg-[#000E2F] text-white text-sm font-bold rounded mb-2">1940
+                                - 1964</span>
+                            <i class="fas fa-chevron-down text-[#314882] chevron text-xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-[#000E2F] mb-2">39 Woodland Street: The Jacobus Mansion</h3>
+                        <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/39_Woodland_Street_with_addition_after_1953.jpg"
+                            alt="39 Woodland Street"
+                            class="w-full h-48 object-cover rounded mb-4 border border-gray-200">
+                        <p class="text-gray-600 mb-2">A "veritable mansion" compared to previous quarters. An annex was
+                            later built to house book stacks and a reading room.</p>
+
+                        <!-- Hidden Content -->
+                        <div class="details-content mt-4 pt-4 border-t border-gray-200">
+                            <h4 class="font-bold text-[#314882] mb-3 text-sm uppercase">Highlights</h4>
+                            <div class="gallery-grid">
+                                <div class="gallery-timeline">
+
+                                    <div class="gallery-timeline-item" data-date="1940">
+                                        <!-- Woodland Street -->
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/UCLS22806-64_39_Woodland_Ave.jpg"
+                                                alt="39 Woodland">
+                                            <div class="gallery-caption">39 Woodland Street, former home of M.W.
+                                                Jacobus.</div>
+                                        </div>
+                                    </div>
+                                    <!-- Woodland with Addition -->
+                                    <div class="gallery-timeline-item" data-date="1940">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/39_Woodland_Street_with_addition_after_1953.jpg"
+                                                alt="Addition">
+                                            <div class="gallery-caption">39 Woodland Street showing the new annex
+                                                addition.</div>
+                                        </div>
+                                    </div>
+                                    <!-- Reading Room -->
+                                    <div class="gallery-timeline-item" data-date="1940">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Law_Library_Woodland_Street_circa_1930s.jpg"
+                                                alt="Reading Room">
+                                            <div class="gallery-caption">The new reading room inside the annex.</div>
+                                        </div>
+                                    </div>
+                                    <!-- Board Minutes -->
+                                    <div class="gallery-timeline-item" data-date="1940">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/money_raise_to_purchase_39_Woodland.png"
+                                                alt="Board Minutes">
+                                            <div class="gallery-caption">Board of Trustees minutes regarding purchase of
+                                                39 Woodland.</div>
+                                        </div>
+                                    </div>
+                                    <!-- Caroline Lillard -->
+                                    <div class="gallery-timeline-item" data-date="1940-1942">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://libapps.s3.amazonaws.com/accounts/194059/images/1_-_Caroline__Lillard.jpg"
+                                                alt="Caroline Lillard">
+                                            <div class="gallery-caption">Caroline Lillard, co-founder, managed the
+                                                library 1940-1942.</div>
+                                        </div>
+                                    </div>
+                                    <!-- George Lillard Death -->
+                                    <div class="gallery-timeline-item" data-date="1940">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/George_Lillard_Dies__Formed_Law_College_October_25_1940.jpg"
+                                                alt="Lillard Death">
+                                            <div class="gallery-caption">Obituary: George Lillard Dies (Oct 25, 1940).
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Margaret Lane -->
+                                    <div class="gallery-timeline-item" data-date="1943">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Margaret_Turner_Lane_appointed_Librarian_HC_May_12__1944.png"
+                                                alt="Margaret Lane">
+                                            <div class="gallery-caption">Margaret Taylor Lane appointed librarian
+                                                (1943), the first professional librarian.</div>
+                                        </div>
+                                    </div>
+                                    <!-- Leon Liddell -->
+                                    <div class="gallery-timeline-item" data-date="1946">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Liddell_appointed_librarian.png"
+                                                alt="Leon Liddell">
+                                            <div class="gallery-caption">Leon M. Liddell named Law Librarian (1946).
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Eileen Murphy -->
+                                    <div class="gallery-timeline-item" data-date="1956">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Eileen_Murphy_Prattorian_Yearbook_photo_1952.jpg"
+                                                alt="Eileen Murphy">
+                                            <div class="gallery-caption">Eileen M. Murphy, librarian 1956-1957.</div>
+                                        </div>
+                                    </div>
+                                    <!-- Shirley Bysiewicz -->
+                                    <div class="gallery-timeline-item" data-date="1957">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Shirley_Byciewicz_1.jpg"
+                                                alt="Shirley Bysiewicz">
+                                            <div class="gallery-caption">Shirley Raissi Bysiewicz succeeded Murphy in
+                                                1957.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div
+                class="hidden md:flex absolute left-1/2 transform -translate-x-1/2 mt-6 justify-center items-center w-12 h-12 bg-[#314882] rounded-full border-4 border-white shadow-xl z-20">
+                <i class="fas fa-home text-white"></i>
+            </div>
+            <div class="w-full md:w-5/12 order-1 md:order-2"></div>
+        </div>
+        </div>
+
+        <!-- 1964-1984: 1800 Asylum -->
+        <div class="relative mb-12 md:mb-24 timeline-item">
+            <div class="md:flex items-start justify-between w-full">
+                <div class="w-full md:w-5/12 order-1 md:order-2">
+                    <div class="bg-white p-6 rounded-lg shadow-lg timeline-card border-t-4 border-[#314882]"
+                        onclick="toggleCard(event, this)">
+                        <div class="flex justify-between items-start">
+                            <span
+                                class="inline-block px-3 py-1 bg-[#000E2F] text-white text-sm font-bold rounded mb-2">1964
+                                - 1984</span>
+                            <i class="fas fa-chevron-down text-[#314882] chevron text-xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-[#000E2F] mb-2">1800 Asylum Avenue</h3>
+                        <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/197__-_1800_Asylum_bldg___students.jpg"
+                            alt="1800 Asylum Avenue"
+                            class="w-full h-48 object-cover rounded mb-4 border border-gray-200">
+                        <p class="text-gray-600">A purpose-built building in West Hartford. This era saw the
+                            introduction of early legal technology.</p>
+
+                        <!-- Hidden Content -->
+                        <div class="details-content mt-4 pt-4 border-t border-gray-200">
+                            <h4 class="font-bold text-[#314882] mb-3 text-sm uppercase">Highlights</h4>
+                            <div class="gallery-grid">
+                                <div class="gallery-timeline">
+
+                                    <div class="gallery-timeline-item" data-date="1964">
+                                        <!-- 1800 Asylum -->
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/197__-_1800_Asylum_bldg___students.jpg"
+                                                alt="1800 Asylum">
+                                            <div class="gallery-caption">1800 Asylum Avenue in West Hartford.</div>
+                                        </div>
+                                    </div>
+                                    <!-- Newspaper -->
+                                    <div class="gallery-timeline-item" data-date="1964">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/front_page_of_West_Hartford_News_1964_April_30.jpg"
+                                                alt="Newspaper">
+                                            <div class="gallery-caption">West Hartford News Special Section, April 30,
+                                                1964.</div>
+                                        </div>
+                                    </div>
+                                    <!-- Advertisement -->
+                                    <div class="gallery-timeline-item" data-date="1964">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/West_Hartford_News_advertisdement_1964_April_30.jpg"
+                                                alt="Ad">
+                                            <div class="gallery-caption">Advertisement from West Hartford News.</div>
+                                        </div>
+                                    </div>
+                                    <!-- Bysiewicz Hallway -->
+                                    <div class="gallery-timeline-item" data-date="1979">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Bysiewicz_Shirley_hallway_with_student_and_faculty_1800_Asylum_4.11.1979_001.536.jpg"
+                                                alt="Bysiewicz">
+                                            <div class="gallery-caption">Shirley Bysiewicz (second from left) with
+                                                students/faculty, 1979.</div>
+                                        </div>
+                                    </div>
+                                    <!-- Staff List -->
+                                    <div class="gallery-timeline-item" data-date="1968">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/1968-1968_Library_staff.png"
+                                                alt="Staff">
+                                            <div class="gallery-caption">1968-1969 Library Staff List.</div>
+                                        </div>
+                                    </div>
+                                    <!-- Description -->
+                                    <div class="gallery-timeline-item" data-date="1972">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/library_description_1972-1973_catalog.png"
+                                                alt="Description">
+                                            <div class="gallery-caption">Library description, 1972-1973 catalog.</div>
+                                        </div>
+                                    </div>
+                                    <!-- Main Desk -->
+                                    <div class="gallery-timeline-item" data-date="1979">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Building_LS_polaroids_5.jpg"
+                                                alt="Main Desk">
+                                            <div class="gallery-caption">The main desk in the 1800 Asylum library.</div>
+                                        </div>
+                                    </div>
+                                    <!-- Students Studying -->
+                                    <div class="gallery-timeline-item" data-date="1979">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Students_in_Library_1800_Asylum_1979_S3_003.368_001.jpg"
+                                                alt="Students">
+                                            <div class="gallery-caption">Students studying, 1979.</div>
+                                        </div>
+                                    </div>
+                                    <!-- Student Newspaper -->
+                                    <div class="gallery-timeline-item" data-date="1979">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Student_reading_newspaper_Starr_Library_S6_003.342_001.jpg"
+                                                alt="Newspaper">
+                                            <div class="gallery-caption">Student reading newspaper in print format.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Photocopying -->
+                                    <div class="gallery-timeline-item" data-date="1968">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Student_photocopying_book_Starr_RR_perhaps_001.348.jpg"
+                                                alt="Photocopying">
+                                            <div class="gallery-caption">Student photocopying. First mention of Xerox in
+                                                1968.</div>
+                                        </div>
+                                    </div>
+                                    <!-- Early Computer -->
+                                    <div class="gallery-timeline-item" data-date="1970">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/198_-_Student_at_early_terminal.jpg"
+                                                alt="Early Computer">
+                                            <div class="gallery-caption">Student at an early word processing machine.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Microfiche -->
+                                    <div class="gallery-timeline-item" data-date="1970">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Student_at_Computer_Starr_Library_S6_003.339_001.jpg"
+                                                alt="Microfiche">
+                                            <div class="gallery-caption">Student using a microfiche reader.</div>
+                                        </div>
+                                    </div>
+                                    <!-- 1983 Staff -->
+                                    <div class="gallery-timeline-item" data-date="1983">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/1983-84_Library_Staff.png"
+                                                alt="Staff">
+                                            <div class="gallery-caption">1983-1984 Library Staff (expanded to 12).</div>
+                                        </div>
+                                    </div>
+                                    <!-- Dennis Stone -->
+                                    <div class="gallery-timeline-item" data-date="1983">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Dennis_Stone_standing_at_desk_F4_001.339.jpg"
+                                                alt="Dennis Stone">
+                                            <div class="gallery-caption">Dennis Stone, Librarian 1983-1995.</div>
+                                        </div>
+                                    </div>
+                                    <!-- Dennis Stone Portrait -->
+                                    <div class="gallery-timeline-item" data-date="1984">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Dennis_Stone_001.490.jpg"
+                                                alt="Dennis Stone Portrait">
+                                            <div class="gallery-caption">Dennis Stone oversaw the move to the new
+                                                campus.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div
+                    class="hidden md:flex absolute left-1/2 transform -translate-x-1/2 mt-6 justify-center items-center w-12 h-12 bg-[#314882] rounded-full border-4 border-white shadow-xl z-20">
+                    <i class="fas fa-city text-white"></i>
+                </div>
+                <div class="w-full md:w-5/12 order-1 md:order-1"></div>
+            </div>
+        </div>
+
+        <!-- 1984-1995: Starr Library -->
+        <div class="relative mb-12 md:mb-24 timeline-item">
+            <div class="md:flex items-start justify-between w-full">
+                <div class="w-full md:w-5/12 order-1 md:order-1">
+                    <div class="bg-white p-6 rounded-lg shadow-lg timeline-card border-t-4 border-[#314882]"
+                        onclick="toggleCard(event, this)">
+                        <div class="flex justify-between items-start">
+                            <span
+                                class="inline-block px-3 py-1 bg-[#000E2F] text-white text-sm font-bold rounded mb-2">1984
+                                - 1995</span>
+                            <i class="fas fa-chevron-down text-[#314882] chevron text-xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-[#000E2F] mb-2">Starr Library</h3>
+                        <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Starr_Hall_landscape.jpg"
+                            alt="Starr Hall" class="w-full h-48 object-cover rounded mb-4 border border-gray-200">
+                        <p class="text-gray-600">The school moved to the former Hartford Seminary Campus. The library
+                            was located in Avery Hall, later named Starr Hall.</p>
+
+                        <!-- Hidden Content -->
+                        <div class="details-content mt-4 pt-4 border-t border-gray-200">
+                            <h4 class="font-bold text-[#314882] mb-3 text-sm uppercase">Highlights</h4>
+                            <div class="gallery-grid">
+                                <div class="gallery-timeline">
+                                    <!-- Starr Winter -->
+                                    <div class="gallery-timeline-item" data-date="1982">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/StarrhallSnowStudents.jpg"
+                                                alt="Starr Winter">
+                                            <div class="gallery-caption">Starr Hall in Winter.</div>
+                                        </div>
+                                    </div>
+                                    <!-- Avery Arch -->
+                                    <div class="gallery-timeline-item" data-date="1982">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Catalogs_1982-1983_Cover_with_Avery_arch_detail.jpg"
+                                                alt="Arch">
+                                            <div class="gallery-caption">Avery Building archway, 1982-1983 catalog.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Starr Reading Room -->
+                                    <div class="gallery-timeline-item" data-date="1988">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Starr_Reading_Room_view_from_above_of_students_studying_Sept_1988_S2_003.131_001_c_Breadheft.jpg"
+                                                alt="Reading Room">
+                                            <div class="gallery-caption">Starr Reading Room, Sept 1988.</div>
+                                        </div>
+                                    </div>
+                                    <!-- Card Catalog -->
+                                    <div class="gallery-timeline-item" data-date="1988">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Card_catalog_1988_S1_003.079_c_Beadheft_001.jpg"
+                                                alt="Card Catalog">
+                                            <div class="gallery-caption">Using the card catalog in Starr Library, 1988.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Students in Stacks -->
+                                    <div class="gallery-timeline-item" data-date="1988">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/student_in_stacks_Starr_Library_1988_S1_003.078_c_Breadheft_001.jpg"
+                                                alt="Stacks">
+                                            <div class="gallery-caption">Students in the stacks, 1988.</div>
+                                        </div>
+                                    </div>
+                                    <!-- 1983 Description -->
+                                    <div class="gallery-timeline-item" data-date="1983">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/1983-1984_library_description.png"
+                                                alt="Description">
+                                            <div class="gallery-caption">Library as a community hub, 1983-1984 catalog.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Empty Reading Room -->
+                                    <div class="gallery-timeline-item" data-date="1995">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Starr_Reading_room_no_students.png"
+                                                alt="Room">
+                                            <div class="gallery-caption">Starr Reading Room (1995-1996 catalog).</div>
+                                        </div>
+                                    </div>
+                                    <!-- Student in Window -->
+                                    <div class="gallery-timeline-item" data-date="1984">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Student_at_Starr_Reading_Room_Window__S4_003.421.jpg"
+                                                alt="Window">
+                                            <div class="gallery-caption">Student reading in window at Starr Library.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Lexis Terminal -->
+                                    <div class="gallery-timeline-item" data-date="1984">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Lexis_terminal_in_library.png"
+                                                alt="Lexis">
+                                            <div class="gallery-caption">Lexis and Westlaw terminals available by 1984.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Lexis Terminal 2 -->
+                                    <div class="gallery-timeline-item" data-date="1988">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Lexis_Terminal_1988_S2_003.135_001.jpg"
+                                                alt="Lexis 2">
+                                            <div class="gallery-caption">Woman at Lexis terminal, 1988.</div>
+                                        </div>
+                                    </div>
+                                    <!-- Group at Terminal -->
+                                    <div class="gallery-timeline-item" data-date="1988">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/198-_1st_Lexis_terminal.jpg"
+                                                alt="Group">
+                                            <div class="gallery-caption">Group gathered around an early legal database
+                                                terminal.</div>
+                                        </div>
+                                    </div>
+                                    <!-- Construction Report -->
+                                    <div class="gallery-timeline-item" data-date="1990">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/New_Library_Construction_and_Design_1990-1991_Annual_Report.png"
+                                                alt="Report">
+                                            <div class="gallery-caption">New Library Construction Report (1990-1991).
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Tree Topping -->
+                                    <div class="gallery-timeline-item" data-date="1994">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/1994_Dec-Tree_Topping_Library.jpg"
+                                                alt="Tree Topping">
+                                            <div class="gallery-caption">Tree Topping for the new library, Dec 1994.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Construction -->
+                                    <div class="gallery-timeline-item" data-date="1995">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/1995_Lib_Construction_3.jpg"
+                                                alt="Construction">
+                                            <div class="gallery-caption">New Library under construction, 1995.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div
+                    class="hidden md:flex absolute left-1/2 transform -translate-x-1/2 mt-6 justify-center items-center w-12 h-12 bg-[#314882] rounded-full border-4 border-white shadow-xl z-20">
+                    <i class="fas fa-tree text-white"></i>
+                </div>
+                <div class="w-full md:w-5/12 order-1 md:order-2"></div>
+            </div>
+        </div>
+
+        <!-- 1996: Meskill Library -->
+        <div class="relative mb-12 md:mb-24 timeline-item">
+            <div class="md:flex items-start justify-between w-full">
+                <div class="w-full md:w-5/12 order-1 md:order-2">
+                    <div class="bg-white p-6 rounded-lg shadow-lg timeline-card border-t-4 border-[#314882]"
+                        onclick="toggleCard(event, this)">
+                        <div class="flex justify-between items-start">
+                            <span
+                                class="inline-block px-3 py-1 bg-[#000E2F] text-white text-sm font-bold rounded mb-2">1996
+                                - Present</span>
+                            <i class="fas fa-chevron-down text-[#314882] chevron text-xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-[#000E2F] mb-2">Thomas J. Meskill Law Library</h3>
+                        <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/GrayLibrary.JPG"
+                            alt="Meskill Law Library"
+                            class="w-full h-48 object-cover rounded mb-4 border border-gray-200">
+                        <p class="text-gray-600 mb-2">A standalone library opened in 1996. Dedicated as the Thomas J.
+                            Meskill Law Library in 2010.</p>
+
+                        <!-- Hidden Content -->
+                        <div class="details-content mt-4 pt-4 border-t border-gray-200">
+                            <h4 class="font-bold text-[#314882] mb-3 text-sm uppercase">Highlights</h4>
+                            <div class="gallery-grid">
+                                <div class="gallery-timeline">
+                                    <!-- Panorama -->
+                                    <div class="gallery-timeline-item" data-date="1996">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Starr_Hall_panorama.jpg"
+                                                alt="Panorama">
+                                            <div class="gallery-caption">The New Library.</div>
+                                        </div>
+                                    </div>
+                                    <!-- Breyer -->
+                                    <div class="gallery-timeline-item" data-date="1996">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Breyer__Stephen_1.JPG"
+                                                alt="Breyer">
+                                            <div class="gallery-caption">Justice Stephen G. Breyer at the 1996
+                                                dedication.</div>
+                                        </div>
+                                    </div>
+                                    <!-- Invitation -->
+                                    <div class="gallery-timeline-item" data-date="1996">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/New_Library_Dedication_1996_invitation_and_Oct_24_1996_Public_Forum_Page_2.jpg"
+                                                alt="Invitation">
+                                            <div class="gallery-caption">Invitation to the new library dedication
+                                                (1996).</div>
+                                        </div>
+                                    </div>
+                                    <!-- Specs -->
+                                    <div class="gallery-timeline-item" data-date="1995">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Library_specs.jpg"
+                                                alt="Specs">
+                                            <div class="gallery-caption">Specification sheet for new library.</div>
+                                        </div>
+                                    </div>
+                                    <!-- Darcy Kirk -->
+                                    <div class="gallery-timeline-item" data-date="1996">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Kirk_Darcy_1990s_001.485.jpg"
+                                                alt="Darcy Kirk">
+                                            <div class="gallery-caption">Darcy Kirk, inaugural Director (1996).</div>
+                                        </div>
+                                    </div>
+                                    <!-- Darcy Kirk Portrait -->
+                                    <div class="gallery-timeline-item" data-date="1995-2017">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/DarcyKirk_new.jpeg"
+                                                alt="Darcy Kirk Portrait">
+                                            <div class="gallery-caption">Darcy Kirk, Director 1995-2017.</div>
+                                        </div>
+                                    </div>
+                                    <!-- Interior -->
+                                    <div class="gallery-timeline-item" data-date="1996">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/lawlib30_morenus.jpg"
+                                                alt="Interior">
+                                            <div class="gallery-caption">Interior of the new library, 3rd floor.</div>
+                                        </div>
+                                    </div>
+                                    <!-- Meskill Dedication -->
+                                    <div class="gallery-timeline-item" data-date="2010">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/P1011042.JPG"
+                                                alt="Meskill Dedication">
+                                            <div class="gallery-caption">Meskill Law Library Dedication, April 13, 2010.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Jodi Rell -->
+                                    <div class="gallery-timeline-item" data-date="2010">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/P1011038.JPG"
+                                                alt="Jodi Rell">
+                                            <div class="gallery-caption">Gov. Jodi Rell at the dedication.</div>
+                                        </div>
+                                    </div>
+                                    <!-- Library Dusk -->
+                                    <div class="gallery-timeline-item" data-date="2010">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Library_dusk_3.jpeg"
+                                                alt="Dusk">
+                                            <div class="gallery-caption">Thomas J. Meskill Library at dusk.</div>
+                                        </div>
+                                    </div>
+                                    <!-- Graduate Report -->
+                                    <div class="gallery-timeline-item" data-date="2010">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/GraduateReports_2010_Fall_024.jpg"
+                                                alt="Graduate Report">
+                                            <div class="gallery-caption">Meskill Library dedication, Graduate Report
+                                                2010.</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Rehab: Exterior -->
+                                    <div class="gallery-timeline-item" data-date="2008">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Outside_4_12_08.JPG"
+                                                alt="Rehab Exterior">
+                                            <div class="gallery-caption">Rehab: Exterior construction (2008).</div>
+                                        </div>
+                                    </div>
+                                    <!-- Rehab: Scaffolding -->
+                                    <div class="gallery-timeline-item" data-date="2008">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Outside_2_12_08.JPG"
+                                                alt="Scaffolding">
+                                            <div class="gallery-caption">Rehab: Exterior scaffolding.</div>
+                                        </div>
+                                    </div>
+                                    <!-- Rehab: Door -->
+                                    <div class="gallery-timeline-item" data-date="2008">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/door_between_ref_fed_room_12_08.JPG"
+                                                alt="Blocked Door">
+                                            <div class="gallery-caption">Rehab: Blocked fire door.</div>
+                                        </div>
+                                    </div>
+                                    <!-- Rehab: Stacks -->
+                                    <div class="gallery-timeline-item" data-date="2008">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Ref_CT_12_08.JPG"
+                                                alt="Rehab Stacks">
+                                            <div class="gallery-caption">Rehab: Reference Stacks.</div>
+                                        </div>
+                                    </div>
+                                    <!-- Rehab: Books -->
+                                    <div class="gallery-timeline-item" data-date="2008">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Ref_in_3rl_12_08.JPG"
+                                                alt="Rehab Books">
+                                            <div class="gallery-caption">Rehab: Book trucks in reading room.</div>
+                                        </div>
+                                    </div>
+                                    <!-- Rehab: Table -->
+                                    <div class="gallery-timeline-item" data-date="2008">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/table_in_front_of_ref_desk_12_08.JPG"
+                                                alt="Rehab Table">
+                                            <div class="gallery-caption">Rehab: Table in front of Reference Desk.</div>
+                                        </div>
+                                    </div>
+                                    <!-- Rehab: Fed Room -->
+                                    <div class="gallery-timeline-item" data-date="2008">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/view_of_stacks_in_fed_room_12_08.JPG"
+                                                alt="Fed Room">
+                                            <div class="gallery-caption">Rehab: Federal Room stacks.</div>
+                                        </div>
+                                    </div>
+                                    <!-- Rehab: Insurance -->
+                                    <div class="gallery-timeline-item" data-date="2008">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/view_of_stacks_by_insur_coll_2_12_08.JPG"
+                                                alt="Insurance">
+                                            <div class="gallery-caption">Rehab: Insurance Collection stacks.</div>
+
+                                        </div>
+
+                                    </div>
+                                    <!-- Wittman -->
+                                    <div class="gallery-timeline-item" data-date="2018">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/deperio-wittman.jpeg"
+                                                alt="Wittman">
+                                            <div class="gallery-caption">Jessica de Perio Wittman, Director
+                                                2018-present.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div
+                    class="hidden md:flex absolute left-1/2 transform -translate-x-1/2 mt-6 justify-center items-center w-12 h-12 bg-[#FFC40D] rounded-full border-4 border-white shadow-xl z-20">
+                    <i class="fas fa-star text-[#000E2F]"></i>
+                </div>
+                <div class="w-full md:w-5/12 order-1 md:order-1"></div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-[#000E2F] text-white py-8 text-center">
+        <p class="text-sm opacity-80">&copy; 2025 University of Connecticut School of Law. All Rights Reserved.</p>
+        <p class="text-xs opacity-60 mt-2">Content curated from the Law Library Centennial Exhibit.</p>
+    </footer>
+
+    <!-- Lightbox -->
+    <div id="lightbox" onclick="closeLightbox()">
+        <span id="lightbox-close">&times;</span>
+        <img id="lightbox-img" src="" alt="Enlarged Image" onclick="event.stopPropagation()">
+        <div id="lightbox-caption" onclick="event.stopPropagation()"></div>
+    </div>
+
+    <script>
+        function handleKeyActivate(event, element) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                element.click();
+            }
+        }
+
+        function toggleCard(event, card) {
+            if (event) {
+                event.stopPropagation();
+                }
+            card.classList.toggle('expanded');
+            card.setAttribute('aria-expanded', card.classList.contains('expanded') ? 'true' : 'false');
+        }
+
+        function openLightbox(event, element) {
+            if (event) {
+                event.stopPropagation();
+            }
+            const img = element.querySelector('img');
+            const caption = element.querySelector('.gallery-caption');
+
+            if (img) {
+                document.getElementById('lightbox-img').src = img.src;
+                document.getElementById('lightbox-caption').innerText = caption ? caption.innerText : '';
+                document.getElementById('lightbox').classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Add ESC key listener to close lightbox
+        document.addEventListener('keydown', function (event) {
+            if (event.key === "Escape") {
+                closeLightbox();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.timeline-card');
+            cards.forEach(card => {
+                card.setAttribute('role', 'button');
+                card.setAttribute('tabindex', '0');
+                card.setAttribute('aria-expanded', 'false');
+                const heading = card.querySelector('h3');
+                if (heading) {
+                    card.setAttribute('aria-label', heading.innerText.trim());
+                }
+                card.addEventListener('keydown', (event) => handleKeyActivate(event, card));
+            });
+
+            const galleryItems = document.querySelectorAll('.gallery-item');
+            galleryItems.forEach(item => {
+                item.setAttribute('role', 'button');
+                item.setAttribute('tabindex', '0');
+                const caption = item.querySelector('.gallery-caption');
+                if (caption) {
+                    item.setAttribute('aria-label', caption.innerText.trim());
+                }
+                item.addEventListener('keydown', (event) => handleKeyActivate(event, item));
+            });
+
+            document.querySelectorAll('img').forEach(img => {
+                if (img.dataset.priority === "true") {
+                    return;
+                }
+                img.loading = 'lazy';
+            });
+        });
+    </script>
+
+</body>
+
+</html>
+
