@@ -179,6 +179,7 @@
 
         .gallery-timeline-item {
             position: relative;
+            margin-bottom: 1rem;
             padding-left: 2.25rem;
             /* room for badge */
         }
@@ -217,7 +218,7 @@
             display: grid;
             grid-template-columns: 1fr;
             gap: 0.75rem;
-            align-items: start;
+            align-items:start;
             cursor: zoom-in;
             background: #f8fafc;
             border-radius: 0.5rem;
@@ -235,9 +236,9 @@
         .gallery-item img {
             width: 100%;
             height: 90px;
-            object-fit: cover;
+            object-fit: contain;
             border-radius: 0.5rem;
-            border: 1px solid #e2e8f0;
+           
         }
 
         .gallery-caption {
@@ -309,7 +310,7 @@
                 </h1>
 
                 <p class="text-xl md:text-2xl text-[#FFC40D] font-light">
-                    University of Connecticut School of Law Library (1921&ndash;Present)
+                    University of Connecticut School of Law Library (1926 &ndash; Present)
                 </p>
 
                 <div class="mt-6 w-24 h-1 bg-[#FFC40D] mx-auto md:mx-0 rounded-full"></div>
@@ -495,7 +496,7 @@
                             alt="44 Niles Street" class="w-full h-48 object-cover rounded mb-4 border border-gray-200">
                         <p class="text-gray-600">The move to Niles Street provided space for the library to expand.
                             Accreditation followed shortly after.</p>
-
+                        
                         <!-- Hidden Content -->
                         <div class="details-content mt-4 pt-4 border-t border-gray-200">
                             <h4 class="font-bold text-[#314882] mb-3 text-sm uppercase">Highlights</h4>
@@ -526,14 +527,14 @@
                                                 alt="Accreditation">
                                             <div class="gallery-caption">ABA Accreditation notice, 1934-1935 Catalog.
                                             </div>
-                                        </div>
+                                        </div></div>
                                         <!-- Birdseye Case -->
                                         <div class="gallery-timeline-item" data-date="1934">
                                             <div class="gallery-item" onclick="openLightbox(event, this)">
-                                                <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Birdseye_Case_listed_as_Librarian_1934_catalog.png"
+                                                <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Birdsey_Case_F6_001.543.jpg"
                                                     alt="Birdseye Case">
-                                                <div class="gallery-caption">Birdseye Case listed as the first Law
-                                                    Library Director in 1934.</div>
+                                                <div class="gallery-caption"><strong>Birdseye Case</strong> listed as the first Law
+                                                    Library Director in 1934. He had also been a law professor at the Hartford College of Law starting in 1922.</div>
                                             </div>
                                         </div>
                                         <!-- Library Facilities -->
@@ -542,15 +543,6 @@
                                                 <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Library_facilities_1934_text_from_catalog.png"
                                                     alt="Facilities">
                                                 <div class="gallery-caption">Description of Library Facilities, 1934.
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <!-- Birdseye Case Portrait -->
-                                        <div class="gallery-timeline-item" data-date="1934">
-                                            <div class="gallery-item" onclick="openLightbox(event, this)">
-                                                <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Birdseye_Case_F6_001.543.jpg"
-                                                    alt="Birdseye Case Portrait">
-                                                <div class="gallery-caption">Birdseye Case, librarian from 1934-1943.
                                                 </div>
                                             </div>
                                         </div>
@@ -584,7 +576,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                       
                     </div>
                 </div>
                 <div
@@ -660,7 +652,7 @@
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://libapps.s3.amazonaws.com/accounts/194059/images/1_-_Caroline__Lillard.jpg"
                                                 alt="Caroline Lillard">
-                                            <div class="gallery-caption">Caroline Lillard, co-founder, managed the
+                                            <div class="gallery-caption"><strong>Caroline Lillard</strong>, co-founder, managed the
                                                 library 1940-1942.</div>
                                         </div>
                                     </div>
@@ -674,12 +666,12 @@
                                         </div>
                                     </div>
                                     <!-- Margaret Lane -->
-                                    <div class="gallery-timeline-item" data-date="1943">
+                                    <div class="gallery-timeline-item" data-date="1943-1945">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Margaret_Turner_Lane_appointed_Librarian_HC_May_12__1944.png"
                                                 alt="Margaret Lane">
-                                            <div class="gallery-caption">Margaret Taylor Lane appointed librarian
-                                                (1943), the first professional librarian.</div>
+                                            <div class="gallery-caption"><strong>Margaret Taylor Lane</strong> appointed librarian. Ms. Taylor Lane's career would mostly take place in Louisiana but for two years, she oversaw the law library.  She was a graduate of both the Louisiana State Law School and Columbia University School of Library Science. Board Minutes from January 16, 1946, show the Board accepting her resignation in that year.  She went on work at the Louisiana State as Law Librarian and lecturer on Legal Bibliography and later as recorder of documents for the state of Louisiana.
+                                                </div>
                                         </div>
                                     </div>
                                     <!-- Leon Liddell -->
@@ -687,7 +679,16 @@
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Liddell_appointed_librarian.png"
                                                 alt="Leon Liddell">
-                                            <div class="gallery-caption">Leon M. Liddell named Law Librarian (1946).
+                                            <div class="gallery-caption"><strong>Leon M. Liddell</strong> named Law Librarian. Liddell earned his legal degree at the University of Texas and was admitted to the Texas Bar.  He worked both in private practice and for Insurance companies in the claims divisions before coming to the Law Library, which at that time was now the University of Connecticut School of Law.  After a short stint in Connecticut, Liddell moved on to the University of Minnesota for the law librarian position there.
+                                            </div>
+                                        </div>
+                                    </div>
+                                                                        <!-- Karl Punzak-->
+                                    <div class="gallery-timeline-item" data-date="1948 - 1955">
+                                        <div class="gallery-item" onclick="openLightbox(event, this)">
+                                            <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Karl_Punzak_Harvard_Law_School_photograph-Enhance.png"
+                                                alt="Karl Punzak">
+                                            <div class="gallery-caption"><strong>Karl Punzak</strong> put constant pressure on the Administration for increases to the library budget and the collection grew from 15,000 to over 22,000 volumes during this tenure.  He also directed planning for a new wing at the 39 Woodland Street building. The entire second floor of this addition housed the main reading room of the Library. 
                                             </div>
                                         </div>
                                     </div>
@@ -696,16 +697,16 @@
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Eileen_Murphy_Prattorian_Yearbook_photo_1952.jpg"
                                                 alt="Eileen Murphy">
-                                            <div class="gallery-caption">Eileen M. Murphy, librarian 1956-1957.</div>
-                                        </div>
+                                            <div class="gallery-caption"><strong>Eileen M. Murphy</strong>took over as law librarian in 1956.  Ms. Murphy had an MLS (Master of Library Science) from Pratt Institute Library School in New York City and a LL.B. from St. John's University.  She moved on to an illustrious career after leaving UConn.  She was hired as the first female attorney at General Motors Corporation in 1959 and played an important role in establishing the American Association of Law Librarians' (AALL) headquarters in Chicago. </div>
+                                        </div> 
                                     </div>
                                     <!-- Shirley Bysiewicz -->
-                                    <div class="gallery-timeline-item" data-date="1957">
+                                    <div class="gallery-timeline-item" data-date="1957-1983">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Shirley_Byciewicz_1.jpg"
                                                 alt="Shirley Bysiewicz">
-                                            <div class="gallery-caption">Shirley Raissi Bysiewicz succeeded Murphy in
-                                                1957.</div>
+                                            <div class="gallery-caption"><strong> Shirley Raissi Bysiewicz </strong>oversaw the move of the library to 1800 Asylum and staffing of a new space. She was a strong advocate for the library and staff.
+                                            Bysiewicz returned to her alma mater in 1956 to teach and in 1972 became the first female tenured professor at the University of Connecticut School of Law.  She served as a law librarian and later library director.  Bysiewicz is widely credited and commended for the growth and quality of the library's collections during her time as Director.</div>
                                         </div>
                                     </div>
                                 </div>
@@ -857,11 +858,11 @@
                                         </div>
                                     </div>
                                     <!-- Dennis Stone -->
-                                    <div class="gallery-timeline-item" data-date="1983">
+                                    <div class="gallery-timeline-item" data-date="1983-1995">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Dennis_Stone_standing_at_desk_F4_001.339.jpg"
                                                 alt="Dennis Stone">
-                                            <div class="gallery-caption">Dennis Stone, Librarian 1983-1995.</div>
+                                            <div class="gallery-caption"><strong>Dennis Stone</strong>, Librarian 1983-1995.</div>
                                         </div>
                                     </div>
                                     <!-- Dennis Stone Portrait -->
@@ -869,8 +870,7 @@
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Dennis_Stone_001.490.jpg"
                                                 alt="Dennis Stone Portrait">
-                                            <div class="gallery-caption">Dennis Stone oversaw the move to the new
-                                                campus.</div>
+                                            <div class="gallery-caption">Stone moved the library from 1800 Asylum to the new campus of the former Hartford Seminary.  He also was instrumental in planning for the new library at 39 Elizabeth Street including spaces, collections and staff considerations.</div>
                                         </div>
                                     </div>
                                 </div>
@@ -1101,19 +1101,19 @@
                                         </div>
                                     </div>
                                     <!-- Darcy Kirk -->
-                                    <div class="gallery-timeline-item" data-date="1996">
+                                    <div class="gallery-timeline-item" data-date="1995-2017">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Kirk_Darcy_1990s_001.485.jpg"
                                                 alt="Darcy Kirk">
-                                            <div class="gallery-caption">Darcy Kirk, inaugural Director (1996).</div>
+                                            <div class="gallery-caption"><strong>Darcy Kirk</strong>, Director of the Law Library, 1995-2017 and Associate Professor of Law</div>
                                         </div>
                                     </div>
                                     <!-- Darcy Kirk Portrait -->
-                                    <div class="gallery-timeline-item" data-date="1995-2017">
+                                    <div class="gallery-timeline-item" data-date="1996">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/DarcyKirk_new.jpeg"
                                                 alt="Darcy Kirk Portrait">
-                                            <div class="gallery-caption">Darcy Kirk, Director 1995-2017.</div>
+                                            <div class="gallery-caption">Kirk came on while the library was moving into the new space.  She had to quickly get up to date on the move and space configurations and was instrumental in improving study space and library layout in her first years as director.</div>
                                         </div>
                                     </div>
                                     <!-- Interior -->
@@ -1230,8 +1230,8 @@
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/deperio-wittman.jpeg"
                                                 alt="Wittman">
-                                            <div class="gallery-caption">Jessica de Perio Wittman, Director
-                                                2018-present.</div>
+                                            <div class="gallery-caption"><strong>Jessica de Perio Wittman</strong>, Director
+                                                2018-present. Wittman has been director during a move from less print to more digital to online learning. During her time, law librarians have increased courses taught in legal research and writing, and added ones on access to justice and diversity in the law among others.  Librarians also provide in class sessions on using legal databases, and provide one on one consulting to students for papers and projects.  They also provide indepth research services for faculty.</div>
                                         </div>
                                     </div>
                                 </div>
