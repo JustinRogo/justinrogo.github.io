@@ -42,6 +42,54 @@
             z-index: 0;
         }
 
+        .timeline-item .timeline-marker {
+            top: 1.5rem;
+        }
+
+        @media (min-width: 1200px) {
+            .timeline-item .timeline-column.timeline-content {
+                flex: 0 0 58%;
+                width: 58% !important;
+                max-width: 58%;
+            }
+
+            .timeline-item .timeline-column.timeline-spacer {
+                flex: 0 0 42%;
+                width: 42% !important;
+                max-width: 42%;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .timeline-item {
+                --timeline-center-gap: 3.25rem;
+            }
+
+            .timeline-item .timeline-column.timeline-content.timeline-content-left {
+                padding-right: var(--timeline-center-gap);
+            }
+
+            .timeline-item .timeline-column.timeline-content.timeline-content-right {
+                padding-left: var(--timeline-center-gap);
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .timeline-item {
+                --timeline-center-gap: 5.25rem;
+            }
+
+            .timeline-item .timeline-column.timeline-content.timeline-content-left .timeline-card {
+                width: calc(100% - var(--timeline-center-gap));
+                margin-right: var(--timeline-center-gap);
+            }
+
+            .timeline-item .timeline-column.timeline-content.timeline-content-right .timeline-card {
+                width: calc(100% - var(--timeline-center-gap));
+                margin-left: var(--timeline-center-gap);
+            }
+        }
+
         /* Card animations */
         .timeline-card {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -508,7 +556,7 @@
 
 
     <!-- Timeline Container -->
-    <main class="max-w-6xl mx-auto py-12 px-4 relative">
+    <main class="max-w-7xl xl:max-w-[1600px] mx-auto py-12 px-4 relative">
 
         <!-- Central Line -->
         <div class="timeline-line hidden md:block"></div>
@@ -516,7 +564,7 @@
         <!-- 1921: Founding Era -->
         <div class="relative mb-12 md:mb-24 timeline-item">
             <div class="md:flex items-start justify-between w-full">
-                <div class="w-full md:w-5/12 lg:w-6/12 order-1 md:order-1">
+                <div class="timeline-column timeline-content timeline-content-left w-full md:w-5/12 lg:w-6/12 order-1 md:order-1">
                     <div class="bg-white p-6 rounded-lg shadow-lg timeline-card border-t-4 border-[#314882]"
                         onclick="toggleCard(event, this)">
                         <div class="flex justify-between items-start">
@@ -616,16 +664,16 @@
                 </div>
             </div>
             <div
-                class="hidden md:flex absolute left-1/2 transform -translate-x-1/2 mt-6 justify-center items-center w-12 h-12 bg-[#FFC40D] rounded-full border-4 border-white shadow-xl z-20">
+                class="timeline-marker hidden md:flex absolute left-1/2 transform -translate-x-1/2 justify-center items-center w-12 h-12 bg-[#FFC40D] rounded-full border-4 border-white shadow-xl z-20">
                 <i class="fas fa-landmark text-[#000E2F]"></i>
             </div>
-            <div class="w-full md:w-5/12 lg:w-6/12 order-1 md:order-2"></div>
+            <div class="timeline-column timeline-spacer w-full md:w-5/12 lg:w-6/12 order-1 md:order-2"></div>
         </div>
 
         <!-- 1931-1940: Niles Street -->
         <div class="relative mb-12 md:mb-24 timeline-item">
             <div class="md:flex items-start justify-between w-full">
-                <div class="w-full md:w-5/12 lg:w-6/12 order-1 md:order-2">
+                <div class="timeline-column timeline-content timeline-content-right w-full md:w-5/12 lg:w-6/12 order-1 md:order-2">
                     <div class="bg-white p-6 rounded-lg shadow-lg timeline-card border-t-4 border-[#314882]"
                         onclick="toggleCard(event, this)">
                         <div class="flex justify-between items-start">
@@ -723,17 +771,17 @@
                     </div>
                 </div>
                 <div
-                    class="hidden md:flex absolute left-1/2 transform -translate-x-1/2 mt-6 justify-center items-center w-12 h-12 bg-[#314882] rounded-full border-4 border-white shadow-xl z-20">
-                    <i class="fas fa-university text-white"></i>
+                    class="timeline-marker hidden md:flex absolute left-1/2 transform -translate-x-1/2 justify-center items-center w-12 h-12 bg-[#314882] rounded-full border-4 border-white shadow-xl z-20">
+                    <i class="fas fa-landmark text-white"></i>
                 </div>
-                <div class="w-full md:w-5/12 lg:w-6/12 order-1 md:order-1"></div>
+                <div class="timeline-column timeline-spacer w-full md:w-5/12 lg:w-6/12 order-1 md:order-1"></div>
             </div>
         </div>
 
         <!-- 1940-1964: Woodland Street -->
         <div class="relative mb-12 md:mb-24 timeline-item">
             <div class="md:flex items-start justify-between w-full">
-                <div class="w-full md:w-5/12 lg:w-6/12 order-1 md:order-1">
+                <div class="timeline-column timeline-content timeline-content-left w-full md:w-5/12 lg:w-6/12 order-1 md:order-1">
                     <div class="bg-white p-6 rounded-lg shadow-lg timeline-card border-t-4 border-[#314882]"
                         onclick="toggleCard(event, this)">
                         <div class="flex justify-between items-start">
@@ -859,17 +907,17 @@
                 </div>
             </div>
             <div
-                class="hidden md:flex absolute left-1/2 transform -translate-x-1/2 mt-6 justify-center items-center w-12 h-12 bg-[#314882] rounded-full border-4 border-white shadow-xl z-20">
-                <i class="fas fa-home text-white"></i>
+                class="timeline-marker hidden md:flex absolute left-1/2 transform -translate-x-1/2 justify-center items-center w-12 h-12 bg-[#314882] rounded-full border-4 border-white shadow-xl z-20">
+                <i class="fas fa-landmark text-white"></i>
             </div>
-            <div class="w-full md:w-5/12 lg:w-6/12 order-1 md:order-2"></div>
+            <div class="timeline-column timeline-spacer w-full md:w-5/12 lg:w-6/12 order-1 md:order-2"></div>
         </div>
         </div>
 
         <!-- 1964-1984: 1800 Asylum -->
         <div class="relative mb-12 md:mb-24 timeline-item">
             <div class="md:flex items-start justify-between w-full">
-                <div class="w-full md:w-5/12 lg:w-6/12 order-1 md:order-2">
+                <div class="timeline-column timeline-content timeline-content-right w-full md:w-5/12 lg:w-6/12 order-1 md:order-2">
                     <div class="bg-white p-6 rounded-lg shadow-lg timeline-card border-t-4 border-[#314882]"
                         onclick="toggleCard(event, this)">
                         <div class="flex justify-between items-start">
@@ -1022,17 +1070,17 @@
                     </div>
                 </div>
                 <div
-                    class="hidden md:flex absolute left-1/2 transform -translate-x-1/2 mt-6 justify-center items-center w-12 h-12 bg-[#314882] rounded-full border-4 border-white shadow-xl z-20">
-                    <i class="fas fa-city text-white"></i>
+                    class="timeline-marker hidden md:flex absolute left-1/2 transform -translate-x-1/2 justify-center items-center w-12 h-12 bg-[#314882] rounded-full border-4 border-white shadow-xl z-20">
+                    <i class="fas fa-landmark text-white"></i>
                 </div>
-                <div class="w-full md:w-5/12 lg:w-6/12 order-1 md:order-1"></div>
+                <div class="timeline-column timeline-spacer w-full md:w-5/12 lg:w-6/12 order-1 md:order-1"></div>
             </div>
         </div>
 
         <!-- 1984-1995: Starr Library -->
         <div class="relative mb-12 md:mb-24 timeline-item">
             <div class="md:flex items-start justify-between w-full">
-                <div class="w-full md:w-5/12 lg:w-6/12 order-1 md:order-1">
+                <div class="timeline-column timeline-content timeline-content-left w-full md:w-5/12 lg:w-6/12 order-1 md:order-1">
                     <div class="bg-white p-6 rounded-lg shadow-lg timeline-card border-t-4 border-[#314882]"
                         onclick="toggleCard(event, this)">
                         <div class="flex justify-between items-start">
@@ -1178,17 +1226,17 @@
                     </div>
                 </div>
                 <div
-                    class="hidden md:flex absolute left-1/2 transform -translate-x-1/2 mt-6 justify-center items-center w-12 h-12 bg-[#314882] rounded-full border-4 border-white shadow-xl z-20">
-                    <i class="fas fa-tree text-white"></i>
+                    class="timeline-marker hidden md:flex absolute left-1/2 transform -translate-x-1/2 justify-center items-center w-12 h-12 bg-[#314882] rounded-full border-4 border-white shadow-xl z-20">
+                    <i class="fas fa-landmark text-white"></i>
                 </div>
-                <div class="w-full md:w-5/12 lg:w-6/12 order-1 md:order-2"></div>
+                <div class="timeline-column timeline-spacer w-full md:w-5/12 lg:w-6/12 order-1 md:order-2"></div>
             </div>
         </div>
 
         <!-- 1996: Meskill Library -->
         <div class="relative mb-12 md:mb-24 timeline-item">
             <div class="md:flex items-start justify-between w-full">
-                <div class="w-full md:w-5/12 lg:w-6/12 order-1 md:order-2">
+                <div class="timeline-column timeline-content timeline-content-right w-full md:w-5/12 lg:w-6/12 order-1 md:order-2">
                     <div class="bg-white p-6 rounded-lg shadow-lg timeline-card border-t-4 border-[#314882]"
                         onclick="toggleCard(event, this)">
                         <div class="flex justify-between items-start">
@@ -1383,10 +1431,10 @@
                     </div>
                 </div>
                 <div
-                    class="hidden md:flex absolute left-1/2 transform -translate-x-1/2 mt-6 justify-center items-center w-12 h-12 bg-[#FFC40D] rounded-full border-4 border-white shadow-xl z-20">
-                    <i class="fas fa-star text-[#000E2F]"></i>
+                    class="timeline-marker hidden md:flex absolute left-1/2 transform -translate-x-1/2 justify-center items-center w-12 h-12 bg-[#FFC40D] rounded-full border-4 border-white shadow-xl z-20">
+                    <i class="fas fa-landmark text-[#000E2F]"></i>
                 </div>
-                <div class="w-full md:w-5/12 lg:w-6/12 order-1 md:order-1"></div>
+                <div class="timeline-column timeline-spacer w-full md:w-5/12 lg:w-6/12 order-1 md:order-1"></div>
             </div>
         </div>
 
