@@ -484,6 +484,43 @@
             outline: 3px solid var(--uconn-gold);
             outline-offset: 3px;
         }
+
+        .filter-btn {
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            color: #0b0f1a;
+            padding: 0.35rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 999px;
+            transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .filter-btn[aria-pressed="true"] {
+            background: var(--uconn-blue);
+            border-color: var(--uconn-blue);
+            color: #ffffff;
+        }
+
+        .filter-btn:focus-visible {
+            outline: 3px solid var(--uconn-gold);
+            outline-offset: 2px;
+        }
+
+        .filter-item {
+            transition: opacity 180ms ease, transform 180ms ease;
+        }
+
+        .filter-item.filter-fade {
+            opacity: 0;
+            transform: translateY(6px);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .filter-item {
+                transition: none;
+            }
+        }
     </style>
 </head>
 
@@ -497,7 +534,7 @@
             <div class="md:w-1/2 text-center md:text-left opacity-0 translate-y-3"
                 style="animation: fadeUp 700ms ease-out 80ms forwards;">
                 <h1 class="text-4xl md:text-5xl font-bold mb-4">
-                    A Century of Legal Knowledge
+                    100 Years of History
                 </h1>
 
                 <p class="text-xl md:text-2xl text-[#FFC40D] font-light">
@@ -518,6 +555,22 @@
             </div>
 
         </div>
+
+        <section class="mt-10">
+            <div class="max-w-6xl mx-auto flex flex-col items-center gap-3 text-center">
+                <span class="text-sm font-semibold text-white/80">Filter:</span>
+                <div class="flex flex-wrap justify-center gap-2" role="group" aria-label="Filter timeline by category">
+                    <button type="button" class="filter-btn" data-filter="all" aria-pressed="true">All</button>
+                    <button type="button" class="filter-btn" data-filter="people" aria-pressed="false">People</button>
+                    <button type="button" class="filter-btn" data-filter="buildings" aria-pressed="false">Buildings &amp; Spaces</button>
+                    <button type="button" class="filter-btn" data-filter="services" aria-pressed="false">Library Services &amp; Collections</button>
+                    <button type="button" class="filter-btn" data-filter="technology" aria-pressed="false">Technology &amp; Research Tools</button>
+                    <button type="button" class="filter-btn" data-filter="events" aria-pressed="false">Events &amp; Milestones</button>
+                    <button type="button" class="filter-btn" data-filter="students" aria-pressed="false">Students &amp; Daily Life</button>
+                </div>
+            </div>
+            <p id="filter-status" class="sr-only" role="status" aria-live="polite">Showing: All</p>
+        </section>
 
         <style>
             @keyframes fadeUp {
@@ -557,12 +610,11 @@
 
     <!-- Timeline Container -->
     <main class="max-w-7xl xl:max-w-[1600px] mx-auto py-12 px-4 relative">
-
         <!-- Central Line -->
         <div class="timeline-line hidden md:block"></div>
 
         <!-- 1921: Founding Era -->
-        <div class="relative mb-12 md:mb-24 timeline-item">
+        <div class="relative mb-12 md:mb-24 timeline-item filter-item" data-category="people buildings services events">
             <div class="md:flex items-start justify-between w-full">
                 <div class="timeline-column timeline-content timeline-content-left w-full md:w-5/12 lg:w-6/12 order-1 md:order-1">
                     <div class="bg-white p-6 rounded-lg shadow-lg timeline-card border-t-4 border-[#314882]"
@@ -573,12 +625,10 @@
                                 - 1931</span>
                             <i class="fas fa-chevron-down text-[#314882] chevron text-xl"></i>
                         </div>
-                        <h3 class="text-2xl font-bold text-[#000E2F] mb-2">The Early Years: Downtown Hartford</h3>
+                        <h3 class="text-2xl font-bold text-[#000E2F] mb-2">Downtown Hartford</h3>
                         <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/94_Allyn_Street_Hartford_Wire_Works_Co..jpg"
                             alt="94 Allyn Street" class="w-full h-48 object-cover rounded mb-4 border border-gray-200">
-                        <p class="text-gray-600 mb-3">From rented rooms at 94 Allyn Street to space in the Hartford
-                            Trust Building and Chapel Street. The college began with no library, relying on the Bar
-                            Library.</p>
+                        <p class="text-gray-600 mb-3">The law school operated out of rented space at several downtown locations, including 94 Allyn Street and the Hartford Trust Building. During this period, there was no dedicated law library, and students relied on the Hartford County Bar Library.</p>
 
                         <!-- Hidden Content -->
                         <div class="details-content mt-4 pt-4 border-t border-gray-200">
@@ -586,7 +636,7 @@
                             <div class="gallery-grid">
                                 <div class="gallery-timeline">
 
-                                    <div class="gallery-timeline-item" data-date="1921">
+                                    <div class="gallery-timeline-item filter-item" data-date="1921" data-category="buildings">
                                         <!-- 94 Allyn Street -->
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/94_Allyn_Street_Hartford_Wire_Works_Co..jpg"
@@ -596,7 +646,7 @@
                                         </div>
                                     </div>
                                     <!-- Display Ad -->
-                                    <div class="gallery-timeline-item" data-date="1921">
+                                    <div class="gallery-timeline-item filter-item" data-date="1921" data-category="events">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Hartford_College_for_Law_1_.PNG"
                                                 alt="Ad">
@@ -605,7 +655,7 @@
                                         </div>
                                     </div>
                                     <!-- 1922 Catalog -->
-                                    <div class="gallery-timeline-item" data-date="1922">
+                                    <div class="gallery-timeline-item filter-item" data-date="1922" data-category="services students">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/1922_1923_course_catalog_page_shortened_version.png"
                                                 alt="Catalog">
@@ -613,7 +663,7 @@
                                         </div>
                                     </div>
                                     <!-- Catalog Blurb -->
-                                    <div class="gallery-timeline-item" data-date="1922">
+                                    <div class="gallery-timeline-item filter-item" data-date="1922" data-category="services">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/blurb_1922_course_catalog_on_Hartford_as_location.png"
                                                 alt="Catalog Blurb">
@@ -622,7 +672,7 @@
                                         </div>
                                     </div>
                                     <!-- 750 Main Street -->
-                                    <div class="gallery-timeline-item" data-date="1923">
+                                    <div class="gallery-timeline-item filter-item" data-date="1923" data-category="buildings">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/750_Main_Street_Our_3rd_floor_Home_1922_B-3_005.373.jpg"
                                                 alt="750 Main">
@@ -631,7 +681,7 @@
                                         </div>
                                     </div>
                                     <!-- Gladys Judd Day -->
-                                    <div class="gallery-timeline-item" data-date="1926">
+                                    <div class="gallery-timeline-item filter-item" data-date="1926" data-category="people services">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/GJD_special_course_1926_catalog.png"
                                                 alt="Gladys Judd Day">
@@ -640,7 +690,7 @@
                                         </div>
                                     </div>
                                     <!-- Courant Article -->
-                                    <div class="gallery-timeline-item" data-date="1926">
+                                    <div class="gallery-timeline-item filter-item" data-date="1926" data-category="buildings events">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/College_Moves_into_New_Home_on_Chapel_Street_Spt_8_1926_SAVE.jpg"
                                                 alt="Article">
@@ -649,7 +699,7 @@
                                         </div>
                                     </div>
                                     <!-- 51 Chapel Street -->
-                                    <div class="gallery-timeline-item" data-date="1926">
+                                    <div class="gallery-timeline-item filter-item" data-date="1926" data-category="buildings">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/51_Chapel_Street_cropped.jpg"
                                                 alt="51 Chapel">
@@ -671,7 +721,7 @@
         </div>
 
         <!-- 1931-1940: Niles Street -->
-        <div class="relative mb-12 md:mb-24 timeline-item">
+        <div class="relative mb-12 md:mb-24 timeline-item filter-item" data-category="buildings services people events">
             <div class="md:flex items-start justify-between w-full">
                 <div class="timeline-column timeline-content timeline-content-right w-full md:w-5/12 lg:w-6/12 order-1 md:order-2">
                     <div class="bg-white p-6 rounded-lg shadow-lg timeline-card border-t-4 border-[#314882]"
@@ -682,11 +732,10 @@
                                 - 1940</span>
                             <i class="fas fa-chevron-down text-[#314882] chevron text-xl"></i>
                         </div>
-                        <h3 class="text-2xl font-bold text-[#000E2F] mb-2">44 Niles Street: Growth Begins</h3>
+                        <h3 class="text-2xl font-bold text-[#000E2F] mb-2">44 Niles Street</h3>
                         <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/44_Niles_Street_with_arch_etching_blacked_out_005.365.jpg"
                             alt="44 Niles Street" class="w-full h-48 object-cover rounded mb-4 border border-gray-200">
-                        <p class="text-gray-600">The move to Niles Street provided space for the library to expand.
-                            Accreditation followed shortly after.</p>
+                        <p class="text-gray-600">The move to 44 Niles Street provided dedicated space for library collections and services. The school received ABA accreditation shortly after this period.</p>
                         
                         <!-- Hidden Content -->
                         <div class="details-content mt-4 pt-4 border-t border-gray-200">
@@ -694,7 +743,7 @@
                             <div class="gallery-grid">
                                 <div class="gallery-timeline">
 
-                                    <div class="gallery-timeline-item" data-date="1931">
+                                    <div class="gallery-timeline-item filter-item" data-date="1931" data-category="buildings">
                                         <!-- 44 Niles Arch -->
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/44_Niles_Street_with_arch_etching_blacked_out_005.365.jpg"
@@ -703,7 +752,7 @@
                                         </div>
                                     </div>
                                     <!-- Catalog Cover -->
-                                    <div class="gallery-timeline-item" data-date="1932">
+                                    <div class="gallery-timeline-item filter-item" data-date="1932" data-category="buildings services">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/1932-1933_catalog_cover_of_44_Niles.png"
                                                 alt="Catalog Cover">
@@ -712,7 +761,7 @@
                                         </div>
                                     </div>
                                     <!-- Accreditation -->
-                                    <div class="gallery-timeline-item" data-date="1934">
+                                    <div class="gallery-timeline-item filter-item" data-date="1934" data-category="services events">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/ABA_Accreditation_1934-1935_catalog.png"
                                                 alt="Accreditation">
@@ -720,7 +769,7 @@
                                             </div>
                                         </div></div>
                                         <!-- Birdseye Case -->
-                                        <div class="gallery-timeline-item" data-date="1934">
+                                        <div class="gallery-timeline-item filter-item" data-date="1934" data-category="people buildings">
                                             <div class="gallery-item" onclick="openLightbox(event, this)">
                                                 <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Birdsey_Case_F6_001.543.jpg"
                                                     alt="Birdseye Case">
@@ -729,7 +778,7 @@
                                             </div>
                                         </div>
                                         <!-- Library Facilities -->
-                                        <div class="gallery-timeline-item" data-date="1934">
+                                        <div class="gallery-timeline-item filter-item" data-date="1934" data-category="buildings services">
                                             <div class="gallery-item" onclick="openLightbox(event, this)">
                                                 <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Library_facilities_1934_text_from_catalog.png"
                                                     alt="Facilities">
@@ -738,7 +787,7 @@
                                             </div>
                                         </div>
                                         <!-- Day Division -->
-                                        <div class="gallery-timeline-item" data-date="1935">
+                                        <div class="gallery-timeline-item filter-item" data-date="1935" data-category="events students">
                                             <div class="gallery-item" onclick="openLightbox(event, this)">
                                                 <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Day_Division_added_1934-1935_Catalog_p._4.png"
                                                     alt="Day Division">
@@ -746,7 +795,7 @@
                                             </div>
                                         </div>
                                         <!-- Valuable Gift -->
-                                        <div class="gallery-timeline-item" data-date="1939">
+                                        <div class="gallery-timeline-item filter-item" data-date="1939" data-category="events">
                                             <div class="gallery-item" onclick="openLightbox(event, this)">
                                                 <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Valuable_Gift_Received_January_31_1939__Edit.jpg"
                                                     alt="Gift">
@@ -756,7 +805,7 @@
                                         </div>
 
                                         <!-- Trustees Minutes -->
-                                        <div class="gallery-timeline-item" data-date="1939">
+                                        <div class="gallery-timeline-item filter-item" data-date="1939" data-category="people services">
                                             <div class="gallery-item" onclick="openLightbox(event, this)">
                                                 <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Trustees__minutes_on_librarian_duties.png"
                                                     alt="Minutes">
@@ -779,7 +828,7 @@
         </div>
 
         <!-- 1940-1964: Woodland Street -->
-        <div class="relative mb-12 md:mb-24 timeline-item">
+        <div class="relative mb-12 md:mb-24 timeline-item filter-item" data-category="buildings services people events">
             <div class="md:flex items-start justify-between w-full">
                 <div class="timeline-column timeline-content timeline-content-left w-full md:w-5/12 lg:w-6/12 order-1 md:order-1">
                     <div class="bg-white p-6 rounded-lg shadow-lg timeline-card border-t-4 border-[#314882]"
@@ -790,12 +839,11 @@
                                 - 1964</span>
                             <i class="fas fa-chevron-down text-[#314882] chevron text-xl"></i>
                         </div>
-                        <h3 class="text-2xl font-bold text-[#000E2F] mb-2">39 Woodland Street: The Jacobus Mansion</h3>
+                        <h3 class="text-2xl font-bold text-[#000E2F] mb-2">39 Woodland Street</h3>
                         <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/39_Woodland_Street_with_addition_after_1953.jpg"
                             alt="39 Woodland Street"
                             class="w-full h-48 object-cover rounded mb-4 border border-gray-200">
-                        <p class="text-gray-600 mb-2">A "veritable mansion" compared to previous quarters. An annex was
-                            later built to house book stacks and a reading room.</p>
+                        <p class="text-gray-600 mb-2">The move to 39 Woodland Street significantly increased available space. A later annex added dedicated stack areas and a reading room.</p>
 
                         <!-- Hidden Content -->
                         <div class="details-content mt-4 pt-4 border-t border-gray-200">
@@ -803,7 +851,7 @@
                             <div class="gallery-grid">
                                 <div class="gallery-timeline">
 
-                                    <div class="gallery-timeline-item" data-date="1940">
+                                    <div class="gallery-timeline-item filter-item" data-date="1940" data-category="buildings">
                                         <!-- Woodland Street -->
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/UCLS22806-64_39_Woodland_Ave.jpg"
@@ -813,7 +861,7 @@
                                         </div>
                                     </div>
                                     <!-- Woodland with Addition -->
-                                    <div class="gallery-timeline-item" data-date="1940">
+                                    <div class="gallery-timeline-item filter-item" data-date="1940" data-category="buildings">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/39_Woodland_Street_with_addition_after_1953.jpg"
                                                 alt="Addition">
@@ -822,7 +870,7 @@
                                         </div>
                                     </div>
                                     <!-- Reading Room -->
-                                    <div class="gallery-timeline-item" data-date="1940">
+                                    <div class="gallery-timeline-item filter-item" data-date="1940" data-category="buildings">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Law_Library_Woodland_Street_circa_1930s.jpg"
                                                 alt="Reading Room">
@@ -830,7 +878,7 @@
                                         </div>
                                     </div>
                                     <!-- Board Minutes -->
-                                    <div class="gallery-timeline-item" data-date="1940">
+                                    <div class="gallery-timeline-item filter-item" data-date="1940" data-category="services">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/money_raise_to_purchase_39_Woodland.png"
                                                 alt="Board Minutes">
@@ -839,7 +887,7 @@
                                         </div>
                                     </div>
                                     <!-- Caroline Lillard -->
-                                    <div class="gallery-timeline-item" data-date="1940-1942">
+                                    <div class="gallery-timeline-item filter-item" data-date="1940-1942" data-category="people buildings">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://libapps.s3.amazonaws.com/accounts/194059/images/1_-_Caroline__Lillard.jpg"
                                                 alt="Caroline Lillard">
@@ -848,16 +896,16 @@
                                         </div>
                                     </div>
                                     <!-- George Lillard Death -->
-                                    <div class="gallery-timeline-item" data-date="1940">
+                                    <div class="gallery-timeline-item filter-item" data-date="1940" data-category="people events">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/George_Lillard_Dies__Formed_Law_College_October_25_1940.jpg"
                                                 alt="Lillard Death">
-                                            <div class="gallery-caption">Obituary: George Lillard Dies (Oct 25, 1940).
+                                            <div class="gallery-caption">Obituary: George Lillard passed away October 25, 1940.
                                             </div>
                                         </div>
                                     </div>
                                     <!-- Margaret Lane -->
-                                    <div class="gallery-timeline-item" data-date="1943-1945">
+                                    <div class="gallery-timeline-item filter-item" data-date="1943-1945" data-category="people buildings services">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Margaret_Turner_Lane_appointed_Librarian_HC_May_12__1944.png"
                                                 alt="Margaret Lane">
@@ -866,7 +914,7 @@
                                         </div>
                                     </div>
                                     <!-- Leon Liddell -->
-                                    <div class="gallery-timeline-item" data-date="1946">
+                                    <div class="gallery-timeline-item filter-item" data-date="1946" data-category="people buildings services events">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Liddell_appointed_librarian.png"
                                                 alt="Leon Liddell">
@@ -875,7 +923,7 @@
                                         </div>
                                     </div>
                                                                         <!-- Karl Punzak-->
-                                    <div class="gallery-timeline-item" data-date="1948 - 1955">
+                                    <div class="gallery-timeline-item filter-item" data-date="1948 - 1955" data-category="people buildings services">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Karl_Punzak_Harvard_Law_School_photograph-Enhance.png"
                                                 alt="Karl Punzak">
@@ -884,7 +932,7 @@
                                         </div>
                                     </div>
                                     <!-- Eileen Murphy -->
-                                    <div class="gallery-timeline-item" data-date="1956">
+                                    <div class="gallery-timeline-item filter-item" data-date="1956" data-category="people buildings events">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Eileen_Murphy_Prattorian_Yearbook_photo_1952.jpg"
                                                 alt="Eileen Murphy">
@@ -892,7 +940,7 @@
                                         </div> 
                                     </div>
                                     <!-- Shirley Bysiewicz -->
-                                    <div class="gallery-timeline-item" data-date="1957-1983">
+                                    <div class="gallery-timeline-item filter-item" data-date="1957-1983" data-category="people buildings services events">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Shirley_Byciewicz_1.jpg"
                                                 alt="Shirley Bysiewicz">
@@ -915,7 +963,7 @@
         </div>
 
         <!-- 1964-1984: 1800 Asylum -->
-        <div class="relative mb-12 md:mb-24 timeline-item">
+        <div class="relative mb-12 md:mb-24 timeline-item filter-item" data-category="buildings services technology students people">
             <div class="md:flex items-start justify-between w-full">
                 <div class="timeline-column timeline-content timeline-content-right w-full md:w-5/12 lg:w-6/12 order-1 md:order-2">
                     <div class="bg-white p-6 rounded-lg shadow-lg timeline-card border-t-4 border-[#314882]"
@@ -930,8 +978,7 @@
                         <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/197__-_1800_Asylum_bldg___students.jpg"
                             alt="1800 Asylum Avenue"
                             class="w-full h-48 object-cover rounded mb-4 border border-gray-200">
-                        <p class="text-gray-600">A purpose-built building in West Hartford. This era saw the
-                            introduction of early legal technology.</p>
+                        <p class="text-gray-600">The move to 1800 Asylum Avenue marked the first purpose-built law library facility. During this period, early legal research technologies were introduced.</p>
 
                         <!-- Hidden Content -->
                         <div class="details-content mt-4 pt-4 border-t border-gray-200">
@@ -939,7 +986,7 @@
                             <div class="gallery-grid">
                                 <div class="gallery-timeline">
 
-                                    <div class="gallery-timeline-item" data-date="1964">
+                                    <div class="gallery-timeline-item filter-item" data-date="1964" data-category="buildings">
                                         <!-- 1800 Asylum -->
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/197__-_1800_Asylum_bldg___students.jpg"
@@ -948,7 +995,7 @@
                                         </div>
                                     </div>
                                     <!-- Newspaper -->
-                                    <div class="gallery-timeline-item" data-date="1964">
+                                    <div class="gallery-timeline-item filter-item" data-date="1964" data-category="events">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/front_page_of_West_Hartford_News_1964_April_30.jpg"
                                                 alt="Newspaper">
@@ -957,7 +1004,7 @@
                                         </div>
                                     </div>
                                     <!-- Advertisement -->
-                                    <div class="gallery-timeline-item" data-date="1964">
+                                    <div class="gallery-timeline-item filter-item" data-date="1964" data-category="events">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/West_Hartford_News_advertisdement_1964_April_30.jpg"
                                                 alt="Ad">
@@ -965,7 +1012,7 @@
                                         </div>
                                     </div>
                                     <!-- Bysiewicz Hallway -->
-                                    <div class="gallery-timeline-item" data-date="1979">
+                                    <div class="gallery-timeline-item filter-item" data-date="1979" data-category="students">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Bysiewicz_Shirley_hallway_with_student_and_faculty_1800_Asylum_4.11.1979_001.536.jpg"
                                                 alt="Bysiewicz">
@@ -974,7 +1021,7 @@
                                         </div>
                                     </div>
                                     <!-- Staff List -->
-                                    <div class="gallery-timeline-item" data-date="1968">
+                                    <div class="gallery-timeline-item filter-item" data-date="1968" data-category="buildings services">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/1968-1968_Library_staff.png"
                                                 alt="Staff">
@@ -982,7 +1029,7 @@
                                         </div>
                                     </div>
                                     <!-- Description -->
-                                    <div class="gallery-timeline-item" data-date="1972">
+                                    <div class="gallery-timeline-item filter-item" data-date="1972" data-category="buildings services">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/library_description_1972-1973_catalog.png"
                                                 alt="Description">
@@ -990,7 +1037,7 @@
                                         </div>
                                     </div>
                                     <!-- Main Desk -->
-                                    <div class="gallery-timeline-item" data-date="1979">
+                                    <div class="gallery-timeline-item filter-item" data-date="1979" data-category="buildings">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Building_LS_polaroids_5.jpg"
                                                 alt="Main Desk">
@@ -998,7 +1045,7 @@
                                         </div>
                                     </div>
                                     <!-- Students Studying -->
-                                    <div class="gallery-timeline-item" data-date="1979">
+                                    <div class="gallery-timeline-item filter-item" data-date="1979" data-category="students">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Students_in_Library_1800_Asylum_1979_S3_003.368_001.jpg"
                                                 alt="Students">
@@ -1006,7 +1053,7 @@
                                         </div>
                                     </div>
                                     <!-- Student Newspaper -->
-                                    <div class="gallery-timeline-item" data-date="1979">
+                                    <div class="gallery-timeline-item filter-item" data-date="1979" data-category="students">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Student_reading_newspaper_Starr_Library_S6_003.342_001.jpg"
                                                 alt="Newspaper">
@@ -1015,7 +1062,7 @@
                                         </div>
                                     </div>
                                     <!-- Photocopying -->
-                                    <div class="gallery-timeline-item" data-date="1968">
+                                    <div class="gallery-timeline-item filter-item" data-date="1968" data-category="technology students">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Student_photocopying_book_Starr_RR_perhaps_001.348.jpg"
                                                 alt="Photocopying">
@@ -1024,7 +1071,7 @@
                                         </div>
                                     </div>
                                     <!-- Early Computer -->
-                                    <div class="gallery-timeline-item" data-date="1970">
+                                    <div class="gallery-timeline-item filter-item" data-date="1970" data-category="technology students">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/198_-_Student_at_early_terminal.jpg"
                                                 alt="Early Computer">
@@ -1033,7 +1080,7 @@
                                         </div>
                                     </div>
                                     <!-- Microfiche -->
-                                    <div class="gallery-timeline-item" data-date="1970">
+                                    <div class="gallery-timeline-item filter-item" data-date="1970" data-category="technology students">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Student_at_Computer_Starr_Library_S6_003.339_001.jpg"
                                                 alt="Microfiche">
@@ -1041,7 +1088,7 @@
                                         </div>
                                     </div>
                                     <!-- 1983 Staff -->
-                                    <div class="gallery-timeline-item" data-date="1983">
+                                    <div class="gallery-timeline-item filter-item" data-date="1983" data-category="buildings services">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/1983-84_Library_Staff.png"
                                                 alt="Staff">
@@ -1049,7 +1096,7 @@
                                         </div>
                                     </div>
                                     <!-- Dennis Stone -->
-                                    <div class="gallery-timeline-item" data-date="1983-1995">
+                                    <div class="gallery-timeline-item filter-item" data-date="1983-1995" data-category="people">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Dennis_Stone_standing_at_desk_F4_001.339.jpg"
                                                 alt="Dennis Stone">
@@ -1057,7 +1104,7 @@
                                         </div>
                                     </div>
                                     <!-- Dennis Stone Portrait -->
-                                    <div class="gallery-timeline-item" data-date="1984">
+                                    <div class="gallery-timeline-item filter-item" data-date="1984" data-category="buildings services events">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Dennis_Stone_001.490.jpg"
                                                 alt="Dennis Stone Portrait">
@@ -1078,7 +1125,7 @@
         </div>
 
         <!-- 1984-1995: Starr Library -->
-        <div class="relative mb-12 md:mb-24 timeline-item">
+        <div class="relative mb-12 md:mb-24 timeline-item filter-item" data-category="buildings services technology students events">
             <div class="md:flex items-start justify-between w-full">
                 <div class="timeline-column timeline-content timeline-content-left w-full md:w-5/12 lg:w-6/12 order-1 md:order-1">
                     <div class="bg-white p-6 rounded-lg shadow-lg timeline-card border-t-4 border-[#314882]"
@@ -1101,7 +1148,7 @@
                             <div class="gallery-grid">
                                 <div class="gallery-timeline">
                                     <!-- Starr Winter -->
-                                    <div class="gallery-timeline-item" data-date="1982">
+                                    <div class="gallery-timeline-item filter-item" data-date="1982" data-category="buildings">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/StarrhallSnowStudents.jpg"
                                                 alt="Starr Winter">
@@ -1109,7 +1156,7 @@
                                         </div>
                                     </div>
                                     <!-- Avery Arch -->
-                                    <div class="gallery-timeline-item" data-date="1982">
+                                    <div class="gallery-timeline-item filter-item" data-date="1982" data-category="buildings services">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Catalogs_1982-1983_Cover_with_Avery_arch_detail.jpg"
                                                 alt="Arch">
@@ -1118,7 +1165,7 @@
                                         </div>
                                     </div>
                                     <!-- Starr Reading Room -->
-                                    <div class="gallery-timeline-item" data-date="1988">
+                                    <div class="gallery-timeline-item filter-item" data-date="1988" data-category="buildings">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Starr_Reading_Room_view_from_above_of_students_studying_Sept_1988_S2_003.131_001_c_Breadheft.jpg"
                                                 alt="Reading Room">
@@ -1126,7 +1173,7 @@
                                         </div>
                                     </div>
                                     <!-- Card Catalog -->
-                                    <div class="gallery-timeline-item" data-date="1988">
+                                    <div class="gallery-timeline-item filter-item" data-date="1988" data-category="buildings services">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Card_catalog_1988_S1_003.079_c_Beadheft_001.jpg"
                                                 alt="Card Catalog">
@@ -1135,7 +1182,7 @@
                                         </div>
                                     </div>
                                     <!-- Students in Stacks -->
-                                    <div class="gallery-timeline-item" data-date="1988">
+                                    <div class="gallery-timeline-item filter-item" data-date="1988" data-category="buildings students">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/student_in_stacks_Starr_Library_1988_S1_003.078_c_Breadheft_001.jpg"
                                                 alt="Stacks">
@@ -1143,7 +1190,7 @@
                                         </div>
                                     </div>
                                     <!-- 1983 Description -->
-                                    <div class="gallery-timeline-item" data-date="1983">
+                                    <div class="gallery-timeline-item filter-item" data-date="1983" data-category="buildings services">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/1983-1984_library_description.png"
                                                 alt="Description">
@@ -1152,7 +1199,7 @@
                                         </div>
                                     </div>
                                     <!-- Empty Reading Room -->
-                                    <div class="gallery-timeline-item" data-date="1995">
+                                    <div class="gallery-timeline-item filter-item" data-date="1995" data-category="buildings services">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Starr_Reading_room_no_students.png"
                                                 alt="Room">
@@ -1160,7 +1207,7 @@
                                         </div>
                                     </div>
                                     <!-- Student in Window -->
-                                    <div class="gallery-timeline-item" data-date="1984">
+                                    <div class="gallery-timeline-item filter-item" data-date="1984" data-category="buildings students">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Student_at_Starr_Reading_Room_Window__S4_003.421.jpg"
                                                 alt="Window">
@@ -1169,7 +1216,7 @@
                                         </div>
                                     </div>
                                     <!-- Lexis Terminal -->
-                                    <div class="gallery-timeline-item" data-date="1984">
+                                    <div class="gallery-timeline-item filter-item" data-date="1984" data-category="technology">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Lexis_terminal_in_library.png"
                                                 alt="Lexis">
@@ -1178,7 +1225,7 @@
                                         </div>
                                     </div>
                                     <!-- Lexis Terminal 2 -->
-                                    <div class="gallery-timeline-item" data-date="1988">
+                                    <div class="gallery-timeline-item filter-item" data-date="1988" data-category="technology">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Lexis_Terminal_1988_S2_003.135_001.jpg"
                                                 alt="Lexis 2">
@@ -1186,7 +1233,7 @@
                                         </div>
                                     </div>
                                     <!-- Group at Terminal -->
-                                    <div class="gallery-timeline-item" data-date="1988">
+                                    <div class="gallery-timeline-item filter-item" data-date="1988" data-category="technology">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/198-_1st_Lexis_terminal.jpg"
                                                 alt="Group">
@@ -1195,7 +1242,7 @@
                                         </div>
                                     </div>
                                     <!-- Construction Report -->
-                                    <div class="gallery-timeline-item" data-date="1990">
+                                    <div class="gallery-timeline-item filter-item" data-date="1990" data-category="buildings services events">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/New_Library_Construction_and_Design_1990-1991_Annual_Report.png"
                                                 alt="Report">
@@ -1204,7 +1251,7 @@
                                         </div>
                                     </div>
                                     <!-- Tree Topping -->
-                                    <div class="gallery-timeline-item" data-date="1994">
+                                    <div class="gallery-timeline-item filter-item" data-date="1994" data-category="buildings events">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/1994_Dec-Tree_Topping_Library.jpg"
                                                 alt="Tree Topping">
@@ -1213,7 +1260,7 @@
                                         </div>
                                     </div>
                                     <!-- Construction -->
-                                    <div class="gallery-timeline-item" data-date="1995">
+                                    <div class="gallery-timeline-item filter-item" data-date="1995" data-category="buildings events">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/1995_Lib_Construction_3.jpg"
                                                 alt="Construction">
@@ -1234,7 +1281,7 @@
         </div>
 
         <!-- 1996: Meskill Library -->
-        <div class="relative mb-12 md:mb-24 timeline-item">
+        <div class="relative mb-12 md:mb-24 timeline-item filter-item" data-category="buildings services technology people events">
             <div class="md:flex items-start justify-between w-full">
                 <div class="timeline-column timeline-content timeline-content-right w-full md:w-5/12 lg:w-6/12 order-1 md:order-2">
                     <div class="bg-white p-6 rounded-lg shadow-lg timeline-card border-t-4 border-[#314882]"
@@ -1258,7 +1305,7 @@
                             <div class="gallery-grid">
                                 <div class="gallery-timeline">
                                     <!-- Panorama -->
-                                    <div class="gallery-timeline-item" data-date="1996">
+                                    <div class="gallery-timeline-item filter-item" data-date="1996" data-category="buildings">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Starr_Hall_panorama.jpg"
                                                 alt="Panorama">
@@ -1266,7 +1313,7 @@
                                         </div>
                                     </div>
                                     <!-- Breyer -->
-                                    <div class="gallery-timeline-item" data-date="1996">
+                                    <div class="gallery-timeline-item filter-item" data-date="1996" data-category="people events">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Breyer__Stephen_1.JPG"
                                                 alt="Breyer">
@@ -1275,7 +1322,7 @@
                                         </div>
                                     </div>
                                     <!-- Invitation -->
-                                    <div class="gallery-timeline-item" data-date="1996">
+                                    <div class="gallery-timeline-item filter-item" data-date="1996" data-category="buildings events">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/New_Library_Dedication_1996_invitation_and_Oct_24_1996_Public_Forum_Page_2.jpg"
                                                 alt="Invitation">
@@ -1284,7 +1331,7 @@
                                         </div>
                                     </div>
                                     <!-- Specs -->
-                                    <div class="gallery-timeline-item" data-date="1995">
+                                    <div class="gallery-timeline-item filter-item" data-date="1995" data-category="buildings services">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Library_specs.jpg"
                                                 alt="Specs">
@@ -1292,7 +1339,7 @@
                                         </div>
                                     </div>
                                     <!-- Darcy Kirk -->
-                                    <div class="gallery-timeline-item" data-date="1995-2017">
+                                    <div class="gallery-timeline-item filter-item" data-date="1995-2017" data-category="people buildings">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Kirk_Darcy_1990s_001.485.jpg"
                                                 alt="Darcy Kirk">
@@ -1300,7 +1347,7 @@
                                         </div>
                                     </div>
                                     <!-- Darcy Kirk Portrait -->
-                                    <div class="gallery-timeline-item" data-date="1996">
+                                    <div class="gallery-timeline-item filter-item" data-date="1996" data-category="people buildings events">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/DarcyKirk_new.jpeg"
                                                 alt="Darcy Kirk Portrait">
@@ -1308,7 +1355,7 @@
                                         </div>
                                     </div>
                                     <!-- Interior -->
-                                    <div class="gallery-timeline-item" data-date="1996">
+                                    <div class="gallery-timeline-item filter-item" data-date="1996" data-category="buildings">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/lawlib30_morenus.jpg"
                                                 alt="Interior">
@@ -1316,7 +1363,7 @@
                                         </div>
                                     </div>
                                     <!-- Meskill Dedication -->
-                                    <div class="gallery-timeline-item" data-date="2010">
+                                    <div class="gallery-timeline-item filter-item" data-date="2010" data-category="buildings events">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/P1011042.JPG"
                                                 alt="Meskill Dedication">
@@ -1325,7 +1372,7 @@
                                         </div>
                                     </div>
                                     <!-- Jodi Rell -->
-                                    <div class="gallery-timeline-item" data-date="2010">
+                                    <div class="gallery-timeline-item filter-item" data-date="2010" data-category="people events">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/P1011038.JPG"
                                                 alt="Jodi Rell">
@@ -1333,7 +1380,7 @@
                                         </div>
                                     </div>
                                     <!-- Library Dusk -->
-                                    <div class="gallery-timeline-item" data-date="2010">
+                                    <div class="gallery-timeline-item filter-item" data-date="2010" data-category="buildings">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Library_dusk_3.jpeg"
                                                 alt="Dusk">
@@ -1341,7 +1388,7 @@
                                         </div>
                                     </div>
                                     <!-- Graduate Report -->
-                                    <div class="gallery-timeline-item" data-date="2010">
+                                    <div class="gallery-timeline-item filter-item" data-date="2010" data-category="buildings services events">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/GraduateReports_2010_Fall_024.jpg"
                                                 alt="Graduate Report">
@@ -1351,7 +1398,7 @@
                                     </div>
 
                                     <!-- Rehab: Exterior -->
-                                    <div class="gallery-timeline-item" data-date="2008">
+                                    <div class="gallery-timeline-item filter-item" data-date="2008" data-category="buildings events">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Outside_4_12_08.JPG"
                                                 alt="Rehab Exterior">
@@ -1359,7 +1406,7 @@
                                         </div>
                                     </div>
                                     <!-- Rehab: Scaffolding -->
-                                    <div class="gallery-timeline-item" data-date="2008">
+                                    <div class="gallery-timeline-item filter-item" data-date="2008" data-category="buildings">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Outside_2_12_08.JPG"
                                                 alt="Scaffolding">
@@ -1367,7 +1414,7 @@
                                         </div>
                                     </div>
                                     <!-- Rehab: Door -->
-                                    <div class="gallery-timeline-item" data-date="2008">
+                                    <div class="gallery-timeline-item filter-item" data-date="2008" data-category="buildings">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/door_between_ref_fed_room_12_08.JPG"
                                                 alt="Blocked Door">
@@ -1375,7 +1422,7 @@
                                         </div>
                                     </div>
                                     <!-- Rehab: Stacks -->
-                                    <div class="gallery-timeline-item" data-date="2008">
+                                    <div class="gallery-timeline-item filter-item" data-date="2008" data-category="buildings services">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Ref_CT_12_08.JPG"
                                                 alt="Rehab Stacks">
@@ -1383,7 +1430,7 @@
                                         </div>
                                     </div>
                                     <!-- Rehab: Books -->
-                                    <div class="gallery-timeline-item" data-date="2008">
+                                    <div class="gallery-timeline-item filter-item" data-date="2008" data-category="buildings services">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/Ref_in_3rl_12_08.JPG"
                                                 alt="Rehab Books">
@@ -1391,7 +1438,7 @@
                                         </div>
                                     </div>
                                     <!-- Rehab: Table -->
-                                    <div class="gallery-timeline-item" data-date="2008">
+                                    <div class="gallery-timeline-item filter-item" data-date="2008" data-category="buildings services">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/table_in_front_of_ref_desk_12_08.JPG"
                                                 alt="Rehab Table">
@@ -1399,7 +1446,7 @@
                                         </div>
                                     </div>
                                     <!-- Rehab: Fed Room -->
-                                    <div class="gallery-timeline-item" data-date="2008">
+                                    <div class="gallery-timeline-item filter-item" data-date="2008" data-category="buildings services">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/view_of_stacks_in_fed_room_12_08.JPG"
                                                 alt="Fed Room">
@@ -1407,7 +1454,7 @@
                                         </div>
                                     </div>
                                     <!-- Rehab: Insurance -->
-                                    <div class="gallery-timeline-item" data-date="2008">
+                                    <div class="gallery-timeline-item filter-item" data-date="2008" data-category="buildings services">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/view_of_stacks_by_insur_coll_2_12_08.JPG"
                                                 alt="Insurance">
@@ -1417,7 +1464,7 @@
 
                                     </div>
                                     <!-- Wittman -->
-                                    <div class="gallery-timeline-item" data-date="2018">
+                                    <div class="gallery-timeline-item filter-item" data-date="2018" data-category="people services technology events students">
                                         <div class="gallery-item" onclick="openLightbox(event, this)">
                                             <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/321838/images/deperio-wittman.jpeg"
                                                 alt="Wittman">
@@ -1425,6 +1472,7 @@
                                                 2018-present. de Perio Wittman has been director during a move from less print to more digital to online learning. During her time, law librarians have increased courses taught in legal research and writing, and added ones on access to justice and diversity in the law among others.  Librarians also provide in class sessions on using legal databases, and provide one on one consulting to students for papers and projects.  They also provide indepth research services for faculty.</div>
                                         </div>
                                     </div>
+
                                 </div>
                             </div>
                         </div>
@@ -1454,6 +1502,9 @@
     </div>
 
     <script>
+        let layoutMasonry = () => {};
+        let scheduleMasonry = () => {};
+
         function handleKeyActivate(event, element) {
             if (event.key === 'Enter' || event.key === ' ') {
                 event.preventDefault();
@@ -1467,6 +1518,7 @@
                 }
             card.classList.toggle('expanded');
             card.setAttribute('aria-expanded', card.classList.contains('expanded') ? 'true' : 'false');
+            card.dataset.userExpanded = card.classList.contains('expanded') ? 'true' : 'false';
         }
 
         function openLightbox(event, element) {
@@ -1489,6 +1541,120 @@
             document.body.style.overflow = '';
         }
 
+        const filterLabels = {
+            all: 'All',
+            people: 'People',
+            buildings: 'Buildings & Spaces',
+            services: 'Library Services & Collections',
+            technology: 'Technology & Research Tools',
+            events: 'Events & Milestones',
+            students: 'Students & Daily Life'
+        };
+
+        let activeFilterKey = 'all';
+
+        function applyFilter(filterKey) {
+            const items = document.querySelectorAll('.filter-item');
+            const buttons = document.querySelectorAll('[data-filter]');
+            const liveRegion = document.getElementById('filter-status');
+            const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const cards = document.querySelectorAll('.timeline-card');
+
+            buttons.forEach(button => {
+                const isActive = button.dataset.filter === filterKey;
+                button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+            });
+
+            const expandCards = filterKey !== 'all';
+            if (expandCards && activeFilterKey === 'all') {
+                cards.forEach(card => {
+                    card.dataset.prevExpanded = card.classList.contains('expanded') ? 'true' : 'false';
+                    card.classList.add('expanded');
+                    card.setAttribute('aria-expanded', 'true');
+                });
+            } else if (!expandCards && activeFilterKey !== 'all') {
+                cards.forEach(card => {
+                    const wasExpanded = card.dataset.prevExpanded === 'true';
+                    card.classList.toggle('expanded', wasExpanded);
+                    card.setAttribute('aria-expanded', wasExpanded ? 'true' : 'false');
+                    delete card.dataset.prevExpanded;
+                });
+            } else if (expandCards) {
+                cards.forEach(card => {
+                    if (!card.classList.contains('expanded')) {
+                        card.classList.add('expanded');
+                        card.setAttribute('aria-expanded', 'true');
+                    }
+                });
+            }
+
+            items.forEach(item => {
+                const categories = (item.dataset.category || '').split(/\s+/).filter(Boolean);
+                const matches = filterKey === 'all' || categories.includes(filterKey);
+
+                if (matches) {
+                    if (item.hideTimer) {
+                        window.clearTimeout(item.hideTimer);
+                        item.hideTimer = null;
+                    }
+                    if (item.classList.contains('hidden')) {
+                        item.classList.remove('hidden');
+                        if (!reduceMotion) {
+                            item.classList.add('filter-fade');
+                            requestAnimationFrame(() => {
+                                item.classList.remove('filter-fade');
+                            });
+                        } else {
+                            item.classList.remove('filter-fade');
+                        }
+                    } else {
+                        item.classList.remove('filter-fade');
+                    }
+                    return;
+                }
+
+                if (reduceMotion) {
+                    item.classList.add('hidden');
+                    return;
+                }
+
+                if (!item.classList.contains('filter-fade')) {
+                    item.classList.add('filter-fade');
+                }
+
+                if (!item.classList.contains('hidden')) {
+                    item.hideTimer = window.setTimeout(() => {
+                        item.classList.add('hidden');
+                    }, 180);
+                }
+            });
+
+            const updateGroupVisibility = () => {
+                const groups = document.querySelectorAll('.gallery-timeline-group');
+                groups.forEach(group => {
+                    const hasVisibleItems = group.querySelectorAll('.filter-item:not(.hidden)').length > 0;
+                    group.classList.toggle('hidden', !hasVisibleItems);
+                });
+            };
+
+            updateGroupVisibility();
+            if (!reduceMotion) {
+                window.setTimeout(updateGroupVisibility, 220);
+            }
+
+            if (liveRegion) {
+                const label = filterLabels[filterKey] || filterKey;
+                liveRegion.textContent = `Showing: ${label}`;
+            }
+
+            scheduleMasonry();
+            if (!reduceMotion) {
+                window.setTimeout(scheduleMasonry, 220);
+            }
+
+            activeFilterKey = filterKey;
+        }
+
         // Add ESC key listener to close lightbox
         document.addEventListener('keydown', function (event) {
             if (event.key === "Escape") {
@@ -1497,7 +1663,7 @@
         });
 
         document.addEventListener('DOMContentLoaded', () => {
-            const layoutMasonry = () => {
+            layoutMasonry = () => {
                 document.querySelectorAll('.gallery-timeline-group-items').forEach(container => {
                     const styles = getComputedStyle(container);
                     const rowHeight = parseFloat(styles.gridAutoRows) || 8;
@@ -1520,7 +1686,7 @@
                 });
             };
 
-            const scheduleMasonry = (() => {
+            scheduleMasonry = (() => {
                 let timer;
                 return () => {
                     window.clearTimeout(timer);
@@ -1675,6 +1841,13 @@
                 setupCaptionToggles();
                 scheduleMasonry();
             });
+
+            const filterButtons = document.querySelectorAll('[data-filter]');
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => applyFilter(button.dataset.filter));
+            });
+
+            applyFilter('all');
         });
     </script>
 
