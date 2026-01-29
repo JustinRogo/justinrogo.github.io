@@ -3,347 +3,451 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Strategic Framework - UConn Law Library</title>
-    <style>
-        :root {
-            --uconn-navy: #000E2F;
-            --uconn-blue: #000E2F;
-            --uconn-grey: #7C878E;
-            --white: #ffffff;
-            --off-white: #f4f4f4;
-            --text-dark: #333333;
-            --accent-blue: #0077c8; /* Lighter blue for interactive elements */
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            color: var(--text-dark);
-            background-color: var(--off-white);
-            line-height: 1.6;
-        }
-
-        /* Hero Section */
-        header {
-            background-color: var(--uconn-navy);
-            color: var(--white);
-            padding: 4rem 2rem;
-            text-align: center;
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .vision-statement {
-            font-size: 1.25rem;
-            font-weight: 300;
-            max-width: 800px;
-            margin: 0 auto;
-            opacity: 0.9;
-            font-style: italic;
-        }
-
-        /* Main Container */
-        .container {
-            max-width: 1200px;
-            margin: -30px auto 50px;
-            padding: 0 20px;
-            position: relative;
-            z-index: 10;
-        }
-
-        /* Grid Layout */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr); /* Slightly wider min-width */
-            gap: 20px;
-            align-items: start; /* Prevents cards from stretching weirdly when one opens */
-        }
-
-        /* Cards */
-        .card {
-            background: var(--white);
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border-top: 5px solid var(--uconn-navy);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
-        }
-
-        .card h2 {
-            color: var(--uconn-navy);
-            font-size: 2rem;
-            margin-top: 0;
-            margin-bottom: 0.2rem;
-            text-transform: uppercase;
-        }
-
-        .card h3 {
-            color: var(--uconn-grey);
-            font-size: 1rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 1.5rem;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 1rem;
-        }
-
-        /* Hidden Content Section */
-        .details-content {
-            display: none; /* Hidden by default */
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px dashed #ddd;
-            animation: fadeIn 0.4s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .details-content h4 {
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            color: var(--uconn-navy);
-            margin-bottom: 0.5rem;
-            margin-top: 1rem;
-        }
-
-        .details-content p {
-            font-size: 0.95rem;
-            color: #444;
-            margin-bottom: 1rem;
-            font-style: italic;
-        }
-
-        .details-content ul {
-            padding-left: 1.2rem;
-            margin: 0;
-        }
-
-        .details-content li {
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
-            color: #555;
-        }
-
-        /* Toggle Button */
-        .toggle-btn {
-            background: none;
-            border: 2px solid var(--uconn-navy);
-            color: var(--uconn-navy);
-            padding: 0.6rem 1.2rem;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            margin-top: auto; /* Pushes button to bottom if flex container has height */
-            align-self: flex-start;
-            transition: all 0.2s;
-        }
-
-        .toggle-btn:hover {
-            background-color: var(--uconn-navy);
-            color: var(--white);
-        }
-
-        /* Active State styling (optional) */
-        .card.active .toggle-btn {
-            background-color: var(--uconn-navy);
-            color: var(--white);
-        }
-
-        /* Values Banner */
-        .values-section {
-            background-color: var(--white);
-            padding: 3rem 2rem;
-            text-align: center;
-            border-top: 1px solid #ddd;
-            margin-top: 3rem;
-        }
-
-        .values-title {
-            text-transform: uppercase;
-            color: var(--uconn-grey);
-            font-size: 0.9rem;
-            letter-spacing: 2px;
-            margin-bottom: 1.5rem;
-        }
-
-        .values-cloud {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 15px;
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        .value-tag {
-            background-color: var(--off-white);
-            color: var(--uconn-navy);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: background 0.2s;
-        }
-        
-        .value-tag:hover {
-            background-color: var(--uconn-navy);
-            color: var(--white);
-            cursor: default;
-        }
-
-        footer {
-            text-align: center;
-            padding: 2rem;
-            font-size: 0.8rem;
-            color: var(--uconn-grey);
-        }
-
-    </style>
-</head>
-<body>
-
-    <header>
-        <h1>Our Strategic Framework</h1>
-        <p class="vision-statement">
-            "Creativity supported. Collaboration fueled. Process shaped with intention."
-        </p>
-    </header>
-
-    <div class="container">
-        <div class="grid">
-            
-            <div class="card" id="card-1">
-                <h2>Access</h2>
-                <h3>Evolving Resources</h3>
-                <button class="toggle-btn" onclick="toggleCard('card-1')">View Strategy</button>
-                
-                <div class="details-content">
-                    <h4>Strategic Direction</h4>
-                    <p>Provide accessible, relevant resources that support the needs of the law school community and address the changing landscape of legal information and the legal profession.</p>
-                    
-                    <h4>Our Goals</h4>
-                    <ul>
-                        <li>Curate and preserve a collection that supports research, scholarship, and curricular needs.</li>
-                        <li>Enhance accessibility and discovery of electronic and print resources.</li>
-                        <li>Promote visibility of the law library and technology departments.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="card" id="card-2">
-                <h2>Prepare</h2>
-                <h3>Student Success</h3>
-                <button class="toggle-btn" onclick="toggleCard('card-2')">View Strategy</button>
-
-                <div class="details-content">
-                    <h4>Strategic Direction</h4>
-                    <p>Educate the law school community through formal and informal instruction, supporting student success while preparing them for modern legal practice.</p>
-                    
-                    <h4>Our Goals</h4>
-                    <ul>
-                        <li>Lead curricular development in legal technology and research.</li>
-                        <li>Develop specialized instruction and leverage innovative ed-tech solutions.</li>
-                        <li>Align instructional services and resources to support student success.</li>
-                        <li>Integrate information literacy and critical thinking competencies.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="card" id="card-3">
-                <h2>Discover</h2>
-                <h3>Advancing Scholarship</h3>
-                <button class="toggle-btn" onclick="toggleCard('card-3')">View Strategy</button>
-
-                <div class="details-content">
-                    <h4>Strategic Direction</h4>
-                    <p>Create a culture of inquiry and critical thinking by supporting, contributing to, and engaging in research and scholarship.</p>
-                    
-                    <h4>Our Goals</h4>
-                    <ul>
-                        <li>Support discovery by making faculty and student scholarship available online.</li>
-                        <li>Strengthen support for scholarly research through training and technical resources.</li>
-                        <li>Identify new opportunities to engage with the law school community.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="card" id="card-4">
-                <h2>Connect</h2>
-                <h3>Community & Justice</h3>
-                <button class="toggle-btn" onclick="toggleCard('card-4')">View Strategy</button>
-
-                <div class="details-content">
-                    <h4>Strategic Direction</h4>
-                    <p>Serve as a welcoming community hub that supports the academic mission of the law school and the legal information needs of Connecticut communities.</p>
-                    
-                    <h4>Our Goals</h4>
-                    <ul>
-                        <li>Assess user experience to continually improve services.</li>
-                        <li>Promote access to justice by honoring our commitment to serve the public.</li>
-                        <li>Create, promote, and host events that bring the community together.</li>
-                    </ul>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <div class="values-section">
-        <div class="values-title">Driven By Our Core Values</div>
-        <div class="values-cloud">
-            <span class="value-tag">Excellence</span>
-            <span class="value-tag">Innovation</span>
-            <span class="value-tag">Collaboration</span>
-            <span class="value-tag">Agility</span>
-            <span class="value-tag">Accountability</span>
-            <span class="value-tag">Integrity</span>
-            <span class="value-tag">Reflection</span>
-            <span class="value-tag">Equity & Inclusion</span>
-            <span class="value-tag">Well-being</span>
-        </div>
-    </div>
-
-    <footer>
-        <p>University of Connecticut School of Law Library & Technology Departments</p>
-    </footer>
-
+    <title>Law Library & IT 2026 - Gen-Z Edition</title>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        function toggleCard(cardId) {
-            const card = document.getElementById(cardId);
-            const content = card.querySelector('.details-content');
-            const btn = card.querySelector('.toggle-btn');
-            
-            if (content.style.display === "block") {
-                content.style.display = "none";
-                btn.textContent = "View Strategy";
-                card.classList.remove('active');
-            } else {
-                content.style.display = "block";
-                btn.textContent = "Close Strategy";
-                card.classList.add('active');
-            }
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        blob: "blob 7s infinite",
+                    },
+                    keyframes: {
+                        blob: {
+                            "0%": { transform: "translate(0px, 0px) scale(1)" },
+                            "33%": { transform: "translate(30px, -50px) scale(1.1)" },
+                            "66%": { transform: "translate(-20px, 20px) scale(0.9)" },
+                            "100%": { transform: "translate(0px, 0px) scale(1)" },
+                        },
+                    },
+                },
+            },
         }
     </script>
 
+    <!-- Lucide Icons (Vanilla JS version) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* Custom scrollbar to match the vibe */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9333ea; 
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Icon Helper Component
+        // Fixed: Uses lucide.createIcons API instead of .toSvg()
+        const Icon = ({ name, className, size = 24 }) => {
+            const containerRef = useRef(null);
+
+            useEffect(() => {
+                if (typeof lucide === 'undefined' || !containerRef.current) return;
+
+                // Clean up previous content to prevent duplicates on re-render
+                containerRef.current.innerHTML = '';
+
+                // Create a temporary element for Lucide to process
+                const tempIcon = document.createElement('i');
+                
+                // Convert PascalCase (e.g., ChevronDown) to kebab-case (e.g., chevron-down)
+                const kebabName = name.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
+                
+                tempIcon.setAttribute('data-lucide', kebabName);
+                
+                // Apply attributes that Lucide will transfer to the SVG
+                if (className) tempIcon.setAttribute('class', className);
+                tempIcon.setAttribute('width', size);
+                tempIcon.setAttribute('height', size);
+
+                containerRef.current.appendChild(tempIcon);
+
+                // Run Lucide's replacement logic scoped to this container
+                lucide.createIcons({
+                    root: containerRef.current,
+                    nameAttr: 'data-lucide',
+                });
+            }, [name, className, size]);
+
+            return <span ref={containerRef} style={{ display: 'inline-flex', alignItems: 'center' }} />;
+        };
+
+        const StrategicPlanApp = () => {
+            const [activeSection, setActiveSection] = useState('hero');
+            const [isMenuOpen, setIsMenuOpen] = useState(false);
+            const [scrolled, setScrolled] = useState(false);
+
+            // Handle scroll effects
+            useEffect(() => {
+                const handleScroll = () => {
+                    setScrolled(window.scrollY > 20);
+                    
+                    // Update active section based on scroll position
+                    const sections = ['vision', 'mission', 'values', 'strategies'];
+                    const current = sections.find(section => {
+                        const element = document.getElementById(section);
+                        if (element) {
+                            const rect = element.getBoundingClientRect();
+                            return rect.top >= 0 && rect.top <= 300;
+                        }
+                        return false;
+                    });
+                    if (current) setActiveSection(current);
+                };
+
+                window.addEventListener('scroll', handleScroll);
+                return () => window.removeEventListener('scroll', handleScroll);
+            }, []);
+
+            const scrollTo = (id) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                    setActiveSection(id);
+                    setIsMenuOpen(false);
+                }
+            };
+
+            const navItems = [
+                { id: 'vision', label: 'Vibe Check' },
+                { id: 'mission', label: 'The Assignment' },
+                { id: 'values', label: 'Green Flags' },
+                { id: 'strategies', label: 'Plot Progression' },
+            ];
+
+            return (
+                <div className="min-h-screen bg-slate-900 text-slate-100 font-sans selection:bg-purple-500 selection:text-white">
+                
+                    {/* Navigation */}
+                    <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-slate-900/90 backdrop-blur-md border-b border-slate-800 py-3' : 'bg-transparent py-6'}`}>
+                        <div className="container mx-auto px-6 flex justify-between items-center">
+                        <div className="flex items-center gap-2 cursor-pointer" onClick={() => scrollTo('hero')}>
+                            <div className="bg-gradient-to-tr from-purple-500 to-pink-500 p-2 rounded-lg">
+                                <Icon name="Zap" className="text-white" size={20} />
+                            </div>
+                            <span className="font-bold text-xl tracking-tight">LawLib<span className="text-purple-400">IT</span>_2026</span>
+                        </div>
+
+                        {/* Desktop Nav */}
+                        <div className="hidden md:flex items-center gap-8">
+                            {navItems.map((item) => (
+                            <button
+                                key={item.id}
+                                onClick={() => scrollTo(item.id)}
+                                className={`text-sm font-medium transition-colors hover:text-purple-400 ${activeSection === item.id ? 'text-purple-400' : 'text-slate-400'}`}
+                            >
+                                {item.label}
+                            </button>
+                            ))}
+                            <button className="bg-white text-slate-900 px-4 py-2 rounded-full font-bold text-sm hover:bg-slate-200 transition-colors">
+                            Connect
+                            </button>
+                        </div>
+
+                        {/* Mobile Menu Toggle */}
+                        <button className="md:hidden text-slate-300" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                            {isMenuOpen ? <Icon name="X" /> : <Icon name="Menu" />}
+                        </button>
+                        </div>
+
+                        {/* Mobile Nav Dropdown */}
+                        {isMenuOpen && (
+                        <div className="md:hidden absolute top-full left-0 w-full bg-slate-900 border-b border-slate-800 p-6 flex flex-col gap-4 shadow-xl">
+                            {navItems.map((item) => (
+                            <button
+                                key={item.id}
+                                onClick={() => scrollTo(item.id)}
+                                className="text-left text-lg font-medium text-slate-300 hover:text-purple-400"
+                            >
+                                {item.label}
+                            </button>
+                            ))}
+                        </div>
+                        )}
+                    </nav>
+
+                    {/* Hero Section */}
+                    <section id="hero" className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
+                        {/* Background Gradients */}
+                        <div className="absolute top-20 left-10 w-72 h-72 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+                        <div className="absolute top-20 right-10 w-72 h-72 bg-cyan-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+                        <div className="absolute -bottom-8 left-1/2 w-72 h-72 bg-pink-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+
+                        <div className="container mx-auto px-6 text-center z-10">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-purple-300 text-xs font-bold uppercase tracking-wider mb-6">
+                            <Icon name="Sparkles" className="w-3 h-3" size={12} />
+                            Official Strat Plan
+                        </div>
+                        <h1 className="text-5xl md:text-7xl font-extrabold leading-tight mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white via-purple-200 to-slate-400">
+                            Law Library & IT <br/>
+                            <span className="text-purple-500">2026</span>
+                        </h1>
+                        <p className="text-xl md:text-2xl text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+                            We don't do random. Every move is calculated. <br/>
+                            Welcome to the future of legal info.
+                        </p>
+                        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                            <button onClick={() => scrollTo('vision')} className="w-full sm:w-auto px-8 py-4 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-bold transition-all transform hover:scale-105 shadow-lg shadow-purple-900/50">
+                            Check the Vibe
+                            </button>
+                            <button onClick={() => scrollTo('strategies')} className="w-full sm:w-auto px-8 py-4 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition-all border border-slate-700">
+                            See the Strat
+                            </button>
+                        </div>
+                        </div>
+                        
+                        <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce text-slate-500">
+                        <Icon name="ChevronDown" size={32} />
+                        </div>
+                    </section>
+
+                    {/* Vision (The Vibe Check) */}
+                    <section id="vision" className="py-24 bg-slate-900 relative">
+                        <div className="container mx-auto px-6">
+                        <div className="max-w-4xl mx-auto bg-slate-800/50 rounded-3xl p-8 md:p-12 border border-slate-700 backdrop-blur-sm shadow-2xl">
+                            <div className="flex items-center gap-4 mb-8">
+                            <div className="p-3 bg-pink-500/20 rounded-xl">
+                                <Icon name="Globe" className="text-pink-400" size={32} />
+                            </div>
+                            <h2 className="text-3xl md:text-4xl font-bold text-white">The Vibe Check</h2>
+                            </div>
+                            
+                            <p className="text-lg md:text-xl text-slate-300 leading-relaxed mb-6">
+                            We're manifesting a Law Library and IT zone where creativity has <span className="text-pink-400 font-bold">main character energy</span>, the group chat is actually popping with collab, and we don't do anything random—every move is calculated.
+                            </p>
+                            <p className="text-lg md:text-xl text-slate-300 leading-relaxed">
+                            With this setup, we're <span className="text-purple-400 font-bold">gaslighting no one</span> and empowering everyone, glowing up our efficiency, and dropping innovative services that push our agenda forward.
+                            </p>
+                        </div>
+                        </div>
+                    </section>
+
+                    {/* Mission (The Assignment) */}
+                    <section id="mission" className="py-24 bg-slate-950">
+                        <div className="container mx-auto px-6">
+                        <div className="text-center mb-16">
+                            <h2 className="text-3xl md:text-5xl font-bold mb-4">The Assignment</h2>
+                            <p className="text-slate-400 text-lg">UConn Law Library & Tech fam is here to plug the whole squad.</p>
+                        </div>
+
+                        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <MissionCard 
+                            icon="BookOpen"
+                            color="text-cyan-400"
+                            title="Drop the Lore"
+                            desc="Providing tutorials so students, faculty, and staff can unlock new levels of research and inspo."
+                            />
+                            <MissionCard 
+                            icon="Target"
+                            color="text-purple-400"
+                            title="High-Key Relevant"
+                            desc="Providing collections that are high-key comprehensive and actually relevant."
+                            />
+                            <MissionCard 
+                            icon="Zap"
+                            color="text-yellow-400"
+                            title="Shifting Vibes"
+                            desc="Making sure our services pass the vibe check for the constantly shifting world of legal ed."
+                            />
+                            <MissionCard 
+                            icon="Flame"
+                            color="text-red-400"
+                            title="Next-Gen Drops"
+                            desc="Getting the community obsessed with our next-gen library and tech drops."
+                            />
+                        </div>
+                        </div>
+                    </section>
+
+                    {/* Values (Green Flags) */}
+                    <section id="values" className="py-24 bg-slate-900">
+                        <div className="container mx-auto px-6">
+                        <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-4">
+                            <div>
+                            <h2 className="text-3xl md:text-5xl font-bold mb-4 flex items-center gap-3">
+                                Green Flags <span className="text-green-400">Only</span>
+                            </h2>
+                            <p className="text-slate-400 text-lg max-w-xl">These are the non-negotiables for how we secure the bag. If it ain't on this list, we aren't doing it.</p>
+                            </div>
+                            <div className="hidden md:block">
+                            <div className="bg-slate-800 px-4 py-2 rounded-lg text-sm font-mono text-slate-300 border border-slate-700">
+                                // values.config.js
+                            </div>
+                            </div>
+                        </div>
+
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <ValueItem title="We Strive for Excellence" desc="Aiming for straight Ws by delivering service that slays." />
+                            <ValueItem title="We Are Innovative" desc="Built different. Intentionally chasing new metas and strats." />
+                            <ValueItem title="We Are Collaborative" desc="It's giving squad goals. Different skills cooking up success." />
+                            <ValueItem title="We Embrace Change" desc="We don't fear the update; we're open to new patches." />
+                            <ValueItem title="We Are Accountable" desc="No ghosts here. We stand on business and deliver the goods." />
+                            <ValueItem title="We Have Integrity" desc="Keeping it 100. We're trustworthy, no cap." />
+                            <ValueItem title="We Are Reflective" desc="Touching grass and thinking deeply before we send it." />
+                            <ValueItem title="We Strive for Equity" desc="Gatekeeping is canceled. We stan a full spectrum of POVs." />
+                            <ValueItem title="We Value Each Other" desc="Wholesome workplace only. Giving everyone tools to go off." />
+                        </div>
+                        </div>
+                    </section>
+
+                    {/* Strategic Directions (The Plot Progression) */}
+                    <section id="strategies" className="py-24 bg-slate-950">
+                        <div className="container mx-auto px-6">
+                        <div className="text-center mb-20">
+                            <div className="inline-block bg-purple-900/30 text-purple-300 px-4 py-1 rounded-full text-sm font-bold mb-4">
+                            2026 ROADMAP
+                            </div>
+                            <h2 className="text-3xl md:text-5xl font-bold">The Plot Progression</h2>
+                        </div>
+
+                        <div className="space-y-12">
+                            <StrategyBlock 
+                            number="01"
+                            title="Accessible Resources"
+                            mainGoal="Provide accessible, relevant resources that support the law school fam."
+                            quests={[
+                                "Curate and protect a stash of loot for research and classwork.",
+                                "Make finding electronic/print resources way less of a struggle.",
+                                "Clout chase to make sure everyone knows we are the moment."
+                            ]}
+                            />
+                            
+                            <StrategyBlock 
+                            number="02"
+                            title="Put the Community on Game"
+                            mainGoal="Formal and informal tutorials, helping students slay while prepping for the future."
+                            quests={[
+                                "Be the CEO of curricular dev in legal tech.",
+                                "Develop classes with big-brain ed-tech solutions.",
+                                "Make sure teaching actually helps students get that bag.",
+                                "Integrate info literacy so students can think critically, no cap."
+                            ]}
+                            />
+
+                            <StrategyBlock 
+                            number="03"
+                            title="Culture of Curiosity"
+                            mainGoal="Create a culture of curiosity by hyping up research and scholarship."
+                            quests={[
+                                "Support discovery by putting faculty/student work on blast.",
+                                "Boost support for scholarly research with responsive training.",
+                                "Find new ways to interact with the law school fam."
+                            ]}
+                            />
+
+                            <StrategyBlock 
+                            number="04"
+                            title="The Main Hub"
+                            mainGoal="Serve as the main hub for the academic mission and the CT streets."
+                            quests={[
+                                "Vibe check the UX constantly to glow up services.",
+                                "Promote access to justice (real ones only).",
+                                "Host events that actually bring the community together.",
+                                "Champion the dept as THE place for engagement."
+                            ]}
+                            />
+                        </div>
+                        </div>
+                    </section>
+
+                    {/* Footer */}
+                    <footer className="bg-slate-900 border-t border-slate-800 py-12">
+                        <div className="container mx-auto px-6 text-center">
+                        <div className="flex items-center justify-center gap-2 mb-6 opacity-70">
+                            <Icon name="Zap" className="text-purple-500" size={24} />
+                            <span className="font-bold text-xl">LawLib<span className="text-purple-400">IT</span>_2026</span>
+                        </div>
+                        <p className="text-slate-500 text-sm mb-6">
+                            © 2026 UConn Law Library & Tech. No rights reserved, it's a vibe.
+                        </p>
+                        <div className="flex justify-center gap-6">
+                            <a href="#" className="text-slate-400 hover:text-white transition-colors"><Icon name="Search" size={20} /></a>
+                            <a href="#" className="text-slate-400 hover:text-white transition-colors"><Icon name="Wifi" size={20} /></a>
+                            <a href="#" className="text-slate-400 hover:text-white transition-colors"><Icon name="MessageCircle" size={20} /></a>
+                        </div>
+                        </div>
+                    </footer>
+                </div>
+            );
+        };
+
+        // Sub-components
+
+        const MissionCard = ({ icon, color, title, desc }) => (
+            <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800 hover:border-purple-500/50 transition-all hover:-translate-y-1 group">
+                <div className="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center mb-4 group-hover:bg-slate-700 transition-colors">
+                <Icon name={icon} className={color} size={24} />
+                </div>
+                <h3 className="text-xl font-bold mb-2 text-slate-100">{title}</h3>
+                <p className="text-slate-400 text-sm leading-relaxed">{desc}</p>
+            </div>
+        );
+
+        const ValueItem = ({ title, desc }) => (
+            <div className="p-6 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-800/50 border border-slate-700/50 hover:from-purple-900/20 hover:to-slate-800 transition-all">
+                <div className="flex items-start gap-3">
+                <div className="mt-1">
+                    <Icon name="Shield" className="text-green-400" size={20} />
+                </div>
+                <div>
+                    <h3 className="font-bold text-lg text-slate-100 mb-1">{title}</h3>
+                    <p className="text-slate-400 text-sm">{desc}</p>
+                </div>
+                </div>
+            </div>
+        );
+
+        const StrategyBlock = ({ number, title, mainGoal, quests }) => (
+            <div className="grid md:grid-cols-12 gap-8 items-start border-b border-slate-800 pb-12 last:border-0 last:pb-0">
+                <div className="md:col-span-1 text-4xl font-black text-slate-800 font-mono">
+                {number}
+                </div>
+                <div className="md:col-span-4">
+                <h3 className="text-2xl font-bold text-white mb-3">{title}</h3>
+                <p className="text-slate-400 text-lg leading-relaxed mb-4">{mainGoal}</p>
+                </div>
+                <div className="md:col-span-7 bg-slate-900 rounded-2xl p-6 border border-slate-800">
+                <h4 className="text-sm font-bold text-purple-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <Icon name="Brain" size={16} /> Side Quests
+                </h4>
+                <ul className="space-y-4">
+                    {quests.map((quest, i) => (
+                    <li key={i} className="flex items-start gap-3 text-slate-300">
+                        <span className="mt-0.5"><Icon name="ArrowRight" className="text-slate-600" size={20} /></span>
+                        <span>{quest}</span>
+                    </li>
+                    ))}
+                </ul>
+                </div>
+            </div>
+        );
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<StrategicPlanApp />);
+    </script>
 </body>
 </html>
