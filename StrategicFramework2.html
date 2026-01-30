@@ -28,6 +28,7 @@
                     },
                     animation: {
                         blob: "blob 10s infinite",
+                        pulse: "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
                     },
                     keyframes: {
                         blob: {
@@ -61,15 +62,253 @@
             background: #00438E; 
         }
         body {
-            background-color: #000E2F;
+            /* Handled by React */
+            margin: 0;
+            padding: 0;
         }
     </style>
 </head>
-<body class="bg-uconn-navy text-slate-100 antialiased">
+<body>
     <div id="root"></div>
 
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
+
+        // --- CONTENT DATA ---
+        const contentData = {
+            Standard: {
+                title: "Strategic Framework",
+                subtitle: "2026",
+                heroText: "Creativity. Collaboration. Intention.",
+                heroSub: "Empowering people, strengthening efficiency, and offering innovative services that advance our mission for the University of Connecticut School of Law.",
+                visionTitle: "Our Vision",
+                visionText: "We envision a law library and IT department where creativity is supported, communication fuels collaboration, and every process is shaped with intention. With this foundation, we empower people, strengthen our efficiency, and offer innovative services that advance our mission.",
+                missionTitle: "Our Mission",
+                missionText: "The University of Connecticut School of Law Library & Technology Departments connect members of the law school community to information, ideas, and resources.",
+                missionCards: [
+                    { title: "Education", desc: "Creating a pathway to research, learning, and inspiration by educating students, faculty and staff." },
+                    { title: "Collections", desc: "Providing comprehensive, current, and relevant collections." },
+                    { title: "Alignment", desc: "Aligning our services and resources with the evolving needs of legal education, scholarship, and technology." },
+                    { title: "Innovation", desc: "Engaging our community with innovative library and technology services." }
+                ],
+                valuesTitle: "Core Values",
+                valuesSub: "Defining how we carry out our mission.",
+                values: [
+                    { title: "Excellence", desc: "Striving for quality services and work performance." },
+                    { title: "Innovation", desc: "Intentionally pursuing improved methods, practices, and services by being flexible, creative, and imaginative." },
+                    { title: "Collaboration", desc: "Bringing our diverse skills sets, experiences, and viewpoints to bear as we work toward common goals." },
+                    { title: "Adaptability", desc: "Embracing change and remaining open to new ideas and perspectives." },
+                    { title: "Accountability", desc: "Taking responsibility for our conduct, performance, and delivery of information and technology." },
+                    { title: "Integrity", desc: "Being honest, trustworthy, and upholding the values of the Library, Law School, and University." },
+                    { title: "Reflection", desc: "Employing thoughtfulness, including careful consideration and thorough examination of issues." },
+                    { title: "Equity & Inclusion", desc: "Valuing and respecting a full spectrum of backgrounds and points of view to enhance service." },
+                    { title: "Community", desc: "Valuing each other by building a workplace that supports well-being and tools to innovate." }
+                ],
+                stratTitle: "Strategic Directions",
+                stratSub: "The Path Forward",
+                strategies: [
+                    { title: "Resources & Accessibility", goal: "Provide accessible, relevant resources that support the needs of the law school community.", bullets: ["Curate and preserve a collection that supports research.", "Enhance accessibility of electronic resources.", "Promote visibility of the law library resources."] },
+                    { title: "Education & Instruction", goal: "Educate the law school community through formal and informal instruction.", bullets: ["Lead curricular development in legal technology.", "Develop additional classes utilizing innovative ed-tech.", "Integrate information literacy strategically."] },
+                    { title: "Research & Scholarship", goal: "Create a culture of inquiry and critical thinking by engaging in research and scholarship.", bullets: ["Support discovery by making scholarship available online.", "Strengthen support for scholarly research.", "Identify new opportunities to engage with the community."] },
+                    { title: "Community Hub", goal: "Serve as a welcoming community hub that supports the academic mission.", bullets: ["Assess user experience to continually improve services.", "Promote access to justice by serving the public.", "Create events that bring together the law school community."] }
+                ]
+            },
+            GenA: {
+                title: "The Skibidi Blueprint",
+                subtitle: "Arc 2026",
+                heroText: "Infinite Aura. High Stats. No Cap.",
+                heroSub: "We’re looksmaxxing our efficiency and glitching the system to provide services that let the whole law school cook.",
+                visionTitle: "The Aura Check",
+                visionText: "We’re manifesting a server where creativity has max aura, the chat is always active, and every move is calculated. We’re empowering the fam, mewing for efficiency, and dropping updates that actually hit different.",
+                missionTitle: "The Lore",
+                missionText: "The UConn Law Lib & Tech fam connects the chat to the infinite knowledge glitch, ideas, and W loot.",
+                missionCards: [
+                    { title: "The Tutorial", desc: "Dropping alpha on research so students and staff don't get cooked." },
+                    { title: "Fanum Tax", desc: "Collecting all the W resources so you don't have to." },
+                    { title: "The Meta", desc: "Aligning our services with the current patch notes of legal ed." },
+                    { title: "Let Him Cook", desc: "Engaging the fam with tech services that have crazy aura." }
+                ],
+                valuesTitle: "Sigma Grindset",
+                valuesSub: "How we stand on business.",
+                values: [
+                    { title: "Gigachad Energy", desc: "Striving for pure Ws in everything we do." },
+                    { title: "Let Him Cook", desc: "Pursuing new metas by being creative and avoiding brainrot." },
+                    { title: "No Cap Collaboration", desc: "Bringing our stats together to Mog the competition." },
+                    { title: "New Era", desc: "Embracing the update and not being an NPC about change." },
+                    { title: "Standing On Business", desc: "Taking responsibility for our own gameplay and delivery." },
+                    { title: "Valid", desc: "Being trustworthy and keeping our aura positive." },
+                    { title: "Post-Nut Clarity", desc: "Deep reflection before making moves. No impulsive crashing out." },
+                    { title: "W Community", desc: "Respecting all skins and avatars to provide the best service." },
+                    { title: "Glazing the Squad", desc: "Supporting each other so we can all lookmax together." }
+                ],
+                stratTitle: "The Arc",
+                stratSub: "Main Character Energy",
+                strategies: [
+                    { title: "W Loot", goal: "Provide accessible resources that prevent academic brainrot.", bullets: ["Curate a stash that helps you cook in class.", "Make finding resources easier than Minecraft crafting.", "Make sure the library is the main character."] },
+                    { title: "Skill Issue Fixes", goal: "Teach the community so they don't get caught lacking.", bullets: ["Lead the meta in legal tech dev.", "Develop tools that actually have rizz.", "Help students fix their skill issues."] },
+                    { title: "Big Brain Energy", goal: "Create a culture of inquiry so we don't end up in Ohio.", bullets: ["Make scholarship accessible (no gatekeeping).", "Glaze scholarly research with tech support.", "Find new ways to vibe with the community."] },
+                    { title: "The Lobby", goal: "Serve as the base where everyone spawns for learning.", bullets: ["Check the vibe to improve user XP.", "Promote justice (Common W).", "Host events that don't make you want to touch grass."] }
+                ]
+            },
+            GenZ: {
+                title: "The Vibe Check",
+                subtitle: "Era 2026",
+                heroText: "Main Character Energy. Bet.",
+                heroSub: "We’re gaslighting no one. We're empowering everyone, glowing up our efficiency, and dropping innovative services that slap.",
+                visionTitle: "The Vision",
+                visionText: "We envision a space where creativity is the moment, the group chat is popping with collab, and we don't do anything random. We're securing the bag for our mission.",
+                missionTitle: "The Assignment",
+                missionText: "UConn Law Lib & Tech is here to plug the law school fam into the info, the tea, and the resources they need.",
+                missionCards: [
+                    { title: "Inspo", desc: "Creating a pathway to research and learning that hits different." },
+                    { title: "The Stash", desc: "Providing collections that are high-key relevant." },
+                    { title: "Vibe Shift", desc: "Aligning our services with the shifting vibes of legal ed." },
+                    { title: "Next Gen", desc: "Engaging the community with innovative drops." }
+                ],
+                valuesTitle: "Green Flags",
+                valuesSub: "Non-negotiables for securing the bag.",
+                values: [
+                    { title: "Slaying", desc: "Striving for excellence and leaving no crumbs." },
+                    { title: "Built Different", desc: "Intentionally pursuing improved methods. We're not basic." },
+                    { title: "Squad Goals", desc: "Collaborating with diverse POVs to catch Ws." },
+                    { title: "Bet on Change", desc: "Open to new ideas. We don't fear the update." },
+                    { title: "No Ghosting", desc: "Accountable for our actions. We show up." },
+                    { title: "Real Ones", desc: "Integrity is key. We keep it 100." },
+                    { title: "Touching Grass", desc: "Reflective and thoughtful. We don't just react." },
+                    { title: "Inclusion Era", desc: "Respecting the full spectrum. Gatekeeping is cancelled." },
+                    { title: "Wholesome", desc: "Valuing each other and supporting mental health." }
+                ],
+                stratTitle: "The Plot",
+                stratSub: "Plot Progression",
+                strategies: [
+                    { title: "Secure the Loot", goal: "Provide resources that pass the vibe check.", bullets: ["Curate a collection that supports the grind.", "Make discovery easy, no cap.", "Clout chase for the library resources."] },
+                    { title: "Put You On Game", goal: "Educate the fam so they can slay in practice.", bullets: ["Lead curricular dev in legal tech.", "Develop classes that are actually valid.", "Integrate critical thinking so you don't look sus."] },
+                    { title: "Curiosity Core", goal: "Create a culture of inquiry. It's giving scholar.", bullets: ["Support discovery online.", "Strengthen support for research.", "Identify new opportunities to link up."] },
+                    { title: "The Hub", goal: "Serve as a welcoming hub. We are the moment.", bullets: ["Assess UX to glow up services.", "Promote access to justice (Real).", "Host events that bring the fam together."] }
+                ]
+            },
+            GenY: {
+                title: "The Strategic Blueprint",
+                subtitle: "Est. 2026",
+                heroText: "Adulting. Hustle. All The Feels.",
+                heroSub: "We are hacking efficiency and crafting epic services because we can't even with outdated systems. #Goals",
+                visionTitle: "The Dream Board",
+                visionText: "We envision a library where creativity is epic, collaboration is everything, and we are being intentional AF. We are empowering our tribe and winning at our mission.",
+                missionTitle: "Our Why",
+                missionText: "UConn Law Lib & Tech connects our squad to the information and ideas they need to be a boss.",
+                missionCards: [
+                    { title: "Leveling Up", desc: "Educating students so they can adult successfully." },
+                    { title: "The Curated Feed", desc: "Providing collections that spark joy." },
+                    { title: "Pivot", desc: "Aligning services with the disruption of legal ed." },
+                    { title: "Disrupt", desc: "Engaging our community with life-hacking services." }
+                ],
+                valuesTitle: "House Rules",
+                valuesSub: "Keep Calm and Carry On.",
+                values: [
+                    { title: "Winning", desc: "Striving for excellence. Nailed it." },
+                    { title: "Ninja Skills", desc: "Being a unicorn of innovation and creativity." },
+                    { title: "Tribe Vibe", desc: "Collaborating because team work makes the dream work." },
+                    { title: "Pivot", desc: "Embracing change. Challenge accepted." },
+                    { title: "Own It", desc: "Taking responsibility. Like a boss." },
+                    { title: "Legit", desc: "Being honest and trustworthy. Seriously." },
+                    { title: "Deep Dive", desc: "Thoughtful consideration. No TL;DR here." },
+                    { title: "All Are Welcome", desc: " celebrating diversity. Yaaas queen." },
+                    { title: "Self Care", desc: "Supporting personal well-being. Treat yo self." }
+                ],
+                stratTitle: "Game Plan",
+                stratSub: "Challenge Accepted",
+                strategies: [
+                    { title: "Access Granted", goal: "Provide resources that break the internet.", bullets: ["Curate a collection that is on fleek.", "Enhance accessibility. It's a game changer.", "Promote visibility. Pics or it didn't happen."] },
+                    { title: "Knowledge Drop", goal: "Educate the community. The more you know.", bullets: ["Lead curricular development. Like a boss.", "Develop classes using epic tech.", "Integrate literacy skills. Adulting 101."] },
+                    { title: "Nerd Out", goal: "Create a culture of inquiry. Science is real.", bullets: ["Make scholarship available online.", "Support research. Because science.", "Engage with the community."] },
+                    { title: "The Third Place", goal: "Serve as a community hub. Coffee included.", bullets: ["Improve UX because we listen.", "Promote access to justice. Be the change.", "Host events. FOMO is real."] }
+                ]
+            }
+        };
+
+        // --- THEME DATA ---
+        // Defines the visual styles for each generation
+        const themeData = {
+            Standard: {
+                wrapper: "bg-[#000E2F] text-slate-100 selection:bg-[#00438E] selection:text-white",
+                navBg: "bg-[#000E2F]/95 border-slate-700",
+                navTextActive: "text-white border-b-2 border-white",
+                navTextInactive: "text-slate-400 hover:text-white",
+                heroGradient: "from-[#000E2F] to-[#051C45]",
+                badge: "bg-blue-900/50 border-blue-800 text-blue-200",
+                buttonPrimary: "bg-white hover:bg-slate-100 text-[#000E2F]",
+                buttonSecondary: "bg-transparent hover:bg-blue-900/30 text-white border-white",
+                sectionBgAlt: "bg-[#021033]", // Alternating section background
+                cardBg: "bg-[#051C45] border-white/10 hover:border-blue-400/50",
+                cardIconBg: "bg-blue-900/30 group-hover:bg-blue-800/50",
+                cardIconColor: "text-white",
+                accentText: "text-blue-400",
+                iconPrimary: "text-white",
+                footerBg: "bg-[#000E2F] border-white/10",
+                toggleActive: "bg-blue-600 text-white border-blue-500",
+                toggleInactive: "text-slate-400 hover:text-white border-transparent"
+            },
+            GenA: {
+                // High contrast, Matrix/Hacker/Gamer aesthetic (Black, Lime, Zinc)
+                wrapper: "bg-black text-lime-50 selection:bg-lime-500 selection:text-black font-mono",
+                navBg: "bg-black/90 border-lime-900",
+                navTextActive: "text-lime-400 border-b-2 border-lime-400",
+                navTextInactive: "text-zinc-500 hover:text-lime-200",
+                heroGradient: "from-black to-zinc-900",
+                badge: "bg-lime-900/20 border-lime-500/50 text-lime-400",
+                buttonPrimary: "bg-lime-500 hover:bg-lime-400 text-black shadow-[0_0_15px_rgba(132,204,22,0.5)]",
+                buttonSecondary: "bg-transparent hover:bg-lime-900/30 text-lime-400 border-lime-500",
+                sectionBgAlt: "bg-zinc-950",
+                cardBg: "bg-zinc-900/80 border-lime-500/20 hover:border-lime-400",
+                cardIconBg: "bg-lime-900/20 group-hover:bg-lime-500/20",
+                cardIconColor: "text-lime-400",
+                accentText: "text-lime-400",
+                iconPrimary: "text-lime-500",
+                footerBg: "bg-black border-lime-900",
+                toggleActive: "bg-lime-500 text-black border-lime-400",
+                toggleInactive: "text-zinc-500 hover:text-lime-400 border-zinc-800"
+            },
+            GenZ: {
+                // Vaporwave/Dark Mode Vibe (Slate 900, Purple, Pink)
+                wrapper: "bg-slate-900 text-purple-100 selection:bg-pink-500 selection:text-white",
+                navBg: "bg-slate-900/90 border-purple-900/50",
+                navTextActive: "text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 border-b-2 border-pink-500",
+                navTextInactive: "text-slate-400 hover:text-purple-300",
+                heroGradient: "from-slate-900 via-[#1a103d] to-slate-900",
+                badge: "bg-purple-900/40 border-purple-500/50 text-pink-300",
+                buttonPrimary: "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white shadow-lg shadow-purple-900/50",
+                buttonSecondary: "bg-slate-800 hover:bg-slate-700 text-white border-slate-600",
+                sectionBgAlt: "bg-[#0f0a20]", // Very dark purple/slate
+                cardBg: "bg-slate-800/60 border-purple-500/20 hover:border-pink-500/50 backdrop-blur-sm",
+                cardIconBg: "bg-purple-900/30 group-hover:bg-pink-600/20",
+                cardIconColor: "text-pink-400",
+                accentText: "text-pink-400",
+                iconPrimary: "text-purple-400",
+                footerBg: "bg-slate-900 border-purple-900/30",
+                toggleActive: "bg-gradient-to-r from-purple-600 to-pink-600 text-white border-purple-500",
+                toggleInactive: "text-slate-400 hover:text-purple-300 border-slate-700"
+            },
+            GenY: {
+                // Retro Hipster / Warm Dark (Stone, Teal, Millennial Pink)
+                wrapper: "bg-[#292524] text-stone-200 selection:bg-teal-500 selection:text-white",
+                navBg: "bg-[#292524]/95 border-stone-700",
+                navTextActive: "text-teal-400 border-b-2 border-teal-400",
+                navTextInactive: "text-stone-500 hover:text-rose-200",
+                heroGradient: "from-[#292524] to-[#1c1917]",
+                badge: "bg-stone-800 border-stone-600 text-rose-300",
+                buttonPrimary: "bg-teal-600 hover:bg-teal-500 text-white rounded-full",
+                buttonSecondary: "bg-transparent hover:bg-stone-800 text-rose-200 border-rose-300 rounded-full",
+                sectionBgAlt: "bg-[#1c1917]",
+                cardBg: "bg-[#1c1917] border-stone-700 hover:border-teal-500",
+                cardIconBg: "bg-teal-900/20 group-hover:bg-teal-800/30",
+                cardIconColor: "text-teal-400",
+                accentText: "text-teal-400",
+                iconPrimary: "text-rose-300",
+                footerBg: "bg-[#292524] border-stone-800",
+                toggleActive: "bg-teal-600 text-white border-teal-500",
+                toggleInactive: "text-stone-500 hover:text-rose-200 border-stone-700"
+            }
+        };
 
         // Icon Helper Component
         const Icon = ({ name, className, size = 24 }) => {
@@ -95,9 +334,13 @@
         };
 
         const StrategicPlanApp = () => {
+            const [generation, setGeneration] = useState('Standard');
             const [activeSection, setActiveSection] = useState('hero');
             const [isMenuOpen, setIsMenuOpen] = useState(false);
             const [scrolled, setScrolled] = useState(false);
+
+            const content = contentData[generation];
+            const theme = themeData[generation];
 
             useEffect(() => {
                 const handleScroll = () => {
@@ -129,234 +372,209 @@
             const navItems = [
                 { id: 'vision', label: 'Vision' },
                 { id: 'mission', label: 'Mission' },
-                { id: 'values', label: 'Core Values' },
-                { id: 'strategies', label: 'Strategic Directions' },
+                { id: 'values', label: 'Values' },
+                { id: 'strategies', label: 'Strategies' },
             ];
 
             return (
-                <div className="min-h-screen font-sans selection:bg-uconn-blue selection:text-white">
+                <div className={`min-h-screen transition-colors duration-500 ${theme.wrapper} pb-20`}>
                 
                     {/* Navigation */}
-                    <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-uconn-navy/95 backdrop-blur-md border-b border-slate-700 py-3 shadow-lg' : 'bg-transparent py-6'}`}>
+                    <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? `${theme.navBg} backdrop-blur-md border-b py-3 shadow-lg` : 'bg-transparent py-6'}`}>
                         <div className="container mx-auto px-6 flex justify-between items-center">
-                        <div className="flex items-center gap-3 cursor-pointer" onClick={() => scrollTo('hero')}>
-                            <div className="bg-white p-1.5 rounded-sm">
-                                <Icon name="BookOpen" className="text-uconn-navy" size={20} />
+                            <div className="flex items-center gap-3 cursor-pointer" onClick={() => scrollTo('hero')}>
+                                <div className={`${generation === 'Standard' ? 'bg-white' : 'bg-transparent border border-current'} p-1.5 rounded-sm`}>
+                                    <Icon name="BookOpen" className={generation === 'Standard' ? "text-uconn-navy" : "text-current"} size={20} />
+                                </div>
+                                <span className="font-bold text-xl tracking-tight hidden sm:inline">UConn Law <span className="opacity-70 font-light">Library & IT</span></span>
+                                <span className="font-bold text-xl tracking-tight sm:hidden">LawLib<span className="opacity-70">IT</span></span>
                             </div>
-                            <span className="font-bold text-xl tracking-tight text-white">UConn Law <span className="text-slate-300 font-light">Library & IT</span></span>
-                        </div>
 
-                        {/* Desktop Nav */}
-                        <div className="hidden md:flex items-center gap-8">
-                            {navItems.map((item) => (
-                            <button
-                                key={item.id}
-                                onClick={() => scrollTo(item.id)}
-                                className={`text-sm font-medium transition-colors hover:text-white uppercase tracking-wide ${activeSection === item.id ? 'text-white border-b-2 border-white' : 'text-slate-400'}`}
-                            >
-                                {item.label}
+                            {/* Desktop Nav */}
+                            <div className="hidden md:flex items-center gap-8">
+                                {navItems.map((item) => (
+                                <button
+                                    key={item.id}
+                                    onClick={() => scrollTo(item.id)}
+                                    className={`text-sm font-medium transition-colors uppercase tracking-wide ${activeSection === item.id ? theme.navTextActive : theme.navTextInactive}`}
+                                >
+                                    {item.label}
+                                </button>
+                                ))}
+                            </div>
+
+                            {/* Generation Toggle (Desktop) */}
+                            <div className="hidden md:flex items-center bg-black/20 rounded-lg p-1 border border-white/10 backdrop-blur-sm">
+                                {['Standard', 'GenA', 'GenZ', 'GenY'].map((gen) => (
+                                    <button
+                                        key={gen}
+                                        onClick={() => setGeneration(gen)}
+                                        className={`px-3 py-1 rounded-md text-xs font-bold uppercase transition-all border ${generation === gen ? theme.toggleActive : theme.toggleInactive}`}
+                                    >
+                                        {gen === 'Standard' ? 'Standard' : gen}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Mobile Menu Toggle */}
+                            <button className="md:hidden opacity-80" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                                {isMenuOpen ? <Icon name="X" /> : <Icon name="Menu" />}
                             </button>
-                            ))}
-                        </div>
-
-                        {/* Mobile Menu Toggle */}
-                        <button className="md:hidden text-slate-300" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                            {isMenuOpen ? <Icon name="X" /> : <Icon name="Menu" />}
-                        </button>
                         </div>
 
                         {/* Mobile Nav Dropdown */}
                         {isMenuOpen && (
-                        <div className="md:hidden absolute top-full left-0 w-full bg-uconn-navy border-b border-slate-700 p-6 flex flex-col gap-4 shadow-xl">
+                        <div className={`md:hidden absolute top-full left-0 w-full ${theme.navBg} border-b border-white/10 p-6 flex flex-col gap-4 shadow-xl`}>
                             {navItems.map((item) => (
                             <button
                                 key={item.id}
                                 onClick={() => scrollTo(item.id)}
-                                className="text-left text-lg font-medium text-slate-300 hover:text-white"
+                                className="text-left text-lg font-medium opacity-80 hover:opacity-100"
                             >
                                 {item.label}
                             </button>
                             ))}
+                            <div className="border-t border-white/10 pt-4 mt-2">
+                                <p className="text-xs opacity-50 uppercase font-bold mb-3">Translate Mode</p>
+                                <div className="grid grid-cols-2 gap-2">
+                                     {['Standard', 'GenA', 'GenZ', 'GenY'].map((gen) => (
+                                        <button
+                                            key={gen}
+                                            onClick={() => { setGeneration(gen); setIsMenuOpen(false); }}
+                                            className={`px-3 py-2 rounded-md text-xs font-bold uppercase transition-all border ${generation === gen ? theme.toggleActive : theme.toggleInactive}`}
+                                        >
+                                            {gen}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
                         )}
                     </nav>
 
                     {/* Hero Section */}
-                    <section id="hero" className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden bg-gradient-to-b from-uconn-navy to-[#051C45]">
-                        {/* Background Elements */}
+                    <section id="hero" className={`relative min-h-screen flex items-center justify-center pt-20 overflow-hidden bg-gradient-to-b ${theme.heroGradient}`}>
+                        {/* Background blobs based on theme */}
                         <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-20 pointer-events-none">
-                             <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-900 rounded-full mix-blend-screen filter blur-[100px] opacity-30 animate-blob"></div>
-                             <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-slate-700 rounded-full mix-blend-screen filter blur-[100px] opacity-30 animate-blob animation-delay-2000"></div>
+                             <div className={`absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full mix-blend-screen filter blur-[100px] opacity-30 animate-blob ${generation === 'GenA' ? 'bg-lime-600' : 'bg-blue-900'}`}></div>
+                             <div className={`absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full mix-blend-screen filter blur-[100px] opacity-30 animate-blob animation-delay-2000 ${generation === 'GenZ' ? 'bg-pink-600' : generation === 'GenY' ? 'bg-teal-600' : 'bg-slate-700'}`}></div>
                         </div>
 
                         <div className="container mx-auto px-6 text-center z-10">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-900/50 border border-blue-800 text-blue-200 text-xs font-bold uppercase tracking-wider mb-8">
+                        <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-8 transition-all ${theme.badge}`}>
                             <Icon name="Landmark" className="w-3 h-3" size={12} />
-                            Strategic Framework
+                            {content.title}
                         </div>
-                        <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6 text-white font-serif tracking-tight">
-                            Creativity. Collaboration. <br/>
-                            <span className="text-slate-300">Intention.</span>
+                        <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6 tracking-tight transition-all duration-500 min-h-[160px] flex items-center justify-center">
+                            {content.heroText}
                         </h1>
-                        <p className="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto mb-12 leading-relaxed font-light">
-                            Empowering people, strengthening efficiency, and offering innovative services that advance our mission for the University of Connecticut School of Law.
+                        <p className="text-lg md:text-xl opacity-80 max-w-3xl mx-auto mb-12 leading-relaxed font-light transition-all duration-500 min-h-[80px]">
+                            {content.heroSub}
                         </p>
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                            <button onClick={() => scrollTo('vision')} className="w-full sm:w-auto px-8 py-3 bg-white hover:bg-slate-100 text-uconn-navy rounded-sm font-bold transition-all uppercase tracking-wide text-sm">
+                            <button onClick={() => scrollTo('vision')} className={`w-full sm:w-auto px-8 py-3 rounded-sm font-bold transition-all uppercase tracking-wide text-sm ${theme.buttonPrimary}`}>
                                 View Vision
                             </button>
-                            <button onClick={() => scrollTo('strategies')} className="w-full sm:w-auto px-8 py-3 bg-transparent hover:bg-blue-900/30 text-white border border-white rounded-sm font-bold transition-all uppercase tracking-wide text-sm">
-                                Strategic Directions
+                            <button onClick={() => scrollTo('strategies')} className={`w-full sm:w-auto px-8 py-3 rounded-sm font-bold transition-all uppercase tracking-wide text-sm border ${theme.buttonSecondary}`}>
+                                {content.stratTitle}
                             </button>
                         </div>
                         </div>
                         
-                        <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce text-slate-500">
+                        <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce opacity-50">
                         <Icon name="ChevronDown" size={32} />
                         </div>
                     </section>
 
                     {/* Vision Section */}
-                    <section id="vision" className="py-24 bg-uconn-navy relative border-t border-white/5">
+                    <section id="vision" className={`py-24 relative border-t border-white/5 ${generation === 'GenY' ? 'bg-[#292524]' : generation === 'GenZ' ? 'bg-slate-900' : generation === 'GenA' ? 'bg-black' : 'bg-uconn-navy'}`}>
                         <div className="container mx-auto px-6">
                         <div className="max-w-4xl mx-auto text-center">
-                            <div className="inline-flex p-4 rounded-full bg-blue-900/30 mb-6">
-                                <Icon name="Eye" className="text-white" size={32} />
+                            <div className="inline-flex p-4 rounded-full bg-white/10 mb-6">
+                                <Icon name="Eye" className={theme.iconPrimary} size={32} />
                             </div>
-                            <h2 className="text-3xl md:text-4xl font-bold text-white mb-8 font-serif">Our Vision</h2>
-                            <p className="text-xl md:text-2xl text-slate-300 leading-relaxed font-light">
-                                We envision a law library and IT department where creativity is supported, communication fuels collaboration, and every process is shaped with intention. With this foundation, we empower people, strengthen our efficiency, and offer innovative services that advance our mission.
+                            <h2 className="text-3xl md:text-4xl font-bold mb-8 font-serif">{content.visionTitle}</h2>
+                            <p className="text-xl md:text-2xl opacity-90 leading-relaxed font-light transition-all duration-500">
+                                "{content.visionText}"
                             </p>
                         </div>
                         </div>
                     </section>
 
                     {/* Mission Section */}
-                    <section id="mission" className="py-24 bg-[#021033]">
+                    <section id="mission" className={`py-24 ${theme.sectionBgAlt}`}>
                         <div className="container mx-auto px-6">
                         <div className="text-center mb-16 max-w-3xl mx-auto">
-                            <h2 className="text-3xl md:text-4xl font-bold mb-6 font-serif text-white">Our Mission</h2>
-                            <p className="text-slate-300 text-lg mb-12">
-                                The University of Connecticut School of Law Library & Technology Departments connect members of the law school community to information, ideas, and resources.
+                            <h2 className="text-3xl md:text-4xl font-bold mb-6 font-serif">{content.missionTitle}</h2>
+                            <p className="opacity-80 text-lg mb-12 transition-all duration-500">
+                                {content.missionText}
                             </p>
-                            <div className="h-1 w-20 bg-blue-600 mx-auto rounded-full"></div>
+                            <div className={`h-1 w-20 mx-auto rounded-full ${generation === 'GenA' ? 'bg-lime-500' : generation === 'GenZ' ? 'bg-purple-500' : generation === 'GenY' ? 'bg-teal-500' : 'bg-blue-600'}`}></div>
                         </div>
 
                         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                            <MissionCard 
-                                icon="GraduationCap"
-                                title="Education"
-                                desc="Creating a pathway to research, learning, and inspiration by educating students, faculty and staff."
-                            />
-                            <MissionCard 
-                                icon="Library"
-                                title="Collections"
-                                desc="Providing comprehensive, current, and relevant collections."
-                            />
-                            <MissionCard 
-                                icon="RefreshCw"
-                                title="Alignment"
-                                desc="Aligning our services and resources with the evolving needs of legal education, scholarship, and technology."
-                            />
-                            <MissionCard 
-                                icon="Lightbulb"
-                                title="Innovation"
-                                desc="Engaging our community with innovative library and technology services."
-                            />
+                            {content.missionCards.map((card, idx) => (
+                                <MissionCard 
+                                    key={idx}
+                                    icon={['GraduationCap', 'Library', 'RefreshCw', 'Lightbulb'][idx]}
+                                    title={card.title}
+                                    desc={card.desc}
+                                    theme={theme}
+                                />
+                            ))}
                         </div>
                         </div>
                     </section>
 
                     {/* Core Values Section */}
-                    <section id="values" className="py-24 bg-uconn-navy border-t border-white/5">
+                    <section id="values" className={`py-24 border-t border-white/5 ${generation === 'GenY' ? 'bg-[#292524]' : generation === 'GenZ' ? 'bg-slate-900' : generation === 'GenA' ? 'bg-black' : 'bg-uconn-navy'}`}>
                         <div className="container mx-auto px-6">
                         <div className="mb-16">
-                            <h2 className="text-3xl md:text-4xl font-bold mb-4 font-serif text-white">Core Values</h2>
-                            <p className="text-slate-400 text-lg max-w-2xl">Defining how we carry out our mission with purpose and integrity.</p>
+                            <h2 className="text-3xl md:text-4xl font-bold mb-4 font-serif">{content.valuesTitle}</h2>
+                            <p className="opacity-60 text-lg max-w-2xl">{content.valuesSub}</p>
                         </div>
 
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            <ValueItem title="Excellence" desc="Striving for quality services and work performance." />
-                            <ValueItem title="Innovation" desc="Intentionally pursuing improved methods, practices, and services by being flexible, creative, and imaginative." />
-                            <ValueItem title="Collaboration" desc="Bringing our diverse skills sets, experiences, and viewpoints to bear as we work toward common goals." />
-                            <ValueItem title="Adaptability" desc="Embracing change and remaining open to new ideas and perspectives." />
-                            <ValueItem title="Accountability" desc="Taking responsibility for our conduct, performance, and delivery of information and technology." />
-                            <ValueItem title="Integrity" desc="Being honest, trustworthy, and upholding the values of the Library, Law School, and University." />
-                            <ValueItem title="Reflection" desc="Employing thoughtfulness, including careful consideration and thorough examination of issues." />
-                            <ValueItem title="Equity & Inclusion" desc="Valuing and respecting a full spectrum of backgrounds and points of view to enhance service." />
-                            <ValueItem title="Community" desc="Valuing each other by building a workplace that supports well-being and tools to innovate." />
+                            {content.values.map((val, idx) => (
+                                <ValueItem key={idx} title={val.title} desc={val.desc} theme={theme} />
+                            ))}
                         </div>
                         </div>
                     </section>
 
                     {/* Strategic Directions Section */}
-                    <section id="strategies" className="py-24 bg-[#051C45]">
+                    <section id="strategies" className={`py-24 ${theme.sectionBgAlt}`}>
                         <div className="container mx-auto px-6">
                         <div className="text-center mb-20">
-                            <div className="inline-block bg-white text-uconn-navy px-4 py-1 rounded-sm text-sm font-bold mb-4 uppercase tracking-wider">
-                            Strategic Directions
+                            <div className={`inline-block px-4 py-1 rounded-sm text-sm font-bold mb-4 uppercase tracking-wider ${generation === 'Standard' ? 'bg-white text-uconn-navy' : theme.badge}`}>
+                            {content.stratTitle}
                             </div>
-                            <h2 className="text-3xl md:text-5xl font-bold font-serif text-white">The Path Forward</h2>
+                            <h2 className="text-3xl md:text-5xl font-bold font-serif">{content.stratSub}</h2>
                         </div>
 
                         <div className="space-y-16">
-                            <StrategyBlock 
-                                number="01"
-                                title="Resources & Accessibility"
-                                mainGoal="Provide accessible, relevant resources that support the needs of the law school community and address the changing landscape of legal information and the legal profession."
-                                goals={[
-                                    "Curate and preserve a collection that supports research, scholarship, and curricular needs.",
-                                    "Enhance accessibility and discovery of electronic and print resources.",
-                                    "Promote visibility of the law library and technology departments and their resources."
-                                ]}
-                            />
-                            
-                            <StrategyBlock 
-                                number="02"
-                                title="Education & Instruction"
-                                mainGoal="Educate the law school community through formal and informal instruction, supporting student success while preparing them for modern legal practice and the future of legal information and technology."
-                                goals={[
-                                    "Lead curricular development in legal technology and research to address evolving needs.",
-                                    "Develop additional classes, tools, and specialized instruction utilizing innovative ed-tech.",
-                                    "Align instructional services, programs, and resources to support student success.",
-                                    "Work with key partners to integrate information literacy and critical thinking competencies."
-                                ]}
-                            />
-
-                            <StrategyBlock 
-                                number="03"
-                                title="Research & Scholarship"
-                                mainGoal="Create a culture of inquiry and critical thinking by supporting, contributing to, and engaging in research and scholarship."
-                                goals={[
-                                    "Support discovery by making faculty and student scholarship available through online platforms.",
-                                    "Strengthen and promote support for scholarly research through responsive training and technical resources.",
-                                    "Identify new opportunities to engage with the community and align information services with their needs."
-                                ]}
-                            />
-
-                            <StrategyBlock 
-                                number="04"
-                                title="Community Hub"
-                                mainGoal="Serve as a welcoming community hub that supports the academic mission of the law school and the legal information needs of Connecticut communities."
-                                goals={[
-                                    "Assess user experience to continually improve services to better meet user needs.",
-                                    "Promote access to justice by honoring our commitment to serve the public.",
-                                    "Create, promote, and host events that bring together the law school community.",
-                                    "Champion the department as a central resource for learning, research, and community engagement."
-                                ]}
-                            />
+                            {content.strategies.map((strat, idx) => (
+                                <StrategyBlock 
+                                    key={idx}
+                                    number={`0${idx + 1}`}
+                                    title={strat.title}
+                                    mainGoal={strat.goal}
+                                    goals={strat.bullets}
+                                    theme={theme}
+                                />
+                            ))}
                         </div>
                         </div>
                     </section>
 
                     {/* Footer */}
-                    <footer className="bg-uconn-navy border-t border-white/10 py-12">
+                    <footer className={`py-12 ${theme.footerBg}`}>
                         <div className="container mx-auto px-6 text-center">
                         <div className="flex items-center justify-center gap-2 mb-6 opacity-90">
-                            <Icon name="Landmark" className="text-white" size={24} />
-                            <span className="font-bold text-xl text-white">UConn Law <span className="font-light">Library & IT</span></span>
+                            <Icon name="Landmark" className={theme.iconPrimary} size={24} />
+                            <span className="font-bold text-xl">UConn Law <span className="opacity-70 font-light">Library & IT</span></span>
                         </div>
-                        <p className="text-slate-400 text-sm mb-6">
+                        <p className="opacity-50 text-sm mb-6">
                             © 2026 University of Connecticut School of Law. All Rights Reserved.
                         </p>
                         </div>
@@ -367,47 +585,47 @@
 
         // Sub-components
 
-        const MissionCard = ({ icon, title, desc }) => (
-            <div className="bg-[#051C45] p-8 rounded-sm border border-white/10 hover:border-blue-400/50 transition-all hover:-translate-y-1 group shadow-lg">
-                <div className="w-12 h-12 bg-blue-900/30 rounded-full flex items-center justify-center mb-6 group-hover:bg-blue-800/50 transition-colors">
-                <Icon name={icon} className="text-white" size={24} />
+        const MissionCard = ({ icon, title, desc, theme }) => (
+            <div className={`p-8 rounded-sm border transition-all hover:-translate-y-1 group shadow-lg ${theme.cardBg}`}>
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-6 transition-colors ${theme.cardIconBg}`}>
+                <Icon name={icon} className={theme.cardIconColor} size={24} />
                 </div>
-                <h3 className="text-xl font-bold mb-3 text-white font-serif">{title}</h3>
-                <p className="text-slate-400 text-sm leading-relaxed">{desc}</p>
+                <h3 className="text-xl font-bold mb-3 font-serif">{title}</h3>
+                <p className="opacity-70 text-sm leading-relaxed min-h-[80px]">{desc}</p>
             </div>
         );
 
-        const ValueItem = ({ title, desc }) => (
+        const ValueItem = ({ title, desc, theme }) => (
             <div className="p-6 rounded-sm bg-white/5 border border-white/5 hover:bg-white/10 transition-all">
                 <div className="flex items-start gap-4">
                 <div className="mt-1">
-                    <Icon name="CheckCircle" className="text-blue-400" size={20} />
+                    <Icon name="CheckCircle" className={theme.accentText} size={20} />
                 </div>
                 <div>
-                    <h3 className="font-bold text-lg text-white mb-2 font-serif">{title}</h3>
-                    <p className="text-slate-400 text-sm leading-relaxed">{desc}</p>
+                    <h3 className="font-bold text-lg mb-2 font-serif">{title}</h3>
+                    <p className="opacity-70 text-sm leading-relaxed">{desc}</p>
                 </div>
                 </div>
             </div>
         );
 
-        const StrategyBlock = ({ number, title, mainGoal, goals }) => (
+        const StrategyBlock = ({ number, title, mainGoal, goals, theme }) => (
             <div className="grid md:grid-cols-12 gap-8 items-start border-b border-white/10 pb-16 last:border-0 last:pb-0">
-                <div className="md:col-span-1 text-4xl font-black text-white/20 font-serif">
+                <div className="md:col-span-1 text-4xl font-black opacity-20 font-serif">
                 {number}
                 </div>
                 <div className="md:col-span-4">
-                <h3 className="text-2xl font-bold text-white mb-4 font-serif">{title}</h3>
-                <p className="text-slate-300 text-lg leading-relaxed mb-6 font-light">{mainGoal}</p>
+                <h3 className="text-2xl font-bold mb-4 font-serif">{title}</h3>
+                <p className="opacity-80 text-lg leading-relaxed mb-6 font-light">{mainGoal}</p>
                 </div>
-                <div className="md:col-span-7 bg-uconn-navy rounded-sm p-8 border border-white/10 shadow-lg">
-                <h4 className="text-sm font-bold text-blue-300 uppercase tracking-wider mb-6 flex items-center gap-2">
+                <div className={`md:col-span-7 rounded-sm p-8 border shadow-lg ${theme.cardBg}`}>
+                <h4 className={`text-sm font-bold uppercase tracking-wider mb-6 flex items-center gap-2 ${theme.accentText}`}>
                     <Icon name="Target" size={16} /> Key Goals
                 </h4>
                 <ul className="space-y-4">
                     {goals.map((goal, i) => (
-                    <li key={i} className="flex items-start gap-3 text-slate-300">
-                        <span className="mt-1"><Icon name="ArrowRight" className="text-blue-500" size={16} /></span>
+                    <li key={i} className="flex items-start gap-3 opacity-80">
+                        <span className={`mt-1 ${theme.accentText}`}><Icon name="ArrowRight" size={16} /></span>
                         <span className="text-sm md:text-base">{goal}</span>
                     </li>
                     ))}
