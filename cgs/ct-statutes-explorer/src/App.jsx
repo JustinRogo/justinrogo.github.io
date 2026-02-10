@@ -118,6 +118,7 @@ useEffect(() => {
 
   // Global drawer state
   const [globalOpen, setGlobalOpen] = useState(true);
+  const [mobileBrowseExpanded, setMobileBrowseExpanded] = useState(false);
 
   // Reader
   const [selectedDoc, setSelectedDoc] = useState(null);
@@ -249,6 +250,7 @@ const globalResults = useMemo(() => {
 
   async function openInReader(doc) {
     setSelectedDoc(doc);
+    setMobileBrowseExpanded(false);
     setReaderState({ status: "loading", html: "", error: "", mode: "inline" });
 
     try {
@@ -286,12 +288,13 @@ const globalResults = useMemo(() => {
     setSelectedTitleKey(r.titleKey);
     setSelectedChapterKey(r.chapterKey);
     setChapterQuery("");
+    setMobileBrowseExpanded(false);
     openInReader(r);
     setGlobalOpen(true); // keep open; change to false if you want it to auto-collapse
   }
 
   return (
-    <div className="shell">
+    <div className={`shell ${selectedDoc ? "has-selection" : ""} ${mobileBrowseExpanded ? "browse-expanded" : ""}`}>
       <header className="topbar">
         <div className="brand">
           <div className="brand-title">CT General Statutes</div>
@@ -313,6 +316,15 @@ const globalResults = useMemo(() => {
         <section className="panel leftPanel">
           <div className="panel-header">
             <div className="panel-title">Browse</div>
+            {selectedDoc && (
+              <button
+                className="ghost mobileBrowseToggle"
+                onClick={() => setMobileBrowseExpanded((v) => !v)}
+                type="button"
+              >
+                {mobileBrowseExpanded ? "Hide browse" : "Show browse"}
+              </button>
+            )}
             <div className="crumbs">
               <button className="linkbtn" onClick={backToTitles} disabled={!selectedTitleKey}>
                 Titles
