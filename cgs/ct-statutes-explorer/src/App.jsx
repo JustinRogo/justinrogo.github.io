@@ -130,7 +130,7 @@ useEffect(() => {
 
   useEffect(() => {
     (async () => {
-      const res = await fetch("/cgs_index.json");
+      const res = await fetch(`${import.meta.env.BASE_URL}cgs_index.json`);
       if (!res.ok) throw new Error(`Failed to load cgs_index.json (${res.status})`);
       const json = await res.json();
       setIndexJson(json);
