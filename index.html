@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -738,6 +738,296 @@
       }
     }
   </style>
+
+  <style id="modern-refresh">
+    @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+    :root {
+      --bg: #060d20;
+      --bg-elev: #0d1c44;
+      --glass: rgba(9, 25, 63, 0.7);
+      --text: #ebf2ff;
+      --muted: #9aaaca;
+      --orange: #ff9a3c;
+      --radius: 20px;
+      --shadow: 0 24px 45px rgba(3, 10, 26, 0.48);
+      --shadow-sm: 0 12px 25px rgba(3, 10, 26, 0.35);
+      --ring: 0 0 0 2px rgba(255, 154, 60, 0.32), 0 20px 38px rgba(3, 10, 26, 0.42);
+      --speed: 0.25s;
+    }
+
+    body {
+      font-family: 'Space Grotesk', 'Avenir Next', 'Segoe UI', sans-serif;
+      background:
+        radial-gradient(1200px 780px at -8% -10%, rgba(255, 154, 60, 0.2), transparent 62%),
+        radial-gradient(1000px 700px at 108% 10%, rgba(39, 87, 198, 0.26), transparent 58%),
+        linear-gradient(165deg, #040915 0%, #09173b 45%, #0b1a47 100%);
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image: linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: radial-gradient(circle at center, #000 35%, transparent 92%);
+      opacity: 0.45;
+      z-index: -1;
+    }
+
+    .container {
+      max-width: 1320px;
+      padding: clamp(16px, 3vw, 30px);
+      grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+      gap: clamp(14px, 2vw, 24px);
+    }
+
+    .card {
+      border-radius: var(--radius);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: linear-gradient(140deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.02)), var(--glass);
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      gap: 16px;
+      padding: clamp(16px, 2vw, 22px);
+      text-align: center;
+    }
+
+    .avatar {
+      width: 7.4rem;
+      height: 7.4rem;
+      border-radius: 24%;
+    }
+
+    .hgroup h1 {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: clamp(1.65rem, 2.5vw, 2.2rem);
+      letter-spacing: 0.01em;
+      margin-bottom: 0.5rem;
+    }
+
+    .hgroup p {
+      font-size: 0.9rem;
+      color: color-mix(in srgb, var(--text) 80%, var(--muted));
+      margin: 0.3rem 0;
+    }
+
+    .info-card {
+      gap: 0.75rem;
+      border-radius: calc(var(--radius) - 6px);
+      background: linear-gradient(180deg, rgba(5, 16, 43, 0.88), rgba(7, 22, 56, 0.72));
+    }
+
+    .chip {
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      background: linear-gradient(120deg, rgba(255, 154, 60, 0.25), rgba(255, 154, 60, 0.08));
+      color: #ffd7af;
+      border: 1px solid rgba(255, 154, 60, 0.35);
+      border-radius: 999px;
+      padding: 0.35rem 0.7rem;
+    }
+
+    .btn,
+    .tab,
+    .controls button,
+    .toggle-buttons button {
+      border-radius: 14px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      transition: transform var(--speed), box-shadow var(--speed), border-color var(--speed), background var(--speed);
+    }
+
+    .btn {
+      justify-content: center;
+      width: 100%;
+      border-color: rgba(255, 255, 255, 0.24);
+      background: linear-gradient(120deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04)), rgba(8, 24, 60, 0.8);
+    }
+
+    .btn:hover,
+    .btn:focus-visible {
+      transform: translateY(-2px);
+      box-shadow: var(--ring);
+      border-color: rgba(255, 154, 60, 0.6);
+      outline: none;
+    }
+
+    .tabs {
+      padding: clamp(14px, 2vw, 20px);
+    }
+
+    .tablist {
+      margin-bottom: 12px;
+      gap: 10px;
+    }
+
+    .tab {
+      color: #a8b6d4;
+      border-color: rgba(255, 255, 255, 0.22);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .tab[aria-selected="true"] {
+      color: #fff8ef;
+      border-color: rgba(255, 154, 60, 0.6);
+      background: linear-gradient(120deg, rgba(255, 154, 60, 0.3), rgba(52, 108, 235, 0.18));
+    }
+
+    .embed {
+      height: min(72vh, 900px);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .link-tools input,
+    .link {
+      border-radius: 14px;
+    }
+
+    .link-tools input {
+      min-height: 45px;
+      border-color: rgba(255, 255, 255, 0.2);
+      background: rgba(8, 24, 60, 0.7);
+    }
+
+    .link {
+      border-color: rgba(255, 255, 255, 0.2);
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03)), rgba(9, 23, 54, 0.78);
+    }
+
+    .link:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--ring);
+    }
+
+    .quickbar {
+      right: 22px;
+      bottom: 22px;
+      gap: 12px;
+    }
+
+    .fab {
+      border-radius: 18px;
+      width: 54px;
+      height: 54px;
+      border-color: rgba(255, 255, 255, 0.24);
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.03)), rgba(8, 24, 60, 0.85);
+      transition: transform var(--speed), box-shadow var(--speed);
+    }
+
+    .fab:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--ring);
+    }
+
+    .donate {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    footer {
+      font-size: 0.9rem;
+      color: #b4c1dc;
+      letter-spacing: 0.02em;
+    }
+
+    
+    body.light {
+      background:
+        radial-gradient(1200px 780px at -8% -10%, rgba(255, 154, 60, 0.14), transparent 62%),
+        radial-gradient(1000px 700px at 108% 10%, rgba(52, 108, 235, 0.14), transparent 58%),
+        linear-gradient(165deg, #f8fbff 0%, #edf3ff 45%, #e7eefb 100%);
+    }
+
+    body.light::before {
+      background-image: linear-gradient(rgba(11, 25, 58, 0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(11, 25, 58, 0.06) 1px, transparent 1px);
+      opacity: 0.3;
+    }
+
+    body.light .card {
+      border-color: rgba(15, 26, 46, 0.14);
+      background: linear-gradient(140deg, rgba(255, 255, 255, 0.92), rgba(244, 248, 255, 0.82)), rgba(255, 255, 255, 0.9);
+      box-shadow: 0 16px 32px rgba(31, 52, 92, 0.12);
+    }
+
+    body.light .info-card {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(241, 247, 255, 0.9));
+    }
+
+    body.light .chip {
+      color: #8a4b0d;
+      border-color: rgba(233, 139, 42, 0.36);
+      background: linear-gradient(120deg, rgba(233, 139, 42, 0.22), rgba(233, 139, 42, 0.08));
+    }
+
+    body.light .btn {
+      color: #0f1a2e;
+      border-color: rgba(15, 26, 46, 0.18);
+      background: linear-gradient(120deg, rgba(255, 255, 255, 0.98), rgba(245, 249, 255, 0.88)), rgba(255, 255, 255, 0.92);
+    }
+
+    body.light .tab {
+      color: #41506d;
+      border-color: rgba(15, 26, 46, 0.16);
+      background: rgba(255, 255, 255, 0.75);
+    }
+
+    body.light .tab[aria-selected="true"] {
+      color: #1b253b;
+      border-color: rgba(233, 139, 42, 0.5);
+      background: linear-gradient(120deg, rgba(255, 154, 60, 0.28), rgba(52, 108, 235, 0.12));
+    }
+
+    body.light .embed {
+      border-color: rgba(15, 26, 46, 0.14);
+      box-shadow: 0 10px 18px rgba(31, 52, 92, 0.12);
+    }
+
+    body.light .link-tools input {
+      color: #0f1a2e;
+      border-color: rgba(15, 26, 46, 0.18);
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    body.light .link {
+      color: #0f1a2e;
+      border-color: rgba(15, 26, 46, 0.16);
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(243, 248, 255, 0.88)), rgba(255, 255, 255, 0.9);
+    }
+
+    body.light .fab {
+      border-color: rgba(15, 26, 46, 0.16);
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(242, 247, 255, 0.88)), rgba(255, 255, 255, 0.9);
+      box-shadow: 0 12px 24px rgba(31, 52, 92, 0.14);
+    }
+
+    body.light footer {
+      color: #4f607f;
+    }
+    @media (max-width: 980px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+
+      .quickbar {
+        right: 14px;
+        bottom: 14px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+  </style>
 </head>
 
 <body>
@@ -770,7 +1060,7 @@
               </svg>Toggle Theme</button>
             <button class="btn"
               onclick="window.location.href='https://giving.uconn.edu/campaigns/60852/donations/new?designation=LawLibraryEndowmentFund'">🧡
-              Donate to the Law Library</a>
+              Donate to the Law Library</button>
           </div>
         </div>
       </header>
@@ -959,9 +1249,9 @@
               <div class="orange"></div>
             </div>
             <div class="controls">
-              <button data-limit="5">Top 5</button>
-              <button data-limit="10">Top 10</button>
-              <button data-limit="all" >Show All</button>
+              <button data-limit="5">Top 5</button>
+              <button data-limit="10">Top 10</button>
+              <button data-limit="all" >Show All</button>
             </div>
           </div>
           </br>
@@ -975,21 +1265,21 @@
                 approaches to problems. My mind is always in motion, scanning for patterns and possibilities. I think
                 several steps ahead, intuitively sensing the most effective path forward and adjusting my plans as I go.
                 I love to learn and collect information—not just for the sake of knowing, but because I see the
-                potential in every detail to spark something greater. I’m energized by bringing order to chaos, juggling
-                moving parts, and organizing people or projects for maximum impact. Challenges don’t intimidate me—in
-                fact, I’m driven to fix what’s broken, improve systems, and restore what isn’t working to a better
-                state. I’m at my best when I’m solving complex problems with flexibility, insight, and a deep toolbox of
+                potential in every detail to spark something greater. I'm energized by bringing order to chaos, juggling
+                moving parts, and organizing people or projects for maximum impact. Challenges don't intimidate me—in
+                fact, I'm driven to fix what's broken, improve systems, and restore what isn't working to a better
+                state. I'm at my best when I'm solving complex problems with flexibility, insight, and a deep toolbox of
                 ideas and resources.</p>
             </div>
             <div id="overextended" class="content">
               <p>I sometimes get so caught up in chasing new ideas that I lose focus or leave others behind who need
                 more structure. My mind is constantly running through possibilities, which can make me seem scattered or
-                hard to follow. I gather information endlessly, but I don’t always pause to use or share what I’ve
+                hard to follow. I gather information endlessly, but I don't always pause to use or share what I've
                 collected—and I can become a bottleneck, hoarding ideas or over-researching. My desire to optimize and
                 rearrange everything can come across as controlling or impatient, especially when others prefer
-                consistency. And while I’m driven to solve problems, I can focus so heavily on what’s broken that I
-                overlook what’s already working, or become critical instead of constructive. I want things to be
-                better—but if I’m not careful, I might overwhelm others or myself in the process.</p>
+                consistency. And while I'm driven to solve problems, I can focus so heavily on what's broken that I
+                overlook what's already working, or become critical instead of constructive. I want things to be
+                better—but if I'm not careful, I might overwhelm others or myself in the process.</p>
             </div>
           
           </div>  </br>
@@ -1270,7 +1560,7 @@
       const yr = document.getElementById('year'); if (yr) yr.textContent = new Date().getFullYear();
     })();
 
-    // Weather (Hartford) via Open‑Meteo
+    // Weather (Hartford) via Open-Meteo
     (function () {
       const wxEl = document.getElementById('wx'), note = document.getElementById('wxNote');
       if (!wxEl || !note) return;
@@ -1352,7 +1642,7 @@
             <a href="${i.link}" target="_blank" rel="noopener">${i.title}</a>
             <div class="info-note">${i.date.toLocaleDateString()} · ${i.desc?.slice(0, 90)}${i.desc.length > 90 ? '…' : ''}</div>
           </div>`).join('');
-      }).catch(() => { list.innerHTML = `<span class="info-note">Can’t load events here (CORS). <a href="${FEED}" target="_blank" rel="noopener">Open feed</a>.</span>`; });
+      }).catch(() => { list.innerHTML = `<span class="info-note">Can't load events here (CORS). <a href="${FEED}" target="_blank" rel="noopener">Open feed</a>.</span>`; });
     })();
 
     // ==== UConn Library Search Widget (inject the exact existing markup/behavior) ====
@@ -1513,3 +1803,7 @@
 </body>
 
 </html>
+
+
+
+
