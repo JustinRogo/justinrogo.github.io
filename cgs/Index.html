@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CT General Statutes Explorer</title>
+  <style>
+    :root { --border:#e5e7eb; --muted:#6b7280; --bg:#ffffff; --panel:#f9fafb; --link:#1d4ed8; }
+    * { box-sizing: border-box; }
+    body { margin:0; font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Arial; background:var(--bg); color:#111827; }
+    header { position:sticky; top:0; z-index:10; background:var(--bg); border-bottom:1px solid var(--border); padding:12px 14px; }
+    header .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .brand { font-weight:700; }
+    .pill { font-size:12px; padding:4px 8px; border:1px solid var(--border); border-radius:999px; background:var(--panel); color:var(--muted); }
+    .input { flex:1; min-width:240px; display:flex; gap:8px; align-items:center; }
+    input[type="search"] { width:100%; padding:9px 10px; border:1px solid var(--border); border-radius:10px; outline:none; }
+    select { padding:9px 10px; border:1px solid var(--border); border-radius:10px; background:#fff; }
+    main { display:grid; grid-template-columns: 340px 1fr; height: calc(100vh - 58px); }
+    aside { border-right:1px solid var(--border); overflow:auto; padding:12px; }
+    section { overflow:auto; padding:16px; }
+    .list { display:flex; flex-direction:column; gap:8px; }
+    .card { border:1px solid var(--border); border-radius:12px; padding:10px 10px; background:#fff; }
+    .card:hover { border-color:#cbd5e1; }
+    .card .kicker { font-size:12px; color:var(--muted); }
+    .card .title { font-weight:600; margin-top:2px; }
+    .card .sub { font-size:12px; color:var(--muted); margin-top:2px; }
+    a { color:var(--link); text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    .breadcrumbs { font-size:12px; color:var(--muted); margin-bottom:10px; }
+    .h1 { font-size:18px; font-weight:700; margin:0 0 12px; }
+    .section-label { font-size:16px; font-weight:700; margin:0 0 6px; }
+    .meta { font-size:12px; color:var(--muted); margin-bottom:14px; display:flex; gap:12px; flex-wrap:wrap; }
+    .meta button { font-size:12px; padding:6px 8px; border:1px solid var(--border); border-radius:10px; background:var(--panel); cursor:pointer; }
+    .body p { margin: 10px 0; }
+    .body p:first-child { margin-top:0; }
+    details { border:1px solid var(--border); border-radius:12px; background:#fff; margin-top:10px; overflow:hidden; }
+    summary { cursor:pointer; padding:10px 12px; background:var(--panel); font-weight:600; }
+    .panel { padding:10px 12px; }
+    .panel p { margin: 10px 0; }
+    .panel p:first-child { margin-top:0; }
+    .muted { color:var(--muted); }
+    .empty { padding:18px; border:1px dashed var(--border); border-radius:12px; color:var(--muted); }
+    .row-between { display:flex; justify-content:space-between; gap:8px; align-items:center; }
+    .small { font-size:12px; }
+    .tag { display:inline-block; font-size:11px; padding:3px 7px; border:1px solid var(--border); border-radius:999px; color:var(--muted); background:#fff; }
+    @media (max-width: 960px) {
+      main { grid-template-columns: 1fr; height:auto; }
+      aside { border-right:none; border-bottom:1px solid var(--border); max-height: 45vh; }
+      section { max-height: none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="row">
+      <div class="brand">CT General Statutes Explorer</div>
+      <span class="pill" id="statusPill">Loading…</span>
+      <div class="input">
+        <input id="q" type="search" placeholder="Search titles, chapters, sections (labels) or full text…" autocomplete="off" />
+        <select id="scope">
+          <option value="nav" selected>Titles/Chapters/Sections (labels)</option>
+          <option value="fulltext">Full text (section body)</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <aside>
+      <div class="row-between" style="margin-bottom:10px;">
+        <div class="small muted" id="navHeading">Browse</div>
+        <button id="homeBtn" class="small" style="padding:6px 8px;border:1px solid var(--border);border-radius:10px;background:var(--panel);cursor:pointer;">Home</button>
+      </div>
+      <div id="nav" class="list"></div>
+    </aside>
+
+    <section>
+      <div class="breadcrumbs" id="crumbs"></div>
+      <div id="view"></div>
+    </section>
+  </main>
+
+  <script>
+    // -----------------------------
+    // CONFIG
+    // -----------------------------
+    // Put your generated JSON here in the same folder as this HTML (recommended),
+    // or update the path as needed.
+    const DATA_URL = "./cgs_index.json";
+
+    // Safety: very large file → consider splitting per-title later.
+    const MAX_FULLTEXT_RESULTS = 200;
+
+    // -----------------------------
+    // STATE
+    // -----------------------------
+    const state = {
+      data: null,
+      titleByKey: new Map(),
+      chapterByKey: new Map(), // key: `${titleKey}:${chapterKey}`
+      sectionByKey: new Map(), // key: `${titleKey}:${chapterKey}:${sectionKey}`
+      current: { titleKey: null, chapterKey: null, sectionKey: null },
+      search: { q: "", scope: "nav", results: [] }
+    };
+
+    // -----------------------------
+    // DOM
+    // -----------------------------
+    const $ = (id) => document.getElementById(id);
+    const navEl = $("nav");
+    const viewEl = $("view");
+    const crumbsEl = $("crumbs");
+    const statusPill = $("statusPill");
+    const qEl = $("q");
+    const scopeEl = $("scope");
+    const homeBtn = $("homeBtn");
+    const navHeading = $("navHeading");
+
+    // -----------------------------
+    // HELPERS
+    // -----------------------------
+    function esc(s) {
+      return (s ?? "").replace(/[&<>"']/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+    }
+
+    function setStatus(text) {
+      statusPill.textContent = text;
+    }
+
+    function fmtTitle(t) {
+      return `${t.label}${t.name ? " — " + t.name : ""}`;
+    }
+
+    function fmtChapter(c) {
+      return `${c.label}${c.name ? " — " + c.name : ""}`;
+    }
+
+    function fmtSectionLabel(s) {
+      return s.label || s.section_key || "Section";
+    }
+
+    function keyChapter(titleKey, chapterKey) {
+      return `${titleKey}:${chapterKey}`;
+    }
+    function keySection(titleKey, chapterKey, sectionKey) {
+      return `${titleKey}:${chapterKey}:${sectionKey}`;
+    }
+    function stripSectionPrefix(label) {
+  if (!label) return label;
+
+  // Removes "Sec. 1-1a. " or similar
+  return label.replace(/^Sec\.\s*[\d\w\-]+\.\s*/i, "");
+}
+
+
+    function parseHash() {
+      // Hash routes:
+      // #/                 => titles
+      // #/t/01             => chapters
+      // #/t/01/c/001       => sections
+      // #/t/01/c/001/s/1-1a => section view
+      const h = location.hash || "#/";
+      const parts = h.replace(/^#\/?/, "").split("/").filter(Boolean);
+      const cur = { titleKey: null, chapterKey: null, sectionKey: null };
+
+      for (let i = 0; i < parts.length; i += 2) {
+        const k = parts[i], v = parts[i+1];
+        if (k === "t") cur.titleKey = v;
+        if (k === "c") cur.chapterKey = v;
+        if (k === "s") cur.sectionKey = v;
+      }
+      return cur;
+    }
+
+    function navToTitles() { location.hash = "#/"; }
+    function navToTitle(titleKey) { location.hash = `#/t/${encodeURIComponent(titleKey)}`; }
+    function navToChapter(titleKey, chapterKey) { location.hash = `#/t/${encodeURIComponent(titleKey)}/c/${encodeURIComponent(chapterKey)}`; }
+    function navToSection(titleKey, chapterKey, sectionKey) { location.hash = `#/t/${encodeURIComponent(titleKey)}/c/${encodeURIComponent(chapterKey)}/s/${encodeURIComponent(sectionKey)}`; }
+
+    function buildIndexes(data) {
+      state.titleByKey.clear();
+      state.chapterByKey.clear();
+      state.sectionByKey.clear();
+
+      for (const t of data.titles || []) {
+        state.titleByKey.set(t.title_key, t);
+        for (const c of t.chapters || []) {
+          state.chapterByKey.set(keyChapter(t.title_key, c.chapter_key), c);
+          for (const s of c.sections || []) {
+            // Some sections may have missing keys; skip those for deep linking
+            if (s.section_key) {
+              state.sectionByKey.set(keySection(t.title_key, c.chapter_key, s.section_key), s);
+            }
+          }
+        }
+      }
+    }
+
+    function getCurrentObjects() {
+      const { titleKey, chapterKey, sectionKey } = state.current;
+      const title = titleKey ? state.titleByKey.get(titleKey) : null;
+      const chapter = (titleKey && chapterKey) ? state.chapterByKey.get(keyChapter(titleKey, chapterKey)) : null;
+      const section = (titleKey && chapterKey && sectionKey) ? state.sectionByKey.get(keySection(titleKey, chapterKey, sectionKey)) : null;
+      return { title, chapter, section };
+    }
+
+    // -----------------------------
+    // SEARCH
+    // -----------------------------
+    function setSearch(q, scope) {
+      state.search.q = q.trim();
+      state.search.scope = scope;
+      runSearch();
+      render();
+    }
+
+    function runSearch() {
+      const q = state.search.q.toLowerCase();
+      const scope = state.search.scope;
+      const results = [];
+
+      if (!q) {
+        state.search.results = [];
+        return;
+      }
+
+      if (scope === "nav") {
+        // Search across labels/names only (fast)
+        for (const t of state.data.titles || []) {
+          const tHay = `${t.label} ${t.name || ""}`.toLowerCase();
+          const tMatch = tHay.includes(q);
+
+          // If title matches, include it as a result
+          if (tMatch) {
+            results.push({ type: "title", titleKey: t.title_key, label: fmtTitle(t) });
+          }
+
+          for (const c of t.chapters || []) {
+            const cHay = `${c.label} ${c.name || ""}`.toLowerCase();
+            if (cHay.includes(q)) {
+              results.push({
+                type: "chapter",
+                titleKey: t.title_key,
+                chapterKey: c.chapter_key,
+                label: fmtChapter(c),
+                sub: fmtTitle(t)
+              });
+            }
+
+            for (const s of c.sections || []) {
+              const sHay = `${s.label || ""} ${s.section_key || ""}`.toLowerCase();
+              if (sHay.includes(q)) {
+                results.push({
+                  type: "section",
+                  titleKey: t.title_key,
+                  chapterKey: c.chapter_key,
+                  sectionKey: s.section_key || "",
+                  label: s.label || s.section_key || "Section",
+                  sub: `${fmtTitle(t)} • ${fmtChapter(c)}`
+                });
+              }
+            }
+          }
+        }
+      } else {
+        // Full text search across section body only (content.text)
+        // Note: for very large corpora this will be slow; consider pre-built index later.
+        let count = 0;
+        for (const t of state.data.titles || []) {
+          for (const c of t.chapters || []) {
+            for (const s of c.sections || []) {
+              if (!s.section_key) continue;
+              const text = (s.content && s.content.text) ? String(s.content.text) : "";
+              if (!text) continue;
+              const hay = text.toLowerCase();
+              const idx = hay.indexOf(q);
+              if (idx !== -1) {
+                // Build a small snippet around the match
+                const start = Math.max(0, idx - 60);
+                const end = Math.min(text.length, idx + q.length + 90);
+                const snippet = text.slice(start, end).replace(/\s+/g, " ").trim();
+
+                results.push({
+                  type: "section",
+                  titleKey: t.title_key,
+                  chapterKey: c.chapter_key,
+                  sectionKey: s.section_key,
+                  label: s.label || s.section_key,
+                  sub: `${fmtTitle(t)} • ${fmtChapter(c)}`,
+                  snippet
+                });
+                count++;
+                if (count >= MAX_FULLTEXT_RESULTS) break;
+              }
+            }
+            if (count >= MAX_FULLTEXT_RESULTS) break;
+          }
+          if (count >= MAX_FULLTEXT_RESULTS) break;
+        }
+      }
+
+      state.search.results = results;
+    }
+
+    // -----------------------------
+    // RENDER
+    // -----------------------------
+    function render() {
+      const q = state.search.q;
+      const hasSearch = Boolean(q);
+      if (hasSearch) {
+        navHeading.textContent = `Search results (${state.search.results.length}${state.search.scope==="fulltext" ? `, capped at ${MAX_FULLTEXT_RESULTS}` : ""})`;
+        renderSearchNav();
+        renderSearchView();
+        return;
+      }
+
+      // Normal drill-down navigation
+      navHeading.textContent = "Browse";
+      renderNav();
+      renderView();
+    }
+
+    function renderNav() {
+      const { titleKey, chapterKey, sectionKey } = state.current;
+      navEl.innerHTML = "";
+
+      // Titles list
+      if (!titleKey) {
+        const items = (state.data.titles || []);
+        navEl.appendChild(renderList(items.map(t => ({
+          kicker: t.label,
+          title: t.name || "(no title name)",
+          sub: t.url,
+          onClick: () => navToTitle(t.title_key),
+          right: `<span class="tag">${(t.chapters || []).length} chapters</span>`
+        }))));
+        return;
+      }
+
+      // Chapters list for a title
+      if (titleKey && !chapterKey) {
+        const t = state.titleByKey.get(titleKey);
+        const chapters = (t?.chapters || []);
+        navEl.appendChild(renderList(chapters.map(c => ({
+          kicker: c.label,
+          title: c.name || "(no chapter name)",
+          sub: c.url,
+          onClick: () => navToChapter(titleKey, c.chapter_key),
+          right: `<span class="tag">${(c.sections || []).length} sections</span>`
+        }))));
+        return;
+      }
+
+      // Sections list for a chapter
+      if (titleKey && chapterKey) {
+        const c = state.chapterByKey.get(keyChapter(titleKey, chapterKey));
+        const sections = (c?.sections || []);
+        navEl.appendChild(renderList(sections.map(s => ({
+          kicker: s.section_key ? `Sec. ${s.section_key}` : "Section",
+         title: stripSectionPrefix(s.label) || "(no label)",
+          sub: s.url,
+          onClick: () => s.section_key ? navToSection(titleKey, chapterKey, s.section_key) : null,
+          right: s.content && s.content.status ? `<span class="tag">${esc(s.content.status)}</span>` : ""
+        }))));
+        return;
+      }
+    }
+
+    function renderView() {
+      const { titleKey, chapterKey, sectionKey } = state.current;
+      const { title, chapter, section } = getCurrentObjects();
+
+      // Breadcrumbs
+      crumbsEl.innerHTML = renderBreadcrumbs({ title, chapter, section });
+
+      // Main content
+      if (!titleKey) {
+        viewEl.innerHTML = `
+          <h1 class="h1">Titles</h1>
+          <div class="empty">Select a Title from the left to begin, or use the search bar.</div>
+        `;
+        return;
+      }
+
+      if (titleKey && !chapterKey) {
+        viewEl.innerHTML = `
+          <h1 class="h1">${esc(title?.label || "Title")}${title?.name ? ` — ${esc(title.name)}` : ""}</h1>
+          <div class="meta">
+            <span class="muted">Chapters: ${(title?.chapters || []).length}</span>
+            ${title?.url ? `<a href="${esc(title.url)}" target="_blank" rel="noopener">Open on cga.ct.gov</a>` : ""}
+          </div>
+          <div class="empty">Choose a Chapter from the left.</div>
+        `;
+        return;
+      }
+
+      if (titleKey && chapterKey && !sectionKey) {
+        viewEl.innerHTML = `
+          <h1 class="h1">${esc(chapter?.label || "Chapter")}${chapter?.name ? ` — ${esc(chapter.name)}` : ""}</h1>
+          <div class="meta">
+            <span class="muted">Sections: ${(chapter?.sections || []).length}</span>
+            ${chapter?.url ? `<a href="${esc(chapter.url)}" target="_blank" rel="noopener">Open on cga.ct.gov</a>` : ""}
+          </div>
+          <div class="empty">Choose a Section from the left.</div>
+        `;
+        return;
+      }
+
+      // Section view
+      if (titleKey && chapterKey && sectionKey && section) {
+        const content = section.content || {};
+        const body = Array.isArray(content.body_paragraphs) ? content.body_paragraphs : [];
+        const source = Array.isArray(content.source) ? content.source : [];
+        const history = Array.isArray(content.history) ? content.history : [];
+        const annotations = Array.isArray(content.annotations) ? content.annotations : [];
+
+        const statusTag = content.status ? `<span class="tag">${esc(content.status)}</span>` : "";
+
+        viewEl.innerHTML = `
+          <div class="row-between" style="align-items:flex-start;">
+            <div>
+              <div class="section-label">${esc(section.label || `Sec. ${section.section_key}`)}</div>
+              <div class="meta">
+                ${statusTag}
+                ${section.url ? `<a href="${esc(section.url)}" target="_blank" rel="noopener">Open on cga.ct.gov</a>` : ""}
+                <button id="copyLinkBtn" title="Copy permalink">Copy link</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="body">
+            ${body.length ? body.map(p => `<p>${esc(p)}</p>`).join("") : `<div class="empty">No statute body text found for this section.</div>`}
+          </div>
+
+          ${renderPanel("Source", source)}
+          ${renderPanel("History", history)}
+          ${renderAnnotationsPanel("Annotations", annotations)}
+        `;
+
+        $("copyLinkBtn")?.addEventListener("click", async () => {
+          try {
+            await navigator.clipboard.writeText(location.href);
+            $("copyLinkBtn").textContent = "Copied";
+            setTimeout(() => $("copyLinkBtn").textContent = "Copy link", 900);
+          } catch {
+            // ignore
+          }
+        });
+
+        return;
+      }
+
+      viewEl.innerHTML = `<div class="empty">Section not found (missing key or not indexed).</div>`;
+    }
+
+    function renderPanel(title, arr) {
+      const count = Array.isArray(arr) ? arr.length : 0;
+      const has = count > 0;
+      const openAttr = ""; // keep collapsed by default
+      return `
+        <details ${openAttr}>
+          <summary>${esc(title)} <span class="muted">(${count})</span></summary>
+          <div class="panel">
+            ${has ? arr.map(p => `<p>${esc(p)}</p>`).join("") : `<div class="muted">None.</div>`}
+          </div>
+        </details>
+      `;
+    }
+
+    function renderAnnotationsPanel(title, arr) {
+      const count = Array.isArray(arr) ? arr.length : 0;
+      const has = count > 0;
+      return `
+        <details>
+          <summary>${esc(title)} <span class="muted">(${count})</span></summary>
+          <div class="panel">
+            ${
+              has
+                ? arr.map(a => {
+                    const isFirst = !!a.first;
+                    const text = a.text || "";
+                    return `<p>${isFirst ? `<strong>${esc(text)}</strong>` : esc(text)}</p>`;
+                  }).join("")
+                : `<div class="muted">None.</div>`
+            }
+          </div>
+        </details>
+      `;
+    }
+
+    function renderBreadcrumbs({ title, chapter, section }) {
+      const parts = [];
+      parts.push(`<a href="#/">Titles</a>`);
+      if (title) parts.push(`<a href="#/t/${encodeURIComponent(title.title_key)}">${esc(title.label)}</a>`);
+      if (chapter) parts.push(`<a href="#/t/${encodeURIComponent(title.title_key)}/c/${encodeURIComponent(chapter.chapter_key)}">${esc(chapter.label)}</a>`);
+      if (section) parts.push(`<span>${esc(section.section_key)}</span>`);
+      return parts.join(" <span class='muted'>/</span> ");
+    }
+
+    function renderList(items) {
+      const wrap = document.createElement("div");
+      wrap.className = "list";
+      for (const it of items) {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <div class="row-between">
+            <div class="kicker">${esc(it.kicker)}</div>
+            ${it.right || ""}
+          </div>
+          <div class="title">${esc(it.title)}</div>
+          
+        `;
+        if (typeof it.onClick === "function") {
+          card.style.cursor = "pointer";
+          card.addEventListener("click", it.onClick);
+        } else {
+          card.style.opacity = "0.6";
+        }
+        wrap.appendChild(card);
+      }
+      return wrap;
+    }
+
+    function renderSearchNav() {
+      navEl.innerHTML = "";
+      const items = state.search.results;
+
+      if (!items.length) {
+        navEl.innerHTML = `<div class="empty">No results.</div>`;
+        return;
+      }
+
+      const mapped = items.map(r => {
+        if (r.type === "title") {
+          const t = state.titleByKey.get(r.titleKey);
+          return {
+            kicker: "Title",
+         title: stripSectionPrefix(r.label),
+
+            sub: t?.url || "",
+            onClick: () => navToTitle(r.titleKey),
+            right: `<span class="tag">${(t?.chapters || []).length} chapters</span>`
+          };
+        }
+        if (r.type === "chapter") {
+          const t = state.titleByKey.get(r.titleKey);
+          const c = state.chapterByKey.get(keyChapter(r.titleKey, r.chapterKey));
+          return {
+            kicker: "Chapter",
+            title: stripSectionPrefix(r.label),
+
+            sub: r.sub || "",
+            onClick: () => navToChapter(r.titleKey, r.chapterKey),
+            right: `<span class="tag">${(c?.sections || []).length} sections</span>`
+          };
+        }
+        // section
+        return {
+          kicker: "Section",
+          title: stripSectionPrefix(r.label),
+
+          sub: r.sub || "",
+          onClick: () => navToSection(r.titleKey, r.chapterKey, r.sectionKey),
+          right: ""
+        };
+      });
+
+      navEl.appendChild(renderList(mapped));
+    }
+
+    function renderSearchView() {
+      const q = state.search.q;
+      const scope = state.search.scope;
+      const items = state.search.results;
+
+      crumbsEl.innerHTML = `<span class="muted">Search</span>`;
+      viewEl.innerHTML = `
+        <h1 class="h1">Search</h1>
+        <div class="meta">
+          <span class="muted">Query: <strong>${esc(q)}</strong></span>
+          <span class="muted">Scope: ${scope === "nav" ? "Labels" : "Full text"}</span>
+          <span class="muted">Results: ${items.length}</span>
+        </div>
+        ${
+          items.length
+            ? `<div class="list">
+                ${items.map(r => {
+                  const snippet = r.snippet ? `<div class="sub">${esc(r.snippet)}</div>` : "";
+                  const href =
+                    r.type === "title" ? `#/t/${encodeURIComponent(r.titleKey)}` :
+                    r.type === "chapter" ? `#/t/${encodeURIComponent(r.titleKey)}/c/${encodeURIComponent(r.chapterKey)}` :
+                    `#/t/${encodeURIComponent(r.titleKey)}/c/${encodeURIComponent(r.chapterKey)}/s/${encodeURIComponent(r.sectionKey)}`;
+                  return `
+                    <div class="card">
+                      <div class="kicker">${esc(r.type)}</div>
+                      <div class="title"><a href="${href}">${esc(r.label)}</a></div>
+                      <div class="sub">${esc(r.sub || "")}</div>
+                      ${snippet}
+                    </div>
+                  `;
+                }).join("")}
+              </div>`
+            : `<div class="empty">No results.</div>`
+        }
+      `;
+    }
+
+    // -----------------------------
+    // INIT + ROUTING
+    // -----------------------------
+    async function loadData() {
+      setStatus("Loading JSON…");
+      const res = await fetch(DATA_URL, { cache: "no-store" });
+      if (!res.ok) throw new Error(`Failed to load ${DATA_URL} (${res.status})`);
+      const data = await res.json();
+      state.data = data;
+      buildIndexes(data);
+      setStatus("Ready");
+    }
+
+    function applyRoute() {
+      const cur = parseHash();
+      state.current = cur;
+      render();
+    }
+
+    function bindUI() {
+      qEl.addEventListener("input", () => setSearch(qEl.value, scopeEl.value));
+      scopeEl.addEventListener("change", () => setSearch(qEl.value, scopeEl.value));
+      homeBtn.addEventListener("click", () => {
+        qEl.value = "";
+        setSearch("", scopeEl.value);
+        navToTitles();
+      });
+
+      window.addEventListener("hashchange", () => applyRoute());
+    }
+
+    (async function main() {
+      bindUI();
+      try {
+        await loadData();
+        applyRoute();
+      } catch (e) {
+        setStatus("Error");
+        crumbsEl.textContent = "";
+        viewEl.innerHTML = `<div class="empty">Failed to load data: ${esc(e.message || String(e))}</div>`;
+        navEl.innerHTML = `<div class="empty">Check that <code>${esc(DATA_URL)}</code> is accessible from this page.</div>`;
+      }
+    })();
+  </script>
+</body>
+</html>
