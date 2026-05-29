@@ -25,7 +25,7 @@ nav.toc { position:sticky; top:86px; align-self:start; max-height:calc(100vh - 1
 nav.toc h2 { margin:0 0 10px; font-size:15px; color:var(--navy); }
 nav.toc a { display:block; padding:7px 8px; color:#22304a; text-decoration:none; border-radius:9px; font-size:14px; }
 nav.toc a:hover { background:#f0f4ff; color:var(--accent); }
-.article { margin-bottom:14px; border:1px solid var(--border); border-radius:18px; background:var(--card); box-shadow:0 8px 24px rgba(0,14,47,.07); overflow:hidden; }
+.article { scroll-margin-top:112px; margin-bottom:14px; border:1px solid var(--border); border-radius:18px; background:var(--card); box-shadow:0 8px 24px rgba(0,14,47,.07); overflow:hidden; }
 .article[hidden] { display:none; }
 .article summary { list-style:none; cursor:pointer; padding:18px 22px; display:flex; align-items:center; justify-content:space-between; gap:18px; background:#fff; }
 .article summary::-webkit-details-marker { display:none; }
@@ -796,6 +796,39 @@ function runSearch(){
   noResults.style.display = visible ? 'none' : 'block';
 }
 searchInput.addEventListener('input', runSearch);
+
+document.querySelectorAll('nav.toc a[href^="#"]').forEach(link => {
+  link.addEventListener('click', event => {
+    const targetId = link.getAttribute('href').slice(1);
+    const target = document.getElementById(targetId);
+    if(!target) return;
+
+    event.preventDefault();
+
+    if(searchInput.value.trim() && target.hidden){
+      searchInput.value = '';
+      runSearch();
+    }
+
+    if(target.matches('details.article')){
+      target.open = true;
+    }
+
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    history.pushState(null, '', `#${targetId}`);
+  });
+});
+
+
+window.addEventListener('DOMContentLoaded', () => {
+  const hashId = window.location.hash ? window.location.hash.slice(1) : '';
+  const target = hashId ? document.getElementById(hashId) : null;
+  if(target && target.matches('details.article')){
+    target.open = true;
+    setTimeout(() => target.scrollIntoView({ behavior: 'auto', block: 'start' }), 0);
+  }
+});
+
 document.getElementById('expand-all').addEventListener('click', () => articles.forEach(a => { if(!a.hidden) a.open=true; }));
 document.getElementById('collapse-all').addEventListener('click', () => articles.forEach(a => a.open=false));
 </script>
