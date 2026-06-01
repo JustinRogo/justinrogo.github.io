@@ -18,6 +18,172 @@ const LANG_COLORS = {
 };
 
 /* ===================================================================
+   Page Tree
+   =================================================================== */
+const PAGE_TREE_FALLBACK = [
+  {
+    title: 'For Fun',
+    children: [
+      { title: 'Law Library & IT 2026 - Gen-Z Edition', href: 'Pages/For Fun/StrategicFramework.html' },
+      { title: 'UConn Law Library & IT - Multi-Gen Strategic Framework 2026', href: 'Pages/For Fun/StrategicFramework2.html' },
+    ],
+  },
+  {
+    title: 'Work',
+    children: [
+      {
+        title: 'CGS',
+        children: [
+          { title: 'CT General Statutes Explorer', href: 'Pages/Work/cgs/Index.html' },
+          {
+            title: 'CT Statutes Explorer',
+            children: [
+              { title: 'CT Statutes Explorer', href: 'Pages/Work/cgs/ct-statutes-explorer/index.html' },
+            ],
+          },
+        ],
+      },
+      {
+        title: 'Library',
+        children: [
+          { title: 'Occupancy Heatmap Dashboard', href: 'Pages/Work/Library/heatmap.html' },
+          { title: 'UConn School of Law Library Centennial Timeline', href: 'Pages/Work/Library/Timeline_LawLib.html' },
+        ],
+      },
+      {
+        title: 'UCPEA',
+        children: [
+          { title: 'Salary Increase Calculator', href: 'Pages/Work/UCPEA/salary_calculator.html' },
+          { title: 'UCPEA Collective Bargaining Agreement, 2025-2029', href: 'Pages/Work/UCPEA/UCPEAContract.html' },
+        ],
+      },
+    ],
+  },
+];
+const PAGE_TREE_ROOT = 'Pages/';
+const PAGE_TREE_API = 'https://api.github.com/repos/JustinRogo/justinrogo.github.io/git/trees/main?recursive=1';
+const PAGE_TREE_EXCLUDE = /\.bak\.html$/i;
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, char => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  }[char]));
+}
+
+(function initPageTree() {
+  const mount = document.getElementById('pageTree');
+  if (!mount) return;
+
+  function countPages(nodes) {
+    return nodes.reduce((total, node) => total + (node.href ? 1 : countPages(node.children || [])), 0);
+  }
+
+  function renderNodes(nodes, depth = 0) {
+    return nodes.map(node => {
+      if (node.href) {
+        return `<a class="page-link" href="${escapeHtml(node.href)}">
+          <span class="dot" aria-hidden="true"></span>
+          <span>${escapeHtml(node.title)}</span>
+        </a>`;
+      }
+
+      const childCount = countPages(node.children || []);
+      return `<details class="page-group" ${depth === 0 ? 'open' : ''}>
+        <summary>
+          <span>${escapeHtml(node.title)}</span>
+          <span class="page-count">${childCount}</span>
+        </summary>
+        <div class="page-group-items">
+          ${renderNodes(node.children || [], depth + 1)}
+        </div>
+      </details>`;
+    }).join('');
+  }
+
+  function titleFromPathPart(value) {
+    return value
+      .replace(/\.html$/i, '')
+      .split(/[\s_-]+/)
+      .filter(Boolean)
+      .map(word => (word.length <= 4 && /^[a-z]+$/.test(word) ? word.toUpperCase() : word.replace(/^\w/, char => char.toUpperCase())))
+      .join(' ');
+  }
+
+  function insertPage(tree, path, title) {
+    const parts = path.split('/').slice(1);
+    const fileName = parts.pop();
+    let cursor = tree;
+
+    parts.forEach(part => {
+      let group = cursor.find(node => !node.href && node.pathPart === part);
+      if (!group) {
+        group = { title: titleFromPathPart(part), pathPart: part, children: [] };
+        cursor.push(group);
+      }
+      cursor = group.children;
+    });
+
+    cursor.push({ title: title || titleFromPathPart(fileName), href: path });
+  }
+
+  function sortTree(nodes) {
+    nodes.sort((a, b) => {
+      if (a.href && !b.href) return 1;
+      if (!a.href && b.href) return -1;
+      return a.title.localeCompare(b.title);
+    });
+    nodes.forEach(node => {
+      if (node.children) sortTree(node.children);
+    });
+    return nodes;
+  }
+
+  async function fetchPageTitle(path) {
+    try {
+      const response = await fetch(encodeURI(path));
+      if (!response.ok) throw new Error('Title fetch failed');
+      const doc = new DOMParser().parseFromString(await response.text(), 'text/html');
+      return doc.querySelector('title')?.textContent?.trim() || '';
+    } catch {
+      return '';
+    }
+  }
+
+  async function loadPageTree() {
+    const response = await fetch(PAGE_TREE_API);
+    if (!response.ok) throw new Error('Page tree API failed');
+    const data = await response.json();
+    const paths = (data.tree || [])
+      .filter(item => item.type === 'blob')
+      .map(item => item.path)
+      .filter(path => path.startsWith(PAGE_TREE_ROOT) && /\.html$/i.test(path) && !PAGE_TREE_EXCLUDE.test(path));
+
+    const pages = await Promise.all(paths.map(async path => ({
+      path,
+      title: await fetchPageTitle(path),
+    })));
+
+    const tree = [];
+    pages.forEach(page => insertPage(tree, page.path, page.title));
+    return sortTree(tree);
+  }
+
+  mount.innerHTML = '<span class="info-note">Loading pages...</span>';
+
+  loadPageTree()
+    .then(tree => {
+      mount.innerHTML = tree.length ? renderNodes(tree) : renderNodes(PAGE_TREE_FALLBACK);
+    })
+    .catch(() => {
+      mount.innerHTML = renderNodes(PAGE_TREE_FALLBACK);
+    });
+})();
+
+/* ===================================================================
    CliftonStrengths
    =================================================================== */
 (function mountCliftonStrengths() {
