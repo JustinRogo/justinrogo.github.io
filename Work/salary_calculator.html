@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Salary Increase Calculator</title>
+  <style>
+    .salary-calculator {
+      --navy: #000E2F;
+      --gold: #FFB81C;
+      --blue: #013ECD;
+      --border: #d9dde7;
+      --bg: #f6f8fb;
+      --text: #172033;
+      --muted: #5f6b7a;
+      --success-bg: #f0f7ef;
+      --success-border: #bfdcba;
+
+      max-width: 900px;
+      margin: 24px auto;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 14, 47, 0.08);
+      overflow: hidden;
+    }
+
+    .salary-calculator * {
+      box-sizing: border-box;
+    }
+
+    .salary-calculator__header {
+      padding: 28px 32px;
+      background: var(--navy);
+      color: #fff;
+      border-bottom: 5px solid var(--gold);
+    }
+
+    .salary-calculator__header h2 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      line-height: 1.2;
+    }
+
+    .salary-calculator__header p {
+      margin: 0;
+      max-width: 720px;
+      font-size: 15px;
+      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.88);
+    }
+
+    .salary-calculator__body {
+      padding: 28px 32px 32px;
+      background: var(--bg);
+    }
+
+    .salary-calculator__grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .salary-calculator__field {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .salary-calculator__field label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--navy);
+    }
+
+    .salary-calculator__hint {
+      margin: 8px 0 0;
+      font-size: 12px;
+      line-height: 1.4;
+      color: var(--muted);
+    }
+
+    .salary-calculator input {
+      width: 100%;
+      min-height: 44px;
+      padding: 10px 12px;
+      font-size: 16px;
+      border: 1px solid #b8bfcc;
+      border-radius: 8px;
+      color: var(--text);
+      background: #fff;
+    }
+
+    .salary-calculator input:focus {
+      outline: 3px solid rgba(255, 184, 28, 0.35);
+      border-color: var(--navy);
+    }
+
+    .salary-calculator__actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .salary-calculator button {
+      min-height: 44px;
+      padding: 10px 18px;
+      border: 0;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .salary-calculator__calculate {
+      background: var(--gold);
+      color: var(--navy);
+    }
+
+    .salary-calculator__reset {
+      background: #e7ebf2;
+      color: var(--navy);
+    }
+
+    .salary-calculator__error {
+      display: none;
+      margin: 0 0 18px;
+      padding: 12px 14px;
+      border-left: 5px solid #b42318;
+      background: #fff1f0;
+      color: #7a1b13;
+      border-radius: 8px;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .salary-calculator__summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .salary-calculator__summary-card {
+      background: var(--success-bg);
+      border: 1px solid var(--success-border);
+      border-radius: 12px;
+      padding: 18px;
+    }
+
+    .salary-calculator__summary-card span {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .salary-calculator__summary-card strong {
+      display: block;
+      color: var(--navy);
+      font-size: 24px;
+      line-height: 1.25;
+    }
+
+    .salary-calculator__table-wrap {
+      overflow-x: auto;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    .salary-calculator table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+    }
+
+    .salary-calculator th,
+    .salary-calculator td {
+      padding: 14px 16px;
+      text-align: right;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+      line-height: 1.35;
+      vertical-align: top;
+    }
+
+    .salary-calculator th:first-child,
+    .salary-calculator td:first-child {
+      text-align: left;
+    }
+
+    .salary-calculator th {
+      background: var(--navy);
+      color: #fff;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .salary-calculator tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .salary-calculator__note {
+      margin: 14px 0 0;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    @media (max-width: 760px) {
+      .salary-calculator__header,
+      .salary-calculator__body {
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+
+      .salary-calculator__grid,
+      .salary-calculator__summary {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="salary-calculator" id="salaryCalculator">
+    <div class="salary-calculator__header">
+      <h2>Salary Increase Calculator</h2>
+      <p>Enter a current annual salary, optional merit amount, and optional reclassification percentage to estimate annual salary after scheduled increases.</p>
+    </div>
+
+    <div class="salary-calculator__body">
+      <div class="salary-calculator__grid">
+        <div class="salary-calculator__field">
+          <label for="baseSalary">Current annual salary</label>
+          <input id="baseSalary" type="number" min="0" step="100" placeholder="65000" />
+          <p class="salary-calculator__hint">Enter salary before the July 1, 2025 increase.</p>
+        </div>
+
+        <div class="salary-calculator__field">
+          <label for="meritAmount">2027 merit component</label>
+          <input id="meritAmount" type="number" min="0" max="10000" step="100" placeholder="0" />
+          <p class="salary-calculator__hint">Dollar amount</p>
+        </div>
+
+        <div class="salary-calculator__field">
+          <label for="reclassPercent">Reclassification increase</label>
+          <input id="reclassPercent" type="number" min="0" max="10" step="0.1" placeholder="0" />
+          <p class="salary-calculator__hint">Percentage from 0% to 10%.</p>
+        </div>
+      </div>
+
+      <div class="salary-calculator__actions">
+        <button type="button" class="salary-calculator__calculate" id="calculateSalary">Calculate salary</button>
+        <button type="button" class="salary-calculator__reset" id="resetSalary">Reset</button>
+      </div>
+
+      <div class="salary-calculator__error" id="salaryError"></div>
+
+      <div class="salary-calculator__summary" aria-live="polite">
+        <div class="salary-calculator__summary-card">
+          <span>Estimated final salary</span>
+          <strong id="finalSalary">$0</strong>
+        </div>
+        <div class="salary-calculator__summary-card">
+          <span>Total increase</span>
+          <strong id="totalIncrease">$0</strong>
+        </div>
+        <div class="salary-calculator__summary-card">
+          <span>Percent change</span>
+          <strong id="percentChange">0%</strong>
+        </div>
+      </div>
+
+      <div class="salary-calculator__table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Effective date</th>
+              <th>Increase applied</th>
+              <th>Salary before</th>
+              <th>Increase amount</th>
+              <th>Estimated salary after</th>
+            </tr>
+          </thead>
+          <tbody id="salaryRows">
+            <tr>
+              <td colspan="5" style="text-align: left; color: #5f6b7a;">Enter values and select Calculate salary.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="salary-calculator__note">Calculation method: percentage increases are compounded year over year. The 2027 merit component is added as a dollar amount after the 2027 percentage increase. The reclassification increase is applied first, before the scheduled July 1 increases.</p>
+      <p class="salary-calculator__note">Scheduled increases:
+      <ul>
+        <li>July 1, 2025: 2.5% General Wage Increase (GWI) + 2% Performance-Based Compensation (PBC)</li>
+        <li>July 1, 2026: 2.5% GWI + 2% PBC</li>
+        <li>July 1, 2027: 2.5% GWI + 1.5% PBC + 0.5% merit component</li>
+      </ul></p>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const calculator = document.getElementById('salaryCalculator');
+      const baseSalaryInput = calculator.querySelector('#baseSalary');
+      const meritAmountInput = calculator.querySelector('#meritAmount');
+      const reclassPercentInput = calculator.querySelector('#reclassPercent');
+      const calculateButton = calculator.querySelector('#calculateSalary');
+      const resetButton = calculator.querySelector('#resetSalary');
+      const errorBox = calculator.querySelector('#salaryError');
+      const rows = calculator.querySelector('#salaryRows');
+      const finalSalary = calculator.querySelector('#finalSalary');
+      const totalIncrease = calculator.querySelector('#totalIncrease');
+      const percentChange = calculator.querySelector('#percentChange');
+
+      const currency = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+
+      function getNumber(input) {
+        const value = Number(input.value);
+        return Number.isFinite(value) ? value : 0;
+      }
+
+      function formatPercent(value) {
+        return `${value.toFixed(2)}%`;
+      }
+
+      function showError(message) {
+        errorBox.textContent = message;
+        errorBox.style.display = 'block';
+      }
+
+      function clearError() {
+        errorBox.textContent = '';
+        errorBox.style.display = 'none';
+      }
+
+      function addRow(date, label, salaryBefore, increaseAmount, salaryAfter) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${date}</td>
+          <td>${label}</td>
+          <td>${currency.format(salaryBefore)}</td>
+          <td>${currency.format(increaseAmount)}</td>
+          <td><strong>${currency.format(salaryAfter)}</strong></td>
+        `;
+        rows.appendChild(row);
+      }
+
+      function calculateSalary() {
+        clearError();
+
+        const baseSalary = getNumber(baseSalaryInput);
+        const meritAmount = getNumber(meritAmountInput);
+        const reclassPercent = getNumber(reclassPercentInput);
+
+        if (baseSalary <= 0) {
+          showError('Please enter a current annual salary greater than $0.');
+          return;
+        }
+
+        if (meritAmount < 0 || meritAmount > 5000) {
+          showError('Please enter a 2027 merit component between $0 and $5,000.');
+          return;
+        }
+
+        if (reclassPercent < 0 || reclassPercent > 10) {
+          showError('Please enter a reclassification increase between 0% and 10%.');
+          return;
+        }
+
+        rows.innerHTML = '';
+
+        let salary = baseSalary;
+
+        if (reclassPercent > 0) {
+          const salaryBefore = salary;
+          const increaseAmount = salaryBefore * (reclassPercent / 100);
+          salary = salaryBefore + increaseAmount;
+          addRow('Reclassification', `${formatPercent(reclassPercent)} reclassification increase`, salaryBefore, increaseAmount, salary);
+        }
+
+        const salaryBefore2025 = salary;
+        const increase2025 = salaryBefore2025 * 0.045;
+        salary = salaryBefore2025 + increase2025;
+        addRow('July 1, 2025', '2.5% GWI + 2% PBC = 4.5%', salaryBefore2025, increase2025, salary);
+
+        const salaryBefore2026 = salary;
+        const increase2026 = salaryBefore2026 * 0.045;
+        salary = salaryBefore2026 + increase2026;
+        addRow('July 1, 2026', '2.5% GWI + 2% PBC = 4.5%', salaryBefore2026, increase2026, salary);
+
+        const salaryBefore2027 = salary;
+        const percentageIncrease2027 = salaryBefore2027 * 0.04;
+        salary = salaryBefore2027 + percentageIncrease2027 + meritAmount;
+        addRow('July 1, 2027', `2.5% GWI + 1.5% PBC = 4%, plus ${currency.format(meritAmount)} merit component`, salaryBefore2027, percentageIncrease2027 + meritAmount, salary);
+
+        const increaseTotal = salary - baseSalary;
+        const percentTotal = (increaseTotal / baseSalary) * 100;
+
+        finalSalary.textContent = currency.format(salary);
+        totalIncrease.textContent = currency.format(increaseTotal);
+        percentChange.textContent = formatPercent(percentTotal);
+      }
+
+      function resetSalary() {
+        clearError();
+        baseSalaryInput.value = '';
+        meritAmountInput.value = '';
+        reclassPercentInput.value = '';
+        finalSalary.textContent = '$0';
+        totalIncrease.textContent = '$0';
+        percentChange.textContent = '0%';
+        rows.innerHTML = '<tr><td colspan="5" style="text-align: left; color: #5f6b7a;">Enter values and select Calculate salary.</td></tr>';
+      }
+
+      calculateButton.addEventListener('click', calculateSalary);
+      resetButton.addEventListener('click', resetSalary);
+
+      [baseSalaryInput, meritAmountInput, reclassPercentInput].forEach((input) => {
+        input.addEventListener('keydown', function (event) {
+          if (event.key === 'Enter') {
+            calculateSalary();
+          }
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
