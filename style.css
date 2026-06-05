@@ -360,6 +360,104 @@ aside {
   gap: 0.5rem;
 }
 
+/* ====== UConn Law Events ====== */
+[aria-label="UConn Law Events"].info-card {
+  gap: 0.85rem;
+  background:
+    radial-gradient(280px 160px at 12% 0%, rgba(255, 154, 60, 0.14), transparent 68%),
+    radial-gradient(280px 180px at 100% 18%, rgba(75, 163, 255, 0.12), transparent 70%),
+    linear-gradient(180deg, rgba(9, 21, 47, 0.92), rgba(7, 17, 38, 0.78)),
+    var(--glass-strong);
+}
+
+[aria-label="UConn Law Events"] .chip {
+  background:
+    linear-gradient(120deg, rgba(255, 154, 60, 0.28), rgba(97, 244, 222, 0.1)),
+    rgba(255, 255, 255, 0.04);
+}
+
+#eventsList {
+  display: grid;
+  gap: 10px;
+  margin-top: 0 !important;
+  padding-right: 0;
+  overflow: visible;
+  color: var(--muted);
+}
+
+#eventsList > div {
+  position: relative;
+  min-height: 122px;
+  margin: 0 !important;
+  padding: 13px 13px 13px 16px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background:
+    radial-gradient(160px 90px at 0% 0%, rgba(255, 154, 60, 0.1), transparent 70%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.024)),
+    rgba(9, 23, 54, 0.58);
+  transition: transform var(--speed), border-color var(--speed), background var(--speed), box-shadow var(--speed);
+}
+
+#eventsList > div::before {
+  content: '';
+  position: absolute;
+  inset: 10px auto 10px 0;
+  width: 3px;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(180deg, var(--orange), var(--electric-blue));
+  box-shadow: 0 0 18px rgba(255, 154, 60, 0.35);
+}
+
+#eventsList > div:hover,
+#eventsList > div:focus-within {
+  transform: translateY(-2px);
+  border-color: rgba(255, 154, 60, 0.46);
+  box-shadow: var(--ring);
+}
+
+#eventsList a {
+  display: -webkit-box;
+  color: var(--text-strong);
+  font-size: 0.88rem;
+  font-weight: 750;
+  line-height: 1.25;
+  overflow: hidden;
+  text-decoration: none;
+  text-wrap: pretty;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+#eventsList a:hover,
+#eventsList a:focus-visible {
+  color: color-mix(in srgb, var(--gold) 78%, white);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+#eventsList .info-note {
+  display: -webkit-box;
+  margin-top: 0.42rem;
+  overflow: hidden;
+  color: color-mix(in srgb, var(--muted) 88%, var(--text));
+  font-size: 0.74rem;
+  line-height: 1.38;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+#eventsList > .info-note,
+#eventsList > span.info-note {
+  display: block;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(9, 23, 54, 0.58);
+}
+
 /* ====== Tabs Deck ====== */
 .tabs {
   container-type: inline-size;
@@ -1570,6 +1668,46 @@ body.light .hero {
 
 body.light .info-card {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(241, 247, 255, 0.9));
+}
+
+body.light [aria-label="UConn Law Events"].info-card {
+  background:
+    radial-gradient(280px 160px at 12% 0%, rgba(255, 154, 60, 0.13), transparent 68%),
+    radial-gradient(280px 180px at 100% 18%, rgba(75, 163, 255, 0.1), transparent 70%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(241, 247, 255, 0.9));
+}
+
+body.light #eventsList > div {
+  border-color: rgba(15, 26, 46, 0.14);
+  background:
+    radial-gradient(160px 90px at 0% 0%, rgba(255, 154, 60, 0.1), transparent 70%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(243, 248, 255, 0.86)),
+    rgba(255, 255, 255, 0.88);
+}
+
+body.light #eventsList > div:hover,
+body.light #eventsList > div:focus-within {
+  border-color: rgba(233, 139, 42, 0.42);
+  box-shadow: var(--ring);
+}
+
+body.light #eventsList a {
+  color: #0f1a2e;
+}
+
+body.light #eventsList a:hover,
+body.light #eventsList a:focus-visible {
+  color: #8a4b0d;
+}
+
+body.light #eventsList .info-note {
+  color: #4f607f;
+}
+
+body.light #eventsList > .info-note,
+body.light #eventsList > span.info-note {
+  border-color: rgba(15, 26, 46, 0.14);
+  background: rgba(255, 255, 255, 0.72);
 }
 
 body.light .chip {
