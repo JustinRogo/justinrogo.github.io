@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game of Life - Ultimate Cosmos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-base: #030305;
+            --bg-panel: rgba(10, 10, 15, 0.7);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            
+            /* Faction 1: Indigo */
+            --f1-base: #818cf8;
+            --f1-glow: rgba(129, 140, 248, 0.4);
+            
+            /* Faction 2: Cyan */
+            --f2-base: #22d3ee;
+            --f2-glow: rgba(34, 211, 238, 0.4);
+            
+            /* Glassmorphism */
+            --glass-bg: rgba(255, 255, 255, 0.02);
+            --glass-border: rgba(255, 255, 255, 0.06);
+            --glass-hover-bg: rgba(255, 255, 255, 0.04);
+            --glass-active-bg: rgba(255, 255, 255, 0.08);
+            
+            --radius-lg: 24px;
+            --radius-md: 12px;
+            --spacing-base: clamp(1rem, 2vw, 2rem);
+            
+            --font-sans: 'Outfit', system-ui, sans-serif;
+            --font-display: 'Space Grotesk', system-ui, sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            line-height: 1.5;
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* SVG Grain Overlay */
+        .noise-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none; z-index: 50; opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* Ambient Background */
+        .aurora-container {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            overflow: hidden; z-index: -1; pointer-events: none; background: var(--bg-base);
+        }
+        .aurora-blob {
+            position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.4;
+            animation: float 25s infinite alternate ease-in-out;
+        }
+        .blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%); }
+        .blob-2 { bottom: -20%; right: -10%; width: 60vw; height: 60vw; background: radial-gradient(circle, rgba(34,211,238,0.1) 0%, transparent 70%); animation-delay: -5s; }
+
+        @keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(5%, 10%) scale(1.1); } }
+        @media (prefers-reduced-motion: reduce) { .aurora-blob { animation: none; opacity: 0.2; } * { transition-duration: 0.01ms !important; } }
+
+        .container {
+            max-width: 1600px; margin: 0 auto; padding: var(--spacing-base);
+            display: flex; flex-direction: column; gap: var(--spacing-base); min-height: 100vh;
+        }
+
+        header { margin-top: 1vh; margin-bottom: 1vh; display: flex; justify-content: space-between; align-items: flex-end;}
+        .header-content { flex: 1; }
+        .overline {
+            font-family: var(--font-sans); text-transform: uppercase; letter-spacing: 0.15em;
+            font-size: 0.875rem; color: var(--f1-base); font-weight: 500; margin-bottom: 0.5rem; display: block;
+        }
+        h1 {
+            font-family: var(--font-display); font-size: clamp(2rem, 5vw + 1rem, 4.5rem);
+            line-height: 1.1; font-weight: 700; letter-spacing: -0.02em;
+            background: linear-gradient(to right, #ffffff, #a5b4fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        p.subtitle { color: var(--text-secondary); font-size: 1.1rem; max-width: 60ch; margin-top: 1rem; font-weight: 300; }
+
+        /* Faction Toolbar */
+        .faction-toolbar {
+            display: flex; gap: 0.5rem; background: var(--bg-panel); padding: 0.5rem;
+            border-radius: var(--radius-md); border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+        }
+        .faction-btn {
+            display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem;
+            border-radius: 8px; border: 1px solid transparent; background: transparent;
+            color: var(--text-secondary); font-weight: 600; cursor: pointer; transition: all 0.3s;
+        }
+        .faction-btn.f1.active { background: rgba(129, 140, 248, 0.15); border-color: var(--f1-base); color: var(--f1-base); box-shadow: 0 0 15px var(--f1-glow); }
+        .faction-btn.f2.active { background: rgba(34, 211, 238, 0.15); border-color: var(--f2-base); color: var(--f2-base); box-shadow: 0 0 15px var(--f2-glow); }
+        .f-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+        .faction-btn.f1 .f-dot { background: var(--f1-base); }
+        .faction-btn.f2 .f-dot { background: var(--f2-base); }
+
+        /* Grid Layout */
+        .bento-grid {
+            display: grid; grid-template-columns: repeat(12, 1fr);
+            gap: var(--spacing-base); flex-grow: 1; align-items: stretch;
+        }
+        .glass-card {
+            background: var(--bg-panel); border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); padding: clamp(1.5rem, 2vw, 2.5rem);
+            position: relative; overflow: hidden;
+        }
+
+        .canvas-area {
+            grid-column: span 12; display: flex; flex-direction: column; min-height: 60vh; padding: 0;
+            position: relative;
+        }
+        .controls-area {
+            grid-column: span 12; display: flex; flex-direction: column; gap: 1.5rem;
+        }
+
+        @media (min-width: 1024px) {
+            header { flex-direction: row; }
+            .canvas-area { grid-column: span 9; min-height: 700px; }
+            .controls-area { 
+                grid-column: span 3; max-height: calc(100vh - 12rem); 
+                overflow-y: auto; padding-right: 1.5rem;
+            }
+        }
+
+        /* Canvas */
+        .canvas-wrapper { flex-grow: 1; width: 100%; height: 100%; position: relative; border-radius: var(--radius-lg); overflow: hidden; }
+        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
+        
+        .canvas-overlay-text {
+            position: absolute; bottom: 1rem; right: 1.5rem; pointer-events: none;
+            background: rgba(0,0,0,0.5); padding: 0.5rem 1rem; border-radius: 20px;
+            font-size: 0.85rem; color: rgba(255,255,255,0.6); backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* Control Elements */
+        .control-group { display: flex; flex-direction: column; gap: 0.75rem; }
+        .control-group-title {
+            font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase;
+            letter-spacing: 0.1em; font-weight: 500; margin-bottom: 0.25rem;
+        }
+        .btn-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+        button.tool-btn {
+            appearance: none; background: color-mix(in srgb, var(--glass-bg) 60%, transparent);
+            border: 1px solid var(--glass-border); color: var(--text-primary);
+            padding: 0.75rem 1rem; border-radius: var(--radius-md);
+            font-family: var(--font-sans); font-size: 0.95rem; font-weight: 500;
+            cursor: pointer; transition: all 0.2s; flex: 1; min-width: 80px;
+            display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+        }
+        button.tool-btn:hover { background: var(--glass-hover-bg); transform: translateY(-2px); }
+        button.tool-btn:active { transform: translateY(0); }
+        button.tool-btn.primary { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+
+        /* Custom Toggle */
+        .toggle-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0.5rem 0; border-bottom: 1px solid var(--glass-border);
+        }
+        .toggle-row:last-child { border-bottom: none; }
+        .toggle-label-group { display: flex; flex-direction: column; gap: 0.15rem; }
+        .toggle-title { font-size: 0.95rem; font-weight: 500; color: var(--text-primary); }
+        .toggle-desc { font-size: 0.75rem; color: var(--text-secondary); }
+
+        .toggle-switch { position: relative; display: inline-block; width: 40px; height: 22px; flex-shrink: 0; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(255,255,255,0.1); transition: .3s; border-radius: 22px;
+            border: 1px solid var(--glass-border);
+        }
+        .toggle-slider:before {
+            position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px;
+            background-color: white; transition: .3s; border-radius: 50%;
+        }
+        .toggle-switch input:checked + .toggle-slider { background-color: var(--f1-base); border-color: var(--f1-base); }
+        .toggle-switch input:checked + .toggle-slider:before { transform: translateX(18px); }
+        .toggle-switch.cyan input:checked + .toggle-slider { background-color: var(--f2-base); border-color: var(--f2-base); }
+
+        /* Sliders */
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; height: 1.5rem; }
+        input[type=range]:focus { outline: none; }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 6px; cursor: pointer; background: rgba(255,255,255,0.1); border-radius: 3px;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            height: 16px; width: 16px; border-radius: 50%; background: var(--text-primary); cursor: pointer;
+            -webkit-appearance: none; margin-top: -5px; border: 2px solid var(--bg-base);
+        }
+
+        /* Stats */
+        .stats-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+            padding-bottom: 1rem; border-bottom: 1px solid var(--glass-border); margin-bottom: 0.5rem;
+        }
+        .stat-box { display: flex; flex-direction: column; }
+        .stat-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em; }
+        .stat-value { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+        .stat-f1 { color: var(--f1-base); }
+        .stat-f2 { color: var(--f2-base); }
+
+        /* Scrollbar */
+        .controls-area::-webkit-scrollbar { width: 6px; }
+        .controls-area::-webkit-scrollbar-track { background: transparent; }
+        .controls-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
+        .controls-area::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
+
+    </style>
+</head>
+<body>
+
+    <div class="noise-overlay"></div>
+    <div class="aurora-container">
+        <div class="aurora-blob blob-1"></div>
+        <div class="aurora-blob blob-2"></div>
+    </div>
+
+    <main class="container">
+        <header>
+            <div class="header-content">
+                <span class="overline">Multi-Faction</span>
+                <h1>Game of Life</h1>
+                <p class="subtitle">Modify the universe's fundamental physics in real-time. Paint factions, dictate survival rules, and explore an infinite grid.</p>
+            </div>
+            
+            <div class="faction-toolbar">
+                <button class="faction-btn f1 active" id="btnF1" data-faction="1">
+                    <span class="f-dot"></span> Indigo Empire
+                </button>
+                <button class="faction-btn f2" id="btnF2" data-faction="2">
+                    <span class="f-dot"></span> Cyan Collective
+                </button>
+            </div>
+        </header>
+
+        <div class="bento-grid">
+            <!-- Canvas Area -->
+            <div class="glass-card canvas-area">
+                <div class="canvas-wrapper" id="canvasWrapper">
+                    <canvas id="gridCanvas"></canvas>
+                    <div class="canvas-overlay-text">
+                        Scroll to Zoom • Right-Click & Drag to Pan
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controls Area -->
+            <div class="glass-card controls-area">
+                
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <span class="stat-label">Generation</span>
+                        <span class="stat-value" id="genCount">0</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Total Pop</span>
+                        <span class="stat-value" id="popCount">0</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label stat-f1">Indigo Pop</span>
+                        <span class="stat-value stat-f1" id="popF1">0</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label stat-f2">Cyan Pop</span>
+                        <span class="stat-value stat-f2" id="popF2">0</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <div class="btn-row">
+                        <button id="btnPlay" class="tool-btn primary">Start</button>
+                        <button id="btnStep" class="tool-btn">Step</button>
+                    </div>
+                    <div class="btn-row">
+                        <button id="btnRandom" class="tool-btn">Seed Both</button>
+                        <button id="btnClear" class="tool-btn">Eradicate</button>
+                        <button id="btnCenter" class="tool-btn">Recenter</button>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <div class="control-group-title">Speed</div>
+                    <input type="range" id="speedSlider" min="1" max="60" value="25" aria-label="Speed">
+                </div>
+
+                <!-- Core Physics Toggles -->
+                <div class="control-group" style="margin-top: 0.5rem;">
+                    <div class="control-group-title">Core Physics</div>
+                    
+                    <div class="toggle-row">
+                        <div class="toggle-label-group">
+                            <span class="toggle-title">Underpopulation</span>
+                            <span class="toggle-desc">&lt; 2 neighbors causes death</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="ruleUnderpop" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="toggle-row">
+                        <div class="toggle-label-group">
+                            <span class="toggle-title">Survival</span>
+                            <span class="toggle-desc">2 or 3 neighbors sustains life</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="ruleSurvival" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="toggle-row">
+                        <div class="toggle-label-group">
+                            <span class="toggle-title">Overpopulation</span>
+                            <span class="toggle-desc">&gt; 3 neighbors causes death</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="ruleOverpop" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="toggle-row">
+                        <div class="toggle-label-group">
+                            <span class="toggle-title">Reproduction</span>
+                            <span class="toggle-desc">Exactly 3 neighbors creates life</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="ruleReproduction" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Universe Traits & Mutations -->
+                <div class="control-group" style="margin-top: 0.5rem;">
+                    <div class="control-group-title" style="color: var(--f2-base);">Traits & Mutations</div>
+                    
+                    <div class="toggle-row">
+                        <div class="toggle-label-group">
+                            <span class="toggle-title">Warfare Rules</span>
+                            <span class="toggle-desc">Opposing factions steal births</span>
+                        </div>
+                        <label class="toggle-switch cyan">
+                            <input type="checkbox" id="ruleWarfare" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="toggle-row">
+                        <div class="toggle-label-group">
+                            <span class="toggle-title">Decay Trails</span>
+                            <span class="toggle-desc">Cells leave glowing ghost trails</span>
+                        </div>
+                        <label class="toggle-switch cyan">
+                            <input type="checkbox" id="visDecay" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="toggle-row">
+                        <div class="toggle-label-group">
+                            <span class="toggle-title">HighLife</span>
+                            <span class="toggle-desc">6 neighbors also causes birth</span>
+                        </div>
+                        <label class="toggle-switch cyan">
+                            <input type="checkbox" id="mutHighLife">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="toggle-row">
+                        <div class="toggle-label-group">
+                            <span class="toggle-title">Mortality</span>
+                            <span class="toggle-desc">Cells die of old age (30 gens)</span>
+                        </div>
+                        <label class="toggle-switch cyan">
+                            <input type="checkbox" id="mutMortality">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="toggle-row">
+                        <div class="toggle-label-group">
+                            <span class="toggle-title">Quantum Noise</span>
+                            <span class="toggle-desc">0.05% chance cells randomly flip</span>
+                        </div>
+                        <label class="toggle-switch cyan">
+                            <input type="checkbox" id="mutQuantum">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('gridCanvas');
+            const ctx = canvas.getContext('2d', { alpha: false });
+            const wrapper = document.getElementById('canvasWrapper');
+            
+            // Buttons
+            const btnPlay = document.getElementById('btnPlay');
+            const btnStep = document.getElementById('btnStep');
+            const btnClear = document.getElementById('btnClear');
+            const btnRandom = document.getElementById('btnRandom');
+            const btnCenter = document.getElementById('btnCenter');
+            const speedSlider = document.getElementById('speedSlider');
+            
+            const btnF1 = document.getElementById('btnF1');
+            const btnF2 = document.getElementById('btnF2');
+            
+            // Toggles
+            const ruleUnderpop = document.getElementById('ruleUnderpop');
+            const ruleSurvival = document.getElementById('ruleSurvival');
+            const ruleOverpop = document.getElementById('ruleOverpop');
+            const ruleReproduction = document.getElementById('ruleReproduction');
+            
+            const ruleWarfare = document.getElementById('ruleWarfare');
+            const visDecay = document.getElementById('visDecay');
+            const mutHighLife = document.getElementById('mutHighLife');
+            const mutMortality = document.getElementById('mutMortality');
+            const mutQuantum = document.getElementById('mutQuantum');
+            
+            const els = {
+                gen: document.getElementById('genCount'),
+                pop: document.getElementById('popCount'),
+                f1: document.getElementById('popF1'),
+                f2: document.getElementById('popF2')
+            };
+
+            // Infinite Grid Settings
+            const COLS = 300;
+            const ROWS = 300;
+            const TOTAL_CELLS = COLS * ROWS;
+            const BASE_CELL_SIZE = 12;
+            
+            // Memory grids
+            let ageGrid = new Uint8Array(TOTAL_CELLS);
+            let nextAgeGrid = new Uint8Array(TOTAL_CELLS);
+            let facGrid = new Uint8Array(TOTAL_CELLS);
+            let nextFacGrid = new Uint8Array(TOTAL_CELLS);
+            
+            let decayGrid = new Float32Array(TOTAL_CELLS);
+            let decayFacGrid = new Uint8Array(TOTAL_CELLS);
+
+            // Camera Viewport
+            let camera = { x: 0, y: 0, zoom: 1 };
+            const MIN_ZOOM = 0.2;
+            const MAX_ZOOM = 4.0;
+            
+            // State
+            let isPlaying = false;
+            let animationId = null;
+            let lastDrawTime = 0;
+            let generation = 0;
+            let popF1 = 0; let popF2 = 0;
+            let activePaintFaction = 1;
+
+            // Interaction
+            let isDragging = false;
+            let isPainting = false;
+            let paintMode = 1; 
+            let lastMouseX = 0, lastMouseY = 0;
+
+            // Palettes
+            const COLOR_BG = '#030305';
+            const COLOR_GRID = 'rgba(255, 255, 255, 0.03)';
+            const C_F1 = ['#818cf8', '#a855f7', '#ec4899', '#f43f5e'];
+            const RGB_F1 = '129, 140, 248';
+            const C_F2 = ['#22d3ee', '#3b82f6', '#10b981', '#22c55e'];
+            const RGB_F2 = '34, 211, 238';
+
+            function centerCamera() {
+                const rect = wrapper.getBoundingClientRect();
+                const worldW = COLS * BASE_CELL_SIZE;
+                const worldH = ROWS * BASE_CELL_SIZE;
+                camera.zoom = 1;
+                camera.x = (rect.width - worldW) / 2;
+                camera.y = (rect.height - worldH) / 2;
+            }
+
+            function handleResize() {
+                const rect = wrapper.getBoundingClientRect();
+                const dpr = window.devicePixelRatio || 1;
+                canvas.width = rect.width * dpr;
+                canvas.height = rect.height * dpr;
+                ctx.scale(dpr, dpr);
+                canvas.style.width = `${rect.width}px`;
+                canvas.style.height = `${rect.height}px`;
+                if(generation === 0) centerCamera();
+                draw();
+            }
+
+            // ---------------------------------------------------------
+            // Core Logic (Optimized for all rules & mutations)
+            // ---------------------------------------------------------
+
+            function computeNextGeneration() {
+                let p1 = 0, p2 = 0;
+                
+                // Cache toggles
+                const isUnderpop = ruleUnderpop.checked;
+                const isSurvival = ruleSurvival.checked;
+                const isOverpop = ruleOverpop.checked;
+                const isReprod = ruleReproduction.checked;
+                
+                const isWarfare = ruleWarfare.checked;
+                const isHighLife = mutHighLife.checked;
+                const isMortal = mutMortality.checked;
+                const isQuantum = mutQuantum.checked;
+                const doDecay = visDecay.checked;
+
+                for (let i = 0; i < TOTAL_CELLS; i++) {
+                    const y = Math.floor(i / COLS);
+                    const x = i % COLS;
+                    const cAge = ageGrid[i];
+                    const cFac = facGrid[i];
+                    const isAlive = cAge > 0;
+
+                    let n1 = 0, n2 = 0;
+
+                    // Unrolled Toroidal Neighbor check
+                    for (let dy = -1; dy <= 1; dy++) {
+                        for (let dx = -1; dx <= 1; dx++) {
+                            if (dx === 0 && dy === 0) continue;
+                            const ny = (y + dy + ROWS) % ROWS;
+                            const nx = (x + dx + COLS) % COLS;
+                            const nIdx = ny * COLS + nx;
+                            if (ageGrid[nIdx] > 0) {
+                                if (facGrid[nIdx] === 1) n1++;
+                                else if (facGrid[nIdx] === 2) n2++;
+                            }
+                        }
+                    }
+
+                    const totalNeighbors = n1 + n2;
+                    let willSurvive = false;
+                    let willBirth = false;
+                    let nextFac = 0;
+
+                    // Apply Core Rules
+                    if (isAlive) {
+                        if (totalNeighbors < 2) willSurvive = !isUnderpop;
+                        else if (totalNeighbors === 2 || totalNeighbors === 3) willSurvive = isSurvival;
+                        else if (totalNeighbors > 3) willSurvive = !isOverpop;
+                        
+                        if (willSurvive) nextFac = cFac;
+                    } else {
+                        if (totalNeighbors === 3 && isReprod) {
+                            willBirth = true;
+                            if (isWarfare) {
+                                nextFac = n1 > n2 ? 1 : 2; // Majority rules
+                            } else {
+                                if (n1 === 3) nextFac = 1;
+                                else if (n2 === 3) nextFac = 2;
+                                else willBirth = false; // Sterile mixed parents
+                            }
+                        } else if (isHighLife && totalNeighbors === 6) {
+                            willBirth = true;
+                            if (isWarfare) {
+                                if (n1 > n2) nextFac = 1;
+                                else if (n2 > n1) nextFac = 2;
+                                else nextFac = Math.random() < 0.5 ? 1 : 2; // 3v3 Tiebreaker
+                            } else {
+                                if (n1 === 6) nextFac = 1;
+                                else if (n2 === 6) nextFac = 2;
+                                else willBirth = false;
+                            }
+                        }
+                    }
+
+                    let nextAge = 0;
+                    if (willSurvive) nextAge = cAge + 1;
+                    else if (willBirth) nextAge = 1;
+
+                    // Mutations
+                    if (isMortal && nextAge > 30) {
+                        nextAge = 0; nextFac = 0;
+                    }
+                    
+                    if (isQuantum && Math.random() < 0.0005) {
+                        if (isAlive) {
+                            nextAge = 0; nextFac = 0;
+                        } else {
+                            nextAge = 1; nextFac = Math.random() < 0.5 ? 1 : 2;
+                        }
+                    }
+
+                    if (nextAge > 250) nextAge = 250; // Cap
+                    
+                    nextAgeGrid[i] = nextAge;
+                    nextFacGrid[i] = nextFac;
+
+                    if (nextAge > 0) {
+                        if (nextFac === 1) p1++; else p2++;
+                    }
+
+                    // Decay processing
+                    if (doDecay) {
+                        if (isAlive && nextAge === 0) {
+                            decayGrid[i] = 1.0; decayFacGrid[i] = cFac;
+                        } else if (decayGrid[i] > 0) {
+                            decayGrid[i] -= 0.05; 
+                            if (decayGrid[i] < 0) decayGrid[i] = 0;
+                        }
+                    } else {
+                        decayGrid[i] = 0; 
+                    }
+                }
+
+                let tAge = ageGrid; ageGrid = nextAgeGrid; nextAgeGrid = tAge;
+                let tFac = facGrid; facGrid = nextFacGrid; nextFacGrid = tFac;
+
+                generation++; popF1 = p1; popF2 = p2;
+                updateStats();
+            }
+
+            function updateStats() {
+                els.gen.innerText = generation; els.pop.innerText = popF1 + popF2;
+                els.f1.innerText = popF1; els.f2.innerText = popF2;
+            }
+
+            // ---------------------------------------------------------
+            // Rendering
+            // ---------------------------------------------------------
+
+            function draw() {
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+                ctx.fillStyle = COLOR_BG;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                const dpr = window.devicePixelRatio || 1;
+                ctx.scale(dpr, dpr);
+                ctx.translate(camera.x, camera.y);
+                ctx.scale(camera.zoom, camera.zoom);
+
+                const rect = wrapper.getBoundingClientRect();
+                const viewLeft = -camera.x / camera.zoom;
+                const viewTop = -camera.y / camera.zoom;
+                const viewRight = viewLeft + (rect.width / camera.zoom);
+                const viewBottom = viewTop + (rect.height / camera.zoom);
+
+                const minCol = Math.max(0, Math.floor(viewLeft / BASE_CELL_SIZE));
+                const maxCol = Math.min(COLS - 1, Math.ceil(viewRight / BASE_CELL_SIZE));
+                const minRow = Math.max(0, Math.floor(viewTop / BASE_CELL_SIZE));
+                const maxRow = Math.min(ROWS - 1, Math.ceil(viewBottom / BASE_CELL_SIZE));
+
+                ctx.beginPath();
+                ctx.strokeStyle = COLOR_GRID;
+                ctx.lineWidth = 1 / camera.zoom;
+                for (let x = minCol; x <= maxCol + 1; x++) {
+                    ctx.moveTo(x * BASE_CELL_SIZE, minRow * BASE_CELL_SIZE);
+                    ctx.lineTo(x * BASE_CELL_SIZE, (maxRow + 1) * BASE_CELL_SIZE);
+                }
+                for (let y = minRow; y <= maxRow + 1; y++) {
+                    ctx.moveTo(minCol * BASE_CELL_SIZE, y * BASE_CELL_SIZE);
+                    ctx.lineTo((maxCol + 1) * BASE_CELL_SIZE, y * BASE_CELL_SIZE);
+                }
+                ctx.stroke();
+
+                if (visDecay.checked) {
+                    for(let level = 1; level <= 5; level++) {
+                        const alpha = level * 0.2;
+                        ctx.fillStyle = `rgba(${RGB_F1}, ${alpha})`;
+                        ctx.beginPath();
+                        for (let r = minRow; r <= maxRow; r++) {
+                            for (let c = minCol; c <= maxCol; c++) {
+                                const i = r * COLS + c;
+                                if (ageGrid[i] === 0 && decayGrid[i] > 0 && decayFacGrid[i] === 1) {
+                                    if (Math.ceil(decayGrid[i] * 5) === level) ctx.rect(c * BASE_CELL_SIZE + 1, r * BASE_CELL_SIZE + 1, BASE_CELL_SIZE - 2, BASE_CELL_SIZE - 2);
+                                }
+                            }
+                        }
+                        ctx.fill();
+
+                        ctx.fillStyle = `rgba(${RGB_F2}, ${alpha})`;
+                        ctx.beginPath();
+                        for (let r = minRow; r <= maxRow; r++) {
+                            for (let c = minCol; c <= maxCol; c++) {
+                                const i = r * COLS + c;
+                                if (ageGrid[i] === 0 && decayGrid[i] > 0 && decayFacGrid[i] === 2) {
+                                    if (Math.ceil(decayGrid[i] * 5) === level) ctx.rect(c * BASE_CELL_SIZE + 1, r * BASE_CELL_SIZE + 1, BASE_CELL_SIZE - 2, BASE_CELL_SIZE - 2);
+                                }
+                            }
+                        }
+                        ctx.fill();
+                    }
+                }
+
+                ctx.shadowBlur = 8 / camera.zoom;
+                
+                const drawFactionPass = (factionColors, factionId, shadowColor) => {
+                    ctx.shadowColor = shadowColor;
+                    for (let cIdx = 0; cIdx < 4; cIdx++) {
+                        ctx.fillStyle = factionColors[cIdx];
+                        ctx.beginPath();
+                        for (let r = minRow; r <= maxRow; r++) {
+                            for (let c = minCol; c <= maxCol; c++) {
+                                const i = r * COLS + c;
+                                const age = ageGrid[i];
+                                if (age > 0 && facGrid[i] === factionId) {
+                                    let bucket = 0;
+                                    if (age >= 15) bucket = 3;
+                                    else if (age >= 6) bucket = 2;
+                                    else if (age >= 2) bucket = 1;
+
+                                    if (bucket === cIdx) {
+                                        const sz = BASE_CELL_SIZE - 2;
+                                        if(sz * camera.zoom > 5) ctx.roundRect(c * BASE_CELL_SIZE + 1, r * BASE_CELL_SIZE + 1, sz, sz, sz/4);
+                                        else ctx.rect(c * BASE_CELL_SIZE + 1, r * BASE_CELL_SIZE + 1, sz, sz);
+                                    }
+                                }
+                            }
+                        }
+                        ctx.fill();
+                    }
+                };
+
+                drawFactionPass(C_F1, 1, `rgba(${RGB_F1}, 0.5)`);
+                drawFactionPass(C_F2, 2, `rgba(${RGB_F2}, 0.5)`);
+
+                ctx.shadowBlur = 0;
+            }
+
+            function loop(timestamp) {
+                if (!isPlaying) return;
+                const interval = 1000 / parseInt(speedSlider.value);
+                if (timestamp - lastDrawTime >= interval) {
+                    computeNextGeneration(); draw(); lastDrawTime = timestamp;
+                }
+                animationId = requestAnimationFrame(loop);
+            }
+
+            function togglePlay() {
+                isPlaying = !isPlaying;
+                btnPlay.innerText = isPlaying ? "Pause" : "Start";
+                if (isPlaying) {
+                    btnPlay.classList.add('active');
+                    lastDrawTime = performance.now();
+                    animationId = requestAnimationFrame(loop);
+                } else {
+                    btnPlay.classList.remove('active');
+                    cancelAnimationFrame(animationId);
+                }
+            }
+
+            // ---------------------------------------------------------
+            // Interaction
+            // ---------------------------------------------------------
+
+            function getCellFromPointer(clientX, clientY) {
+                const rect = wrapper.getBoundingClientRect();
+                const worldX = (clientX - rect.left - camera.x) / camera.zoom;
+                const worldY = (clientY - rect.top - camera.y) / camera.zoom;
+                return { col: Math.floor(worldX / BASE_CELL_SIZE), row: Math.floor(worldY / BASE_CELL_SIZE) };
+            }
+
+            function applyPaint(col, row) {
+                if (col >= 0 && col < COLS && row >= 0 && row < ROWS) {
+                    const idx = row * COLS + col;
+                    if (paintMode === 1) {
+                        ageGrid[idx] = 1; facGrid[idx] = activePaintFaction; decayGrid[idx] = 0;
+                    } else {
+                        ageGrid[idx] = 0; facGrid[idx] = 0;
+                        decayGrid[idx] = 1.0; decayFacGrid[idx] = activePaintFaction; // Leave glowing destroyed mark
+                    }
+                }
+            }
+
+            canvas.addEventListener('mousedown', (e) => {
+                if (e.button === 0) { 
+                    isPainting = true;
+                    const { col, row } = getCellFromPointer(e.clientX, e.clientY);
+                    const idx = row * COLS + col;
+                    paintMode = (ageGrid[idx] > 0 && facGrid[idx] === activePaintFaction) ? 0 : 1;
+                    applyPaint(col, row); draw();
+                } else if (e.button === 1 || e.button === 2) { 
+                    e.preventDefault(); isDragging = true;
+                }
+                lastMouseX = e.clientX; lastMouseY = e.clientY;
+            });
+
+            canvas.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    camera.x += e.clientX - lastMouseX; camera.y += e.clientY - lastMouseY; draw();
+                } else if (isPainting) {
+                    const { col, row } = getCellFromPointer(e.clientX, e.clientY);
+                    applyPaint(col, row); draw();
+                }
+                lastMouseX = e.clientX; lastMouseY = e.clientY;
+            });
+
+            window.addEventListener('mouseup', (e) => {
+                if (e.button === 0) isPainting = false;
+                if (e.button === 1 || e.button === 2) isDragging = false;
+            });
+            
+            canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+            canvas.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const rect = wrapper.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left, mouseY = e.clientY - rect.top;
+                const worldX = (mouseX - camera.x) / camera.zoom, worldY = (mouseY - camera.y) / camera.zoom;
+                
+                const zoomFactor = 1.1;
+                if (e.deltaY < 0) camera.zoom = Math.min(MAX_ZOOM, camera.zoom * zoomFactor);
+                else camera.zoom = Math.max(MIN_ZOOM, camera.zoom / zoomFactor);
+                
+                camera.x = mouseX - (worldX * camera.zoom); camera.y = mouseY - (worldY * camera.zoom);
+                draw();
+            }, { passive: false });
+
+            let lastTouchX = 0, lastTouchY = 0, lastTouchDistance = 0;
+            canvas.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1) {
+                    isPainting = true;
+                    const { col, row } = getCellFromPointer(e.touches[0].clientX, e.touches[0].clientY);
+                    const idx = row * COLS + col;
+                    paintMode = ageGrid[idx] > 0 ? 0 : 1;
+                    applyPaint(col, row);
+                } else if (e.touches.length === 2) {
+                    isPainting = false; isDragging = true;
+                    lastTouchX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+                    lastTouchY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+                    lastTouchDistance = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                    );
+                }
+            }, { passive: false });
+
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault(); 
+                if (isDragging && e.touches.length === 2) {
+                    const cx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+                    const cy = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+                    
+                    // Handle Panning
+                    camera.x += cx - lastTouchX; 
+                    camera.y += cy - lastTouchY;
+                    
+                    // Handle Pinch Zoom
+                    const newDistance = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                    );
+                    
+                    if (lastTouchDistance > 0) {
+                        const zoomFactor = newDistance / lastTouchDistance;
+                        const rect = wrapper.getBoundingClientRect();
+                        const mouseX = cx - rect.left;
+                        const mouseY = cy - rect.top;
+                        
+                        // World coord under pinch center before zoom
+                        const worldX = (mouseX - camera.x) / camera.zoom;
+                        const worldY = (mouseY - camera.y) / camera.zoom;
+                        
+                        camera.zoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, camera.zoom * zoomFactor));
+                        
+                        // Reposition camera so the pinch center stays under the fingers
+                        camera.x = mouseX - (worldX * camera.zoom);
+                        camera.y = mouseY - (worldY * camera.zoom);
+                    }
+                    
+                    lastTouchX = cx; 
+                    lastTouchY = cy; 
+                    lastTouchDistance = newDistance;
+                    draw();
+                } else if (isPainting && e.touches.length === 1) {
+                    const { col, row } = getCellFromPointer(e.touches[0].clientX, e.touches[0].clientY);
+                    applyPaint(col, row); draw();
+                }
+            }, { passive: false });
+
+            window.addEventListener('touchend', (e) => { 
+                if (e.touches.length < 2) isDragging = false;
+                if (e.touches.length === 0) isPainting = false; 
+            });
+
+            // ---------------------------------------------------------
+            // UI Listeners
+            // ---------------------------------------------------------
+
+            btnF1.addEventListener('click', () => {
+                activePaintFaction = 1; btnF1.classList.add('active'); btnF2.classList.remove('active');
+            });
+            btnF2.addEventListener('click', () => {
+                activePaintFaction = 2; btnF2.classList.add('active'); btnF1.classList.remove('active');
+            });
+
+            btnPlay.addEventListener('click', togglePlay);
+            btnStep.addEventListener('click', () => { if (isPlaying) togglePlay(); computeNextGeneration(); draw(); });
+            btnCenter.addEventListener('click', () => { centerCamera(); draw(); });
+
+            btnClear.addEventListener('click', () => {
+                if (isPlaying) togglePlay();
+                ageGrid.fill(0); facGrid.fill(0); decayGrid.fill(0);
+                generation = 0; popF1 = 0; popF2 = 0;
+                updateStats(); draw();
+            });
+
+            btnRandom.addEventListener('click', () => {
+                const density = 0.15; 
+                ageGrid.fill(0); facGrid.fill(0); decayGrid.fill(0); popF1 = 0; popF2 = 0;
+
+                const rRadius = 40, cCol = COLS/2, cRow = ROWS/2;
+                for (let r = cRow - rRadius; r < cRow + rRadius; r++) {
+                    for (let c = cCol - rRadius; c < cCol + rRadius; c++) {
+                        if (Math.random() < density) {
+                            const i = r * COLS + c;
+                            const f = Math.random() < 0.5 ? 1 : 2;
+                            ageGrid[i] = Math.floor(Math.random() * 5) + 1; facGrid[i] = f;
+                            if(f===1) popF1++; else popF2++;
+                        }
+                    }
+                }
+                generation = 0; updateStats(); centerCamera(); draw();
+            });
+
+            window.addEventListener('resize', () => { clearTimeout(window.resizeTimeout); window.resizeTimeout = setTimeout(handleResize, 150); });
+
+            // Auto-redraw on toggle changes if paused
+            const toggles = [ruleUnderpop, ruleSurvival, ruleOverpop, ruleReproduction, ruleWarfare, visDecay, mutHighLife, mutMortality, mutQuantum];
+            toggles.forEach(t => t.addEventListener('change', () => { if(!isPlaying) { computeNextGeneration(); draw(); }}));
+
+            handleResize(); btnRandom.click(); 
+        });
+    </script>
+</body>
+</html>

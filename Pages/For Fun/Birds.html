@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Evolutionary Flocking Ecosystem</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #0f172a; /* Slate 900 */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Custom scrollbar for control panel */
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 10px;
+        }
+        
+        /* Range slider styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            margin-top: -6px;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #334155;
+            border-radius: 2px;
+        }
+        input[type=range].pred-slider::-webkit-slider-thumb {
+            background: #ef4444;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+        }
+        input[type=range].eco-slider::-webkit-slider-thumb {
+            background: #10b981;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+        }
+    </style>
+</head>
+<body class="text-slate-200">
+
+    <canvas id="simCanvas"></canvas>
+
+    <!-- UI Toggle Button -->
+    <button id="toggleBtn" class="fixed top-4 right-4 z-50 bg-slate-800/80 hover:bg-slate-700 p-3 rounded-full backdrop-blur-sm transition-colors border border-slate-600 shadow-lg md:hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="4" y1="21" x2="4" y2="14"></line>
+            <line x1="4" y1="10" x2="4" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12" y2="3"></line>
+            <line x1="20" y1="21" x2="20" y2="16"></line>
+            <line x1="20" y1="12" x2="20" y2="3"></line>
+            <line x1="1" y1="14" x2="7" y2="14"></line>
+            <line x1="9" y1="8" x2="15" y2="8"></line>
+            <line x1="17" y1="16" x2="23" y2="16"></line>
+        </svg>
+    </button>
+
+    <!-- Control Panel -->
+    <div id="controlPanel" class="fixed top-4 right-4 z-40 w-72 max-h-[90vh] bg-slate-800/90 backdrop-blur-md rounded-xl border border-slate-700 shadow-2xl overflow-y-auto custom-scroll transition-transform duration-300 transform translate-x-0 max-md:translate-x-[120%] max-md:top-auto max-md:bottom-4 max-md:right-4">
+        <div class="p-5 flex flex-col gap-4">
+            
+            <div>
+                <h2 class="text-xl font-bold text-white mb-1">Ecosystem Controls</h2>
+                <div class="text-[11px] text-slate-400 leading-tight">
+                    Prey reproduce naturally! <span class="text-emerald-400">Green flashes</span> = Births. <span class="text-red-400">Red flashes</span> = Eaten.
+                </div>
+            </div>
+
+            <!-- Ecosystem Dynamics -->
+            <div>
+                <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-2 border-b border-slate-700 pb-1">Ecosystem Rules</h3>
+                <div class="space-y-3">
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-[13px] font-medium">Prey Breed Speed</label>
+                            <span id="reproVal" class="text-xs text-emerald-400">5.0</span>
+                        </div>
+                        <input type="range" id="breedSpeed" class="eco-slider" min="0" max="20" step="0.5" value="5.0">
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-[13px] font-medium">Population Limit (Cap)</label>
+                            <span id="maxPopVal" class="text-xs text-emerald-400">800</span>
+                        </div>
+                        <input type="range" id="maxPop" class="eco-slider" min="100" max="1500" step="50" value="800">
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-[13px] font-medium text-orange-300">Predator Starve Rate</label>
+                            <span id="metabolismVal" class="text-xs text-orange-300">0.8</span>
+                        </div>
+                        <input type="range" id="metabolism" class="eco-slider" min="0" max="3" step="0.1" value="0.8">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prey / General Parameters -->
+            <div>
+                <h3 class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-2 border-b border-slate-700 pb-1 mt-1">Prey Genetics (Spawns)</h3>
+                <div class="space-y-3">
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-[13px] font-medium">Separation</label>
+                            <span id="sepVal" class="text-xs text-blue-400">1.5</span>
+                        </div>
+                        <input type="range" id="separation" min="0" max="3" step="0.1" value="1.5">
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-[13px] font-medium">Base Max Speed</label>
+                            <span id="speedVal" class="text-xs text-blue-400">3.5</span>
+                        </div>
+                        <input type="range" id="maxSpeed" min="1" max="10" step="0.5" value="3.5">
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-[13px] font-medium">Base Flee Panic</label>
+                            <span id="fleeVal" class="text-xs text-blue-400">4.5</span>
+                        </div>
+                        <input type="range" id="fleeWeight" min="0" max="8" step="0.5" value="4.5">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Predator Parameters -->
+            <div>
+                <h3 class="text-xs font-bold text-red-400 uppercase tracking-wider mb-2 border-b border-slate-700 pb-1 mt-1">Predators</h3>
+                <div class="space-y-3">
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-[13px] font-medium">Chase Force</label>
+                            <span id="chaseVal" class="text-xs text-red-400">2.5</span>
+                        </div>
+                        <input type="range" id="chaseWeight" class="pred-slider" min="0" max="8" step="0.5" value="2.5">
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-[13px] font-medium">Base Speed</label>
+                            <span id="predSpeedVal" class="text-xs text-red-400">4.5</span>
+                        </div>
+                        <input type="range" id="predSpeed" class="pred-slider" min="2" max="12" step="0.5" value="4.5">
+                    </div>
+                </div>
+            </div>
+
+            <div class="h-px bg-slate-700 my-1"></div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col gap-2">
+                <button id="toggleModeBtn" class="w-full bg-slate-600 hover:bg-slate-500 text-white text-sm font-semibold py-2 px-4 rounded transition shadow-md">
+                    Brush: Draw Obstacle
+                </button>
+                <div class="flex gap-2 mt-2">
+                    <button id="addPreyBtn" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold py-2 px-2 rounded transition shadow-md">
+                        +50 Prey
+                    </button>
+                    <button id="addPredBtn" class="flex-1 bg-red-600 hover:bg-red-500 text-white text-sm font-semibold py-2 px-2 rounded transition shadow-[0_0_10px_rgba(220,38,38,0.4)]">
+                        +1 Predator
+                    </button>
+                </div>
+                <button id="clearObsBtn" class="w-full bg-slate-800 border border-slate-600 hover:bg-slate-700 text-white text-sm font-semibold py-2 px-4 rounded transition mt-2">
+                    Clear Obstacles
+                </button>
+            </div>
+            
+            <div class="flex justify-between text-base font-bold bg-slate-900/50 p-2 rounded-lg border border-slate-700">
+                <span class="text-blue-400">Prey: <span id="preyCount">0</span></span>
+                <span class="text-red-400">Preds: <span id="predCount">0</span></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Vector2 Math Library ---
+        class Vec2 {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+            }
+            add(v) { this.x += v.x; this.y += v.y; return this; }
+            sub(v) { this.x -= v.x; this.y -= v.y; return this; }
+            mult(n) { this.x *= n; this.y *= n; return this; }
+            div(n) { this.x /= n; this.y /= n; return this; }
+            magSq() { return this.x * this.x + this.y * this.y; }
+            mag() { return Math.sqrt(this.magSq()); }
+            normalize() { 
+                let m = this.mag(); 
+                if (m !== 0) this.div(m); 
+                return this; 
+            }
+            limit(max) {
+                if (this.magSq() > max * max) {
+                    this.normalize();
+                    this.mult(max);
+                }
+                return this;
+            }
+            setMag(n) { return this.normalize().mult(n); }
+            heading() { return Math.atan2(this.y, this.x); }
+            copy() { return new Vec2(this.x, this.y); }
+            
+            static sub(v1, v2) { return new Vec2(v1.x - v2.x, v1.y - v2.y); }
+            static distSq(v1, v2) {
+                let dx = v1.x - v2.x;
+                let dy = v1.y - v2.y;
+                return dx * dx + dy * dy;
+            }
+        }
+
+        // --- Simulation State ---
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let width, height;
+        let boids = [];
+        let obstacles = [];
+        let isDrawing = false;
+        let currentMode = 'draw';
+        
+        let deathEffects = []; // Red flashes
+        let birthEffects = []; // Green flashes
+        
+        let lastPreyCount = -1;
+        let lastPredCount = -1;
+        
+        // Simulation Parameters
+        let params = {
+            // Base physics
+            separationWeight: 1.5,
+            alignmentWeight: 1.0,
+            cohesionWeight: 1.0,
+            obstacleAvoidanceWeight: 5.0,
+            preyMaxForce: 0.15,
+            predMaxForce: 0.10,
+            
+            // Ecosystem Settings
+            breedSpeed: 5.0,       
+            maxPrey: 800,          
+            predMetabolism: 0.8,   
+            
+            // Default Prey Genes
+            baseMaxSpeed: 3.5,
+            baseFleeWeight: 4.5,
+            basePerception: 100,
+
+            // Predator Settings
+            chaseWeight: 2.5,      
+            predSpeed: 4.5, 
+            predPerception: 180     
+        };
+
+        // --- Boid Class ---
+        class Boid {
+            constructor(x, y, type = 'prey', parentDna = null) {
+                // Ensure starting positions are never exactly NaN
+                this.position = new Vec2(x || Math.random() * width, y || Math.random() * height);
+                this.type = type;
+                this.dead = false;
+                
+                if (this.type === 'prey') {
+                    this.breedTimer = Math.random() * 1000; // Random initial maturity 
+
+                    if (parentDna) {
+                        this.dna = {
+                            maxSpeed: Math.max(1.5, Math.min(10, parentDna.maxSpeed + (Math.random() - 0.5) * 0.5)),
+                            perceptionRadius: Math.max(40, Math.min(200, parentDna.perceptionRadius + (Math.random() - 0.5) * 10)),
+                            fleeWeight: Math.max(0, Math.min(10, parentDna.fleeWeight + (Math.random() - 0.5) * 0.5))
+                        };
+                    } else {
+                        this.dna = {
+                            maxSpeed: params.baseMaxSpeed * (0.85 + Math.random() * 0.3),
+                            perceptionRadius: params.basePerception * (0.85 + Math.random() * 0.3),
+                            fleeWeight: params.baseFleeWeight * (0.85 + Math.random() * 0.3)
+                        };
+                    }
+                    this.size = 4;
+                    // Color based on speed: Slow (2) = Blue, Fast (8) = Green/Yellow
+                    let hue = Math.max(0, Math.min(360, 240 - (this.dna.maxSpeed - 2) * 30));
+                    this.color = `hsl(${hue}, 80%, 60%)`;
+                } else {
+                    this.size = 7;
+                    this.color = `hsl(0, 90%, 55%)`; 
+                    this.energy = 1500; 
+                    this.satiation = 0; // Digestion timer
+                }
+
+                let initialSpeed = this.type === 'predator' ? params.predSpeed : this.dna.maxSpeed;
+                let angle = Math.random() * Math.PI * 2;
+                this.velocity = new Vec2(Math.cos(angle), Math.sin(angle)).mult(initialSpeed);
+                this.acceleration = new Vec2(0, 0);
+            }
+
+            edges() {
+                if (this.position.x > width + this.size) this.position.x = -this.size;
+                else if (this.position.x < -this.size) this.position.x = width + this.size;
+                
+                if (this.position.y > height + this.size) this.position.y = -this.size;
+                else if (this.position.y < -this.size) this.position.y = height + this.size;
+            }
+
+            flock(boids, obstacles) {
+                if (this.dead) return;
+
+                let sep = new Vec2(0, 0);
+                let ali = new Vec2(0, 0);
+                let coh = new Vec2(0, 0);
+                let flee = new Vec2(0, 0);
+                let chase = new Vec2(0, 0);
+                let obsSteer = new Vec2(0, 0);
+                
+                let sepCount = 0, aliCount = 0, cohCount = 0, fleeCount = 0, chaseCount = 0, obsCount = 0;
+
+                let sightRadius = this.type === 'predator' ? params.predPerception : this.dna.perceptionRadius;
+                let perceptionSq = sightRadius * sightRadius;
+                let separationRadiusSq = (sightRadius / 2) * (sightRadius / 2);
+                
+                let localMaxSpeed = this.type === 'predator' ? params.predSpeed : this.dna.maxSpeed;
+                let maxForce = this.type === 'predator' ? params.predMaxForce : params.preyMaxForce;
+
+                if (this.type === 'predator' && this.satiation > 0) this.satiation--;
+
+                // Physics / Interactions
+                for (let other of boids) {
+                    if (other === this || other.dead) continue;
+                    
+                    let dSq = Vec2.distSq(this.position, other.position);
+                    
+                    // ANTI-NAN SAFETY: Ignore boids that are physically sitting on the exact same pixel 
+                    // This guarantees we never divide by zero during normalization.
+                    if (dSq < 0.0001) continue; 
+                    
+                    // Predation logic (Eating)
+                    if (this.type === 'predator' && other.type === 'prey') {
+                        let eatRadiusSq = (this.size + other.size + 2) * (this.size + other.size + 2);
+                        if (dSq < eatRadiusSq && this.satiation <= 0) {
+                            other.dead = true;
+                            this.energy = Math.min(4500, this.energy + 1000); // Gain energy
+                            this.satiation = 40; // Digest
+                            deathEffects.push({x: other.position.x, y: other.position.y, life: 1.0});
+                            continue;
+                        }
+                    }
+
+                    if (dSq < perceptionSq) {
+                        if (this.type === other.type) {
+                            ali.add(other.velocity);
+                            aliCount++;
+                            coh.add(other.position);
+                            cohCount++;
+                            
+                            if (dSq < separationRadiusSq) {
+                                let diff = Vec2.sub(this.position, other.position);
+                                diff.normalize().div(Math.sqrt(dSq)); 
+                                sep.add(diff);
+                                sepCount++;
+                            }
+                        } else {
+                            if (this.type === 'prey' && other.type === 'predator') {
+                                let diff = Vec2.sub(this.position, other.position);
+                                diff.normalize().div(Math.sqrt(dSq)); 
+                                flee.add(diff);
+                                fleeCount++;
+                            } 
+                            else if (this.type === 'predator' && other.type === 'prey' && this.satiation <= 0) {
+                                chase.add(other.position);
+                                chaseCount++;
+                            }
+                        }
+                    }
+                }
+
+                // Obstacles
+                for (let obs of obstacles) {
+                    let dSq = Vec2.distSq(this.position, new Vec2(obs.x, obs.y));
+                    if (dSq < 0.0001) dSq = 0.0001; // Safety
+                    
+                    let avoidRadius = obs.r + 40;
+                    if (dSq < avoidRadius * avoidRadius) {
+                        let diff = Vec2.sub(this.position, new Vec2(obs.x, obs.y));
+                        diff.normalize().div(Math.sqrt(dSq));
+                        obsSteer.add(diff);
+                        obsCount++;
+                    }
+                }
+
+                // Calculate Forces (Checking > 0 to prevent NaN propagation on div)
+                if (aliCount > 0) ali.div(aliCount).normalize().mult(localMaxSpeed).sub(this.velocity).limit(maxForce);
+                if (cohCount > 0) {
+                    coh.div(cohCount);
+                    let desired = Vec2.sub(coh, this.position);
+                    desired.normalize().mult(localMaxSpeed);
+                    coh = desired.sub(this.velocity).limit(maxForce);
+                }
+                if (sepCount > 0) sep.div(sepCount).normalize().mult(localMaxSpeed).sub(this.velocity).limit(maxForce);
+                
+                if (fleeCount > 0) flee.div(fleeCount).normalize().mult(localMaxSpeed).sub(this.velocity).limit(maxForce * 2.5);
+                if (chaseCount > 0) {
+                    chase.div(chaseCount);
+                    let desired = Vec2.sub(chase, this.position);
+                    desired.normalize().mult(localMaxSpeed);
+                    chase = desired.sub(this.velocity).limit(maxForce * 1.5);
+                }
+                if (obsCount > 0) obsSteer.div(obsCount).normalize().mult(localMaxSpeed).sub(this.velocity).limit(maxForce * 3.0);
+
+                // Apply Weights
+                sep.mult(params.separationWeight);
+                ali.mult(params.alignmentWeight);
+                coh.mult(params.cohesionWeight);
+                obsSteer.mult(params.obstacleAvoidanceWeight);
+                
+                let localFleeWeight = this.type === 'prey' ? this.dna.fleeWeight : 0;
+                flee.mult(localFleeWeight);
+                chase.mult(params.chaseWeight);
+
+                this.acceleration.add(sep).add(ali).add(coh).add(obsSteer).add(flee).add(chase);
+            }
+
+            update() {
+                if (this.dead) return;
+
+                let localMaxSpeed = this.type === 'predator' ? params.predSpeed : this.dna.maxSpeed;
+                
+                // Predator Metabolism
+                if (this.type === 'predator') {
+                    this.energy -= params.predMetabolism; 
+                    if (this.energy <= 0) this.dead = true;
+                    
+                    if (this.satiation > 0) {
+                        this.acceleration.add(new Vec2((Math.random()-0.5)*0.2, (Math.random()-0.5)*0.2));
+                    }
+                }
+
+                this.position.add(this.velocity);
+                this.velocity.add(this.acceleration);
+                this.velocity.limit(localMaxSpeed);
+                this.acceleration.mult(0);
+            }
+
+            draw() {
+                if (this.dead) return;
+                let theta = this.velocity.heading() + Math.PI / 2;
+                
+                ctx.save();
+                ctx.translate(this.position.x, this.position.y);
+                ctx.rotate(theta);
+                
+                ctx.beginPath();
+                ctx.moveTo(0, -this.size * 2);
+                ctx.lineTo(-this.size, this.size * 2);
+                ctx.lineTo(0, this.size);
+                ctx.lineTo(this.size, this.size * 2);
+                ctx.closePath();
+                
+                ctx.fillStyle = this.color;
+                
+                if(this.type === 'predator') {
+                    ctx.shadowBlur = 12;
+                    if (this.satiation > 0) {
+                        ctx.shadowColor = `rgba(16, 185, 129, 0.9)`; // Green digestion glow
+                    } else {
+                        ctx.shadowColor = `rgba(255, 0, 0, ${Math.min(1, this.energy/1000)})`; // Red hungry glow
+                    }
+                }
+                
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        // --- Core Functions ---
+        function init() {
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            addBoids(250, 'prey');
+            addBoids(4, 'predator'); 
+            requestAnimationFrame(animate);
+        }
+
+        function resizeCanvas() {
+            // Robust check to ensure canvas is never 0x0
+            width = window.innerWidth || document.documentElement.clientWidth || 800;
+            height = window.innerHeight || document.documentElement.clientHeight || 600;
+            canvas.width = width;
+            canvas.height = height;
+        }
+
+        function updateCountsDisplay(preyCount, predCount) {
+            if (preyCount !== lastPreyCount) {
+                document.getElementById('preyCount').innerText = preyCount;
+                lastPreyCount = preyCount;
+            }
+            if (predCount !== lastPredCount) {
+                document.getElementById('predCount').innerText = predCount;
+                lastPredCount = predCount;
+            }
+        }
+
+        function addBoids(count, type) {
+            for (let i = 0; i < count; i++) {
+                boids.push(new Boid(Math.random() * width, Math.random() * height, type));
+            }
+        }
+
+        function handleInteraction(x, y) {
+            const panel = document.getElementById('controlPanel');
+            const rect = panel.getBoundingClientRect();
+            if (!panel.classList.contains('max-md:translate-x-[120%]')) { 
+                if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) return; 
+            }
+
+            if (currentMode === 'draw') {
+                obstacles.push({ x: x, y: y, r: 3 + Math.random() * 5 });
+            } else if (currentMode === 'erase') {
+                const eraserRadiusSq = 40 * 40;
+                obstacles = obstacles.filter(obs => {
+                    const dx = obs.x - x;
+                    const dy = obs.y - y;
+                    return (dx * dx + dy * dy) > eraserRadiusSq;
+                });
+            }
+        }
+
+        function animate() {
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.35)'; 
+            ctx.fillRect(0, 0, width, height);
+
+            // Draw Obstacles
+            ctx.fillStyle = '#64748b'; 
+            for (let obs of obstacles) {
+                ctx.beginPath();
+                ctx.arc(obs.x, obs.y, obs.r, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Draw Effects (Death = Red, Birth = Green)
+            for (let i = deathEffects.length - 1; i >= 0; i--) {
+                let e = deathEffects[i];
+                ctx.beginPath();
+                ctx.arc(e.x, e.y, 10 * (1 - e.life) + 2, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(239, 68, 68, ${e.life})`;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                e.life -= 0.1;
+                if (e.life <= 0) deathEffects.splice(i, 1);
+            }
+            for (let i = birthEffects.length - 1; i >= 0; i--) {
+                let e = birthEffects[i];
+                ctx.beginPath();
+                ctx.arc(e.x, e.y, 15 * (1 - e.life) + 2, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(16, 185, 129, ${e.life})`; 
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                e.life -= 0.05; 
+                if (e.life <= 0) birthEffects.splice(i, 1);
+            }
+
+            let newBoids = [];
+            let currentPreyCount = 0;
+            let currentPredCount = 0;
+            
+            // Count alive boids
+            for (let b of boids) {
+                if (!b.dead) {
+                    b.type === 'prey' ? currentPreyCount++ : currentPredCount++;
+                }
+            }
+
+            // Logistic Growth Calculation 
+            let growthFactor = Math.max(0, 1 - (currentPreyCount / params.maxPrey));
+            let activeBreedSpeed = params.breedSpeed * growthFactor;
+
+            // Update & Draw Boids
+            for (let boid of boids) {
+                if (boid.dead) continue;
+                
+                boid.edges();
+                boid.flock(boids, obstacles);
+                boid.update();
+                boid.draw();
+
+                // Ecosystem: Guaranteed Reproduction Logic with spatial offset
+                if (boid.type === 'prey') {
+                    boid.breedTimer += activeBreedSpeed;
+                    if (boid.breedTimer >= 1000 && (currentPreyCount + newBoids.length) < params.maxPrey) {
+                        boid.breedTimer = 0; // Reset maturity
+                        // Add an offset so they don't occupy the exact same coordinate
+                        let offsetX = (Math.random() - 0.5) * 10;
+                        let offsetY = (Math.random() - 0.5) * 10;
+                        newBoids.push(new Boid(boid.position.x + offsetX, boid.position.y + offsetY, 'prey', boid.dna));
+                        birthEffects.push({x: boid.position.x, y: boid.position.y, life: 1.0}); 
+                    }
+                } else if (boid.type === 'predator') {
+                    if (boid.energy > 3500) { 
+                        boid.energy = 1500; 
+                        let offsetX = (Math.random() - 0.5) * 10;
+                        let offsetY = (Math.random() - 0.5) * 10;
+                        newBoids.push(new Boid(boid.position.x + offsetX, boid.position.y + offsetY, 'predator'));
+                        birthEffects.push({x: boid.position.x, y: boid.position.y, life: 1.0});
+                    }
+                }
+            }
+
+            // Cleanup dead, add newborns
+            boids = boids.filter(b => !b.dead);
+            if (newBoids.length > 0) {
+                boids.push(...newBoids);
+            }
+
+            // Update UI
+            updateCountsDisplay(currentPreyCount + newBoids.filter(b=>b.type==='prey').length, currentPredCount + newBoids.filter(b=>b.type==='predator').length);
+
+            if (isDrawing && currentMode === 'erase') {
+                ctx.beginPath();
+                ctx.arc(mouseX, mouseY, 40, 0, Math.PI * 2);
+                ctx.strokeStyle = 'rgba(255, 100, 100, 0.5)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        // --- Event Listeners ---
+
+        let mouseX = 0;
+        let mouseY = 0;
+
+        canvas.addEventListener('mousedown', (e) => { isDrawing = true; handleInteraction(e.clientX, e.clientY); });
+        canvas.addEventListener('mousemove', (e) => { 
+            mouseX = e.clientX; mouseY = e.clientY;
+            if(isDrawing) handleInteraction(e.clientX, e.clientY); 
+        });
+        canvas.addEventListener('mouseup', () => isDrawing = false);
+        canvas.addEventListener('mouseleave', () => isDrawing = false);
+
+        canvas.addEventListener('touchstart', (e) => { 
+            isDrawing = true; 
+            mouseX = e.touches[0].clientX; mouseY = e.touches[0].clientY;
+            handleInteraction(mouseX, mouseY); 
+        }, {passive: false});
+        canvas.addEventListener('touchmove', (e) => { 
+            e.preventDefault(); 
+            mouseX = e.touches[0].clientX; mouseY = e.touches[0].clientY;
+            if(isDrawing) handleInteraction(mouseX, mouseY); 
+        }, {passive: false});
+        canvas.addEventListener('touchend', () => isDrawing = false);
+
+        // UI Binding
+        const bindSlider = (id, paramKey, displayId, suffix = '') => {
+            const el = document.getElementById(id);
+            const disp = document.getElementById(displayId);
+            el.addEventListener('input', (e) => {
+                const val = parseFloat(e.target.value);
+                params[paramKey] = val;
+                if(displayId) {
+                    disp.innerText = (val % 1 === 0 && val > 20) ? val : val.toFixed(1) + suffix;
+                }
+            });
+        };
+
+        // Eco sliders
+        bindSlider('breedSpeed', 'breedSpeed', 'reproVal');
+        bindSlider('maxPop', 'maxPrey', 'maxPopVal');
+        bindSlider('metabolism', 'predMetabolism', 'metabolismVal');
+        
+        // Physics Sliders
+        bindSlider('separation', 'separationWeight', 'sepVal');
+        bindSlider('maxSpeed', 'baseMaxSpeed', 'speedVal');
+        bindSlider('fleeWeight', 'baseFleeWeight', 'fleeVal');
+        bindSlider('chaseWeight', 'chaseWeight', 'chaseVal');
+        bindSlider('predSpeed', 'predSpeed', 'predSpeedVal');
+
+        document.getElementById('addPreyBtn').addEventListener('click', () => addBoids(50, 'prey'));
+        document.getElementById('addPredBtn').addEventListener('click', () => addBoids(1, 'predator'));
+        document.getElementById('clearObsBtn').addEventListener('click', () => { obstacles = []; });
+
+        const toggleModeBtn = document.getElementById('toggleModeBtn');
+        toggleModeBtn.addEventListener('click', () => {
+            if (currentMode === 'draw') {
+                currentMode = 'erase';
+                toggleModeBtn.innerText = 'Brush: Erase Obstacles';
+                toggleModeBtn.classList.replace('bg-slate-600', 'bg-slate-800');
+                toggleModeBtn.classList.add('border', 'border-red-500');
+            } else {
+                currentMode = 'draw';
+                toggleModeBtn.innerText = 'Brush: Draw Obstacle';
+                toggleModeBtn.classList.replace('bg-slate-800', 'bg-slate-600');
+                toggleModeBtn.classList.remove('border', 'border-red-500');
+            }
+        });
+
+        const toggleBtn = document.getElementById('toggleBtn');
+        const controlPanel = document.getElementById('controlPanel');
+        
+        toggleBtn.addEventListener('click', () => {
+            controlPanel.classList.toggle('max-md:translate-x-[120%]');
+            toggleBtn.style.transform = controlPanel.classList.contains('max-md:translate-x-[120%]') ? 'rotate(0deg)' : 'rotate(90deg)';
+            toggleBtn.style.transition = 'transform 0.3s';
+        });
+
+        window.onload = init;
+
+    </script>
+</body>
+</html>
