@@ -22,7 +22,10 @@ const PRELOAD_YIELD_MS = 30;
 const DATA_CACHE = "cgs-data-v1";  // must match sw.js
 
 const BOOKMARKS_KEY = "cgs:bookmarks:v1";
-const THEME_KEY = "cgs:theme"; // "light" | "dark" pins a theme; unset follows the system
+const THEME_KEY = "cgs:theme";       // "light" | "dark" pins a theme; unset follows the system
+const TEXT_SIZE_KEY = "cgs:textsize"; // font scale factor; unset = 1
+const DENSITY_KEY = "cgs:density";    // "compact"; unset = comfortable
+const TEXT_SIZES = [0.85, 0.925, 1, 1.075, 1.15, 1.25, 1.4];
 
 // -----------------------------
 // STATE
@@ -66,7 +69,8 @@ const scopeEl = $("scope");
 const backBtn = $("backBtn");
 const navHeading = $("navHeading");
 const bmCountEl = $("bmCount");
-const themeBtn = $("themeBtn");
+const settingsBtn = $("settingsBtn");
+const settingsPanel = $("settingsPanel");
 const tabs = {
   browse: $("tabBrowse"),
   index: $("tabIndex"),
@@ -208,41 +212,123 @@ function parentHash() {
 }
 
 // -----------------------------
-// THEME
+// SETTINGS (theme, text size, density)
 // -----------------------------
 const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
-function storedTheme() {
+function getSetting(key) {
+  try { return localStorage.getItem(key); } catch { return null; }
+}
+
+function setSetting(key, value) {
   try {
-    const t = localStorage.getItem(THEME_KEY);
-    return t === "light" || t === "dark" ? t : null;
-  } catch {
-    return null;
-  }
+    if (value === null) localStorage.removeItem(key);
+    else localStorage.setItem(key, value);
+  } catch { /* private mode — applies for this session only */ }
+}
+
+function storedTheme() {
+  const t = getSetting(THEME_KEY);
+  return t === "light" || t === "dark" ? t : null;
 }
 
 function effectiveTheme() {
   return storedTheme() || (darkQuery.matches ? "dark" : "light");
 }
 
-function applyTheme() {
-  const pinned = storedTheme();
-  if (pinned) document.documentElement.dataset.theme = pinned;
-  else delete document.documentElement.dataset.theme;
-
-  const eff = effectiveTheme();
-  themeBtn.textContent = eff === "dark" ? "☀️" : "🌙";
-  const label = eff === "dark" ? "Switch to light mode" : "Switch to dark mode";
-  themeBtn.setAttribute("aria-label", label);
-  themeBtn.title = label;
-  document.querySelector('meta[name="theme-color"]')
-    ?.setAttribute("content", eff === "dark" ? "#0f172a" : "#1e3a8a");
+function textScale() {
+  const v = parseFloat(getSetting(TEXT_SIZE_KEY));
+  return TEXT_SIZES.includes(v) ? v : 1;
 }
 
-function toggleTheme() {
-  const next = effectiveTheme() === "dark" ? "light" : "dark";
-  try { localStorage.setItem(THEME_KEY, next); } catch { /* applies for this session only */ }
-  applyTheme();
+function applySettings() {
+  const root = document.documentElement;
+
+  const pinned = storedTheme();
+  if (pinned) root.dataset.theme = pinned;
+  else delete root.dataset.theme;
+  document.querySelector('meta[name="theme-color"]')
+    ?.setAttribute("content", effectiveTheme() === "dark" ? "#0f172a" : "#1e3a8a");
+
+  const scale = textScale();
+  if (scale === 1) root.style.removeProperty("--font-scale");
+  else root.style.setProperty("--font-scale", String(scale));
+
+  const compact = getSetting(DENSITY_KEY) === "compact";
+  if (compact) root.dataset.density = "compact";
+  else delete root.dataset.density;
+
+  // reflect state in the panel controls
+  const choice = pinned || "auto";
+  settingsPanel.querySelectorAll("[data-theme-choice]").forEach((btn) => {
+    btn.setAttribute("aria-pressed", String(btn.dataset.themeChoice === choice));
+  });
+  $("textSizeValue").textContent = Math.round(scale * 100) + "%";
+  $("textSmaller").disabled = TEXT_SIZES.indexOf(scale) === 0;
+  $("textLarger").disabled = TEXT_SIZES.indexOf(scale) === TEXT_SIZES.length - 1;
+  $("densityToggle").checked = compact;
+  $("bookmarkHint").textContent = state.bookmarks.length
+    ? `${state.bookmarks.length} saved` : "None saved";
+  $("clearBookmarksBtn").disabled = !state.bookmarks.length;
+}
+
+function stepTextSize(delta) {
+  const i = TEXT_SIZES.indexOf(textScale()) + delta;
+  const next = TEXT_SIZES[Math.max(0, Math.min(TEXT_SIZES.length - 1, i))];
+  setSetting(TEXT_SIZE_KEY, next === 1 ? null : String(next));
+  applySettings();
+}
+
+function toggleSettingsPanel(open) {
+  const show = open ?? settingsPanel.hidden;
+  settingsPanel.hidden = !show;
+  settingsBtn.setAttribute("aria-expanded", String(show));
+  if (show) applySettings();
+}
+
+function bindSettings() {
+  settingsBtn.addEventListener("click", () => toggleSettingsPanel());
+
+  document.addEventListener("click", (ev) => {
+    if (!settingsPanel.hidden && !settingsPanel.contains(ev.target) && ev.target !== settingsBtn) {
+      toggleSettingsPanel(false);
+    }
+  });
+  document.addEventListener("keydown", (ev) => {
+    if (ev.key === "Escape" && !settingsPanel.hidden) toggleSettingsPanel(false);
+  });
+
+  settingsPanel.querySelectorAll("[data-theme-choice]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const c = btn.dataset.themeChoice;
+      setSetting(THEME_KEY, c === "auto" ? null : c);
+      applySettings();
+    });
+  });
+  // keep theme in sync with the OS while in auto mode
+  darkQuery.addEventListener?.("change", applySettings);
+
+  $("textSmaller").addEventListener("click", () => stepTextSize(-1));
+  $("textLarger").addEventListener("click", () => stepTextSize(1));
+
+  $("densityToggle").addEventListener("change", (ev) => {
+    setSetting(DENSITY_KEY, ev.target.checked ? "compact" : null);
+    applySettings();
+  });
+
+  $("refreshDataBtn").addEventListener("click", async () => {
+    if ("caches" in window) await caches.delete(DATA_CACHE);
+    location.reload();
+  });
+
+  $("clearBookmarksBtn").addEventListener("click", () => {
+    if (!state.bookmarks.length) return;
+    if (!confirm(`Remove all ${state.bookmarks.length} bookmarks? This cannot be undone.`)) return;
+    state.bookmarks = [];
+    saveBookmarks();
+    applySettings();
+    render();
+  });
 }
 
 // -----------------------------
@@ -1016,7 +1102,7 @@ function renderHome() {
       <div class="home-card">
         <h2>📴 Offline access</h2>
         <p id="offlineLine">${esc(offlineLine)}</p>
-        <p><button class="btn" id="refreshDataBtn">Re-download data</button></p>
+        <p class="small muted">Theme, text size and data refresh live in ⚙ Settings (top right).</p>
       </div>
       <div class="home-card">
         <h2>★ Bookmarks</h2>
@@ -1029,11 +1115,6 @@ function renderHome() {
     ev.preventDefault();
     qEl.value = "14-296aa";
     setSearch(qEl.value, scopeEl.value);
-  });
-
-  $("refreshDataBtn")?.addEventListener("click", async () => {
-    if ("caches" in window) await caches.delete(DATA_CACHE);
-    location.reload();
   });
 }
 
@@ -1465,10 +1546,6 @@ function bindUI() {
   });
   scopeEl.addEventListener("change", () => setSearch(qEl.value, scopeEl.value));
 
-  themeBtn.addEventListener("click", toggleTheme);
-  // keep button icon in sync with the OS while in follow-system mode
-  darkQuery.addEventListener?.("change", applyTheme);
-
   backBtn.addEventListener("click", () => {
     const up = parentHash();
     if (up) go(up);
@@ -1498,8 +1575,9 @@ function registerServiceWorker() {
 }
 
 (async function main() {
-  applyTheme();
   loadBookmarks();
+  applySettings();
+  bindSettings();
   updateBookmarkBadge();
   bindUI();
   registerServiceWorker();
