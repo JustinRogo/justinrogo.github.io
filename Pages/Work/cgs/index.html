@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>CT General Statutes Explorer</title>
   <meta name="description"
     content="Browse and search the Connecticut General Statutes and the infraction schedule — works offline." />
@@ -38,7 +38,7 @@
         <a href="#/b" id="tabBookmarks" data-tab="bookmarks">Bookmarks<span id="bmCount" class="count-badge"
             hidden></span></a>
         <button id="settingsBtn" class="settings-btn" aria-label="Settings" aria-haspopup="true"
-          aria-expanded="false">⚙ Settings</button>
+          aria-expanded="false">⚙<span class="settings-label"> Settings</span></button>
       </nav>
       <span class="pill" id="statusPill" role="status" aria-live="polite">Loading…</span>
     </div>
@@ -96,7 +96,10 @@
     </aside>
 
     <section id="viewWrap">
-      <div class="breadcrumbs" id="crumbs"></div>
+      <div class="view-top">
+        <button id="backBtnTop" class="btn small back-top" hidden>← Back</button>
+        <div class="breadcrumbs" id="crumbs"></div>
+      </div>
       <div id="view" tabindex="-1"></div>
     </section>
   </main>

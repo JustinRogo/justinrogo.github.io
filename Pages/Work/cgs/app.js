@@ -67,6 +67,7 @@ const statusPill = $("statusPill");
 const qEl = $("q");
 const scopeEl = $("scope");
 const backBtn = $("backBtn");
+const backBtnTop = $("backBtnTop");
 const navHeading = $("navHeading");
 const bmCountEl = $("bmCount");
 const settingsBtn = $("settingsBtn");
@@ -861,19 +862,37 @@ function setTab(area) {
 // -----------------------------
 // RENDER — main dispatcher
 // -----------------------------
+
+// On phones the navigation list is hidden whenever the main view stands on
+// its own (statute section, infraction entry, all index/bookmark views,
+// search results) so the content gets the full screen.
+function mobileNeedsAside() {
+  if (state.search.q) return false;
+  const r = state.route;
+  if (r.area === "browse") return !r.sectionKey;
+  if (r.area === "infractions") return !r.category && !r.infraId;
+  return false;
+}
+
+function setBackButtons(hidden) {
+  backBtn.hidden = hidden;
+  backBtnTop.hidden = hidden;
+}
+
 function render() {
   updateBookmarkBadge();
+  document.body.classList.toggle("no-aside", !mobileNeedsAside());
 
   if (state.search.q) {
     setTab(null);
     renderSearch();
-    backBtn.hidden = true;
+    setBackButtons(true);
     return;
   }
 
   setTab(state.route.area);
   const up = parentHash();
-  backBtn.hidden = !up;
+  setBackButtons(!up);
 
   if (state.route.area === "index") {
     renderIndexNav();
@@ -1546,10 +1565,12 @@ function bindUI() {
   });
   scopeEl.addEventListener("change", () => setSearch(qEl.value, scopeEl.value));
 
-  backBtn.addEventListener("click", () => {
+  const goUp = () => {
     const up = parentHash();
     if (up) go(up);
-  });
+  };
+  backBtn.addEventListener("click", goUp);
+  backBtnTop.addEventListener("click", goUp);
 
   window.addEventListener("hashchange", applyRoute);
 
