@@ -422,7 +422,8 @@ a:hover { text-decoration: underline; }
 
 .body p { margin: 10px 0; }
 .body p:first-child { margin-top: 0; }
-.body { max-width: 75ch; }
+/* fill the content pane on desktops; cap only on very wide monitors */
+.body { max-width: 120ch; }
 
 details {
   border: 1px solid var(--border);
