@@ -12,6 +12,13 @@
   <link rel="icon" href="./icon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="./icon.svg" />
   <link rel="stylesheet" href="./styles.css" />
+  <script>
+    // apply a pinned theme before first paint to avoid a flash; app.js owns the toggle
+    try {
+      var t = localStorage.getItem("cgs:theme");
+      if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+    } catch (e) { }
+  </script>
 </head>
 
 <body>
@@ -26,6 +33,7 @@
         <a href="#/b" id="tabBookmarks" data-tab="bookmarks">Bookmarks<span id="bmCount" class="count-badge"
             hidden></span></a>
       </nav>
+      <button id="themeBtn" class="btn theme-btn" aria-label="Switch theme">🌙</button>
       <span class="pill" id="statusPill" role="status" aria-live="polite">Loading…</span>
     </div>
     <div class="header-row">

@@ -13,8 +13,11 @@
   --shadow: 0 1px 2px rgb(15 23 42 / 0.06);
 }
 
+/* Dark palette applies when the system prefers dark (and the user hasn't
+   pinned light), or when the user pinned dark via the header toggle.
+   Keep both blocks identical. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --border: #334155;
     --muted: #94a3b8;
     --bg: #0f172a;
@@ -28,6 +31,21 @@
     --star: #fbbf24;
     --shadow: none;
   }
+}
+
+:root[data-theme="dark"] {
+  --border: #334155;
+  --muted: #94a3b8;
+  --bg: #0f172a;
+  --panel: #1e293b;
+  --panel-2: #243349;
+  --text: #e2e8f0;
+  --link: #93c5fd;
+  --accent: #3b82f6;
+  --accent-contrast: #0f172a;
+  --mark: #92681c;
+  --star: #fbbf24;
+  --shadow: none;
 }
 
 * { box-sizing: border-box; }
@@ -130,6 +148,13 @@ header {
 .tabs a[aria-current="page"] .count-badge {
   background: rgb(255 255 255 / 0.25);
   color: inherit;
+}
+
+.theme-btn {
+  margin-left: auto;
+  font-size: 14px;
+  line-height: 1;
+  padding: 7px 9px;
 }
 
 .pill {

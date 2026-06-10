@@ -21,6 +21,7 @@ const PRELOAD_YIELD_MS = 30;
 const DATA_CACHE = "cgs-data-v1";  // must match sw.js
 
 const BOOKMARKS_KEY = "cgs:bookmarks:v1";
+const THEME_KEY = "cgs:theme"; // "light" | "dark" pins a theme; unset follows the system
 
 // -----------------------------
 // STATE
@@ -58,6 +59,7 @@ const scopeEl = $("scope");
 const backBtn = $("backBtn");
 const navHeading = $("navHeading");
 const bmCountEl = $("bmCount");
+const themeBtn = $("themeBtn");
 const tabs = {
   browse: $("tabBrowse"),
   infractions: $("tabInfractions"),
@@ -178,6 +180,44 @@ function parentHash() {
   }
   if (r.area === "bookmarks") return hashFor.home();
   return null;
+}
+
+// -----------------------------
+// THEME
+// -----------------------------
+const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+function storedTheme() {
+  try {
+    const t = localStorage.getItem(THEME_KEY);
+    return t === "light" || t === "dark" ? t : null;
+  } catch {
+    return null;
+  }
+}
+
+function effectiveTheme() {
+  return storedTheme() || (darkQuery.matches ? "dark" : "light");
+}
+
+function applyTheme() {
+  const pinned = storedTheme();
+  if (pinned) document.documentElement.dataset.theme = pinned;
+  else delete document.documentElement.dataset.theme;
+
+  const eff = effectiveTheme();
+  themeBtn.textContent = eff === "dark" ? "☀️" : "🌙";
+  const label = eff === "dark" ? "Switch to light mode" : "Switch to dark mode";
+  themeBtn.setAttribute("aria-label", label);
+  themeBtn.title = label;
+  document.querySelector('meta[name="theme-color"]')
+    ?.setAttribute("content", eff === "dark" ? "#0f172a" : "#1e3a8a");
+}
+
+function toggleTheme() {
+  const next = effectiveTheme() === "dark" ? "light" : "dark";
+  try { localStorage.setItem(THEME_KEY, next); } catch { /* applies for this session only */ }
+  applyTheme();
 }
 
 // -----------------------------
@@ -1206,6 +1246,10 @@ function bindUI() {
   });
   scopeEl.addEventListener("change", () => setSearch(qEl.value, scopeEl.value));
 
+  themeBtn.addEventListener("click", toggleTheme);
+  // keep button icon in sync with the OS while in follow-system mode
+  darkQuery.addEventListener?.("change", applyTheme);
+
   backBtn.addEventListener("click", () => {
     const up = parentHash();
     if (up) go(up);
@@ -1235,6 +1279,7 @@ function registerServiceWorker() {
 }
 
 (async function main() {
+  applyTheme();
   loadBookmarks();
   updateBookmarkBadge();
   bindUI();
