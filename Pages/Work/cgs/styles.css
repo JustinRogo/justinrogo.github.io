@@ -435,6 +435,64 @@ table.amounts tr.total th { font-weight: 700; }
 
 .home-card p { margin: 6px 0; font-size: 13.5px; color: var(--muted); }
 
+/* ---------- Subject index ---------- */
+.letter-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0;
+  max-width: 700px;
+}
+
+.letter-grid a {
+  display: inline-block;
+  min-width: 44px;
+  text-align: center;
+  padding: 10px 8px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--text);
+}
+
+.letter-grid a:hover {
+  border-color: var(--accent);
+  text-decoration: none;
+}
+
+.idx-items {
+  max-width: 85ch;
+  margin-top: 8px;
+}
+
+.idx-item {
+  padding: 5px 0 5px calc(var(--lvl, 0) * 22px);
+  border-bottom: 1px solid var(--border);
+  font-size: 14.5px;
+  line-height: 1.45;
+}
+
+.idx-item .refs {
+  white-space: nowrap;
+}
+
+.idx-item .refs a,
+.idx-item .refs span {
+  margin-left: 6px;
+}
+
+.idx-item .see-link {
+  display: inline-block;
+  margin-left: 8px;
+  font-size: 12.5px;
+  padding: 1px 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--panel);
+}
+
 /* ---------- Focus & a11y ---------- */
 :focus-visible {
   outline: 2px solid var(--accent);

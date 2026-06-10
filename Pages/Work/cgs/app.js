@@ -11,6 +11,7 @@
 const DATA_DIR = "./data/";
 const MASTER_URL = DATA_DIR + "titles_index.json";
 const INFRACTIONS_URL = DATA_DIR + "infractions.json";
+const STAT_INDEX_URL = DATA_DIR + "statutes_index.json";
 
 const MAX_GROUP_RESULTS = 100;     // per result group (sections, infractions, …)
 const MAX_FULLTEXT_RESULTS = 200;
@@ -33,13 +34,19 @@ const state = {
   infraById: new Map(),          // entry.id -> entry
   infraCategories: [],           // [{name, slug, count}]
 
+  statIndex: null,               // statutes_index.json payload
+  idxBySlug: new Map(),          // heading slug -> heading object
+  idxByName: new Map(),          // heading name -> heading object
+  idxLetters: new Map(),         // "A" -> [heading, ...]
+  idxByRef: new Map(),           // base section key -> Set of headings citing it
+
   titleCache: new Map(),         // title_key -> loaded title object
   titleByKey: new Map(),         // title_key -> master entry
   chapterByKey: new Map(),       // `${t}:${c}` -> chapter
   sectionByKey: new Map(),       // `${t}:${c}:${s}` -> section
   sectionLoc: new Map(),         // section_key -> {t, c} (first occurrence)
 
-  route: { area: "browse", titleKey: null, chapterKey: null, sectionKey: null, category: null, infraId: null },
+  route: { area: "browse", titleKey: null, chapterKey: null, sectionKey: null, category: null, infraId: null, letter: null, headingSlug: null },
   search: { q: "", scope: "nav", results: null },
   bookmarks: [],
 
@@ -62,6 +69,7 @@ const bmCountEl = $("bmCount");
 const themeBtn = $("themeBtn");
 const tabs = {
   browse: $("tabBrowse"),
+  index: $("tabIndex"),
   infractions: $("tabInfractions"),
   bookmarks: $("tabBookmarks"),
 };
@@ -128,8 +136,14 @@ function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
 function parseHash() {
   const h = location.hash || "#/";
   const parts = h.replace(/^#\/?/, "").split("/").filter(Boolean).map(decodeURIComponent);
-  const r = { area: "browse", titleKey: null, chapterKey: null, sectionKey: null, category: null, infraId: null };
+  const r = { area: "browse", titleKey: null, chapterKey: null, sectionKey: null, category: null, infraId: null, letter: null, headingSlug: null };
 
+  if (parts[0] === "x") {
+    r.area = "index";
+    if (parts[1] === "l" && parts[2]) r.letter = parts[2].toUpperCase();
+    if (parts[1] === "h" && parts[2]) r.headingSlug = parts[2];
+    return r;
+  }
   if (parts[0] === "i") {
     r.area = "infractions";
     if (parts[1] === "c" && parts[2]) r.category = parts[2];
@@ -154,6 +168,9 @@ const hashFor = {
   title: (t) => `#/t/${encodeURIComponent(t)}`,
   chapter: (t, c) => `#/t/${encodeURIComponent(t)}/c/${encodeURIComponent(c)}`,
   section: (t, c, s) => `#/t/${encodeURIComponent(t)}/c/${encodeURIComponent(c)}/s/${encodeURIComponent(s)}`,
+  index: () => "#/x",
+  indexLetter: (l) => `#/x/l/${encodeURIComponent(l)}`,
+  indexHeading: (slug) => `#/x/h/${encodeURIComponent(slug)}`,
   infractions: () => "#/i",
   infraCategory: (slug) => `#/i/c/${encodeURIComponent(slug)}`,
   infraEntry: (id) => `#/i/e/${encodeURIComponent(id)}`,
@@ -169,6 +186,14 @@ function parentHash() {
     if (r.chapterKey) return hashFor.title(r.titleKey);
     if (r.titleKey) return hashFor.home();
     return null;
+  }
+  if (r.area === "index") {
+    if (r.headingSlug) {
+      const h = state.idxBySlug.get(r.headingSlug);
+      return h ? hashFor.indexLetter(h.h[0]) : hashFor.index();
+    }
+    if (r.letter) return hashFor.index();
+    return hashFor.home();
   }
   if (r.area === "infractions") {
     if (r.infraId) {
@@ -399,6 +424,45 @@ async function loadInfractions() {
   }
 }
 
+async function loadStatutesIndex() {
+  try {
+    const data = await fetchJson(STAT_INDEX_URL);
+    state.statIndex = data;
+    state.idxBySlug.clear();
+    state.idxByName.clear();
+    state.idxLetters.clear();
+
+    for (const h of data.headings || []) {
+      let slug = slugify(h.h) || "heading";
+      while (state.idxBySlug.has(slug)) slug += "-x";
+      h.slug = slug;
+      state.idxBySlug.set(slug, h);
+      state.idxByName.set(h.h, h);
+      const letter = /^[A-Z]/.test(h.h) ? h.h[0] : "#";
+      if (!state.idxLetters.has(letter)) state.idxLetters.set(letter, []);
+      state.idxLetters.get(letter).push(h);
+
+      for (const it of h.items) {
+        for (const [, base] of it.r || []) {
+          if (!base) continue;
+          if (!state.idxByRef.has(base)) state.idxByRef.set(base, new Set());
+          state.idxByRef.get(base).add(h);
+        }
+      }
+    }
+    // refresh whatever is on screen now that the index is available
+    if (state.search.q) {
+      runSearch();
+      render();
+    } else if (state.route.area === "index" || (state.route.area === "browse" && !state.route.titleKey)) {
+      render();
+    }
+  } catch (err) {
+    console.warn("Statutes index unavailable:", err);
+    state.statIndex = null;
+  }
+}
+
 function indexLoadedTitle(titleObj) {
   for (const c of titleObj.chapters || []) {
     state.chapterByKey.set(keyChapter(titleObj.title_key, c.chapter_key), c);
@@ -497,7 +561,7 @@ function runSearch() {
   const statKey = statMatch ? statMatch[1].toLowerCase() : null;
   const tokens = q.split(/\s+/).filter(Boolean);
 
-  const groups = { sections: [], infractions: [], chapters: [], titles: [] };
+  const groups = { sections: [], infractions: [], topics: [], chapters: [], titles: [] };
 
   const matchesTokens = (hay) => tokens.every((tok) => hay.includes(tok));
 
@@ -543,6 +607,16 @@ function runSearch() {
     }
     groups.infractions.sort((a, b) => (b.exact - a.exact) || a.sub.localeCompare(b.sub, "en", { numeric: true }));
     groups.infractions = groups.infractions.slice(0, MAX_GROUP_RESULTS);
+
+    // index topics that cite this section
+    for (const h of state.idxByRef.get(statKey) || []) {
+      groups.topics.push({
+        label: h.h,
+        sub: `cites § ${statKey} — ${h.items.length} entries`,
+        hash: hashFor.indexHeading(h.slug),
+      });
+      if (groups.topics.length >= 50) break;
+    }
   }
 
   if (state.search.scope === "fulltext" && !statKey) {
@@ -600,6 +674,17 @@ function runSearch() {
             }
           }
         }
+      }
+    }
+    // subject-index headings by keyword
+    for (const h of state.statIndex?.headings || []) {
+      if (matchesTokens(h.h.toLowerCase())) {
+        groups.topics.push({
+          label: h.h,
+          sub: `${h.items.length} entries`,
+          hash: hashFor.indexHeading(h.slug),
+        });
+        if (groups.topics.length >= 50) break;
       }
     }
     // infractions by keyword
@@ -704,7 +789,10 @@ function render() {
   const up = parentHash();
   backBtn.hidden = !up;
 
-  if (state.route.area === "infractions") {
+  if (state.route.area === "index") {
+    renderIndexNav();
+    renderIndexView();
+  } else if (state.route.area === "infractions") {
     renderInfractionsNav();
     renderInfractionsView();
   } else if (state.route.area === "bookmarks") {
@@ -916,6 +1004,11 @@ function renderHome() {
         <p>${(state.master?.titles || []).length} titles. Pick one from the list to drill into chapters and sections.</p>
       </div>
       <div class="home-card">
+        <h2>🔎 Subject index</h2>
+        <p>${state.statIndex ? `${state.statIndex.headings.length.toLocaleString()} topics from the official LCO index, A to Z.` : "Loading the official subject index…"}
+          <a href="${hashFor.index()}">Browse the index →</a></p>
+      </div>
+      <div class="home-card">
         <h2>🎫 Infraction schedule</h2>
         <p>${inf ? `${inf.entries.length} infractions & violations, linked to their statutes.` : "Not available."}</p>
         <p>${inf?.source?.effective ? `Effective ${esc(inf.source.effective)}.` : ""} <a href="${hashFor.infractions()}">Open the schedule →</a></p>
@@ -942,6 +1035,126 @@ function renderHome() {
     if ("caches" in window) await caches.delete(DATA_CACHE);
     location.reload();
   });
+}
+
+// -----------------------------
+// RENDER — subject index area
+// -----------------------------
+function renderIndexNav() {
+  navEl.innerHTML = "";
+  if (!state.statIndex) {
+    navHeading.textContent = "Subject index";
+    navEl.innerHTML = `<div class="empty">Loading the subject index…</div>`;
+    return;
+  }
+
+  const { letter, headingSlug } = state.route;
+  const current = headingSlug ? state.idxBySlug.get(headingSlug) : null;
+  const activeLetter = letter || (current ? current.h[0] : null);
+
+  if (!activeLetter) {
+    navHeading.textContent = "Subject index";
+    const items = [...state.idxLetters.keys()].sort().map((l) => ({
+      kicker: `${state.idxLetters.get(l).length} headings`,
+      title: l,
+      hash: hashFor.indexLetter(l),
+    }));
+    navEl.appendChild(renderList(items));
+    return;
+  }
+
+  navHeading.textContent = `Index — ${activeLetter}`;
+  const headings = state.idxLetters.get(activeLetter) || [];
+  const items = headings.map((h) => ({
+    kicker: `${h.items.length} entries`,
+    title: h.h,
+    hash: hashFor.indexHeading(h.slug),
+    right: current === h ? `<span class="tag">viewing</span>` : "",
+  }));
+  navEl.appendChild(renderList(items));
+}
+
+function refLinkHtml(display, baseKey) {
+  if (baseKey) {
+    const loc = state.sectionLoc.get(baseKey);
+    if (loc) return `<a href="${hashFor.section(loc.t, loc.c, baseKey)}">${esc(display)}</a>`;
+  }
+  return `<span class="muted">${esc(display)}</span>`;
+}
+
+function seeLinkHtml(target) {
+  const [name, sub] = target;
+  const h = state.idxByName.get(name);
+  const label = sub ? `${name}, at ${sub}` : name;
+  if (!h) return "";
+  return `<a class="see-link" href="${hashFor.indexHeading(h.slug)}">→ ${esc(label)}</a>`;
+}
+
+function renderIndexView() {
+  crumbsEl.innerHTML = `<a href="${hashFor.index()}">Index</a>`;
+
+  if (!state.statIndex) {
+    viewEl.innerHTML = `<div class="empty">The subject index is loading (or unavailable). Try again in a moment.</div>`;
+    return;
+  }
+
+  const { letter, headingSlug } = state.route;
+
+  if (headingSlug) {
+    const h = state.idxBySlug.get(headingSlug);
+    if (!h) {
+      viewEl.innerHTML = `<div class="empty">Index heading not found.</div>`;
+      return;
+    }
+    crumbsEl.innerHTML += ` <span class="muted">/</span> <a href="${hashFor.indexLetter(h.h[0])}">${esc(h.h[0])}</a>`
+      + ` <span class="muted">/</span> <span>${esc(h.h)}</span>`;
+    viewEl.innerHTML = `
+      <h1 class="h1">${esc(h.h)}</h1>
+      <div class="meta"><span class="muted">${h.items.length} entries</span></div>
+      <div class="idx-items">
+        ${h.items.map((it) => `
+          <div class="idx-item" style="--lvl:${it.l}">
+            ${esc(it.t)}${it.r ? `<span class="refs">${it.r.map(([d, k]) => refLinkHtml(d, k)).join(",")}</span>` : ""}
+            ${it.see ? it.see.map(seeLinkHtml).join("") : ""}
+          </div>`).join("")}
+      </div>
+    `;
+    return;
+  }
+
+  if (letter) {
+    const headings = state.idxLetters.get(letter) || [];
+    crumbsEl.innerHTML += ` <span class="muted">/</span> <span>${esc(letter)}</span>`;
+    viewEl.innerHTML = `
+      <h1 class="h1">Index — ${esc(letter)}</h1>
+      <div class="meta"><span class="muted">${headings.length} headings</span></div>
+      <div class="list" id="letterList"></div>
+    `;
+    $("letterList").append(renderList(headings.map((h) => ({
+      kicker: `${h.items.length} entries`,
+      title: h.h,
+      hash: hashFor.indexHeading(h.slug),
+    }))));
+    return;
+  }
+
+  const src = state.statIndex.source || {};
+  viewEl.innerHTML = `
+    <h1 class="h1">Subject index</h1>
+    <div class="meta">
+      <span class="muted">${state.statIndex.headings.length.toLocaleString()} headings</span>
+      ${src.revised ? `<span class="tag">${esc(src.revised)}</span>` : ""}
+      ${src.url ? `<a href="${esc(src.url)}" target="_blank" rel="noopener">Official index (cga.ct.gov)</a>` : ""}
+    </div>
+    <p class="muted" style="max-width:75ch;">The official subject index to the General Statutes, prepared by the
+      Legislative Commissioners' Office. Look up a topic to find every statute about it — section numbers link
+      straight to the statute text. If a topic isn't listed under the word you expect, try a more general heading,
+      or follow the “→” cross-references.</p>
+    <div class="letter-grid">
+      ${[...state.idxLetters.keys()].sort().map((l) =>
+    `<a href="${hashFor.indexLetter(l)}">${esc(l)}</a>`).join("")}
+    </div>
+  `;
 }
 
 // -----------------------------
@@ -1149,9 +1362,9 @@ function renderBookmarksView() {
 // RENDER — search results
 // -----------------------------
 function renderSearch() {
-  const g = state.search.results || { sections: [], infractions: [], chapters: [], titles: [] };
+  const g = state.search.results || { sections: [], infractions: [], topics: [], chapters: [], titles: [] };
   const q = state.search.q;
-  const totals = g.sections.length + g.infractions.length + g.chapters.length + g.titles.length;
+  const totals = g.sections.length + g.infractions.length + (g.topics?.length || 0) + g.chapters.length + g.titles.length;
 
   navHeading.textContent = `Search results (${totals})`;
   navEl.innerHTML = "";
@@ -1196,6 +1409,12 @@ function renderSearch() {
         </div>
         <div class="title">${highlight(r.label, q)}</div>
         <div class="sub">${highlight(r.sub, q)}</div>
+      </a>`)}
+    ${group("Index topics", g.topics || [], (r) => `
+      <a class="card" href="${r.hash}">
+        <div class="kicker">Index topic</div>
+        <div class="title">${highlight(r.label, q)}</div>
+        <div class="sub">${esc(r.sub)}</div>
       </a>`)}
     ${group("Chapters", g.chapters, (r) => `
       <a class="card" href="${r.hash}">
@@ -1289,6 +1508,7 @@ function registerServiceWorker() {
     await Promise.all([loadMaster(), loadInfractions()]);
     setStatus("Ready");
     await applyRoute();
+    loadStatutesIndex(); // large file — load without blocking first paint
     preloadAllTitles();
   } catch (e) {
     setStatus("Error");
