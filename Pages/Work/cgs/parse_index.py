@@ -148,6 +148,8 @@ class IndexParser:
         self.entry = None           # open entry: {"t": str}
         self.entry_level = 0
         self.just_opened = False    # heading opened by the previous line
+        self.opened_new = False     # last open_heading created a new heading
+        self.body_count = 99        # body lines since last "—Cont'd" heading
 
     def flush_entry(self):
         if not self.entry:
@@ -175,17 +177,41 @@ class IndexParser:
         existing = self.by_name.get(name)
         if existing is not None:
             self.heading = existing
+            self.opened_new = False
             return
         self.heading = {"h": name, "items": []}
         self.by_name[name] = self.heading
         self.headings.append(self.heading)
+        self.opened_new = True
+
+    def switch_to_wrapped(self, second_half):
+        """Handle the second line of a heading that wrapped at a column top.
+
+        "ADMINISTRATIVE SERVICES\nDEPARTMENT—Cont'd" makes the previous line
+        look like a heading of its own; if first+second names a known heading,
+        switch to it and drop the spurious fragment.
+        """
+        if not (self.just_opened and self.heading):
+            return False
+        candidate = self.join_wrapped(self.heading["h"], second_half)
+        target = self.by_name.get(candidate)
+        if target is None:
+            return False
+        if target is not self.heading and self.opened_new and not self.heading["items"]:
+            self.by_name.pop(self.heading["h"], None)
+            self.headings.remove(self.heading)
+        self.heading = target
+        return True
+
+    @staticmethod
+    def join_wrapped(cur, text):
+        # PDF line-break hyphens are soft: "MAM-" + "MOGRAPHIC" -> "MAMMOGRAPHIC"
+        if cur.endswith("-") and text[:1].isalpha():
+            return cur[:-1] + text
+        return cur + " " + text
 
     def join_entry(self, text):
-        cur = self.entry["t"]
-        if cur.endswith("-") and text[:1].islower():
-            self.entry["t"] = cur[:-1] + text
-        else:
-            self.entry["t"] = cur + " " + text
+        self.entry["t"] = self.join_wrapped(self.entry["t"], text)
 
     def feed_line(self, level, text):
         caps = is_caps(text)
@@ -193,14 +219,35 @@ class IndexParser:
         if CONTD_RE.search(text):
             base = CONTD_RE.sub("", text).strip().rstrip(",")
             # "HEADING—Cont'd" at a column top: re-establish heading context.
-            # Re-stated parent subentries ("Damages,—Cont'd") are skipped —
-            # their children attach to the original entry list.
-            if caps:
-                self.flush_entry()
+            # Re-stated parent subentries ("Damages,—Cont'd", "AIDS,—Cont'd")
+            # are skipped — their children attach to the original entry list.
+            restated_sub = re.search(r",\s*[—–-]\s*Cont", text)
+            if is_caps(base) and not restated_sub:
+                if self.switch_to_wrapped(base):
+                    self.body_count = 0
+                    self.just_opened = False
+                    return
+                # an entry cut off mid-line at the column break stays open so
+                # its continuation can rejoin after the Cont'd block
+                if self.entry and has_terminator(self.entry["t"]):
+                    self.flush_entry()
+                # when the previous line opened a heading, this Cont'd line is
+                # the second half of a wrapped "X—Cont'd" — use the full name
+                if self.just_opened and self.heading:
+                    base = self.join_wrapped(self.heading["h"], base)
                 if not self.heading or self.heading["h"] != base:
+                    self.flush_entry()
                     self.open_heading(base)
+                self.body_count = 0
+            elif (self.entry and self.body_count == 1
+                    and not has_terminator(self.entry["t"])):
+                # a long re-stated parent wraps: its first half was mistaken
+                # for a new entry on the previous line — drop it
+                self.entry = None
             self.just_opened = False
             return
+
+        self.body_count += 1
 
         # entry continuations come first: runovers are indented two steps past
         # their entry (and may be ALL CAPS, e.g. a wrapped See-reference)
@@ -211,16 +258,32 @@ class IndexParser:
                 self.join_entry(text)
                 return
 
-        if caps and level == 0 and not is_ref_only(text):
-            self.flush_entry()
-            if self.heading and not self.heading["items"] and self.just_opened:
-                # second line of a heading too long for one column width
+        # all-caps acronym subentries ("AIDS,", "PCB,") sit at the heading
+        # indent but end with a comma — real headings never do
+        caps_heading = caps and not text.rstrip().endswith(",")
+
+        if (caps_heading and self.just_opened and self.heading
+                and self.entry is None):
+            # likely the second line of a long heading
+            if self.switch_to_wrapped(text):
+                return
+            if self.opened_new and not self.heading["items"]:
                 del self.by_name[self.heading["h"]]
-                self.heading["h"] += " " + text
+                self.heading["h"] = self.join_wrapped(self.heading["h"], text)
                 self.by_name[self.heading["h"]] = self.heading
-            else:
-                self.open_heading(text)
-                self.just_opened = True
+                return
+            if level > 0:
+                # previous line reused an existing heading that is a prefix
+                # of this longer one ("HUMAN RIGHTS AND OPPORTUNITIES" /
+                # "…COMMISSION") — open the combined heading, leave the
+                # short one and its items intact
+                self.open_heading(self.join_wrapped(self.heading["h"], text))
+                return
+
+        if caps_heading and level == 0 and not is_ref_only(text):
+            self.flush_entry()
+            self.open_heading(text)
+            self.just_opened = True
             return
 
         self.just_opened = False
