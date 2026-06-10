@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CT General Statutes Explorer</title>
+  <meta name="description"
+    content="Browse and search the Connecticut General Statutes and the infraction schedule — works offline." />
+  <meta name="theme-color" content="#1e3a8a" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="./icon.svg" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body>
+  <a class="skip-link" href="#view">Skip to content</a>
+
+  <header>
+    <div class="header-row">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">§</span> CT General Statutes</div>
+      <nav class="tabs" aria-label="Main sections">
+        <a href="#/" id="tabBrowse" data-tab="browse">Browse</a>
+        <a href="#/i" id="tabInfractions" data-tab="infractions">Infractions</a>
+        <a href="#/b" id="tabBookmarks" data-tab="bookmarks">Bookmarks<span id="bmCount" class="count-badge"
+            hidden></span></a>
+      </nav>
+      <span class="pill" id="statusPill" role="status" aria-live="polite">Loading…</span>
+    </div>
+    <div class="header-row">
+      <div class="input">
+        <input id="q" type="search" placeholder='Search by keyword or statute number, e.g. “distracted driving” or “14-296aa”'
+          autocomplete="off" aria-label="Search statutes and infractions" />
+        <select id="scope" aria-label="Search scope">
+          <option value="nav" selected>Titles, sections &amp; infractions</option>
+          <option value="fulltext">Full text of statutes</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <aside aria-label="Navigation list">
+      <div class="row-between aside-head">
+        <div class="small muted" id="navHeading">Browse</div>
+        <button id="backBtn" class="btn small" hidden>← Back</button>
+      </div>
+      <div id="nav" class="list"></div>
+    </aside>
+
+    <section id="viewWrap">
+      <div class="breadcrumbs" id="crumbs"></div>
+      <div id="view" tabindex="-1"></div>
+    </section>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+
+</html>
