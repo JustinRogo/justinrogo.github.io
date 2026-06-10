@@ -63,6 +63,7 @@ const $ = (id) => document.getElementById(id);
 const navEl = $("nav");
 const viewEl = $("view");
 const crumbsEl = $("crumbs");
+const crumbsAsideEl = $("crumbsAside");
 const statusPill = $("statusPill");
 const qEl = $("q");
 const scopeEl = $("scope");
@@ -880,8 +881,17 @@ function setBackButtons(hidden) {
 }
 
 function render() {
+  renderInner();
+  // mobile title/chapter browsing shows the breadcrumbs in the list header
+  crumbsAsideEl.innerHTML = crumbsEl.innerHTML;
+}
+
+function renderInner() {
   updateBookmarkBadge();
   document.body.classList.toggle("no-aside", !mobileNeedsAside());
+  const r = state.route;
+  document.body.classList.toggle("list-nav",
+    !state.search.q && r.area === "browse" && !!r.titleKey && !r.sectionKey);
 
   if (state.search.q) {
     setTab(null);

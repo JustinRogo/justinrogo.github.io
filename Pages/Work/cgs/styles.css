@@ -358,6 +358,8 @@ a:hover { text-decoration: underline; }
 
 .back-top { display: none; }
 
+.crumbs-aside { display: none; }
+
 .breadcrumbs {
   font-size: 0.78125rem;
   color: var(--muted);
@@ -644,6 +646,19 @@ table.amounts tr.total th { font-weight: 700; }
      a back button appears beside the breadcrumbs instead */
   body.no-aside aside { display: none; }
   body.no-aside .back-top:not([hidden]) { display: inline-block; white-space: nowrap; }
+
+  /* title/chapter browsing hides the placeholder content panel so the
+     navigation list gets the full screen; breadcrumbs move into the
+     list header beside the back button */
+  body.list-nav #viewWrap { display: none; }
+  body.list-nav aside { max-height: none; border-bottom: none; }
+  body.list-nav #navHeading { display: none; }
+  body.list-nav .crumbs-aside {
+    display: block;
+    flex: 1;
+    margin-bottom: 0;
+    min-width: 0;
+  }
 
   .settings-panel {
     top: auto;
