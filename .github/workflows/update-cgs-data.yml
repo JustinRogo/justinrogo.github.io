@@ -1,0 +1,104 @@
+name: Update CGS data
+
+# Re-runs the CGS Explorer data pipelines against the official sources and
+# opens a pull request when anything changed:
+#   - infraction schedule  (jud.ct.gov PDF -> data/infractions.json)
+#   - LCO subject index    (cga.ct.gov PDFs -> data/statutes_index.json)
+#   - statute text         (cga.ct.gov crawl -> data/title_*.json, opt-in)
+#
+# Runs monthly, or on demand from the Actions tab. Tick "crawl_statutes"
+# there to also re-crawl the statute text (adds ~25 minutes).
+#
+# Requires: repo Settings -> Actions -> General -> Workflow permissions ->
+# "Allow GitHub Actions to create and approve pull requests".
+
+on:
+  schedule:
+    - cron: "17 9 1 * *" # 09:17 UTC on the 1st of each month
+  workflow_dispatch:
+    inputs:
+      crawl_statutes:
+        description: "Also re-crawl all statute text (slow, ~25 min)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Pages/Work/cgs
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4 certifi pdfplumber
+
+      # cga.ct.gov and jud.ct.gov serve incomplete certificate chains, so
+      # downloads use -k like the crawler itself does.
+      - name: Download infraction schedule PDF
+        run: curl -ksSf -o infractions_schedule.pdf "https://www.jud.ct.gov/webforms/forms/infractions.pdf"
+
+      - name: Download LCO subject index PDFs
+        run: |
+          page=$(curl -ksSf "https://www.cga.ct.gov/lco/statutes-index.asp")
+          for name in "Index A-H" "Index I-S" "Index T-Z"; do
+            path=$(printf '%s' "$page" | grep -oiE "href=\"[^\"]*${name}\.pdf\"" | head -1 | sed 's/^href="//; s/"$//')
+            if [ -z "$path" ]; then
+              echo "::error::Could not find a link to '${name}.pdf' on statutes-index.asp"
+              exit 1
+            fi
+            url="https://www.cga.ct.gov/lco/${path// /%20}"
+            echo "Downloading ${url}"
+            curl -ksSf -o "${name}.pdf" "$url"
+          done
+
+      - name: Re-crawl statute text
+        if: ${{ inputs.crawl_statutes == true }}
+        run: python ct_CGS_Crawl-v2.py --no-ssl-verify
+
+      - name: Parse infraction schedule
+        run: python parse_infractions.py
+
+      - name: Parse subject index
+        run: python parse_index.py
+
+      - name: Summarize changes
+        id: diff
+        working-directory: .
+        run: |
+          git add -N Pages/Work/cgs/data
+          {
+            echo "summary<<EOF"
+            git diff --stat -- Pages/Work/cgs/data || true
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          add-paths: Pages/Work/cgs/data/**
+          branch: auto/cgs-data-update
+          delete-branch: true
+          commit-message: "Update CGS data from official sources"
+          title: "Update CGS data (automated)"
+          body: |
+            Automated refresh of the CGS Explorer data from the official sources:
+
+            - Infraction schedule: https://www.jud.ct.gov/webforms/forms/infractions.pdf
+            - LCO subject index: https://www.cga.ct.gov/lco/statutes-index.asp
+            - Statute text crawl included: ${{ inputs.crawl_statutes == true }}
+
+            ```
+            ${{ steps.diff.outputs.summary }}
+            ```
+
+            Review the parser summary lines in the job log before merging.
