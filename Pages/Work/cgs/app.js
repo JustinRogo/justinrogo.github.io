@@ -1235,15 +1235,6 @@ function renderBreadcrumbs({ titleEntry, chapter, section }) {
 }
 
 function renderHome() {
-  const p = state.preload;
-  const offlineLine = p.running
-    ? `Downloading titles for offline use: ${p.loaded}/${p.total}`
-    : p.done && !p.failed
-      ? `All ${p.total} titles are stored on this device — the app now works without an internet connection.`
-      : p.done
-        ? `${p.loaded}/${p.total} titles stored offline (${p.failed} failed — they will retry next visit).`
-        : "Preparing offline storage…";
-
   const inf = state.infractions;
   viewEl.innerHTML = `
     <h1 class="h1">Connecticut General Statutes</h1>
@@ -1252,30 +1243,22 @@ function renderHome() {
       (for example <a href="#" id="exampleSearch">14-296aa</a>), bookmark what you use most, and share sections by email.</p>
 
     <div class="home-grid">
-      <div class="home-card">
+      <a class="home-card" href="${hashFor.titles()}">
         <h2>📚 Browse statutes</h2>
-        <p>${(state.master?.titles || []).length} titles, from Provisions of General Application to Probate.
-          <a href="${hashFor.titles()}">Open the title list →</a></p>
-      </div>
-      <div class="home-card">
+        <p>Every title, chapter and section of the General Statutes.</p>
+      </a>
+      <a class="home-card" href="${hashFor.index()}">
         <h2>🔎 Subject index</h2>
-        <p>${state.statIndex ? `${state.statIndex.headings.length.toLocaleString()} topics from the official LCO index, A to Z.` : "Loading the official subject index…"}
-          <a href="${hashFor.index()}">Browse the index →</a></p>
-      </div>
-      <div class="home-card">
+        <p>Look up any topic, A to Z, in the official LCO index.</p>
+      </a>
+      <a class="home-card" href="${hashFor.infractions()}">
         <h2>🎫 Infraction schedule</h2>
-        <p>${inf ? `${inf.entries.length} infractions & violations, linked to their statutes.` : "Not available."}</p>
-        <p>${inf?.source?.effective ? `Effective ${esc(inf.source.effective)}.` : ""} <a href="${hashFor.infractions()}">Open the schedule →</a></p>
-      </div>
-      <div class="home-card">
-        <h2>📴 Offline access</h2>
-        <p id="offlineLine">${esc(offlineLine)}</p>
-        <p class="small muted">Theme, text size and data refresh live in ⚙ Settings (top right).</p>
-      </div>
-      <div class="home-card">
+        <p>Infractions &amp; violations with fine amounts, linked to their statutes.${inf?.source?.effective ? ` Effective ${esc(inf.source.effective)}.` : ""}</p>
+      </a>
+      <a class="home-card" href="${hashFor.bookmarks()}">
         <h2>★ Bookmarks</h2>
-        <p>${state.bookmarks.length ? `${state.bookmarks.length} saved.` : "Bookmark sections and infractions to find them quickly."} <a href="${hashFor.bookmarks()}">View bookmarks →</a></p>
-      </div>
+        <p>Bookmark sections and infractions to find them quickly.</p>
+      </a>
     </div>
   `;
 
