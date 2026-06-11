@@ -613,6 +613,20 @@ a.home-card:hover {
   background: var(--panel);
 }
 
+/* ---------- Home sections (recents, bookmarks) ---------- */
+.home-section {
+  margin-top: 24px;
+  max-width: 900px;
+}
+
+.home-section h2 {
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin: 0 0 8px;
+}
+
 /* ---------- Focus & a11y ---------- */
 :focus-visible {
   outline: 2px solid var(--accent);

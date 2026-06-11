@@ -22,6 +22,9 @@ const PRELOAD_YIELD_MS = 30;
 const DATA_CACHE = "cgs-data-v1";  // must match sw.js
 
 const BOOKMARKS_KEY = "cgs:bookmarks:v1";
+const RECENT_KEY = "cgs:recent:v1";
+const RECENT_MAX = 20;   // kept in storage
+const HOME_ROWS = 5;     // shown on the home page per section
 const THEME_KEY = "cgs:theme";       // "light" | "dark" pins a theme; unset follows the system
 const TEXT_SIZE_KEY = "cgs:textsize"; // font scale factor; unset = 1
 const DENSITY_KEY = "cgs:density";    // "compact"; unset = comfortable
@@ -53,6 +56,7 @@ const state = {
   route: { area: "browse", titleKey: null, chapterKey: null, sectionKey: null, category: null, infraId: null, letter: null, headingSlug: null },
   search: { q: "", scope: "nav", results: null, posTerms: [] },
   bookmarks: [],
+  recents: [],
 
   preload: { running: false, loaded: 0, total: 0, failed: 0, done: false },
 };
@@ -390,6 +394,33 @@ function toggleInfraBookmark(id, statNo, label) {
   if (i >= 0) state.bookmarks.splice(i, 1);
   else state.bookmarks.push({ type: "i", id, statNo, label, ts: Date.now() });
   saveBookmarks();
+}
+
+// -----------------------------
+// RECENTLY VIEWED (localStorage)
+// -----------------------------
+function loadRecents() {
+  try {
+    const raw = localStorage.getItem(RECENT_KEY);
+    state.recents = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(state.recents)) state.recents = [];
+  } catch {
+    state.recents = [];
+  }
+}
+
+function recentIdentity(r) {
+  return r.type === "s" ? `s:${r.t}:${r.c}:${r.s}` : `i:${r.id}`;
+}
+
+function recordRecent(item) {
+  const id = recentIdentity(item);
+  state.recents = state.recents.filter((r) => recentIdentity(r) !== id);
+  state.recents.unshift({ ...item, ts: Date.now() });
+  state.recents.length = Math.min(state.recents.length, RECENT_MAX);
+  try {
+    localStorage.setItem(RECENT_KEY, JSON.stringify(state.recents));
+  } catch { /* private mode — recents last for this session only */ }
 }
 
 // -----------------------------
@@ -1171,6 +1202,14 @@ function renderSectionView(section, titleEntry, chapter) {
 
   const bookmarked = findSectionBookmark(titleEntry.title_key, chapter.chapter_key, section.section_key) >= 0;
 
+  recordRecent({
+    type: "s",
+    t: titleEntry.title_key,
+    c: chapter.chapter_key,
+    s: section.section_key,
+    label: section.label || `Sec. ${section.section_key}`,
+  });
+
   viewEl.innerHTML = `
     <div class="section-label">${esc(section.label || `Sec. ${section.section_key}`)}</div>
     <div class="meta">
@@ -1234,6 +1273,27 @@ function renderBreadcrumbs({ titleEntry, chapter, section }) {
   return parts.join(` <span class="muted">/</span> `);
 }
 
+// compact row list for the home page (recents, bookmarks); items share the
+// bookmark shape: {type:"s",t,c,s,label} or {type:"i",id,statNo,label}
+function renderHomeRows(heading, items, viewAllHash) {
+  if (!items.length) return "";
+  return `
+    <div class="home-section">
+      <div class="row-between">
+        <h2>${esc(heading)}</h2>
+        ${viewAllHash ? `<a class="small" href="${viewAllHash}">View all →</a>` : ""}
+      </div>
+      <div class="list">
+        ${items.map((r) => `
+          <a class="card" href="${bookmarkHash(r)}">
+            <div class="kicker">${r.type === "s" ? "Statute" : `Infraction § ${esc(r.statNo)}`}</div>
+            <div class="title">${esc(r.label)}</div>
+          </a>`).join("")}
+      </div>
+    </div>
+  `;
+}
+
 function renderHome() {
   const inf = state.infractions;
   viewEl.innerHTML = `
@@ -1260,6 +1320,10 @@ function renderHome() {
         <p>Bookmark sections and infractions to find them quickly.</p>
       </a>
     </div>
+    ${renderHomeRows("🕘 Recently viewed", state.recents.slice(0, HOME_ROWS), null)}
+    ${renderHomeRows("★ Bookmarks",
+    [...state.bookmarks].sort((a, b) => b.ts - a.ts).slice(0, HOME_ROWS),
+    state.bookmarks.length > HOME_ROWS ? hashFor.bookmarks() : null)}
   `;
 
   $("exampleSearch")?.addEventListener("click", (ev) => {
@@ -1476,6 +1540,8 @@ function renderInfractionDetail(e) {
   crumbsEl.innerHTML += ` <span class="muted">/</span> <span>§ ${esc(cite(e))}</span>`;
 
   const bookmarked = findInfraBookmark(e.id) >= 0;
+
+  recordRecent({ type: "i", id: e.id, statNo: cite(e), label: e.description });
   const order = [
     ["fine", "Fine"], ["fee", "Additional fee (C.G.S. § 51-56a(c))"], ["z_fee", "Zone (Z) fee"],
     ["cost", "Cost (C.G.S. § 54-143(a))"], ["surcharge", "Surcharge (C.G.S. § 54-143a)"],
@@ -1733,6 +1799,7 @@ function registerServiceWorker() {
 
 (async function main() {
   loadBookmarks();
+  loadRecents();
   applySettings();
   bindSettings();
   updateBookmarkBadge();
