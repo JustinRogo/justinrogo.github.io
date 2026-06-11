@@ -145,7 +145,7 @@ function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
 function parseHash() {
   const h = location.hash || "#/";
   const parts = h.replace(/^#\/?/, "").split("/").filter(Boolean).map(decodeURIComponent);
-  const r = { area: "browse", titleKey: null, chapterKey: null, sectionKey: null, category: null, infraId: null, letter: null, headingSlug: null };
+  const r = { area: "browse", titleKey: null, chapterKey: null, sectionKey: null, category: null, infraId: null, letter: null, headingSlug: null, titlesList: false };
 
   if (parts[0] === "x") {
     r.area = "index";
@@ -163,6 +163,11 @@ function parseHash() {
     r.area = "bookmarks";
     return r;
   }
+  if (parts[0] === "titles") {
+    r.area = "browse";
+    r.titlesList = true;
+    return r;
+  }
   for (let i = 0; i < parts.length; i += 2) {
     const k = parts[i], v = parts[i + 1];
     if (k === "t") r.titleKey = v;
@@ -174,6 +179,7 @@ function parseHash() {
 
 const hashFor = {
   home: () => "#/",
+  titles: () => "#/titles",
   title: (t) => `#/t/${encodeURIComponent(t)}`,
   chapter: (t, c) => `#/t/${encodeURIComponent(t)}/c/${encodeURIComponent(c)}`,
   section: (t, c, s) => `#/t/${encodeURIComponent(t)}/c/${encodeURIComponent(c)}/s/${encodeURIComponent(s)}`,
@@ -193,7 +199,8 @@ function parentHash() {
   if (r.area === "browse") {
     if (r.sectionKey) return hashFor.chapter(r.titleKey, r.chapterKey);
     if (r.chapterKey) return hashFor.title(r.titleKey);
-    if (r.titleKey) return hashFor.home();
+    if (r.titleKey) return hashFor.titles();
+    if (r.titlesList) return hashFor.home();
     return null;
   }
   if (r.area === "index") {
@@ -964,7 +971,7 @@ function setTab(area) {
 function mobileNeedsAside() {
   if (state.search.q) return false;
   const r = state.route;
-  if (r.area === "browse") return !r.sectionKey;
+  if (r.area === "browse") return r.titlesList || (!!r.titleKey && !r.sectionKey);
   if (r.area === "infractions") return !r.category && !r.infraId;
   return false;
 }
@@ -985,7 +992,8 @@ function renderInner() {
   document.body.classList.toggle("no-aside", !mobileNeedsAside());
   const r = state.route;
   document.body.classList.toggle("list-nav",
-    !state.search.q && r.area === "browse" && !!r.titleKey && !r.sectionKey);
+    !state.search.q && r.area === "browse" &&
+    (r.titlesList || (!!r.titleKey && !r.sectionKey)));
 
   if (state.search.q) {
     setTab(null);
@@ -1075,7 +1083,13 @@ function renderBrowseView() {
   crumbsEl.innerHTML = renderBreadcrumbs({ titleEntry, chapter, section });
 
   if (!titleKey) {
-    renderHome();
+    if (state.route.titlesList) {
+      viewEl.innerHTML = `
+        <h1 class="h1">Titles</h1>
+        <div class="empty">Select a title from the list to drill into its chapters and sections.</div>`;
+    } else {
+      renderHome();
+    }
     return;
   }
 
@@ -1183,7 +1197,7 @@ function renderInfractionsForSection(entries) {
 }
 
 function renderBreadcrumbs({ titleEntry, chapter, section }) {
-  const parts = [`<a href="#/">Titles</a>`];
+  const parts = [`<a href="${hashFor.titles()}">Titles</a>`];
   if (titleEntry) parts.push(`<a href="${hashFor.title(titleEntry.title_key)}">${esc(titleEntry.label)}</a>`);
   if (titleEntry && chapter) parts.push(`<a href="${hashFor.chapter(titleEntry.title_key, chapter.chapter_key)}">${esc(chapter.label)}</a>`);
   if (section) parts.push(`<span>Sec. ${esc(section.section_key)}</span>`);
@@ -1210,7 +1224,8 @@ function renderHome() {
     <div class="home-grid">
       <div class="home-card">
         <h2>📚 Browse statutes</h2>
-        <p>${(state.master?.titles || []).length} titles. Pick one from the list to drill into chapters and sections.</p>
+        <p>${(state.master?.titles || []).length} titles, from Provisions of General Application to Probate.
+          <a href="${hashFor.titles()}">Open the title list →</a></p>
       </div>
       <div class="home-card">
         <h2>🔎 Subject index</h2>
