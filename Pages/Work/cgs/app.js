@@ -50,7 +50,7 @@ const state = {
   sectionLoc: new Map(),         // section_key -> {t, c} (first occurrence)
 
   route: { area: "browse", titleKey: null, chapterKey: null, sectionKey: null, category: null, infraId: null, letter: null, headingSlug: null },
-  search: { q: "", scope: "nav", results: null },
+  search: { q: "", scope: "nav", results: null, posTerms: [] },
   bookmarks: [],
 
   preload: { running: false, loaded: 0, total: 0, failed: 0, done: false },
@@ -101,13 +101,16 @@ function escapeRegExp(str) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-// Escaped HTML with <mark> around query tokens
+// Escaped HTML with <mark> around the query's positive terms
 function highlight(text, query) {
   if (!text) return "";
-  query = (query || "").trim();
-  if (!query) return esc(text);
-  const tokens = query.split(/\s+/).filter(Boolean).map(escapeRegExp);
-  if (!tokens.length) return esc(text);
+  let terms = state.search.posTerms;
+  if (!terms || !terms.length) {
+    terms = (query || "").trim().split(/\s+/).filter(Boolean);
+  }
+  if (!terms.length) return esc(text);
+  // longest first so phrases win over the words inside them
+  const tokens = [...terms].sort((a, b) => b.length - a.length).map(escapeRegExp);
   const re = new RegExp("(" + tokens.join("|") + ")", "ig");
   return esc(text).replace(re, "<mark>$1</mark>");
 }
@@ -631,6 +634,90 @@ async function preloadAllTitles() {
 // -----------------------------
 const STAT_QUERY_RE = /^(?:sec(?:tion)?\.?\s*|§\s*)?(\d+[a-z]{0,2}-\d+[a-z]{0,3})\.?$/i;
 
+// --- boolean query language: terms are ANDed by default; AND / OR / NOT
+// (capitals) and a leading "-" combine them; "double quotes" match exact
+// phrases; parentheses group. Lowercase and/or/not stay literal words so
+// legal phrases like "aiding and abetting" search naturally.
+function parseQuery(raw) {
+  const toks = raw.match(/"[^"]*"?|\(|\)|[^\s()"]+/g) || [];
+  let i = 0;
+
+  function parseOr() {
+    let left = parseAnd();
+    while (i < toks.length && toks[i] === "OR") {
+      i++;
+      const right = parseAnd();
+      if (right) left = left ? { type: "or", a: left, b: right } : right;
+    }
+    return left;
+  }
+
+  function parseAnd() {
+    const kids = [];
+    while (i < toks.length && toks[i] !== ")" && toks[i] !== "OR") {
+      if (toks[i] === "AND") { i++; continue; }
+      const t = parseTerm();
+      if (t) kids.push(t);
+    }
+    if (!kids.length) return null;
+    return kids.length === 1 ? kids[0] : { type: "and", kids };
+  }
+
+  function parseTerm() {
+    let tok = toks[i];
+    if (tok === ")") return null; // parseAnd's loop ends on this token
+    if (tok === "NOT") {
+      i++;
+      const kid = parseTerm();
+      return kid ? { type: "not", kid } : null;
+    }
+    if (tok === "(") {
+      i++;
+      const e = parseOr();
+      if (toks[i] === ")") i++;
+      return e;
+    }
+    i++;
+    let negate = false;
+    if (tok.length > 1 && tok[0] === "-" && tok[1] !== '"') {
+      negate = true;
+      tok = tok.slice(1);
+    }
+    tok = tok.replace(/^"|"$/g, "").toLowerCase().trim();
+    if (!tok) return null;
+    const term = { type: "term", text: tok };
+    return negate ? { type: "not", kid: term } : term;
+  }
+
+  return parseOr();
+}
+
+function evalQuery(node, hay) {
+  switch (node.type) {
+    case "term": return hay.includes(node.text);
+    case "not": return !evalQuery(node.kid, hay);
+    case "and": return node.kids.every((k) => evalQuery(k, hay));
+    case "or": return evalQuery(node.a, hay) || evalQuery(node.b, hay);
+  }
+  return false;
+}
+
+// non-negated terms, used for highlighting and snippets
+function collectPositive(node, negated = false, out = []) {
+  if (!node) return out;
+  if (node.type === "term") {
+    if (!negated) out.push(node.text);
+  } else if (node.type === "not") {
+    collectPositive(node.kid, !negated, out);
+  } else if (node.type === "and") {
+    node.kids.forEach((k) => collectPositive(k, negated, out));
+  } else {
+    collectPositive(node.a, negated, out);
+    collectPositive(node.b, negated, out);
+  }
+  return out;
+}
+
 function setSearch(q, scope) {
   state.search.q = q.trim();
   state.search.scope = scope;
@@ -642,16 +729,18 @@ function runSearch() {
   const qRaw = state.search.q;
   if (!qRaw) {
     state.search.results = null;
+    state.search.posTerms = [];
     return;
   }
-  const q = qRaw.toLowerCase();
   const statMatch = qRaw.match(STAT_QUERY_RE);
   const statKey = statMatch ? statMatch[1].toLowerCase() : null;
-  const tokens = q.split(/\s+/).filter(Boolean);
+  const ast = parseQuery(qRaw);
+  const posTerms = collectPositive(ast);
+  state.search.posTerms = posTerms;
 
   const groups = { sections: [], infractions: [], topics: [], chapters: [], titles: [] };
 
-  const matchesTokens = (hay) => tokens.every((tok) => hay.includes(tok));
+  const matchesTokens = (hay) => (ast ? evalQuery(ast, hay) : false);
 
   // --- titles (always available from master)
   for (const t of state.master?.titles || []) {
@@ -719,9 +808,14 @@ function runSearch() {
           if (!text) continue;
           const hay = text.toLowerCase();
           if (!matchesTokens(hay)) continue;
-          const idx = hay.indexOf(tokens[0]);
+          let idx = -1, hitLen = 0;
+          for (const t of posTerms) {
+            idx = hay.indexOf(t);
+            if (idx !== -1) { hitLen = t.length; break; }
+          }
+          if (idx === -1) idx = 0; // e.g. purely negative query
           const start = Math.max(0, idx - 60);
-          const end = Math.min(text.length, idx + tokens[0].length + 110);
+          const end = Math.min(text.length, idx + hitLen + 110);
           groups.sections.push({
             label: stripSectionPrefix(s.label || s.section_key) || s.section_key,
             sub: `${tLabel} • ${fmtChapter(c)}`,
@@ -1503,7 +1597,11 @@ function renderSearch() {
       <span class="muted">${state.search.scope === "fulltext" ? "Full text of statutes" : "Titles, sections & infractions"}</span>
       ${stillLoading}
     </div>
-    ${totals === 0 ? `<div class="empty">No results for “${esc(q)}”. Try fewer words, a statute number like “14-227a”, or the full-text scope.</div>` : ""}
+    ${totals === 0 ? `<div class="empty">No results for “${esc(q)}”. Try fewer words, a statute number like “14-227a”,
+      the full-text scope, or boolean operators — e.g. <code>leash OR muzzle</code>.</div>` : ""}
+    <p class="small muted search-tips">Advanced: words combine with AND by default · <code>leash OR muzzle</code> ·
+      <code>dog NOT license</code> or <code>-license</code> · <code>"evading responsibility"</code> for exact phrases ·
+      <code>(dog OR cat) AND bite</code> — operators must be CAPITALIZED.</p>
     ${group("Statute sections", g.sections, (r) => `
       <a class="card" href="${r.hash}">
         <div class="kicker">Section${r.exact ? ` <span class="tag">exact match</span>` : ""}</div>

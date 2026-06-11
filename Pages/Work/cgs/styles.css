@@ -487,6 +487,15 @@ mark {
 }
 
 /* ---------- Search results ---------- */
+.search-tips { max-width: 85ch; }
+
+.search-tips code {
+  background: var(--panel-2);
+  border-radius: 6px;
+  padding: 1px 5px;
+  font-size: 0.72rem;
+}
+
 .result-group { margin: 18px 0 8px; }
 
 .result-group h2 {
