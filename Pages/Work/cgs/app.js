@@ -992,8 +992,10 @@ function renderInner() {
   document.body.classList.toggle("no-aside", !mobileNeedsAside());
   const r = state.route;
   document.body.classList.toggle("list-nav",
-    !state.search.q && r.area === "browse" &&
-    (r.titlesList || (!!r.titleKey && !r.sectionKey)));
+    !state.search.q && (
+      (r.area === "browse" && (r.titlesList || (!!r.titleKey && !r.sectionKey))) ||
+      (r.area === "infractions" && !r.category && !r.infraId)
+    ));
 
   if (state.search.q) {
     setTab(null);
