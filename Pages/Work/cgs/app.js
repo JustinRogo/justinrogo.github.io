@@ -48,6 +48,7 @@ const state = {
   chapterByKey: new Map(),       // `${t}:${c}` -> chapter
   sectionByKey: new Map(),       // `${t}:${c}:${s}` -> section
   sectionLoc: new Map(),         // section_key -> {t, c} (first occurrence)
+  chapterLoc: new Map(),         // chapter number (incl. unpadded) -> {t, c}
 
   route: { area: "browse", titleKey: null, chapterKey: null, sectionKey: null, category: null, infraId: null, letter: null, headingSlug: null },
   search: { q: "", scope: "nav", results: null, posTerms: [] },
@@ -564,6 +565,12 @@ async function loadStatutesIndex() {
 function indexLoadedTitle(titleObj) {
   for (const c of titleObj.chapters || []) {
     state.chapterByKey.set(keyChapter(titleObj.title_key, c.chapter_key), c);
+    const loc = { t: titleObj.title_key, c: c.chapter_key };
+    const unpadded = c.chapter_key.replace(/^0+(?=\d)/, "");
+    if (!state.chapterLoc.has(unpadded)) {
+      state.chapterLoc.set(unpadded, loc);
+      state.chapterLoc.set(c.chapter_key, loc);
+    }
     for (const s of c.sections || []) {
       if (!s.section_key) continue;
       state.sectionByKey.set(keySection(titleObj.title_key, c.chapter_key, s.section_key), s);
@@ -897,6 +904,27 @@ function runSearch() {
 // -----------------------------
 // RENDER — shared widgets
 // -----------------------------
+
+// Wrap statute citations in already-escaped text with links. Tokens only
+// link when they resolve in the loaded data, which filters false positives
+// like year ranges ("2019-2020" is not a section). Run on escaped HTML.
+function linkifyCitations(escapedText, selfKey) {
+  let html = escapedText.replace(/\b\d+[a-z]{0,3}-\d+[a-z]{0,3}\b/g, (token, offset, str) => {
+    if (token === selfKey) return token;
+    // public/special act numbers ("P.A. 14-130") share the section format
+    const before = str.slice(Math.max(0, offset - 12), offset);
+    if (/(?:P\.?A\.?|S\.?A\.?|act)\s*$/i.test(before)) return token;
+    const loc = state.sectionLoc.get(token);
+    if (!loc) return token;
+    return `<a href="${hashFor.section(loc.t, loc.c, token)}">${token}</a>`;
+  });
+  html = html.replace(/\b(chapters?\s+)(\d+[a-z]?)\b/gi, (m, word, num) => {
+    const loc = state.chapterLoc.get(num.toLowerCase());
+    if (!loc) return m;
+    return `${word}<a href="${hashFor.chapter(loc.t, loc.c)}">${num}</a>`;
+  });
+  return html;
+}
 function renderList(items) {
   const wrap = document.createElement("div");
   wrap.className = "list";
@@ -917,19 +945,19 @@ function renderList(items) {
   return wrap;
 }
 
-function renderPanel(title, arr, open = false) {
+function renderPanel(title, arr, open = false, selfKey = null) {
   const count = Array.isArray(arr) ? arr.length : 0;
   return `
     <details${open && count ? " open" : ""}>
       <summary>${esc(title)} <span class="muted">(${count})</span></summary>
       <div class="panel">
-        ${count ? arr.map((p) => `<p>${esc(p)}</p>`).join("") : `<div class="muted">None.</div>`}
+        ${count ? arr.map((p) => `<p>${linkifyCitations(esc(p), selfKey)}</p>`).join("") : `<div class="muted">None.</div>`}
       </div>
     </details>
   `;
 }
 
-function renderAnnotationsPanel(title, arr) {
+function renderAnnotationsPanel(title, arr, selfKey = null) {
   const count = Array.isArray(arr) ? arr.length : 0;
   return `
     <details>
@@ -937,8 +965,8 @@ function renderAnnotationsPanel(title, arr) {
       <div class="panel">
         ${count
       ? arr.map((a) => {
-        const text = a.text || "";
-        return `<p>${a.first ? `<strong>${esc(text)}</strong>` : esc(text)}</p>`;
+        const text = linkifyCitations(esc(a.text || ""), selfKey);
+        return `<p>${a.first ? `<strong>${text}</strong>` : text}</p>`;
       }).join("")
       : `<div class="muted">None.</div>`}
       </div>
@@ -1155,14 +1183,14 @@ function renderSectionView(section, titleEntry, chapter) {
 
     <div class="body">
       ${body.length
-      ? body.map((p) => `<p>${esc(p)}</p>`).join("")
+      ? body.map((p) => `<p>${linkifyCitations(esc(p), section.section_key)}</p>`).join("")
       : `<div class="empty">No statute body text found for this section.</div>`}
     </div>
 
     ${infraEntries.length ? renderInfractionsForSection(infraEntries) : ""}
-    ${renderPanel("Source", source)}
-    ${renderPanel("History", history)}
-    ${renderAnnotationsPanel("Annotations", annotations)}
+    ${renderPanel("Source", source, false, section.section_key)}
+    ${renderPanel("History", history, false, section.section_key)}
+    ${renderAnnotationsPanel("Annotations", annotations, section.section_key)}
   `;
 
   viewEl.querySelector('[data-action="bookmark"]').addEventListener("click", () => {
