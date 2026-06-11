@@ -22,6 +22,9 @@ const PRELOAD_YIELD_MS = 30;
 const DATA_CACHE = "cgs-data-v1";  // must match sw.js
 
 const BOOKMARKS_KEY = "cgs:bookmarks:v1";
+const RECENT_KEY = "cgs:recent:v1";
+const RECENT_MAX = 20;   // kept in storage
+const HOME_ROWS = 5;     // shown on the home page per section
 const THEME_KEY = "cgs:theme";       // "light" | "dark" pins a theme; unset follows the system
 const TEXT_SIZE_KEY = "cgs:textsize"; // font scale factor; unset = 1
 const DENSITY_KEY = "cgs:density";    // "compact"; unset = comfortable
@@ -53,6 +56,7 @@ const state = {
   route: { area: "browse", titleKey: null, chapterKey: null, sectionKey: null, category: null, infraId: null, letter: null, headingSlug: null },
   search: { q: "", scope: "nav", results: null, posTerms: [] },
   bookmarks: [],
+  recents: [],
 
   preload: { running: false, loaded: 0, total: 0, failed: 0, done: false },
 };
@@ -390,6 +394,33 @@ function toggleInfraBookmark(id, statNo, label) {
   if (i >= 0) state.bookmarks.splice(i, 1);
   else state.bookmarks.push({ type: "i", id, statNo, label, ts: Date.now() });
   saveBookmarks();
+}
+
+// -----------------------------
+// RECENTLY VIEWED (localStorage)
+// -----------------------------
+function loadRecents() {
+  try {
+    const raw = localStorage.getItem(RECENT_KEY);
+    state.recents = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(state.recents)) state.recents = [];
+  } catch {
+    state.recents = [];
+  }
+}
+
+function recentIdentity(r) {
+  return r.type === "s" ? `s:${r.t}:${r.c}:${r.s}` : `i:${r.id}`;
+}
+
+function recordRecent(item) {
+  const id = recentIdentity(item);
+  state.recents = state.recents.filter((r) => recentIdentity(r) !== id);
+  state.recents.unshift({ ...item, ts: Date.now() });
+  state.recents.length = Math.min(state.recents.length, RECENT_MAX);
+  try {
+    localStorage.setItem(RECENT_KEY, JSON.stringify(state.recents));
+  } catch { /* private mode — recents last for this session only */ }
 }
 
 // -----------------------------
@@ -1171,6 +1202,14 @@ function renderSectionView(section, titleEntry, chapter) {
 
   const bookmarked = findSectionBookmark(titleEntry.title_key, chapter.chapter_key, section.section_key) >= 0;
 
+  recordRecent({
+    type: "s",
+    t: titleEntry.title_key,
+    c: chapter.chapter_key,
+    s: section.section_key,
+    label: section.label || `Sec. ${section.section_key}`,
+  });
+
   viewEl.innerHTML = `
     <div class="section-label">${esc(section.label || `Sec. ${section.section_key}`)}</div>
     <div class="meta">
@@ -1234,16 +1273,28 @@ function renderBreadcrumbs({ titleEntry, chapter, section }) {
   return parts.join(` <span class="muted">/</span> `);
 }
 
-function renderHome() {
-  const p = state.preload;
-  const offlineLine = p.running
-    ? `Downloading titles for offline use: ${p.loaded}/${p.total}`
-    : p.done && !p.failed
-      ? `All ${p.total} titles are stored on this device — the app now works without an internet connection.`
-      : p.done
-        ? `${p.loaded}/${p.total} titles stored offline (${p.failed} failed — they will retry next visit).`
-        : "Preparing offline storage…";
+// compact row list for the home page (recents, bookmarks); items share the
+// bookmark shape: {type:"s",t,c,s,label} or {type:"i",id,statNo,label}
+function renderHomeRows(heading, items, viewAllHash) {
+  if (!items.length) return "";
+  return `
+    <div class="home-section">
+      <div class="row-between">
+        <h2>${esc(heading)}</h2>
+        ${viewAllHash ? `<a class="small" href="${viewAllHash}">View all →</a>` : ""}
+      </div>
+      <div class="list">
+        ${items.map((r) => `
+          <a class="card" href="${bookmarkHash(r)}">
+            <div class="kicker">${r.type === "s" ? "Statute" : `Infraction § ${esc(r.statNo)}`}</div>
+            <div class="title">${esc(r.label)}</div>
+          </a>`).join("")}
+      </div>
+    </div>
+  `;
+}
 
+function renderHome() {
   const inf = state.infractions;
   viewEl.innerHTML = `
     <h1 class="h1">Connecticut General Statutes</h1>
@@ -1252,31 +1303,27 @@ function renderHome() {
       (for example <a href="#" id="exampleSearch">14-296aa</a>), bookmark what you use most, and share sections by email.</p>
 
     <div class="home-grid">
-      <div class="home-card">
+      <a class="home-card" href="${hashFor.titles()}">
         <h2>📚 Browse statutes</h2>
-        <p>${(state.master?.titles || []).length} titles, from Provisions of General Application to Probate.
-          <a href="${hashFor.titles()}">Open the title list →</a></p>
-      </div>
-      <div class="home-card">
+        <p>Every title, chapter and section of the General Statutes.</p>
+      </a>
+      <a class="home-card" href="${hashFor.index()}">
         <h2>🔎 Subject index</h2>
-        <p>${state.statIndex ? `${state.statIndex.headings.length.toLocaleString()} topics from the official LCO index, A to Z.` : "Loading the official subject index…"}
-          <a href="${hashFor.index()}">Browse the index →</a></p>
-      </div>
-      <div class="home-card">
+        <p>Look up any topic, A to Z, in the official LCO index.</p>
+      </a>
+      <a class="home-card" href="${hashFor.infractions()}">
         <h2>🎫 Infraction schedule</h2>
-        <p>${inf ? `${inf.entries.length} infractions & violations, linked to their statutes.` : "Not available."}</p>
-        <p>${inf?.source?.effective ? `Effective ${esc(inf.source.effective)}.` : ""} <a href="${hashFor.infractions()}">Open the schedule →</a></p>
-      </div>
-      <div class="home-card">
-        <h2>📴 Offline access</h2>
-        <p id="offlineLine">${esc(offlineLine)}</p>
-        <p class="small muted">Theme, text size and data refresh live in ⚙ Settings (top right).</p>
-      </div>
-      <div class="home-card">
+        <p>Infractions &amp; violations with fine amounts, linked to their statutes.${inf?.source?.effective ? ` Effective ${esc(inf.source.effective)}.` : ""}</p>
+      </a>
+      <a class="home-card" href="${hashFor.bookmarks()}">
         <h2>★ Bookmarks</h2>
-        <p>${state.bookmarks.length ? `${state.bookmarks.length} saved.` : "Bookmark sections and infractions to find them quickly."} <a href="${hashFor.bookmarks()}">View bookmarks →</a></p>
-      </div>
+        <p>Bookmark sections and infractions to find them quickly.</p>
+      </a>
     </div>
+    ${renderHomeRows("🕘 Recently viewed", state.recents.slice(0, HOME_ROWS), null)}
+    ${renderHomeRows("★ Bookmarks",
+    [...state.bookmarks].sort((a, b) => b.ts - a.ts).slice(0, HOME_ROWS),
+    state.bookmarks.length > HOME_ROWS ? hashFor.bookmarks() : null)}
   `;
 
   $("exampleSearch")?.addEventListener("click", (ev) => {
@@ -1493,6 +1540,8 @@ function renderInfractionDetail(e) {
   crumbsEl.innerHTML += ` <span class="muted">/</span> <span>§ ${esc(cite(e))}</span>`;
 
   const bookmarked = findInfraBookmark(e.id) >= 0;
+
+  recordRecent({ type: "i", id: e.id, statNo: cite(e), label: e.description });
   const order = [
     ["fine", "Fine"], ["fee", "Additional fee (C.G.S. § 51-56a(c))"], ["z_fee", "Zone (Z) fee"],
     ["cost", "Cost (C.G.S. § 54-143(a))"], ["surcharge", "Surcharge (C.G.S. § 54-143a)"],
@@ -1750,6 +1799,7 @@ function registerServiceWorker() {
 
 (async function main() {
   loadBookmarks();
+  loadRecents();
   applySettings();
   bindSettings();
   updateBookmarkBadge();
