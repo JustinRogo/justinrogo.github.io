@@ -16,6 +16,7 @@ const supabaseClient = SUPABASE_CONFIG && window.supabase?.createClient
   ? window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey)
   : null;
 const usesSupabase = Boolean(supabaseClient);
+const ADMIN_USERS_FUNCTION = "admin-users";
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
@@ -75,6 +76,11 @@ function formatDate(value) {
 
 function roleLabel(role) {
   return ROLE_LABELS[role] || "Staff User";
+}
+
+function defaultPasswordForStaff(person) {
+  const lastName = (person?.last_name || person?.name?.split(" ").pop() || "Staff").trim();
+  return `${lastName.charAt(0).toUpperCase()}${lastName.slice(1)}123!`;
 }
 
 function hoursBetween(start, end) {
@@ -562,6 +568,18 @@ async function supabaseApi(path, options = {}) {
     return { ok: true };
   }
   throw new Error(`Unsupported Supabase endpoint: ${method} ${url.pathname}`);
+}
+
+async function invokeAdminUsers(payload) {
+  if (!usesSupabase) {
+    throw new Error("Login management requires Supabase mode");
+  }
+  const { data: result, error } = await supabaseClient.functions.invoke(ADMIN_USERS_FUNCTION, {
+    body: payload,
+  });
+  if (error) throw supabaseError(error);
+  if (result?.error) throw new Error(result.error);
+  return result;
 }
 
 async function api(path, options = {}) {
@@ -1165,6 +1183,15 @@ async function openStaffProfile(staffId) {
     $("#profileRemoteDays").innerHTML = person.remote_days.length
       ? person.remote_days.map(day => `<span>${DAY_LABELS[DAYS.indexOf(day)]}</span>`).join("")
       : `<span class="profile-empty-pill">No recurring remote days</span>`;
+    $("#profileLoginAdmin").classList.toggle("hidden", !usesSupabase || !canEditAll());
+    if (usesSupabase && canEditAll()) {
+      $("#profileLoginPassword").value = defaultPasswordForStaff(person);
+      $("#profileLoginStatus").textContent = person.auth_user_id
+        ? `Login is linked for ${person.email}.`
+        : `No login is linked yet for ${person.email}.`;
+      $("#createStaffLogin").classList.toggle("hidden", Boolean(person.auth_user_id));
+      $("#resetStaffPassword").classList.toggle("hidden", !person.auth_user_id);
+    }
     $("#profileShifts").innerHTML = profile.shifts.length
       ? profile.shifts.map(shift => `
           <div class="profile-list-item">
@@ -1387,6 +1414,32 @@ function bindEvents() {
     if (!confirm(`Remove ${person.name}? Existing shifts must be deleted first.`)) return;
     $("#staffProfileDialog").close();
     await remove(`/api/staff/${person.id}`, "Staff member removed");
+  });
+  $("#createStaffLogin").addEventListener("click", async () => {
+    const person = staffById(activeProfileId);
+    if (!person) return;
+    const password = $("#profileLoginPassword").value;
+    if (!password) return toast("Enter a temporary password", true);
+    if (!confirm(`Create a login for ${person.email}?`)) return;
+    try {
+      await invokeAdminUsers({ action: "create-login", staffId: person.id, password });
+      toast("Login created");
+      await load();
+      await openStaffProfile(person.id);
+    } catch (error) { toast(error.message, true); }
+  });
+  $("#resetStaffPassword").addEventListener("click", async () => {
+    const person = staffById(activeProfileId);
+    if (!person) return;
+    const password = $("#profileLoginPassword").value;
+    if (!password) return toast("Enter a temporary password", true);
+    if (!confirm(`Reset password for ${person.email}?`)) return;
+    try {
+      await invokeAdminUsers({ action: "reset-password", staffId: person.id, password });
+      toast("Password reset");
+      await load();
+      await openStaffProfile(person.id);
+    } catch (error) { toast(error.message, true); }
   });
   $("#addLeave").addEventListener("click", () => {
     if (!data.staff.length) return toast("Add a staff member first", true);

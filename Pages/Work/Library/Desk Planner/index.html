@@ -4,14 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Front Desk Planner</title>
-  <link rel="stylesheet" href="./styles.css?v=16">
+  <link rel="stylesheet" href="./styles.css?v=17">
 </head>
 <body>
   <section id="loginScreen" class="login-screen">
     <form id="loginForm" class="login-card">
       <p class="eyebrow">Staff access</p>
       <h1>Front Desk Planner</h1>
-      <p class="section-intro">Sign in with your UConn email address.</p>
+      <p class="section-intro">Sign in with your email address.</p>
       <label>Email<input type="email" name="email" required autocomplete="email"></label>
       <label>Password<input type="password" name="password" required autocomplete="current-password"></label>
       <button class="primary">Sign in</button>
@@ -189,6 +189,15 @@
         <h3>Remote days</h3>
         <div id="profileRemoteDays" class="profile-pills"></div>
       </div>
+      <div id="profileLoginAdmin" class="profile-section admin-login-panel hidden">
+        <h3>Login management</h3>
+        <p id="profileLoginStatus" class="muted"></p>
+        <div class="login-admin-row">
+          <label>Temporary password<input id="profileLoginPassword" type="text" autocomplete="off"></label>
+          <button type="button" id="createStaffLogin">Create login</button>
+          <button type="button" id="resetStaffPassword">Reset password</button>
+        </div>
+      </div>
       <div class="profile-grid">
         <section class="profile-section">
           <h3>Upcoming shifts</h3>
@@ -265,6 +274,6 @@
   <div id="toast" role="status" aria-live="polite"></div>
   <script src="./supabase-config.js?v=1"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="./app.js?v=16"></script>
+  <script src="./app.js?v=17"></script>
 </body>
 </html>
