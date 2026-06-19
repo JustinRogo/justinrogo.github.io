@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Front Desk Planner</title>
+  <link rel="stylesheet" href="./styles.css?v=16">
+</head>
+<body>
+  <section id="loginScreen" class="login-screen">
+    <form id="loginForm" class="login-card">
+      <p class="eyebrow">Staff access</p>
+      <h1>Front Desk Planner</h1>
+      <p class="section-intro">Sign in with your UConn email address.</p>
+      <label>Email<input type="email" name="email" required autocomplete="email"></label>
+      <label>Password<input type="password" name="password" required autocomplete="current-password"></label>
+      <button class="primary">Sign in</button>
+    </form>
+  </section>
+
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">Shared scheduling workspace</p>
+      <h1>Front Desk Planner</h1>
+    </div>
+    <div class="header-actions">
+      <button id="autoFill" class="primary">Auto-fill week</button>
+      <button id="copyWeek">Copy to next week</button>
+      <a id="deskExport" class="button" download>Desk .ics</a>
+      <a id="leaveExport" class="button" download>Leave .ics</a>
+      <span id="currentUserBadge" class="user-badge"></span>
+      <button id="logoutButton" class="quiet">Logout</button>
+    </div>
+  </header>
+
+  <nav class="tabs" aria-label="Planner sections">
+    <button class="tab active" data-tab="schedule">Schedule</button>
+    <button class="tab" data-tab="trades">Shift trades</button>
+    <button class="tab" data-tab="staff">Staff</button>
+    <button class="tab" data-tab="remote">Remote days</button>
+    <button class="tab" data-tab="leave">Leave</button>
+    <button class="tab" data-tab="hours">Library hours</button>
+  </nav>
+
+  <main>
+    <section id="schedule" class="panel active">
+      <div class="weekbar">
+        <button id="previousWeek" aria-label="Previous week">←</button>
+        <div>
+          <p id="viewHint" class="muted">Visible week</p>
+          <h2 id="weekLabel"></h2>
+        </div>
+        <button id="nextWeek" aria-label="Next week">→</button>
+        <button id="todayWeek" class="quiet">Today</button>
+        <div class="view-toggle" aria-label="Schedule view">
+          <button type="button" class="view-mode active" data-view="week">Week</button>
+          <button type="button" class="view-mode" data-view="day">Day</button>
+          <button type="button" class="view-mode" data-view="month">Month</button>
+        </div>
+      </div>
+      <div class="schedule-layout">
+        <div id="weekGrid" class="week-grid"></div>
+        <aside class="hours-card">
+          <p class="eyebrow">Coverage balance</p>
+          <h2>Scheduled hours</h2>
+          <div id="hoursChart"></div>
+          <div id="hoursTotal" class="hours-total"></div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="trades" class="panel">
+      <div class="section-heading">
+        <div><p class="eyebrow">Requests</p><h2>Shift trades and coverage</h2></div>
+      </div>
+      <p class="section-intro">Swap requests notify the selected staff member to accept or decline. Coverage requests are open shifts that another staff member can take.</p>
+      <div id="tradeList" class="card-list"></div>
+    </section>
+
+    <section id="staff" class="panel">
+      <div class="section-heading">
+        <div><p class="eyebrow">Roster</p><h2>Staff directory</h2></div>
+        <button id="addStaff" class="primary">Add staff member</button>
+      </div>
+      <div id="staffList" class="card-list"></div>
+    </section>
+
+    <section id="remote" class="panel">
+      <div class="section-heading">
+        <div><p class="eyebrow">Weekly availability</p><h2>Recurring remote days</h2></div>
+      </div>
+      <p class="section-intro">Toggle the weekdays each staff member regularly works remotely. These rules repeat every week and block desk assignments.</p>
+      <div id="remoteList" class="card-list"></div>
+    </section>
+
+    <section id="leave" class="panel">
+      <div class="section-heading">
+        <div><p class="eyebrow">Availability</p><h2>Current and upcoming leave</h2></div>
+        <button id="addLeave" class="primary">Add leave</button>
+      </div>
+      <p class="section-intro">Showing leave that is ongoing today or scheduled for a future date.</p>
+      <div id="leaveList" class="card-list"></div>
+    </section>
+
+    <section id="hours" class="panel">
+      <div class="split-heading">
+        <div>
+          <div class="section-heading compact">
+            <div><p class="eyebrow">Recurring rules</p><h2>Hour schedules</h2></div>
+            <button id="addSchedule" class="primary">Add schedule</button>
+          </div>
+          <div id="scheduleList" class="card-list"></div>
+        </div>
+        <div>
+          <div class="section-heading compact">
+            <div><p class="eyebrow">Date overrides</p><h2>Exceptions</h2></div>
+            <button id="addException" class="primary">Add exception</button>
+          </div>
+          <div id="exceptionList" class="card-list"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="shiftDialog">
+    <form id="shiftForm">
+      <div class="dialog-heading">
+        <div><p class="eyebrow">Desk coverage</p><h2 id="shiftTitle">Add shift</h2></div>
+        <button type="button" class="icon close-dialog" aria-label="Close">×</button>
+      </div>
+      <input type="hidden" name="id">
+      <label>Date<input type="date" name="shift_date" required></label>
+      <div class="form-row">
+        <label>Start<input type="time" name="start_time" step="900" required></label>
+        <label>End<input type="time" name="end_time" step="900" required></label>
+      </div>
+      <label>Staff member<select name="staff_id" required></select></label>
+      <p id="shiftHoursWarning" class="notice hidden"></p>
+      <div id="shiftRequestActions" class="shift-request-actions hidden">
+        <h3>Need a change?</h3>
+        <button type="button" id="requestCoverage">Ask for coverage</button>
+        <div class="swap-request-panel">
+          <h3>Request a shift swap</h3>
+          <label>Choose another scheduled shift<select name="swap_target_shift_id"></select></label>
+          <button type="button" id="requestSwap">Request swap</button>
+        </div>
+      </div>
+      <div class="dialog-actions">
+        <button type="button" id="deleteShift" class="danger hidden">Delete</button>
+        <span class="spacer"></span>
+        <button type="button" class="close-dialog">Cancel</button>
+        <button type="submit" class="primary">Save shift</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="staffDialog">
+    <form id="staffForm">
+      <div class="dialog-heading">
+        <div><p class="eyebrow">Roster</p><h2 id="staffFormTitle">Add staff member</h2></div>
+        <button type="button" class="icon close-dialog">×</button>
+      </div>
+      <input type="hidden" name="id">
+      <div class="form-row">
+        <label>First name<input name="first_name" required autocomplete="given-name"></label>
+        <label>Last name<input name="last_name" required autocomplete="family-name"></label>
+      </div>
+      <label>Email<input type="email" name="email" required autocomplete="email"></label>
+      <label>Department<input name="department" required autocomplete="organization-title"></label>
+      <label>Access role
+        <select name="access_role" required>
+          <option value="administrator">Administrator</option>
+          <option value="staff_user" selected>Staff User</option>
+          <option value="view_only">View Only User</option>
+        </select>
+      </label>
+      <div class="dialog-actions"><span class="spacer"></span><button type="button" class="close-dialog">Cancel</button><button id="staffFormSubmit" class="primary">Add staff</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="staffProfileDialog" class="profile-dialog">
+    <div class="profile-shell">
+      <div class="dialog-heading">
+        <div><p class="eyebrow">Staff profile</p><h2 id="profileName"></h2></div>
+        <button type="button" class="icon close-dialog" aria-label="Close">X</button>
+      </div>
+      <div id="profileDetails" class="profile-details"></div>
+      <div class="profile-section">
+        <h3>Remote days</h3>
+        <div id="profileRemoteDays" class="profile-pills"></div>
+      </div>
+      <div class="profile-grid">
+        <section class="profile-section">
+          <h3>Upcoming shifts</h3>
+          <div id="profileShifts" class="profile-list"></div>
+        </section>
+        <section class="profile-section">
+          <h3>Current and upcoming leave</h3>
+          <div id="profileLeave" class="profile-list"></div>
+        </section>
+      </div>
+      <div class="dialog-actions">
+        <button type="button" id="editStaffProfile">Edit profile</button>
+        <button type="button" id="removeStaffProfile" class="danger">Remove staff</button>
+        <span class="spacer"></span>
+        <button type="button" class="close-dialog">Close</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="leaveDialog">
+    <form id="leaveForm">
+      <div class="dialog-heading">
+        <div><p class="eyebrow">Availability</p><h2>Add leave</h2></div>
+        <button type="button" class="icon close-dialog">×</button>
+      </div>
+      <label>Staff member<select name="staff_id" required></select></label>
+      <div class="form-row">
+        <label>Start date<input type="date" name="start_date" required></label>
+        <label>End date<input type="date" name="end_date" required></label>
+      </div>
+      <label class="check"><input type="checkbox" name="all_day" checked> All day</label>
+      <div id="leaveTimes" class="form-row hidden">
+        <label>Start time<input type="time" name="start_time" step="900" value="09:00"></label>
+        <label>End time<input type="time" name="end_time" step="900" value="17:00"></label>
+      </div>
+      <div class="dialog-actions"><span class="spacer"></span><button type="button" class="close-dialog">Cancel</button><button class="primary">Add leave</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="scheduleDialog" class="wide-dialog">
+    <form id="scheduleForm">
+      <div class="dialog-heading">
+        <div><p class="eyebrow">Library hours</p><h2 id="scheduleTitle">Add schedule</h2></div>
+        <button type="button" class="icon close-dialog">×</button>
+      </div>
+      <input type="hidden" name="id">
+      <label>Name<input name="name" required></label>
+      <div class="form-row">
+        <label>Start date (optional)<input type="date" name="start_date"></label>
+        <label>End date (optional)<input type="date" name="end_date"></label>
+      </div>
+      <div id="scheduleHours" class="schedule-hours"></div>
+      <div class="dialog-actions"><span class="spacer"></span><button type="button" class="close-dialog">Cancel</button><button class="primary">Save schedule</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="exceptionDialog">
+    <form id="exceptionForm">
+      <div class="dialog-heading">
+        <div><p class="eyebrow">Date override</p><h2>Add exception</h2></div>
+        <button type="button" class="icon close-dialog">×</button>
+      </div>
+      <label>Date<input type="date" name="exception_date" required></label>
+      <label>Label<input name="label" placeholder="Labor Day" required></label>
+      <label class="check"><input type="checkbox" name="closed" checked> Library closed</label>
+      <div id="exceptionTimes" class="form-row hidden">
+        <label>Open<input type="time" name="open_time" step="900" value="09:00"></label>
+        <label>Close<input type="time" name="close_time" step="900" value="17:00"></label>
+      </div>
+      <div class="dialog-actions"><span class="spacer"></span><button type="button" class="close-dialog">Cancel</button><button class="primary">Save exception</button></div>
+    </form>
+  </dialog>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script src="./supabase-config.js?v=1"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./app.js?v=16"></script>
+</body>
+</html>
