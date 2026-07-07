@@ -1,30 +1,14 @@
 'use strict';
 
 /* ===================================================================
-   Language color map for GitHub Projects
-   =================================================================== */
-const LANG_COLORS = {
-  JavaScript: '#f1e05a',
-  TypeScript: '#3178c6',
-  Python: '#3572A5',
-  HTML: '#e34c26',
-  CSS: '#563d7c',
-  Shell: '#89e051',
-  Ruby: '#701516',
-  Go: '#00ADD8',
-  Java: '#b07219',
-  'C#': '#178600',
-  'Jupyter Notebook': '#DA5B0B',
-};
-
-/* ===================================================================
    Page Tree
    =================================================================== */
 const PAGE_TREE_FALLBACK = [
   {
     title: 'For Fun',
     children: [
-      { title: 'Law Library & IT 2026 - Gen-Z Edition', href: 'Pages/For Fun/StrategicFramework.html' },
+      { title: 'Evolutionary Flocking Ecosystem', href: 'Pages/For Fun/Birds.html' },
+      { title: 'Game of Life - Ultimate Cosmos', href: 'Pages/For Fun/Game-of-Life.html' },
       { title: 'UConn Law Library & IT - Multi-Gen Strategic Framework 2026', href: 'Pages/For Fun/StrategicFramework2.html' },
     ],
   },
@@ -34,18 +18,13 @@ const PAGE_TREE_FALLBACK = [
       {
         title: 'CGS',
         children: [
-          { title: 'CT General Statutes Explorer', href: 'Pages/Work/cgs/Index.html' },
-          {
-            title: 'CT Statutes Explorer',
-            children: [
-              { title: 'CT Statutes Explorer', href: 'Pages/Work/cgs/ct-statutes-explorer/index.html' },
-            ],
-          },
+          { title: 'CT General Statutes Explorer', href: 'Pages/Work/cgs/index.html' },
         ],
       },
       {
         title: 'Library',
         children: [
+          { title: 'Front Desk Planner', href: 'Pages/Work/Library/Desk Planner/index.html' },
           { title: 'Occupancy Heatmap Dashboard', href: 'Pages/Work/Library/heatmap.html' },
           { title: 'UConn School of Law Library Centennial Timeline', href: 'Pages/Work/Library/Timeline_LawLib.html' },
         ],
@@ -63,6 +42,8 @@ const PAGE_TREE_FALLBACK = [
 const PAGE_TREE_ROOT = 'Pages/';
 const PAGE_TREE_API = 'https://api.github.com/repos/JustinRogo/justinrogo.github.io/git/trees/main?recursive=1';
 const PAGE_TREE_EXCLUDE = /\.bak\.html$/i;
+const PAGE_TREE_CACHE_KEY = 'pageTree.v1';
+const PAGE_TREE_CACHE_TTL = 6 * 60 * 60 * 1000; // 6 hours
 
 function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, char => ({
@@ -172,11 +153,40 @@ function escapeHtml(value) {
     return sortTree(tree);
   }
 
+  function readCachedTree() {
+    try {
+      const raw = localStorage.getItem(PAGE_TREE_CACHE_KEY);
+      if (!raw) return null;
+      const { savedAt, tree } = JSON.parse(raw);
+      if (!Array.isArray(tree) || !tree.length || Date.now() - savedAt > PAGE_TREE_CACHE_TTL) return null;
+      return tree;
+    } catch {
+      return null;
+    }
+  }
+
+  function writeCachedTree(tree) {
+    try {
+      localStorage.setItem(PAGE_TREE_CACHE_KEY, JSON.stringify({ savedAt: Date.now(), tree }));
+    } catch { /* storage blocked or full */ }
+  }
+
+  const cached = readCachedTree();
+  if (cached) {
+    mount.innerHTML = renderNodes(cached);
+    return;
+  }
+
   mount.innerHTML = '<span class="info-note">Loading pages...</span>';
 
   loadPageTree()
     .then(tree => {
-      mount.innerHTML = tree.length ? renderNodes(tree) : renderNodes(PAGE_TREE_FALLBACK);
+      if (tree.length) {
+        writeCachedTree(tree);
+        mount.innerHTML = renderNodes(tree);
+      } else {
+        mount.innerHTML = renderNodes(PAGE_TREE_FALLBACK);
+      }
     })
     .catch(() => {
       mount.innerHTML = renderNodes(PAGE_TREE_FALLBACK);
@@ -206,7 +216,7 @@ function escapeHtml(value) {
           <button data-limit="all">Show All</button>
         </div>
       </div>
-      </br>
+      <br />
       <div class="card">
         <div class="toggle-buttons">
           <button class="active" data-show-content="best" style="color:var(--text);">When I'm at my best 🌞</button>
@@ -234,7 +244,7 @@ function escapeHtml(value) {
             better—but if I'm not careful, I might overwhelm others or myself in the process.</p>
         </div>
       </div>
-      </br>
+      <br />
       <!-- Strategic Thinking -->
       <section class="section">
         <h2>Strategic Thinking <span style="background:var(--green)"></span></h2>
@@ -385,13 +395,23 @@ fetch('https://justinrogo.github.io/data/cards_count.json')
    Theme Toggle
    =================================================================== */
 (function initTheme() {
+  // The class itself is applied pre-paint by an inline script in index.html.
   const body = document.body;
   const btn = document.getElementById('theme');
-  if (localStorage.getItem('theme') === 'light') body.classList.add('light');
+  const meta = document.querySelector('meta[name="theme-color"]');
+
+  function syncThemeColor() {
+    if (meta) meta.content = body.classList.contains('light') ? '#f1f5f9' : '#060d20';
+  }
+  syncThemeColor();
+
   if (btn) {
     btn.addEventListener('click', () => {
       body.classList.toggle('light');
-      localStorage.setItem('theme', body.classList.contains('light') ? 'light' : 'dark');
+      try {
+        localStorage.setItem('theme', body.classList.contains('light') ? 'light' : 'dark');
+      } catch { /* storage blocked */ }
+      syncThemeColor();
     });
   }
 })();
@@ -403,17 +423,22 @@ fetch('https://justinrogo.github.io/data/cards_count.json')
   const btn = document.getElementById('shareBtn');
   if (!btn) return;
   btn.addEventListener('click', async () => {
-    try {
-      await navigator.share?.({ title: document.title, url: location.href });
-    } catch {
+    if (navigator.share) {
       try {
-        await navigator.clipboard?.writeText(location.href);
-        const orig = btn.innerHTML;
-        btn.textContent = 'Link copied!';
-        setTimeout(() => { btn.innerHTML = orig; }, 1400);
-      } catch {
-        /* clipboard blocked — silently ignore */
+        await navigator.share({ title: document.title, url: location.href });
+        return;
+      } catch (err) {
+        if (err.name === 'AbortError') return; // user closed the share sheet
       }
+    }
+    if (!navigator.clipboard) return;
+    try {
+      await navigator.clipboard.writeText(location.href);
+      const orig = btn.innerHTML;
+      btn.textContent = 'Link copied!';
+      setTimeout(() => { btn.innerHTML = orig; }, 1400);
+    } catch {
+      /* clipboard blocked — silently ignore */
     }
   });
 })();
@@ -557,49 +582,13 @@ fetch('https://justinrogo.github.io/data/cards_count.json')
       if (!items.length) throw new Error('No items');
       list.innerHTML = items.map(i =>
         `<div style="margin:.4rem 0">
-          <a href="${i.link}" target="_blank" rel="noopener noreferrer">${i.title}</a>
-          <div class="info-note">${i.date.toLocaleDateString()} · ${i.desc?.slice(0, 90)}${i.desc.length > 90 ? '…' : ''}</div>
+          <a href="${escapeHtml(i.link || '#')}" target="_blank" rel="noopener noreferrer">${escapeHtml(i.title || 'Untitled event')}</a>
+          <div class="info-note">${i.date.toLocaleDateString()} · ${escapeHtml(i.desc.slice(0, 90))}${i.desc.length > 90 ? '…' : ''}</div>
         </div>`
       ).join('');
     })
     .catch(() => {
       list.innerHTML = `<span class="info-note">Events feed unavailable. <a href="${FEED}" target="_blank" rel="noopener noreferrer">Open feed directly</a>.</span>`;
-    });
-})();
-
-/* ===================================================================
-   GitHub Projects
-   =================================================================== */
-(function loadGithubProjects() {
-  const container = document.getElementById('gh-projects');
-  if (!container) return;
-
-  fetch('https://api.github.com/users/justinrogo/repos?sort=pushed&per_page=20')
-    .then(r => r.json())
-    .then(repos => {
-      const visible = repos
-        .filter(r => !r.fork && !r.archived && r.name !== 'justinrogo.github.io')
-        .slice(0, 6);
-
-      if (!visible.length) throw new Error('No repos');
-
-      container.innerHTML = visible.map(repo => {
-        const lang = repo.language || '';
-        const color = LANG_COLORS[lang] || '#6e7681';
-        const desc = repo.description ? repo.description.slice(0, 80) + (repo.description.length > 80 ? '…' : '') : 'No description';
-        const stars = repo.stargazers_count;
-        return `<a class="gh-card" href="${repo.html_url}" target="_blank" rel="noopener noreferrer">
-          <div class="gh-card-name">${repo.name}</div>
-          <div class="gh-card-desc">${desc}</div>
-          <div class="gh-card-meta">
-            ${lang ? `<span class="gh-lang-dot" style="background:${color}"></span><span>${lang}</span>` : ''}
-            ${stars ? `<span>★ ${stars}</span>` : ''}
-          </div>
-        </a>`;
-      }).join('');
-    })
-    .catch(() => {
-      container.innerHTML = `<span class="gh-placeholder">Couldn't load projects. <a href="https://github.com/justinrogo" target="_blank" rel="noopener noreferrer">View on GitHub →</a></span>`;
     });
 })();
 
