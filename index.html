@@ -22,14 +22,30 @@
   <!-- Canonical -->
   <link rel="canonical" href="https://justinrogo.github.io/" />
 
-  <!-- Preconnect for fonts -->
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Space+Grotesk:wght@400;600;700&display=swap" />
 
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
+
+  <!-- Apply saved/OS theme before first paint to avoid a dark flash -->
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('theme');
+        var light = stored ? stored === 'light' : matchMedia('(prefers-color-scheme: light)').matches;
+        if (light) document.body.classList.add('light');
+      } catch (e) { /* storage blocked — keep default dark */ }
+    })();
+  </script>
 
   <!-- Premium Background Spectacle -->
   <div class="noise-overlay" aria-hidden="true"></div>
@@ -52,7 +68,6 @@
         <div class="hgroup">
           <h1>Justin Rogowski</h1>
           <p>Library Information Coordinator · University of Connecticut School of Law</p>
-          <p class="info-note" id="tagline"></p>
           <div class="card info-card">
             <button class="btn" id="shareBtn" title="Share this page">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
@@ -121,11 +136,11 @@
       <!-- Tabs Deck -->
       <section class="card tabs" aria-label="Widgets">
         <div class="tablist" role="tablist" aria-label="Widget tabs">
-          <button class="tab" role="tab" aria-selected="false" aria-controls="tab-cal"  id="tbtn-cal">My Calendar</button>
+          <button class="tab" role="tab" aria-selected="false" aria-controls="tab-cal"  id="tbtn-cal"  tabindex="-1">My Calendar</button>
           <button class="tab" role="tab" aria-selected="false" aria-controls="tab-book" id="tbtn-book" tabindex="-1">Book a Meeting</button>
           <button class="tab" role="tab" aria-selected="false" aria-controls="tab-req"  id="tbtn-req"  tabindex="-1">Submit a Request</button>
           <button class="tab" role="tab" aria-selected="false" aria-controls="tab-cs"   id="tbtn-cs"   tabindex="-1">My CliftonStrengths</button>
-          <button class="tab" role="tab" aria-selected="true"  aria-controls="tab-cat"  id="tbtn-cat"  tabindex="-1">Library Catalog</button>
+          <button class="tab" role="tab" aria-selected="true"  aria-controls="tab-cat"  id="tbtn-cat">Library Catalog</button>
         </div>
 
         <div id="tab-cal" class="tabpanel" role="tabpanel" aria-labelledby="tbtn-cal">

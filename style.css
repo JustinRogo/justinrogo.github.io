@@ -1,7 +1,4 @@
-/* ===================================================================
-   Google Fonts
-   =================================================================== */
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+/* Google Fonts are loaded via <link> in index.html (faster than @import). */
 
 /* ===================================================================
    Design Tokens & Variable Configuration
@@ -1402,6 +1399,70 @@ body.light .fab:hover svg {
 body.light .fab:hover {
   border-color: #0066ff;
   box-shadow: 0 8px 24px rgba(0, 102, 255, 0.15);
+}
+
+/* ULSW (Library Catalog tab) — !important required to beat the base
+   .ulsw overrides above, which are themselves !important. */
+body.light .ulsw .wrap {
+  background: #ffffff !important;
+  border-color: rgba(15, 23, 42, 0.08) !important;
+  box-shadow: 0 6px 20px -8px rgba(15, 23, 42, 0.05) !important;
+}
+
+body.light .ulsw .tabs {
+  background: rgba(15, 23, 42, 0.03) !important;
+  border-bottom-color: var(--line) !important;
+}
+
+body.light .ulsw [role="tab"] {
+  color: #475569 !important;
+}
+
+body.light .ulsw [role="tab"]:hover {
+  color: #0f172a !important;
+  background: rgba(15, 23, 42, 0.04) !important;
+}
+
+body.light .ulsw [role="tab"][aria-selected="true"] {
+  color: #0f172a !important;
+  background: #ffffff !important;
+  border-color: var(--line-strong) !important;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04) !important;
+}
+
+body.light .ulsw input[type="text"] {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border-color: var(--line) !important;
+}
+
+body.light .ulsw input[type="text"]:focus {
+  border-color: #0066ff !important;
+  box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.15) !important;
+}
+
+body.light .ulsw input[type="text"]::placeholder {
+  color: #64748b !important;
+}
+
+body.light .ulsw .btn {
+  background: #ffffff !important;
+  color: var(--text-strong) !important;
+  border-color: var(--line-strong) !important;
+}
+
+body.light .ulsw .btn:hover {
+  background: rgba(0, 102, 255, 0.05) !important;
+  border-color: #0066ff !important;
+  color: #0066ff !important;
+}
+
+body.light .ulsw .links a {
+  color: #1d4ed8 !important;
+}
+
+body.light .ulsw .helper {
+  color: #475569 !important;
 }
 
 /* ===================================================================
