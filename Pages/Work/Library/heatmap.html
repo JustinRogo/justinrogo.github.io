@@ -265,6 +265,27 @@
             z-index: 50;
             transform-origin: top right;
             transition: transform 0.2s, opacity 0.2s;
+            max-height: calc(100dvh - 90px);
+            overflow-y: auto;
+        }
+
+        .panel input[type="datetime-local"],
+        .panel input[type="time"] {
+            background: var(--bg-body);
+            border: 1px solid var(--border);
+            color: white;
+            padding: 4px;
+            border-radius: 4px;
+            width: 100%;
+            font-family: inherit;
+        }
+
+        .dow-filter { display: flex; gap: 4px; }
+        .dow-filter button { flex: 1; padding: 0.4rem 0; font-size: 0.8rem; }
+        .dow-filter button.on {
+            background: var(--primary);
+            border-color: var(--primary-hover);
+            color: #fff;
         }
         
         .panel[hidden] {
@@ -335,8 +356,112 @@
             cursor: pointer;
         }
 
+        /* --- Playback Bar --- */
+        #playbackBar {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg-panel);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid var(--border);
+            z-index: 15;
+            flex-wrap: wrap;
+        }
+        #playbackBar[hidden] { display: none; }
+        #pbSlider { flex: 1; min-width: 120px; }
+        #pbLabel {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            font-variant-numeric: tabular-nums;
+        }
+        #playbackBar button { padding: 0.35rem 0.6rem; font-size: 0.9rem; }
+        #pbAll.active-mode { color: var(--primary); border-color: var(--primary); }
+
+        /* --- Analytics Overlay --- */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            background: var(--bg-body);
+            display: flex;
+            flex-direction: column;
+        }
+        .overlay[hidden] { display: none; }
+        .overlay-head {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-panel);
+        }
+        .overlay-head h2 { margin: 0; font-size: 1.1rem; flex: 1; white-space: nowrap; }
+        .an-muted { color: var(--text-muted); font-size: 0.85rem; }
+        .overlay-body { flex: 1; overflow-y: auto; padding: 1rem; }
+        #anContent { display: grid; gap: 1rem; }
+        #anContent[hidden] { display: none; }
+        .an-empty { color: var(--text-muted); text-align: center; padding: 3rem 1rem; }
+
+        .stat-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.75rem;
+        }
+        .stat-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 0.75rem 1rem;
+        }
+        .stat-card .k { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
+        .stat-card .v { font-size: 1.5rem; font-weight: 700; margin-top: 0.15rem; }
+        .stat-card .s { font-size: 0.75rem; color: var(--text-muted); }
+
+        .chart-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1rem;
+        }
+        .chart-card h3 {
+            margin: 0 0 0.75rem;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+        }
+        #anLine { display: block; }
+        .legend { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.6rem; font-size: 0.8rem; color: var(--text-muted); }
+        .legend .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 4px; vertical-align: -1px; }
+
+        .dow-grid-wrap { overflow-x: auto; }
+        .dow-grid {
+            display: grid;
+            grid-template-columns: 38px repeat(24, minmax(16px, 1fr));
+            gap: 2px;
+            min-width: 540px;
+        }
+        .dow-cell { aspect-ratio: 1; border-radius: 3px; background: rgba(255, 255, 255, 0.04); }
+        .dow-lbl {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .floor-row { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem; font-size: 0.85rem; }
+        .floor-row:last-child { margin-bottom: 0; }
+        .floor-row .fl-name { width: 64px; color: var(--text-muted); flex-shrink: 0; }
+        .floor-row .fl-bar-wrap { flex: 1; background: rgba(255, 255, 255, 0.05); border-radius: 99px; height: 14px; overflow: hidden; }
+        .floor-row .fl-bar { height: 100%; border-radius: 99px; }
+        .floor-row .fl-val { width: 120px; text-align: right; font-variant-numeric: tabular-nums; flex-shrink: 0; }
+
         /* --- Mobile Tweaks --- */
         @media (max-width: 768px) {
+
             footer {
                 grid-template-columns: 1fr 1fr; /* Two columns */
                 grid-template-areas: 
@@ -377,6 +502,15 @@
         <canvas id="heat"></canvas>
     </div>
 
+    <div id="playbackBar" hidden>
+        <button id="pbPrev" class="icon-only" title="Previous session">⏮</button>
+        <button id="pbPlay" class="icon-only" title="Play through sessions">▶</button>
+        <button id="pbNext" class="icon-only" title="Next session">⏭</button>
+        <input id="pbSlider" type="range" min="0" max="0" value="0" aria-label="Session scrubber">
+        <span id="pbLabel"></span>
+        <button id="pbAll" class="active-mode" title="Show all sessions aggregated">Σ All</button>
+    </div>
+
     <footer>
         <div class="toolbar-group">
             <button id="undo" disabled title="Undo last point">
@@ -400,6 +534,10 @@
     </footer>
 
     <div id="controlsPanel" class="panel" hidden>
+        <div class="control-row">
+            <button id="analyticsBtn" type="button" hidden style="width:100%; border-color:var(--primary); color:var(--primary);">📊 Open Trend Analytics</button>
+        </div>
+
         <h3>Visualization</h3>
         <div class="control-row">
             <label>Radius <span id="val-radius">50</span></label>
@@ -425,25 +563,83 @@
         
         <h3>Load History</h3>
         <div class="control-row">
+            <button id="loadFolder" style="width:100%;">📂 Load OneDrive folder…</button>
+            <button id="rescanFolder" style="width:100%;" hidden>🔄 Rescan “<span id="folderName"></span>”</button>
+            <button id="clearSessions" style="width:100%;" hidden>Clear loaded sessions</button>
+            <div id="loadStatus" style="font-size:0.8rem; color:var(--text-muted);"></div>
+            <input id="loadFolderFallback" type="file" webkitdirectory multiple hidden>
+        </div>
+        <div class="control-row">
             <label>Single JSON</label>
             <input id="loadJSON" type="file" accept="application/json">
         </div>
         <div class="control-row">
-            <label>Trend Analysis (Batch)</label>
+            <label>Multiple JSONs</label>
             <input id="loadMany" type="file" accept="application/json" multiple>
         </div>
         
+        <h3>Filters</h3>
         <div class="control-row">
-            <label>Filter Start</label>
-            <input id="from" type="datetime-local" style="background:var(--bg-body); border:1px solid var(--border); color:white; padding:4px; border-radius:4px;">
+            <label>Date Start</label>
+            <input id="from" type="datetime-local">
         </div>
         <div class="control-row">
-            <label>Filter End</label>
-            <input id="to" type="datetime-local" style="background:var(--bg-body); border:1px solid var(--border); color:white; padding:4px; border-radius:4px;">
+            <label>Date End</label>
+            <input id="to" type="datetime-local">
+        </div>
+        <div class="control-row">
+            <label>Time of Day (start – end)</label>
+            <div style="display:flex; gap:0.5rem;">
+                <input id="todFrom" type="time" aria-label="Time of day start">
+                <input id="todTo" type="time" aria-label="Time of day end">
+            </div>
+        </div>
+        <div class="control-row">
+            <label>Days of Week <span style="text-transform:none;">(none = all)</span></label>
+            <div class="dow-filter" id="dowFilter">
+                <button type="button" data-dow="0">Su</button>
+                <button type="button" data-dow="1">Mo</button>
+                <button type="button" data-dow="2">Tu</button>
+                <button type="button" data-dow="3">We</button>
+                <button type="button" data-dow="4">Th</button>
+                <button type="button" data-dow="5">Fr</button>
+                <button type="button" data-dow="6">Sa</button>
+            </div>
+        </div>
+        <div class="control-row">
+            <button id="clearFilters" style="width:100%;">Clear filters</button>
         </div>
         <div class="control-row" style="flex-direction:row; align-items:center;">
              <input id="includeSessions" type="checkbox" checked style="width:auto;">
              <label for="includeSessions" style="margin-left:0.5rem; margin-bottom:0;">Include loaded sessions</label>
+        </div>
+    </div>
+
+    <div id="analyticsOverlay" class="overlay" hidden>
+        <div class="overlay-head">
+            <h2>📊 Trend Analysis</h2>
+            <span id="anRange" class="an-muted"></span>
+            <button id="anExport" title="Export session totals as CSV">⬇ CSV</button>
+            <button id="anClose" class="icon-only" aria-label="Close analytics">✕</button>
+        </div>
+        <div class="overlay-body">
+            <div id="anEmpty" class="an-empty" hidden>No sessions in the selected date range.</div>
+            <div id="anContent" hidden>
+                <div class="stat-cards" id="anStats"></div>
+                <div class="chart-card">
+                    <h3>Patron count per session</h3>
+                    <canvas id="anLine"></canvas>
+                    <div id="anLegend" class="legend"></div>
+                </div>
+                <div class="chart-card">
+                    <h3>Average count by day &amp; hour</h3>
+                    <div id="anGrid" class="dow-grid-wrap"></div>
+                </div>
+                <div class="chart-card">
+                    <h3>Points by floor</h3>
+                    <div id="anFloors"></div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -624,23 +820,11 @@
                 });
             };
 
-            // Load many JSONs
-            loadMany.onchange = async e => {
+            // Load many JSONs (manual multi-select)
+            loadMany.onchange = e => {
                 const files = Array.from(e.target.files || []);
-                if (!files.length) return;
-                const texts = await Promise.all(files.map(f => f.text()));
-                for (const t of texts) {
-                    try {
-                        const j = JSON.parse(t);
-                        if (!j.floors) continue;
-                        const ts = j.submitted_at ? new Date(j.submitted_at) : new Date();
-                        SESSIONS.push({ ts, floors: j.floors });
-                    } catch { }
-                }
-                const min = new Date(Math.min(...SESSIONS.map(s => +s.ts)));
-                const max = new Date(Math.max(...SESSIONS.map(s => +s.ts)));
-                if (isFinite(+min) && isFinite(+max)) { fromEl.value = toLocalDT(min); toEl.value = toLocalDT(max); }
-                redraw();
+                if (files.length) loadFiles(files);
+                e.target.value = '';
             };
             
             // Listeners for sliders that trigger redraw
@@ -679,10 +863,36 @@
             }
 
             function filteredSessions() {
+                if (playback.active) {
+                    const list = analyticsSessions();
+                    return list.length ? [list[Math.min(playback.index, list.length - 1)]] : [];
+                }
                 if (!includeSessionsEl.checked) return [];
+                return analyticsSessions();
+            }
+
+            // Sessions matching all active filters (date range, time of day,
+            // days of week), sorted by time (ignores the include-sessions
+            // toggle — used by analytics, playback and CSV export)
+            function analyticsSessions() {
                 const start = fromEl.value ? new Date(fromEl.value) : new Date(-8640000000000000);
                 const end = toEl.value ? new Date(toEl.value) : new Date(8640000000000000);
-                return SESSIONS.filter(s => s.ts >= start && s.ts <= end);
+                const days = activeDows();
+                const toMins = v => { const [h, m] = v.split(':').map(Number); return h * 60 + m; };
+                const lo = todFromEl.value ? toMins(todFromEl.value) : null;
+                const hi = todToEl.value ? toMins(todToEl.value) : null;
+                return SESSIONS.filter(s => {
+                    if (s.ts < start || s.ts > end) return false;
+                    if (days.size && !days.has(s.ts.getDay())) return false;
+                    if (lo !== null || hi !== null) {
+                        const mins = s.ts.getHours() * 60 + s.ts.getMinutes();
+                        const a = lo ?? 0, b = hi ?? 1439;
+                        // a > b means the window wraps past midnight (e.g. 10 PM – 2 AM)
+                        const inWindow = a <= b ? (mins >= a && mins <= b) : (mins >= a || mins <= b);
+                        if (!inWindow) return false;
+                    }
+                    return true;
+                }).sort((a, b) => a.ts - b.ts);
             }
 
             function redraw() {
@@ -827,6 +1037,442 @@
             function toLocalDT(d) {
                 const pad = n => String(n).padStart(2, '0');
                 return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+            }
+
+            // =================================================================
+            // Session store, folder loading & trend analysis
+            // =================================================================
+            const FLOOR_COLORS = { '1F': '#60a5fa', '2F': '#34d399', '3F': '#fbbf24', '4F': '#f87171', '5F': '#c084fc' };
+            const sessionKeys = new Set();
+            let folderHandle = null;
+
+            const loadFolderBtn = document.getElementById('loadFolder');
+            const rescanBtn = document.getElementById('rescanFolder');
+            const folderNameEl = document.getElementById('folderName');
+            const folderFallback = document.getElementById('loadFolderFallback');
+            const loadStatusEl = document.getElementById('loadStatus');
+            const clearSessionsBtn = document.getElementById('clearSessions');
+            const analyticsBtn = document.getElementById('analyticsBtn');
+            const overlay = document.getElementById('analyticsOverlay');
+            const todFromEl = document.getElementById('todFrom');
+            const todToEl = document.getElementById('todTo');
+            const dowFilterEl = document.getElementById('dowFilter');
+            const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+            const fmtDT = ts => ts.toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+            const fmtD = ts => ts.toLocaleDateString([], { month: 'short', day: 'numeric' });
+            const fmtTod = v => new Date('1970-01-01T' + v).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+
+            function activeDows() {
+                return new Set([...dowFilterEl.querySelectorAll('button.on')].map(b => +b.dataset.dow));
+            }
+
+            function addSession(json, fallbackKey) {
+                if (!json || !Array.isArray(json.floors)) return false;
+                const key = json.submitted_at || fallbackKey;
+                if (!key || sessionKeys.has(key)) return false;
+                sessionKeys.add(key);
+                const ts = json.submitted_at ? new Date(json.submitted_at) : new Date();
+                if (isNaN(+ts)) return false;
+                SESSIONS.push({ ts, floors: json.floors, note: json.note || '' });
+                return true;
+            }
+
+            function sessionTotals(s) {
+                const per = {}; let total = 0;
+                FLOORS.forEach(fl => {
+                    const sf = (s.floors || []).find(f => f.id === fl.id);
+                    const n = sf && Array.isArray(sf.points) ? sf.points.length : 0;
+                    per[fl.id] = n; total += n;
+                });
+                return { per, total };
+            }
+
+            function afterSessionsChanged() {
+                SESSIONS.sort((a, b) => a.ts - b.ts);
+                if (SESSIONS.length && (!fromEl.value || !toEl.value)) {
+                    fromEl.value = toLocalDT(SESSIONS[0].ts);
+                    // pad the end by a minute so the newest session isn't cut off by truncated seconds
+                    toEl.value = toLocalDT(new Date(+SESSIONS[SESSIONS.length - 1].ts + 60000));
+                }
+                analyticsBtn.hidden = SESSIONS.length === 0;
+                clearSessionsBtn.hidden = SESSIONS.length === 0;
+                updatePlaybackUI();
+                fitCanvas();
+                redraw();
+                if (!overlay.hidden) renderAnalytics();
+            }
+
+            async function loadFiles(files) {
+                let added = 0, failed = 0;
+                for (const f of files) {
+                    try {
+                        const j = JSON.parse(await f.text());
+                        if (addSession(j, f.name)) added++;
+                    } catch { failed++; }
+                }
+                loadStatusEl.textContent =
+                    `${SESSIONS.length} session${SESSIONS.length === 1 ? '' : 's'} loaded` +
+                    (added ? ` (+${added} new)` : ' (no new files)') +
+                    (failed ? ` · ${failed} unreadable` : '');
+                afterSessionsChanged();
+            }
+
+            // --- Folder access (File System Access API, synced OneDrive) ----
+            function idb() {
+                return new Promise((res, rej) => {
+                    const r = indexedDB.open('heatmap-fs', 1);
+                    r.onupgradeneeded = () => r.result.createObjectStore('handles');
+                    r.onsuccess = () => res(r.result);
+                    r.onerror = () => rej(r.error);
+                });
+            }
+            async function saveHandle(h) {
+                const db = await idb();
+                const tx = db.transaction('handles', 'readwrite');
+                tx.objectStore('handles').put(h, 'dir');
+                return new Promise(r => { tx.oncomplete = r; tx.onerror = r; });
+            }
+            async function loadHandle() {
+                try {
+                    const db = await idb();
+                    return await new Promise(r => {
+                        const rq = db.transaction('handles').objectStore('handles').get('dir');
+                        rq.onsuccess = () => r(rq.result || null);
+                        rq.onerror = () => r(null);
+                    });
+                } catch { return null; }
+            }
+
+            async function scanFolder() {
+                if (!folderHandle) return;
+                let perm = await folderHandle.queryPermission({ mode: 'read' });
+                if (perm !== 'granted') perm = await folderHandle.requestPermission({ mode: 'read' });
+                if (perm !== 'granted') { loadStatusEl.textContent = 'Folder access denied.'; return; }
+                loadStatusEl.textContent = 'Reading folder…';
+                const files = [];
+                for await (const entry of folderHandle.values()) {
+                    if (entry.kind === 'file' && /\.json$/i.test(entry.name)) files.push(await entry.getFile());
+                }
+                await loadFiles(files);
+            }
+
+            loadFolderBtn.onclick = async () => {
+                if (window.showDirectoryPicker) {
+                    try {
+                        folderHandle = await window.showDirectoryPicker({ mode: 'read' });
+                    } catch { return; /* user cancelled */ }
+                    saveHandle(folderHandle);
+                    folderNameEl.textContent = folderHandle.name;
+                    rescanBtn.hidden = false;
+                    await scanFolder();
+                } else {
+                    folderFallback.click();
+                }
+            };
+            rescanBtn.onclick = scanFolder;
+            folderFallback.onchange = e => {
+                const files = Array.from(e.target.files || []).filter(f => /\.json$/i.test(f.name));
+                if (files.length) loadFiles(files);
+                else loadStatusEl.textContent = 'No JSON files in that folder.';
+                e.target.value = '';
+            };
+
+            // Restore a previously-picked folder (rescan still needs one click,
+            // since re-granting read permission requires a user gesture)
+            loadHandle().then(h => {
+                if (h && window.showDirectoryPicker) {
+                    folderHandle = h;
+                    folderNameEl.textContent = h.name;
+                    rescanBtn.hidden = false;
+                }
+            });
+
+            clearSessionsBtn.onclick = () => {
+                SESSIONS.length = 0;
+                sessionKeys.clear();
+                stopTimer();
+                playback.active = false;
+                playback.index = 0;
+                loadStatusEl.textContent = '';
+                afterSessionsChanged();
+            };
+
+            // --- Playback (scrub through sessions on the heatmap) ------------
+            const playback = { active: false, index: 0, timer: null };
+            const playbackBar = document.getElementById('playbackBar');
+            const pbSlider = document.getElementById('pbSlider');
+            const pbPlay = document.getElementById('pbPlay');
+            const pbPrev = document.getElementById('pbPrev');
+            const pbNext = document.getElementById('pbNext');
+            const pbAll = document.getElementById('pbAll');
+            const pbLabel = document.getElementById('pbLabel');
+
+            function setPlayback(active, index) {
+                const list = analyticsSessions();
+                playback.active = active && list.length > 0;
+                playback.index = Math.max(0, Math.min(index ?? playback.index, list.length - 1));
+                if (!playback.active) stopTimer();
+                updatePlaybackUI();
+                redraw();
+            }
+            function startTimer() {
+                const list = analyticsSessions();
+                if (!list.length) return;
+                if (!playback.active || playback.index >= list.length - 1) setPlayback(true, 0);
+                playback.timer = setInterval(() => {
+                    if (playback.index >= analyticsSessions().length - 1) { stopTimer(); updatePlaybackUI(); return; }
+                    setPlayback(true, playback.index + 1);
+                }, 900);
+                pbPlay.textContent = '⏸';
+                pbPlay.title = 'Pause';
+            }
+            function stopTimer() {
+                clearInterval(playback.timer);
+                playback.timer = null;
+                pbPlay.textContent = '▶';
+                pbPlay.title = 'Play through sessions';
+            }
+            function updatePlaybackUI() {
+                const list = analyticsSessions();
+                playbackBar.hidden = SESSIONS.length === 0;
+                pbSlider.max = Math.max(0, list.length - 1);
+                pbSlider.value = Math.min(playback.index, list.length - 1);
+                pbSlider.disabled = !list.length;
+                pbAll.classList.toggle('active-mode', !playback.active);
+                if (playback.active && list.length) {
+                    const s = list[Math.min(playback.index, list.length - 1)];
+                    pbLabel.textContent = `${Math.min(playback.index, list.length - 1) + 1}/${list.length} · ${fmtDT(s.ts)} · ${sessionTotals(s).total} patrons`;
+                    pbLabel.title = s.note || '';
+                } else {
+                    pbLabel.textContent = `All ${list.length} session${list.length === 1 ? '' : 's'} (aggregate)`;
+                    pbLabel.title = '';
+                }
+            }
+            pbSlider.oninput = e => { stopTimer(); setPlayback(true, +e.target.value); };
+            pbPrev.onclick = () => { stopTimer(); setPlayback(true, playback.index - 1); };
+            pbNext.onclick = () => { stopTimer(); setPlayback(true, playback.index + 1); };
+            pbAll.onclick = () => { stopTimer(); setPlayback(false); };
+            pbPlay.onclick = () => { playback.timer ? stopTimer() : startTimer(); };
+
+            function onFilterChange() {
+                playback.index = Math.max(0, Math.min(playback.index, analyticsSessions().length - 1));
+                updatePlaybackUI();
+                redraw();
+                if (!overlay.hidden) renderAnalytics();
+            }
+            [fromEl, toEl, todFromEl, todToEl].forEach(el => el.addEventListener('input', onFilterChange));
+            dowFilterEl.querySelectorAll('button').forEach(b => {
+                b.addEventListener('click', () => { b.classList.toggle('on'); onFilterChange(); });
+            });
+            document.getElementById('clearFilters').onclick = () => {
+                todFromEl.value = '';
+                todToEl.value = '';
+                dowFilterEl.querySelectorAll('button.on').forEach(b => b.classList.remove('on'));
+                if (SESSIONS.length) {
+                    fromEl.value = toLocalDT(SESSIONS[0].ts);
+                    toEl.value = toLocalDT(new Date(+SESSIONS[SESSIONS.length - 1].ts + 60000));
+                } else {
+                    fromEl.value = '';
+                    toEl.value = '';
+                }
+                onFilterChange();
+            };
+
+            // --- Analytics overlay -------------------------------------------
+            analyticsBtn.onclick = () => {
+                // close the settings menu underneath before opening the overlay
+                document.getElementById('controlsPanel').setAttribute('hidden', '');
+                document.getElementById('menuBtn').setAttribute('aria-expanded', 'false');
+                overlay.hidden = false;
+                renderAnalytics();
+            };
+            document.getElementById('anClose').onclick = () => { overlay.hidden = true; };
+            document.getElementById('anExport').onclick = exportCSV;
+            document.addEventListener('keydown', e => { if (e.key === 'Escape' && !overlay.hidden) overlay.hidden = true; });
+            window.addEventListener('resize', () => { if (!overlay.hidden) renderAnalytics(); });
+
+            function renderAnalytics() {
+                const list = analyticsSessions();
+                const empty = !list.length;
+                document.getElementById('anEmpty').hidden = !empty;
+                document.getElementById('anContent').hidden = empty;
+                const rangeEl = document.getElementById('anRange');
+                if (empty) { rangeEl.textContent = ''; return; }
+                const totals = list.map(sessionTotals);
+                const filterBits = [];
+                if (todFromEl.value || todToEl.value) {
+                    filterBits.push(`${fmtTod(todFromEl.value || '00:00')}–${fmtTod(todToEl.value || '23:59')}`);
+                }
+                const days = activeDows();
+                if (days.size) filterBits.push([...days].sort((a, b) => a - b).map(d => DAY_NAMES[d]).join(', '));
+                rangeEl.textContent = `${list.length} sessions · ${fmtDT(list[0].ts)} – ${fmtDT(list[list.length - 1].ts)}` +
+                    (filterBits.length ? ` · ${filterBits.join(' · ')}` : '');
+                renderStats(list, totals);
+                renderLineChart(list, totals);
+                renderDowGrid(list, totals);
+                renderFloorBars(totals);
+            }
+
+            function renderStats(list, totals) {
+                const grand = totals.reduce((a, t) => a + t.total, 0);
+                let peakI = 0;
+                totals.forEach((t, i) => { if (t.total > totals[peakI].total) peakI = i; });
+                document.getElementById('anStats').innerHTML = `
+                    <div class="stat-card"><div class="k">Sessions</div><div class="v">${list.length}</div></div>
+                    <div class="stat-card"><div class="k">Total patrons counted</div><div class="v">${grand.toLocaleString()}</div></div>
+                    <div class="stat-card"><div class="k">Avg per session</div><div class="v">${(grand / list.length).toFixed(1)}</div></div>
+                    <div class="stat-card"><div class="k">Peak session</div><div class="v">${totals[peakI].total}</div><div class="s">${fmtDT(list[peakI].ts)}</div></div>`;
+            }
+
+            function renderLineChart(list, totals) {
+                const canvas = document.getElementById('anLine');
+                const dpr = window.devicePixelRatio || 1;
+                const cssW = Math.max(280, canvas.parentElement.clientWidth - 32);
+                const cssH = 240;
+                canvas.style.width = cssW + 'px';
+                canvas.style.height = cssH + 'px';
+                canvas.width = cssW * dpr;
+                canvas.height = cssH * dpr;
+                const ctx = canvas.getContext('2d');
+                ctx.scale(dpr, dpr);
+                const W = cssW, H = cssH, L = 34, Rm = 12, T = 12, B = 26;
+
+                const ymax = Math.max(5, Math.ceil(Math.max(...totals.map(t => t.total)) / 5) * 5);
+                const t0 = +list[0].ts, t1 = +list[list.length - 1].ts;
+                const x = t => t1 === t0 ? L + (W - L - Rm) / 2 : L + (t - t0) / (t1 - t0) * (W - L - Rm);
+                const y = v => T + (1 - v / ymax) * (H - T - B);
+
+                ctx.font = '11px sans-serif';
+                ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+                ctx.fillStyle = '#94a3b8';
+                ctx.textAlign = 'right';
+                for (let i = 0; i <= 4; i++) {
+                    const v = ymax * i / 4, yy = y(v);
+                    ctx.beginPath(); ctx.moveTo(L, yy); ctx.lineTo(W - Rm, yy); ctx.stroke();
+                    ctx.fillText(Math.round(v), L - 6, yy + 4);
+                }
+                ctx.textAlign = 'center';
+                const nTicks = Math.min(4, list.length);
+                const multiDay = (t1 - t0) > 3 * 864e5;
+                for (let i = 0; i < nTicks; i++) {
+                    const tt = t0 + (t1 - t0) * (nTicks === 1 ? 0.5 : i / (nTicks - 1));
+                    ctx.fillText(multiDay ? fmtD(new Date(tt)) : fmtDT(new Date(tt)), x(tt), H - 8);
+                }
+
+                FLOORS.forEach(fl => {
+                    ctx.strokeStyle = FLOOR_COLORS[fl.id];
+                    ctx.lineWidth = 1.2;
+                    ctx.globalAlpha = 0.65;
+                    ctx.beginPath();
+                    list.forEach((s, i) => {
+                        const px = x(+s.ts), py = y(totals[i].per[fl.id]);
+                        i ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+                    });
+                    ctx.stroke();
+                });
+                ctx.globalAlpha = 1;
+                ctx.strokeStyle = '#3b82f6';
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                list.forEach((s, i) => {
+                    const px = x(+s.ts), py = y(totals[i].total);
+                    i ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+                });
+                ctx.stroke();
+                ctx.fillStyle = '#3b82f6';
+                list.forEach((s, i) => {
+                    ctx.beginPath(); ctx.arc(x(+s.ts), y(totals[i].total), 3, 0, Math.PI * 2); ctx.fill();
+                });
+
+                document.getElementById('anLegend').innerHTML =
+                    `<span><span class="dot" style="background:#3b82f6"></span>Total</span>` +
+                    FLOORS.map(fl => `<span><span class="dot" style="background:${FLOOR_COLORS[fl.id]}"></span>${fl.label}</span>`).join('');
+            }
+
+            function renderDowGrid(list, totals) {
+                const buckets = Array.from({ length: 7 }, () => Array.from({ length: 24 }, () => ({ sum: 0, n: 0 })));
+                list.forEach((s, i) => {
+                    const b = buckets[s.ts.getDay()][s.ts.getHours()];
+                    b.sum += totals[i].total; b.n++;
+                });
+                let maxAvg = 0;
+                buckets.forEach(row => row.forEach(b => { if (b.n) maxAvg = Math.max(maxAvg, b.sum / b.n); }));
+                const days = DAY_NAMES;
+                let html = '<div class="dow-grid"><div class="dow-lbl"></div>';
+                for (let h = 0; h < 24; h++) html += `<div class="dow-lbl">${h % 3 === 0 ? h : ''}</div>`;
+                for (let d = 0; d < 7; d++) {
+                    html += `<div class="dow-lbl">${days[d]}</div>`;
+                    for (let h = 0; h < 24; h++) {
+                        const b = buckets[d][h];
+                        if (b.n && maxAvg) {
+                            const avg = b.sum / b.n;
+                            const [r, g, bl] = ramp(avg / maxAvg);
+                            html += `<div class="dow-cell" style="background:rgba(${r},${g},${bl},0.8)" title="${days[d]} ${h}:00 — avg ${avg.toFixed(1)} (${b.n} session${b.n === 1 ? '' : 's'})"></div>`;
+                        } else {
+                            html += `<div class="dow-cell" title="${days[d]} ${h}:00 — no data"></div>`;
+                        }
+                    }
+                }
+                document.getElementById('anGrid').innerHTML = html + '</div>';
+            }
+
+            function renderFloorBars(totals) {
+                const perFloor = {};
+                FLOORS.forEach(fl => perFloor[fl.id] = 0);
+                totals.forEach(t => FLOORS.forEach(fl => { perFloor[fl.id] += t.per[fl.id]; }));
+                const grand = Object.values(perFloor).reduce((a, b) => a + b, 0);
+                document.getElementById('anFloors').innerHTML = FLOORS.map(fl => {
+                    const n = perFloor[fl.id];
+                    const pct = grand ? n / grand * 100 : 0;
+                    return `<div class="floor-row">
+                        <span class="fl-name">${fl.label}</span>
+                        <div class="fl-bar-wrap"><div class="fl-bar" style="width:${pct.toFixed(1)}%;background:${FLOOR_COLORS[fl.id]}"></div></div>
+                        <span class="fl-val">${n.toLocaleString()} (${pct.toFixed(1)}%)</span>
+                    </div>`;
+                }).join('');
+            }
+
+            function exportCSV() {
+                const list = analyticsSessions();
+                if (!list.length) return;
+                const rows = [['submitted_at', 'total', ...FLOORS.map(f => f.id), 'note']];
+                list.forEach(s => {
+                    const t = sessionTotals(s);
+                    rows.push([s.ts.toISOString(), t.total, ...FLOORS.map(f => t.per[f.id]), s.note || '']);
+                });
+                const csv = rows.map(r => r.map(v => {
+                    v = String(v);
+                    return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+                }).join(',')).join('\r\n');
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+                a.download = `heatmap-sessions-${list[0].ts.toISOString().slice(0, 10)}_${list[list.length - 1].ts.toISOString().slice(0, 10)}.csv`;
+                a.click();
+                URL.revokeObjectURL(a.href);
+            }
+
+            // ?demo=1 generates synthetic sessions to preview the analytics tools
+            if (new URLSearchParams(location.search).get('demo')) {
+                const now = Date.now();
+                for (let i = 0; i < 60; i++) {
+                    const d = new Date(now - Math.floor(Math.random() * 14) * 864e5);
+                    d.setHours(8 + Math.floor(Math.random() * 13), Math.random() < 0.5 ? 0 : 30, i, 0);
+                    const busy = 0.4 + Math.sin((d.getHours() - 8) / 13 * Math.PI);
+                    addSession({
+                        submitted_at: d.toISOString(),
+                        note: 'demo session',
+                        floors: FLOORS.map((fl, fi) => ({
+                            id: fl.id,
+                            points: Array.from(
+                                { length: Math.max(0, Math.round((Math.random() * 14 + 4) * busy / (fi * 0.4 + 1))) },
+                                () => ({ x: 150 + Math.random() * 1500, y: 150 + Math.random() * 900, t: +d })
+                            )
+                        })),
+                    });
+                }
+                loadStatusEl.textContent = 'Demo data (?demo=1) — not real sessions';
+                afterSessionsChanged();
             }
 
             restore();
