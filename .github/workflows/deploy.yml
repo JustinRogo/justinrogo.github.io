@@ -16,12 +16,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-
-      - run: npm install
-      - run: npm run build
+      - name: Prepare static site
+        run: |
+          mkdir -p dist
+          cp -R data Maps Pages favicon.svg index.html main.js style.css dist/
+          find dist -type f -name '*.bak.html' -delete
 
       - uses: actions/configure-pages@v5
 

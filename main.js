@@ -562,7 +562,136 @@ fetch('https://justinrogo.github.io/data/cards_count.json')
 })();
 
 /* ===================================================================
-   Events RSS — UConn Law
+   Mobile Contact Menu
+   =================================================================== */
+(function initMobileContactMenu() {
+  const toggle = document.getElementById('contactToggle');
+  const actions = document.getElementById('quickbarActions');
+  if (!toggle || !actions) return;
+
+  function setOpen(open) {
+    actions.classList.toggle('is-open', open);
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+
+  toggle.addEventListener('click', () => setOpen(!actions.classList.contains('is-open')));
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') setOpen(false);
+  });
+})();
+
+/* ===================================================================
+   Recent GitHub Commits
+   =================================================================== */
+(function initCommitFeed() {
+  const mount = document.getElementById('commitList');
+  if (!mount) return;
+
+  const sources = [
+    { owner: 'JustinRogo', repo: 'justinrogo.github.io', label: 'This site' },
+    { owner: 'UConn-Law-Library', repo: 'uconn-law-library.github.io', label: 'UConn Law Library site' },
+  ];
+  const cacheKey = 'recentCommits.v1';
+  const cacheTtl = 15 * 60 * 1000;
+  const commitLimit = 6;
+
+  function readCache() {
+    try {
+      const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
+      if (!cached || !Array.isArray(cached.items) || Date.now() - cached.savedAt > cacheTtl) return null;
+      return cached.items;
+    } catch {
+      return null;
+    }
+  }
+
+  function writeCache(items) {
+    try {
+      localStorage.setItem(cacheKey, JSON.stringify({ savedAt: Date.now(), items }));
+    } catch { /* storage blocked or full */ }
+  }
+
+  function formatDate(value) {
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? '' : date.toLocaleDateString('en-US', {
+      month: 'short', day: 'numeric', year: 'numeric',
+    });
+  }
+
+  function render(items) {
+    mount.replaceChildren();
+    items.forEach(item => {
+      const entry = document.createElement('details');
+      entry.className = 'commit-entry';
+      const summary = document.createElement('summary');
+
+      const message = document.createElement('span');
+      message.className = 'commit-message';
+      message.textContent = item.message.split('\n')[0] || 'Untitled commit';
+
+      const meta = document.createElement('span');
+      meta.className = 'commit-meta';
+      const date = document.createElement('span');
+      date.textContent = formatDate(item.date);
+      const sha = document.createElement('span');
+      sha.className = 'commit-sha';
+      sha.textContent = item.sha.slice(0, 7);
+      meta.append(date, ' · ', sha);
+
+      const repo = document.createElement('span');
+      repo.className = 'commit-repo';
+      repo.textContent = item.repo;
+
+      const details = document.createElement('p');
+      details.className = 'commit-details';
+      details.textContent = item.message;
+
+      summary.append(message, meta, repo);
+      entry.append(summary, details);
+      mount.append(entry);
+    });
+  }
+
+  async function fetchSource(source) {
+    const url = new URL(`https://api.github.com/repos/${source.owner}/${source.repo}/commits`);
+    url.search = new URLSearchParams({ sha: 'main', author: 'JustinRogo', per_page: String(commitLimit) });
+    const response = await fetch(url, { headers: { Accept: 'application/vnd.github+json' } });
+    if (!response.ok) throw new Error(`GitHub API request failed (${response.status})`);
+
+    const commits = await response.json();
+    return commits.map(commit => ({
+      date: commit.commit?.author?.date || '',
+      message: commit.commit?.message || '',
+      repo: source.label,
+      sha: commit.sha || '',
+    }));
+  }
+
+  const cached = readCache();
+  if (cached) {
+    render(cached);
+    return;
+  }
+
+  Promise.allSettled(sources.map(fetchSource))
+    .then(results => {
+      const commits = results
+        .filter(result => result.status === 'fulfilled')
+        .flatMap(result => result.value)
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .slice(0, commitLimit);
+
+      if (!commits.length) throw new Error('No commits returned');
+      writeCache(commits);
+      render(commits);
+    })
+    .catch(() => {
+      mount.textContent = 'Recent commits are unavailable right now.';
+    });
+})();
+
+/* ===================================================================
+   Events Feed
    =================================================================== */
 (function initEvents() {
   const list = document.getElementById('eventsList');

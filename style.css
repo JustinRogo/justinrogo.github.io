@@ -553,6 +553,113 @@ aside {
 }
 
 /* ===================================================================
+   Section Labels & Links
+   =================================================================== */
+.eyebrow {
+  margin: 0 0 4px;
+  color: var(--cyan);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.section-link {
+  color: var(--cyan);
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.section-link:hover,
+.section-link:focus-visible {
+  color: var(--text-strong);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ===================================================================
+   Recent Commits
+   =================================================================== */
+.commit-list {
+  display: grid;
+  gap: 10px;
+}
+
+.commit-entry {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.01);
+  color: var(--text);
+  transition: transform var(--speed), border-color var(--speed), background var(--speed);
+}
+
+.commit-entry:hover,
+.commit-entry:has(summary:focus-visible) {
+  transform: translateY(-2px);
+  border-color: var(--cyan);
+  background: rgba(0, 242, 254, 0.06);
+}
+
+.commit-entry[open] {
+  border-color: var(--line-strong);
+  background: rgba(0, 242, 254, 0.04);
+}
+
+.commit-entry summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 14px;
+  align-items: center;
+  padding: 13px 15px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.commit-entry summary::-webkit-details-marker {
+  display: none;
+}
+
+.commit-entry summary:focus-visible {
+  outline: 3px solid var(--cyan);
+  outline-offset: -3px;
+  border-radius: var(--radius-sm);
+}
+
+.commit-message {
+  overflow: hidden;
+  color: var(--text-strong);
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.commit-repo,
+.commit-meta {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.commit-meta {
+  white-space: nowrap;
+}
+
+.commit-sha {
+  color: var(--cyan);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.commit-details {
+  margin: 0;
+  padding: 0 15px 14px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+/* ===================================================================
    Quick Links Grid
    =================================================================== */
 .link-tools {
@@ -1157,6 +1264,16 @@ input, textarea {
   z-index: 1000;
 }
 
+.quickbar-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.contact-toggle {
+  display: none;
+}
+
 .fab {
   width: 54px;
   height: 54px;
@@ -1496,7 +1613,7 @@ body.light .ulsw .helper {
 
 @media (max-width: 600px) {
   .container {
-    padding-bottom: 90px;
+    padding-bottom: var(--gap);
     padding-inline: 16px;
   }
 
@@ -1528,24 +1645,66 @@ body.light .ulsw .helper {
   }
 
   .quickbar {
-    left: 16px;
-    right: 16px;
-    bottom: 16px;
-    flex-direction: row;
+    position: absolute;
+    top: 32px;
+    right: 32px;
+    bottom: auto;
+    left: auto;
+    align-items: flex-end;
+  }
+
+  .contact-toggle {
+    display: inline-flex;
+    min-height: 48px;
+    align-items: center;
     justify-content: center;
-    pointer-events: none;
+    padding: 0 20px;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--electric-blue), var(--violet));
+    box-shadow: var(--shadow);
+    color: var(--text-strong);
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+
+  .contact-toggle:focus-visible {
+    outline: 3px solid var(--cyan);
+    outline-offset: 3px;
+  }
+
+  .quickbar-actions {
+    display: none;
+    position: absolute;
+    right: 0;
+    bottom: 60px;
+    flex-direction: row;
+    gap: 8px;
+    padding: 8px;
+    border: 1px solid var(--line-strong);
+    border-radius: 16px;
+    background: rgba(6, 13, 32, 0.94);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  .quickbar-actions.is-open {
+    display: flex;
   }
 
   .fab {
     width: 48px;
     height: 48px;
-    pointer-events: auto;
     border-radius: 12px;
   }
 
   .link-grid {
     grid-template-columns: 1fr;
   }
+
 }
 
 /* ===================================================================
