@@ -128,10 +128,63 @@
     <!-- ========== Main ========== -->
     <main>
 
-      
+      <!-- About -->
+      <section class="card widget about-intro" aria-labelledby="about-heading">
+        <p class="eyebrow">About</p>
+        <h2 id="about-heading">A little about me</h2>
+        <p class="about-intro__copy">I work at the intersection of information, technology, data, and design. I like untangling complicated processes, automating tedious work, and building useful tools that make things easier to find and use. Outside of work, I’m usually experimenting with code, starting another side project, or tending to an entirely reasonable number of houseplants.</p>
 
+        <details class="about-more">
+          <summary class="about-more__summary">
+            <span>More about me</span>
+            <span class="about-more__icon" aria-hidden="true"></span>
+          </summary>
 
+          <div class="about-more__content">
+            <div class="about-more__grid">
+              <section class="about-resume__panel about-resume__panel--wide">
+                <p class="about-resume__label">Professional focus</p>
+                <h3>Building sustainable systems for library work</h3>
+                <p>I’ve spent more than a decade working in academic libraries and have served the UConn School of Law Library since 2016. As Library Information Coordinator, I lead knowledge-management, reporting, automation, administrative, and cross-functional projects that turn operational needs into durable systems.</p>
+              </section>
 
+              <section class="about-resume__panel">
+                <p class="about-resume__label">Selected work</p>
+                <h3>Projects with practical impact</h3>
+                <ul class="about-resume__list">
+                  <li><strong>Knowledge management:</strong> Built a Confluence staff hub with an ever-growing collection of documentation, training resources, and institutional knowledge.</li>
+                  <li><strong>Data and reporting:</strong> Created Power BI dashboards for payroll, surveys, facilities, collections, scholarship, assessment, projects, and service feedback.</li>
+                  <li><strong>Workflow design:</strong> Led the study-room reservation transition from LibCal to EMS and built a Power Apps tool that automated daily statistics and checklist work.</li>
+                  <li><strong>Web and communications:</strong> Revamped the law library website and supported UConn Law Library Centennial communications and digital content.</li>
+                </ul>
+              </section>
+
+              <section class="about-resume__panel">
+                <p class="about-resume__label">Leadership &amp; learning</p>
+                <h3>Service grounded in curiosity</h3>
+                <ul class="about-resume__list">
+                  <li>University Senate Staff Senator, 2023–2026</li>
+                  <li>UCPEA Executive Board Secretary, 2024–2025</li>
+                  <li>UCPEA Union Steward, 2020–present</li>
+                </ul>
+                <p class="about-resume__education">B.A. in Political Science and Anthropology from UConn, with graduate coursework in Library and Information Science through San José State University.</p>
+              </section>
+
+              <section class="about-resume__panel about-resume__panel--wide">
+                <p class="about-resume__label">Technology &amp; tools</p>
+                <h3>A practical, evolving toolkit</h3>
+                <div class="about-resume__tools" aria-label="Technology and tools">
+                  <span>Power BI</span><span>Confluence</span><span>Jira</span><span>Alma</span>
+                  <span>Primo Analytics</span><span>Microsoft 365</span><span>Power Apps</span>
+                  <span>Power Automate</span><span>Copilot</span><span>WordPress</span>
+                  <span>HTML/CSS/JavaScript</span><span>Python</span><span>GitHub</span>
+                  <span>Adobe Creative Cloud</span><span>Canva</span>
+                </div>
+              </section>
+            </div>
+          </div>
+        </details>
+      </section>
 
       <!-- Tabs Deck -->
       <section class="card tabs" aria-label="Widgets">
@@ -226,30 +279,74 @@
         </div>
       </section>
 
-      <!-- Page Tree -->
-      <section class="card widget" aria-label="Page Tree" id="page-directory">
-        <div class="section-head">
-          <h2>Pages</h2>
+      <!-- The Pocket Part -->
+      <details class="card widget collapsible-widget pocket-part-widget">
+        <summary class="collapsible-widget__summary">
+          <h2 id="pocket-part-heading">
+            <span class="pocket-part-widget__eyebrow">UConn Law Library Blog</span>
+            <span>The Pocket Part</span>
+          </h2>
+          <span class="collapsible-widget__icon" aria-hidden="true"></span>
+        </summary>
+        <div class="collapsible-widget__body">
+          <div class="collapsible-widget__toolbar">
+            <a class="pocket-part-widget__all"
+               href="https://library.law.uconn.edu/the-pocket-part/"
+               target="_blank" rel="noopener noreferrer">
+              View all posts <span aria-hidden="true">&rarr;</span>
+            </a>
+          </div>
+
+          <div id="pocket-part-content" class="pocket-part-widget__content" aria-live="polite">
+            <p class="pocket-part-widget__status">Loading recent posts&hellip;</p>
+          </div>
+
+          <noscript>
+            <p><a href="https://library.law.uconn.edu/the-pocket-part/">Read The Pocket Part blog</a></p>
+          </noscript>
         </div>
-        <div class="page-tree" id="pageTree"></div>
-      </section>
+      </details>
+
+      <!-- Page Tree -->
+      <details class="card widget collapsible-widget" id="page-directory">
+        <summary class="collapsible-widget__summary">
+          <h2>Pages</h2>
+          <span class="collapsible-widget__icon" aria-hidden="true"></span>
+        </summary>
+        <div class="collapsible-widget__body">
+          <div class="page-tree" id="pageTree"></div>
+        </div>
+      </details>
 
       <!-- Recent GitHub Activity -->
-      <section class="card widget commit-feed" aria-labelledby="recent-commits-heading">
-        <div class="section-head">
-          <div>
-            <p class="eyebrow">GitHub activity</p>
-            <h2 id="recent-commits-heading">Recent commits</h2>
+      <details class="card widget collapsible-widget commit-feed">
+        <summary class="collapsible-widget__summary">
+          <h2 id="recent-commits-heading">
+            <span class="eyebrow">GitHub activity</span>
+            <span>Recent commits</span>
+          </h2>
+          <span class="collapsible-widget__icon" aria-hidden="true"></span>
+        </summary>
+        <div class="collapsible-widget__body">
+          <div class="collapsible-widget__toolbar">
+            <a class="section-link" href="https://github.com/JustinRogo" target="_blank" rel="noopener noreferrer">GitHub profile</a>
           </div>
-          <a class="section-link" href="https://github.com/JustinRogo" target="_blank" rel="noopener noreferrer">GitHub profile</a>
+          <div class="commit-list" id="commitList" aria-live="polite">
+            Loading recent commits&hellip;
+          </div>
         </div>
-        <div class="commit-list" id="commitList" aria-live="polite">
-          Loading recent commits…
-        </div>
-      </section>
+      </details>
       <footer>Built with ✨ by Justin · <span id="year"></span></footer>
     </main>
   </div>
+
+  <!-- Animated desktop companion -->
+  <button class="site-pet" id="sitePet" type="button"
+          aria-label="Rogo, Justin's animated site companion. Click to make him wave."
+          title="Click Rogo to wave" hidden>
+    <canvas class="site-pet__canvas" id="sitePetCanvas" width="192" height="208" aria-hidden="true"></canvas>
+    <span class="site-pet__label" aria-hidden="true">Rogo</span>
+  </button>
 
   <!-- Quick contact -->
   <nav aria-label="Quick contact" class="quickbar">

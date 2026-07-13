@@ -204,11 +204,11 @@ function escapeHtml(value) {
     <div id="CS">
       <div class="summary">
         <h3>My <strong>CliftonStrengths Themes</strong></h3>
-        <div class="bar">
-          <div class="green"></div>
-          <div class="blue"></div>
-          <div class="purple"></div>
-          <div class="orange"></div>
+        <div class="bar" role="img" aria-label="CliftonStrengths domain balance">
+          <div class="green" data-domain="thinking" data-label="Strategic Thinking" aria-hidden="true"></div>
+          <div class="blue" data-domain="relationship" data-label="Relationship Building" aria-hidden="true"></div>
+          <div class="purple" data-domain="executing" data-label="Executing" aria-hidden="true"></div>
+          <div class="orange" data-domain="influencing" data-label="Influencing" aria-hidden="true"></div>
         </div>
         <div class="controls">
           <button data-limit="5">Top 5</button>
@@ -315,6 +315,32 @@ function escapeHtml(value) {
     </div>`;
 
   mount.innerHTML = html;
+
+  // Size the domain bar from the ranked profile. A #1 theme receives 34 points,
+  // a #2 theme receives 33, and so on through #34 receiving 1 point.
+  const domainBar = mount.querySelector('.bar');
+  const rankedItems = [...mount.querySelectorAll('.item[data-domain]')];
+  const maxRank = Math.max(...rankedItems.map(item => (
+    parseInt(item.querySelector('.rank')?.textContent || '0', 10)
+  )));
+  const domainScores = rankedItems.reduce((scores, item) => {
+    const rank = parseInt(item.querySelector('.rank')?.textContent || '0', 10);
+    const score = Math.max(1, maxRank + 1 - rank);
+    scores[item.dataset.domain] = (scores[item.dataset.domain] || 0) + score;
+    return scores;
+  }, {});
+  const totalDomainScore = Object.values(domainScores).reduce((total, score) => total + score, 0);
+
+  if (domainBar && totalDomainScore) {
+    const labels = [...domainBar.querySelectorAll('[data-domain]')].map(segment => {
+      const score = domainScores[segment.dataset.domain] || 0;
+      const percentage = Math.round((score / totalDomainScore) * 1000) / 10;
+      segment.style.setProperty('--domain-weight', score);
+      segment.title = `${segment.dataset.label}: ${percentage}%`;
+      return `${segment.dataset.label} ${percentage}%`;
+    });
+    domainBar.setAttribute('aria-label', `Rank-weighted CliftonStrengths domain balance: ${labels.join(', ')}`);
+  }
 
   // Strengths filter controls
   const controlBtns = mount.querySelectorAll('.controls button');
@@ -581,6 +607,138 @@ fetch('https://justinrogo.github.io/data/cards_count.json')
 })();
 
 /* ===================================================================
+   Animated Desktop Companion
+   =================================================================== */
+(function initSitePet() {
+  const pet = document.getElementById('sitePet');
+  const canvas = document.getElementById('sitePetCanvas');
+  if (!pet || !canvas) return;
+
+  const context = canvas.getContext('2d');
+  if (!context) return;
+
+  const desktopQuery = window.matchMedia('(min-width: 1100px)');
+  const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const sprite = new Image();
+  const frameWidth = 192;
+  const frameHeight = 208;
+  const sequences = {
+    idle: { row: 0, durations: [280, 110, 110, 140, 140, 320] },
+    wave: { row: 1, durations: [140, 140, 140, 280] },
+  };
+
+  let loaded = false;
+  let loading = false;
+  let timer = 0;
+  let mode = 'idle';
+  let frame = 0;
+  let waveLoops = 0;
+  let nextWaveAt = 0;
+
+  function draw(row, column) {
+    context.clearRect(0, 0, frameWidth, frameHeight);
+    context.drawImage(
+      sprite,
+      column * frameWidth,
+      row * frameHeight,
+      frameWidth,
+      frameHeight,
+      0,
+      0,
+      frameWidth,
+      frameHeight,
+    );
+  }
+
+  function scheduleWave() {
+    nextWaveAt = Date.now() + 8000 + Math.random() * 8000;
+  }
+
+  function tick() {
+    if (!desktopQuery.matches || reducedMotionQuery.matches || !loaded) return;
+
+    const sequence = sequences[mode];
+    draw(sequence.row, frame);
+    const delay = sequence.durations[frame];
+    frame += 1;
+
+    if (frame >= sequence.durations.length) {
+      frame = 0;
+      if (mode === 'wave') {
+        waveLoops += 1;
+        if (waveLoops >= 2) {
+          mode = 'idle';
+          waveLoops = 0;
+          scheduleWave();
+        }
+      } else if (Date.now() >= nextWaveAt) {
+        mode = 'wave';
+        waveLoops = 0;
+      }
+    }
+
+    timer = window.setTimeout(tick, delay);
+  }
+
+  function start() {
+    window.clearTimeout(timer);
+    pet.hidden = false;
+    mode = 'idle';
+    frame = 0;
+    waveLoops = 0;
+    scheduleWave();
+
+    if (reducedMotionQuery.matches) draw(sequences.idle.row, 0);
+    else tick();
+  }
+
+  function stop() {
+    window.clearTimeout(timer);
+    pet.hidden = true;
+  }
+
+  function requestWave() {
+    if (!loaded || reducedMotionQuery.matches || !desktopQuery.matches) return;
+    mode = 'wave';
+    frame = 0;
+    waveLoops = 0;
+  }
+
+  function load() {
+    if (loaded) {
+      start();
+      return;
+    }
+    if (loading) return;
+
+    loading = true;
+    sprite.decoding = 'async';
+    sprite.onload = () => {
+      loaded = true;
+      loading = false;
+      start();
+    };
+    sprite.onerror = () => {
+      loading = false;
+      stop();
+    };
+    sprite.src = 'assets/rogo-corner.webp';
+  }
+
+  function syncVisibility() {
+    if (desktopQuery.matches) load();
+    else stop();
+  }
+
+  pet.addEventListener('click', requestWave);
+  desktopQuery.addEventListener('change', syncVisibility);
+  reducedMotionQuery.addEventListener('change', () => {
+    if (desktopQuery.matches && loaded) start();
+  });
+  syncVisibility();
+})();
+
+/* ===================================================================
    Recent GitHub Commits
    =================================================================== */
 (function initCommitFeed() {
@@ -718,6 +876,191 @@ fetch('https://justinrogo.github.io/data/cards_count.json')
     })
     .catch(() => {
       list.innerHTML = `<span class="info-note">Events feed unavailable. <a href="${FEED}" target="_blank" rel="noopener noreferrer">Open feed directly</a>.</span>`;
+    });
+})();
+
+/* ===================================================================
+   The Pocket Part
+   =================================================================== */
+(function initPocketPart() {
+  const FEED_URL = 'https://library.law.uconn.edu/category/blog/feed/';
+  const FEED_API = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(FEED_URL)}`;
+  const BLOG_URL = 'https://library.law.uconn.edu/the-pocket-part/';
+  const POST_LIMIT = 4;
+  const container = document.getElementById('pocket-part-content');
+
+  if (!container) return;
+
+  function decodeText(html = '') {
+    const doc = new DOMParser().parseFromString(`<body>${html}</body>`, 'text/html');
+    return (doc.body.textContent || '').replace(/\s+/g, ' ').trim();
+  }
+
+  function shorten(text, words = 34) {
+    const parts = text.split(/\s+/).filter(Boolean);
+    return parts.length > words ? `${parts.slice(0, words).join(' ')}…` : text;
+  }
+
+  function parseDate(value) {
+    if (!value) return null;
+    const normalized = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(value)
+      ? `${value.replace(' ', 'T')}Z`
+      : value;
+    const date = new Date(normalized);
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+
+  function formatDate(value) {
+    const date = parseDate(value);
+    return date ? new Intl.DateTimeFormat('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    }).format(date) : '';
+  }
+
+  function imageFromHtml(html = '') {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    return doc.querySelector('img')?.src || '';
+  }
+
+  function createLink(href, text, className = '') {
+    const link = document.createElement('a');
+    link.href = href;
+    link.textContent = text;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    if (className) link.className = className;
+    return link;
+  }
+
+  function appendPostImage(parent, post, linkClass, imageClass) {
+    if (!post.image) return false;
+
+    const imageLink = createLink(post.link, '', linkClass);
+    imageLink.setAttribute('aria-label', `Read ${post.title}`);
+
+    const image = document.createElement('img');
+    image.className = imageClass;
+    image.src = post.image;
+    image.alt = '';
+    image.loading = 'lazy';
+    image.decoding = 'async';
+    imageLink.append(image);
+    parent.append(imageLink);
+    return true;
+  }
+
+  function render(posts) {
+    const featured = posts[0];
+    if (!featured) throw new Error('No posts were returned.');
+
+    container.replaceChildren();
+
+    const article = document.createElement('article');
+    article.className = 'pocket-part-widget__featured';
+    if (!appendPostImage(
+      article,
+      featured,
+      'pocket-part-widget__image-link',
+      'pocket-part-widget__image'
+    )) article.classList.add('pocket-part-widget__featured--no-image');
+
+    const copy = document.createElement('div');
+    copy.className = 'pocket-part-widget__featured-copy';
+
+    const time = document.createElement('time');
+    time.className = 'pocket-part-widget__date';
+    time.dateTime = featured.isoDate;
+    time.textContent = featured.date;
+
+    const title = document.createElement('h3');
+    title.className = 'pocket-part-widget__title';
+    title.append(createLink(featured.link, featured.title));
+
+    const excerpt = document.createElement('p');
+    excerpt.className = 'pocket-part-widget__excerpt';
+    excerpt.textContent = featured.excerpt;
+
+    copy.append(time, title, excerpt, createLink(
+      featured.link,
+      'Read article →',
+      'pocket-part-widget__read'
+    ));
+    article.append(copy);
+    container.append(article);
+
+    if (posts.length < 2) return;
+
+    const recent = document.createElement('ul');
+    recent.className = 'pocket-part-widget__recent';
+    recent.setAttribute('aria-label', 'More recent Pocket Part posts');
+
+    posts.slice(1).forEach(post => {
+      const item = document.createElement('li');
+      item.className = 'pocket-part-widget__recent-item';
+      if (!appendPostImage(
+        item,
+        post,
+        'pocket-part-widget__recent-image-link',
+        'pocket-part-widget__recent-image'
+      )) item.classList.add('pocket-part-widget__recent-item--no-image');
+
+      const itemCopy = document.createElement('div');
+      itemCopy.className = 'pocket-part-widget__recent-copy';
+
+      const itemTime = document.createElement('time');
+      itemTime.className = 'pocket-part-widget__date';
+      itemTime.dateTime = post.isoDate;
+      itemTime.textContent = post.date;
+
+      const itemTitle = document.createElement('h3');
+      itemTitle.className = 'pocket-part-widget__recent-title';
+      itemTitle.append(createLink(post.link, post.title));
+
+      itemCopy.append(itemTime, itemTitle);
+      item.append(itemCopy);
+      recent.append(item);
+    });
+
+    container.append(recent);
+  }
+
+  fetch(FEED_API)
+    .then(response => {
+      if (!response.ok) throw new Error(`Feed request failed: ${response.status}`);
+      return response.json();
+    })
+    .then(data => {
+      if (data.status !== 'ok' || !Array.isArray(data.items)) {
+        throw new Error(data.message || 'The feed could not be parsed.');
+      }
+
+      const posts = data.items.slice(0, POST_LIMIT).map(item => {
+        const published = item.pubDate || '';
+        const content = item.content || item.description || '';
+        const parsedDate = parseDate(published);
+        return {
+          title: decodeText(item.title || 'Untitled post'),
+          link: item.link || BLOG_URL,
+          isoDate: parsedDate?.toISOString() || '',
+          date: formatDate(published),
+          excerpt: shorten(decodeText(item.description || content)),
+          image: item.thumbnail || item.enclosure?.link || imageFromHtml(content),
+        };
+      });
+
+      render(posts);
+    })
+    .catch(() => {
+      container.replaceChildren();
+      const message = document.createElement('p');
+      message.className = 'pocket-part-widget__status pocket-part-widget__status--error';
+      message.append(
+        'Recent posts are temporarily unavailable. ',
+        createLink(BLOG_URL, 'Visit The Pocket Part blog.')
+      );
+      container.append(message);
     });
 })();
 
