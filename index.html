@@ -54,11 +54,8 @@
   <div class="glow-aurora glow-aurora-3" aria-hidden="true"></div>
 
   <div class="container">
-    <!-- ========== Sidebar ========== -->
-    <aside>
-
-      <!-- Hero / Profile -->
-      <header class="card hero" aria-label="Profile">
+    <!-- Hero / Profile -->
+    <header class="card hero" aria-label="Profile">
         <div class="avatar" aria-hidden="true">
           <img
             alt="Justin Rogowski"
@@ -88,48 +85,8 @@
             </a>
           </div>
         </div>
-      </header>
-
-      <!-- Trello + Time + Weather -->
-      <div class="card info-card">
-        <div class="chip">To Do</div>
-        <div style="margin-top:.4rem">
-          <strong id="trelloTotal">—</strong> total · <strong id="trelloDone">—</strong> completed
-        </div>
-
-        <div class="chip">Now Working On</div>
-        <p class="info-note" id="status" style="margin:.6rem 0 0">
-          Tending plants · Power BI · Other duties as assigned
-        </p>
-
-        <span class="chip">Time</span>
-        <div>
-          <div class="title" id="time">—</div>
-          <div class="info-note">Hartford, CT (ET)</div>
-        </div>
-
-        <div class="info-pair">
-          <span class="chip">Weather</span>
-          <div>
-            <div class="title" id="wx">Loading…</div>
-            <div class="info-note" id="wxNote">—</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- UConn Law Events -->
-      <div class="card info-card" role="region" aria-label="UConn Law Events">
-        <div class="chip">UConn Law Events</div>
-        <div class="info-note" id="eventsList" style="margin-top:.4rem">Loading upcoming events…</div>
-      </div>
-
-    </aside>
-
-    <!-- ========== Main ========== -->
-    <main>
-
       <!-- About -->
-      <section class="card widget about-intro" aria-labelledby="about-heading">
+      <div class="hero-about">
         <p class="eyebrow">About</p>
         <h2 id="about-heading">A little about me</h2>
         <p class="about-intro__copy">I work at the intersection of information, technology, data, and design. I like untangling complicated processes, automating tedious work, and building useful tools that make things easier to find and use. Outside of work, I’m usually experimenting with code, starting another side project, or tending to an entirely reasonable number of houseplants.</p>
@@ -168,6 +125,7 @@
                   <li>UCPEA Union Steward, 2020–present</li>
                 </ul>
                 <p class="about-resume__education">B.A. in Political Science and Anthropology from UConn, with graduate coursework in Library and Information Science through San José State University.</p>
+                <p class="about-resume__affiliations">Member of the American Association of Law Libraries (AALL) and Law Libraries of New England (LLNE).</p>
               </section>
 
               <section class="about-resume__panel about-resume__panel--wide">
@@ -184,7 +142,49 @@
             </div>
           </div>
         </details>
-      </section>
+      </div>
+    </header>
+
+    <!-- ========== Sidebar ========== -->
+    <aside>
+
+      <!-- Trello + Time + Weather -->
+      <div class="card info-card">
+        <div class="chip">To Do</div>
+        <div style="margin-top:.4rem">
+          <strong id="trelloTotal">—</strong> total · <strong id="trelloDone">—</strong> completed
+        </div>
+
+        <div class="chip">Now Working On</div>
+        <p class="info-note" id="status" style="margin:.6rem 0 0">
+          Tending plants · Power BI · Other duties as assigned
+        </p>
+
+        <span class="chip">Time</span>
+        <div>
+          <div class="title" id="time">—</div>
+          <div class="info-note">Hartford, CT (ET)</div>
+        </div>
+
+        <div class="info-pair">
+          <span class="chip">Weather</span>
+          <div>
+            <div class="title" id="wx">Loading…</div>
+            <div class="info-note" id="wxNote">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- UConn Law Events -->
+      <div class="card info-card" role="region" aria-label="UConn Law Events">
+        <div class="chip">UConn Law Events</div>
+        <div class="info-note" id="eventsList" style="margin-top:.4rem">Loading upcoming events…</div>
+      </div>
+
+    </aside>
+
+    <!-- ========== Main ========== -->
+    <main>
 
       <!-- Tabs Deck -->
       <section class="card tabs" aria-label="Widgets">
