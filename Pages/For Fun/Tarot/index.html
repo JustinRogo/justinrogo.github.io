@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070b1c">
+  <meta name="description" content="Draw one or three tarot cards for a private, reflective reading in your browser.">
+  <title>Midnight Tarot</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to the reading</a>
+
+  <div class="sky" aria-hidden="true">
+    <span class="star star-one"></span>
+    <span class="star star-two"></span>
+    <span class="star star-three"></span>
+  </div>
+
+  <header class="site-header">
+    <a class="home-link" href="../../../index.html" aria-label="Return to Justin Rogowski's homepage">
+      <span aria-hidden="true">←</span> Back to the collection
+    </a>
+    <div class="moon-mark" aria-hidden="true"><span>✦</span></div>
+    <p class="eyebrow">A quiet space for reflection</p>
+    <h1>Midnight Tarot</h1>
+    <p class="introduction">Settle your thoughts, choose a spread, and turn the cards when you are ready.</p>
+  </header>
+
+  <main id="main-content" class="page-shell">
+    <section id="setupPanel" class="ritual-panel" aria-labelledby="begin-title">
+      <div class="panel-heading">
+        <p class="step-label">Before the draw</p>
+        <h2 id="begin-title">Choose your reading</h2>
+      </div>
+
+      <fieldset class="spread-picker">
+        <legend>Choose a spread</legend>
+        <div class="spread-options">
+          <label class="spread-option">
+            <input type="radio" name="spread" value="single" checked>
+            <span class="spread-card-count" aria-hidden="true"><i></i></span>
+            <span class="spread-copy">
+              <strong>One card</strong>
+              <small>Your focus for this moment</small>
+            </span>
+          </label>
+          <label class="spread-option">
+            <input type="radio" name="spread" value="three">
+            <span class="spread-card-count three" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="spread-copy">
+              <strong>Three cards</strong>
+              <small>Past · Present · Future</small>
+            </span>
+          </label>
+        </div>
+      </fieldset>
+
+      <div class="intention-field">
+        <label for="intention">Hold an intention <span>optional</span></label>
+        <textarea id="intention" maxlength="240" rows="3" placeholder="What would you like to reflect on?"></textarea>
+        <div class="field-meta">
+          <span>Your words are never stored or sent.</span>
+          <span id="characterCount" aria-live="polite">0 / 240</span>
+        </div>
+      </div>
+
+      <div class="setup-actions">
+        <button id="shuffleButton" class="primary-button" type="button">
+          <span class="button-star" aria-hidden="true">✦</span>
+          <span class="button-label">Shuffle the deck</span>
+        </button>
+        <button id="openExplorerButton" class="secondary-button" type="button">Explore all 78 cards</button>
+      </div>
+    </section>
+
+    <section id="selectionStage" class="selection-stage" aria-labelledby="selection-title" hidden>
+      <div class="selection-heading">
+        <p class="step-label">The deck is spread</p>
+        <h2 id="selection-title" tabindex="-1">Choose your card</h2>
+        <p id="selectionInstructions">Move slowly and select the card that draws your attention.</p>
+        <p id="selectionCount" class="selection-count" role="status" aria-live="polite">0 of 1 cards chosen</p>
+      </div>
+      <div id="deckSpread" class="deck-spread" role="group" aria-label="Face-down tarot deck"></div>
+    </section>
+
+    <section id="readingStage" class="reading-stage" aria-labelledby="reading-title" hidden>
+      <div class="reading-heading">
+        <p id="spreadLabel" class="step-label">Your reading</p>
+        <h2 id="reading-title" tabindex="-1">The cards are waiting</h2>
+        <p id="intentionDisplay" class="intention-display" hidden></p>
+      </div>
+
+      <div id="shuffleVisual" class="shuffle-visual" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </div>
+
+      <div id="cardTable" class="card-table" aria-label="Your drawn cards"></div>
+
+      <article id="readingSummary" class="reading-summary" aria-labelledby="summary-title" hidden>
+        <div class="ornament" aria-hidden="true"><span>✦</span></div>
+        <p class="step-label">The thread between the cards</p>
+        <h2 id="summary-title" tabindex="-1">Your reading</h2>
+        <div id="patternReading" class="pattern-reading"></div>
+        <p id="closingReflection" class="closing-reflection"></p>
+        <div class="reading-actions">
+          <button id="copyButton" class="secondary-button" type="button">Copy reading</button>
+          <button id="resetButton" class="primary-button compact" type="button">Draw again</button>
+        </div>
+        <p id="copyStatus" class="copy-status" role="status" aria-live="polite"></p>
+      </article>
+    </section>
+
+    <p id="statusMessage" class="sr-only" role="status" aria-live="polite"></p>
+  </main>
+
+  <dialog id="cardExplorer" class="card-explorer" aria-labelledby="explorer-title">
+    <div class="explorer-shell">
+      <header class="explorer-header">
+        <div>
+          <p class="step-label">The complete deck</p>
+          <h2 id="explorer-title">Explore all 78 cards</h2>
+          <p>Select any card to study its upright and reversed meanings.</p>
+        </div>
+        <button id="closeExplorerButton" class="explorer-close" type="button" aria-label="Close card explorer">×</button>
+      </header>
+
+      <div class="explorer-layout">
+        <div class="gallery-pane">
+          <div id="cardGallery" class="card-gallery" aria-label="All tarot cards"></div>
+        </div>
+
+        <article id="cardDetail" class="card-detail" aria-labelledby="detailCardName" aria-live="polite">
+          <div class="detail-art">
+            <img id="detailCardImage" alt="" width="768" height="1152">
+          </div>
+          <div class="detail-copy">
+            <p id="detailCardMeta" class="detail-meta"></p>
+            <h3 id="detailCardName" tabindex="-1"></h3>
+            <div class="meaning-pair">
+              <section class="meaning-panel upright-meaning" aria-labelledby="upright-title">
+                <p id="upright-title" class="meaning-label">Upright</p>
+                <p id="uprightKeywords" class="detail-keywords"></p>
+                <p id="uprightMeaning"></p>
+                <p id="uprightGuidance" class="detail-guidance"></p>
+              </section>
+              <section class="meaning-panel reversed-meaning" aria-labelledby="reversed-title">
+                <p id="reversed-title" class="meaning-label">Reversed</p>
+                <p id="reversedKeywords" class="detail-keywords"></p>
+                <p id="reversedMeaning"></p>
+                <p id="reversedGuidance" class="detail-guidance"></p>
+              </section>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </dialog>
+
+  <footer class="site-footer">
+    <span aria-hidden="true">☾</span>
+    <p>Midnight Tarot is for personal reflection and entertainment. It is not a substitute for medical, legal, financial, or mental-health advice.</p>
+    <span aria-hidden="true">☽</span>
+  </footer>
+
+  <script src="deck.js?v=3" defer></script>
+  <script src="app.js?v=3" defer></script>
+</body>
+</html>

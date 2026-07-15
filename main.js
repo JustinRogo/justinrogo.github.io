@@ -9,6 +9,7 @@ const PAGE_TREE_FALLBACK = [
     children: [
       { title: 'Evolutionary Flocking Ecosystem', href: 'Pages/For Fun/Birds.html' },
       { title: 'Game of Life - Ultimate Cosmos', href: 'Pages/For Fun/Game-of-Life.html' },
+      { title: 'Midnight Tarot', href: 'Pages/For Fun/Tarot/index.html' },
       { title: 'UConn Law Library & IT - Multi-Gen Strategic Framework 2026', href: 'Pages/For Fun/StrategicFramework2.html' },
     ],
   },
