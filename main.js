@@ -739,6 +739,68 @@ fetch('https://justinrogo.github.io/data/cards_count.json')
 })();
 
 /* ===================================================================
+   About — hero card spans both columns while "More about me" is open.
+   On desktop the expand/collapse is FLIP-animated: measure the layout
+   before and after the change, then animate each piece between them.
+   =================================================================== */
+(function initAboutExpand() {
+  const details = document.querySelector('.about-more');
+  const container = document.querySelector('.container');
+  if (!details || !container) return;
+
+  const sync = () => container.classList.toggle('about-open', details.open);
+  details.addEventListener('toggle', sync);
+  sync();
+
+  const summary = details.querySelector('.about-more__summary');
+  const hero = container.querySelector(':scope > .hero');
+  const aside = container.querySelector(':scope > aside');
+  const main = container.querySelector(':scope > main');
+  if (!summary || !hero || !aside || !main) return;
+
+  const desktopQuery = window.matchMedia('(min-width: 981px)');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  summary.addEventListener('click', event => {
+    if (!desktopQuery.matches || reducedMotion.matches) return;
+    event.preventDefault();
+
+    const targets = [hero, aside, main];
+    const before = targets.map(el => el.getBoundingClientRect());
+
+    details.open = !details.open;
+    sync();
+
+    const after = targets.map(el => el.getBoundingClientRect());
+    const timing = { duration: 450, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)' };
+
+    // The hero animates its own box; keep it above the columns sliding
+    // beneath it and clip its content while it resizes.
+    hero.style.overflow = 'hidden';
+    hero.style.zIndex = '5';
+    const heroAnim = hero.animate([
+      { width: `${before[0].width}px`, height: `${before[0].height}px` },
+      { width: `${after[0].width}px`, height: `${after[0].height}px` },
+    ], timing);
+    heroAnim.onfinish = heroAnim.oncancel = () => {
+      hero.style.overflow = '';
+      hero.style.zIndex = '';
+    };
+
+    targets.slice(1).forEach((el, i) => {
+      const dx = before[i + 1].left - after[i + 1].left;
+      const dy = before[i + 1].top - after[i + 1].top;
+      if (dx || dy) {
+        el.animate([
+          { transform: `translate(${dx}px, ${dy}px)` },
+          { transform: 'none' },
+        ], timing);
+      }
+    });
+  });
+})();
+
+/* ===================================================================
    Recent GitHub Commits
    =================================================================== */
 (function initCommitFeed() {
@@ -748,8 +810,9 @@ fetch('https://justinrogo.github.io/data/cards_count.json')
   const sources = [
     { owner: 'JustinRogo', repo: 'justinrogo.github.io', label: 'This site' },
     { owner: 'UConn-Law-Library', repo: 'uconn-law-library.github.io', label: 'UConn Law Library site' },
+    { owner: 'UConn-Law-Library', repo: 'CGS', label: 'CGS Explorer' },
   ];
-  const cacheKey = 'recentCommits.v1';
+  const cacheKey = 'recentCommits.v2';
   const cacheTtl = 15 * 60 * 1000;
   const commitLimit = 6;
 
