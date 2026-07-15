@@ -200,10 +200,9 @@ function escapeHtml(value) {
   const mount = document.getElementById('csMount');
   if (!mount) return;
 
-  const html = `<h2 id="CSh2"></h2>
-    <div id="CS">
+  const html = `<div id="CS">
       <div class="summary">
-        <h3>My <strong>CliftonStrengths Themes</strong></h3>
+        <h2>My <strong>CliftonStrengths Themes</strong></h2>
         <div class="bar" role="img" aria-label="CliftonStrengths domain balance">
           <div class="green" data-domain="thinking" data-label="Strategic Thinking" aria-hidden="true"></div>
           <div class="blue" data-domain="relationship" data-label="Relationship Building" aria-hidden="true"></div>
@@ -247,7 +246,7 @@ function escapeHtml(value) {
       <br />
       <!-- Strategic Thinking -->
       <section class="section">
-        <h2>Strategic Thinking <span style="background:var(--green)"></span></h2>
+        <h3>Strategic Thinking <span style="background:var(--green)"></span></h3>
         <div class="list">
           <div class="item top10" data-domain="thinking" data-desc="Ideation: You generate novel connections and angles, turning disparate dots into fresh concepts and creative options."><span class="rank">1</span><span class="name">Ideation</span></div>
           <div class="item top10" data-domain="thinking" data-desc="Strategic: You scan the landscape, play out scenarios, and choose the path with the strongest leverage and least regret."><span class="rank">2</span><span class="name">Strategic</span></div>
@@ -261,7 +260,7 @@ function escapeHtml(value) {
       </section>
       <!-- Executing -->
       <section class="section">
-        <h2>Executing <span style="background:var(--purple)"></span></h2>
+        <h3>Executing <span style="background:var(--purple)"></span></h3>
         <div class="list">
           <div class="item top10" data-domain="executing" data-desc="Arranger: You orchestrate moving parts and people in real time, reconfiguring plans to improve flow and outcomes without dropping the ball."><span class="rank">4</span><span class="name">Arranger</span></div>
           <div class="item top10" data-domain="executing" data-desc="Restorative: You zero in on what's broken, diagnose root causes, and methodically apply fixes until performance is restored and better than before."><span class="rank">5</span><span class="name">Restorative</span></div>
@@ -276,7 +275,7 @@ function escapeHtml(value) {
       </section>
       <!-- Relationship Building -->
       <section class="section">
-        <h2>Relationship Building <span style="background:var(--blue)"></span></h2>
+        <h3>Relationship Building <span style="background:var(--blue)"></span></h3>
         <div class="list">
           <div class="item top10" data-domain="relationship" data-desc="Adaptability: You pivot gracefully as realities change, absorbing shocks and adjusting plans without drama."><span class="rank">6</span><span class="name">Adaptability</span></div>
           <div class="item top10" data-domain="relationship" data-desc="Individualization: You notice unique patterns in people and tailor roles, recognition, and communication to fit each person."><span class="rank">9</span><span class="name">Individualization</span></div>
@@ -291,7 +290,7 @@ function escapeHtml(value) {
       </section>
       <!-- Influencing -->
       <section class="section">
-        <h2>Influencing <span style="background:var(--orange)"></span></h2>
+        <h3>Influencing <span style="background:var(--orange)"></span></h3>
         <div class="list">
           <div class="item" data-domain="influencing" data-desc="Communication: You translate ideas into vivid stories, examples, and images so others understand, remember, and act."><span class="rank">15</span><span class="name">Communication</span></div>
           <div class="item" data-domain="influencing" data-desc="Activator: You convert talk into motion, launching experiments and learning by doing rather than waiting for perfect plans."><span class="rank">16</span><span class="name">Activator</span></div>
@@ -305,9 +304,9 @@ function escapeHtml(value) {
       </section>
 
       <!-- Modal -->
-      <div id="modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div id="modal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="modal-title" aria-describedby="modal-desc">
         <div class="modal-content">
-          <button class="close" aria-label="Close">&times;</button>
+          <button class="close" type="button" aria-label="Close CliftonStrengths description">&times;</button>
           <h3 id="modal-title"></h3>
           <p id="modal-desc"></p>
         </div>
@@ -315,6 +314,21 @@ function escapeHtml(value) {
     </div>`;
 
   mount.innerHTML = html;
+
+  // Promote each generated theme card to a native button before the browser
+  // paints it, so the card has built-in keyboard and assistive-tech behavior.
+  mount.querySelectorAll('.item').forEach(item => {
+    const button = document.createElement('button');
+    [...item.attributes].forEach(attribute => button.setAttribute(attribute.name, attribute.value));
+    button.type = 'button';
+    button.append(...item.childNodes);
+    const themeName = button.querySelector('.name')?.textContent || 'CliftonStrengths theme';
+    const rank = button.querySelector('.rank')?.textContent || '';
+    button.setAttribute('aria-label', `${themeName}, rank ${rank}. Open description`);
+    button.setAttribute('aria-haspopup', 'dialog');
+    button.setAttribute('aria-controls', 'modal');
+    item.replaceWith(button);
+  });
 
   // Size the domain bar from the ranked profile. A #1 theme receives 34 points,
   // a #2 theme receives 33, and so on through #34 receiving 1 point.
@@ -371,20 +385,57 @@ function escapeHtml(value) {
   const modalDesc = mount.querySelector('#modal-desc');
 
   if (modal && modalTitle && modalDesc) {
+    const closeBtn = modal.querySelector('.close');
+    let modalTrigger = null;
+
+    function openModal(item) {
+      modalTrigger = item;
+      modalTitle.textContent = item.querySelector('.name').textContent;
+      modalDesc.textContent = item.dataset.desc;
+      modal.setAttribute('aria-hidden', 'false');
+      modal.style.display = 'flex';
+      closeBtn?.focus();
+    }
+
+    function closeModal() {
+      const trigger = modalTrigger;
+      modalTrigger = null;
+      trigger?.focus({ preventScroll: true });
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden', 'true');
+    }
+
     mount.querySelectorAll('.item').forEach(item => {
-      item.addEventListener('click', () => {
-        modalTitle.textContent = item.querySelector('.name').textContent;
-        modalDesc.textContent = item.dataset.desc;
-        modal.style.display = 'flex';
-      });
+      item.addEventListener('click', () => openModal(item));
     });
 
-    const closeBtn = modal.querySelector('.close');
-    if (closeBtn) closeBtn.addEventListener('click', () => { modal.style.display = 'none'; });
-    modal.addEventListener('click', e => { if (e.target === modal) modal.style.display = 'none'; });
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', event => {
+      if (event.target === modal) closeModal();
+    });
 
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape' && modal.style.display === 'flex') modal.style.display = 'none';
+    modal.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeModal();
+        return;
+      }
+
+      if (event.key !== 'Tab') return;
+      const focusable = [...modal.querySelectorAll(
+        'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )].filter(element => element.getClientRects().length);
+      if (!focusable.length) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     });
   }
 
@@ -554,6 +605,7 @@ fetch('https://justinrogo.github.io/data/cards_count.json')
       b.setAttribute('aria-selected', on ? 'true' : 'false');
       b.tabIndex = on ? 0 : -1;
     });
+    btn.focus();
   }
 
   tabs.forEach(btn => {

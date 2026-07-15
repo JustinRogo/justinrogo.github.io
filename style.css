@@ -23,7 +23,7 @@
   --text: #cbd5e1;
   --text-strong: #ffffff;
   --muted: #94a3b8;
-  --muted-2: #64748b;
+  --muted-2: #718096;
   --line: rgba(255, 255, 255, 0.08);
   --line-strong: rgba(255, 255, 255, 0.15);
   --accent: var(--orange);
@@ -1127,7 +1127,7 @@ input, textarea {
   background: rgba(255, 255, 255, 0.01);
 }
 
-#csMount .summary h3 {
+#csMount .summary h2 {
   margin: 0;
   font-family: 'Fraunces', Georgia, serif;
   font-size: 1.5rem;
@@ -1243,7 +1243,7 @@ input, textarea {
   flex-direction: column;
 }
 
-#csMount .section h2 {
+#csMount .section h3 {
   font-size: 1.15rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -1254,7 +1254,7 @@ input, textarea {
   margin: 20px 0 10px;
 }
 
-#csMount .section h2 span {
+#csMount .section h3 span {
   flex: 1;
   height: 2px;
   margin-left: 16px;
@@ -1269,16 +1269,21 @@ input, textarea {
 
 #csMount .item {
   position: relative;
+  width: 100%;
   background: rgba(255, 255, 255, 0.01);
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   padding: 14px 10px;
   text-align: center;
+  color: inherit;
   cursor: pointer;
+  font: inherit;
+  appearance: none;
   transition: all var(--speed) cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-#csMount .item:hover {
+#csMount .item:hover,
+#csMount .item:focus-visible {
   transform: translateY(-3px);
   border-color: var(--cyan);
   box-shadow: var(--shadow-sm);
@@ -1331,7 +1336,8 @@ input, textarea {
   z-index: 50;
 }
 
-#csMount .item:hover::after {
+#csMount .item:hover::after,
+#csMount .item:focus-visible::after {
   opacity: 1;
   transform: translateX(-50%) translateY(-10px);
 }
