@@ -15,7 +15,64 @@ const SPREADS = Object.freeze({
       Object.freeze({ name: "Future", subtitle: "What may be emerging", lead: "In the position of the future," }),
     ]),
   }),
+  situation: Object.freeze({
+    label: "Situation · Challenge · Guidance",
+    title: "See the path from three directions",
+    positions: Object.freeze([
+      Object.freeze({ name: "Situation", subtitle: "What is present now", lead: "At the heart of the situation," }),
+      Object.freeze({ name: "Challenge", subtitle: "What asks to be met", lead: "Within the challenge," }),
+      Object.freeze({ name: "Guidance", subtitle: "What can help you move", lead: "As guidance," }),
+    ]),
+  }),
+  mindBodySpirit: Object.freeze({
+    label: "Mind · Body · Spirit",
+    title: "Listen to each part of yourself",
+    positions: Object.freeze([
+      Object.freeze({ name: "Mind", subtitle: "Thoughts, beliefs, and perspective", lead: "For the mind," }),
+      Object.freeze({ name: "Body", subtitle: "Needs, senses, and grounded action", lead: "For the body," }),
+      Object.freeze({ name: "Spirit", subtitle: "Meaning, intuition, and inner direction", lead: "For the spirit," }),
+    ]),
+  }),
+  relationship: Object.freeze({
+    label: "You · Them · Connection",
+    title: "Consider the space between you",
+    positions: Object.freeze([
+      Object.freeze({ name: "You", subtitle: "What you bring to the relationship", lead: "In your position," }),
+      Object.freeze({ name: "Them", subtitle: "What the other person brings", lead: "In their position," }),
+      Object.freeze({ name: "Connection", subtitle: "What lives between you", lead: "Within the connection," }),
+    ]),
+  }),
+  crossroads: Object.freeze({
+    label: "Five-card Crossroads",
+    title: "Stand at the crossroads with every card",
+    positions: Object.freeze([
+      Object.freeze({ name: "Where You Stand", subtitle: "The ground beneath this choice", lead: "Where you stand," }),
+      Object.freeze({ name: "Path One", subtitle: "The energy of one direction", lead: "Along the first path," }),
+      Object.freeze({ name: "Path Two", subtitle: "The energy of another direction", lead: "Along the second path," }),
+      Object.freeze({ name: "Hidden Influence", subtitle: "What may not yet be visible", lead: "As a hidden influence," }),
+      Object.freeze({ name: "Guiding Star", subtitle: "What can help you choose", lead: "As your guiding star," }),
+    ]),
+  }),
+  celticCross: Object.freeze({
+    label: "Ten-card Celtic Cross",
+    title: "Let the whole pattern unfold",
+    positions: Object.freeze([
+      Object.freeze({ name: "The Present", subtitle: "The heart of the matter", lead: "At the heart of the matter," }),
+      Object.freeze({ name: "The Challenge", subtitle: "What crosses or tests you", lead: "As the force that crosses you," }),
+      Object.freeze({ name: "The Foundation", subtitle: "What lies beneath the situation", lead: "At the foundation," }),
+      Object.freeze({ name: "The Recent Past", subtitle: "What is moving behind you", lead: "In the recent past," }),
+      Object.freeze({ name: "The Possibility", subtitle: "What may be consciously reached", lead: "As the possibility above you," }),
+      Object.freeze({ name: "The Near Future", subtitle: "What is approaching", lead: "In the near future," }),
+      Object.freeze({ name: "Your Stance", subtitle: "How you meet the situation", lead: "In the way you meet this moment," }),
+      Object.freeze({ name: "External Influences", subtitle: "People, conditions, and atmosphere", lead: "Among the influences around you," }),
+      Object.freeze({ name: "Hopes & Fears", subtitle: "What you desire or resist", lead: "Within your hopes and fears," }),
+      Object.freeze({ name: "The Outcome", subtitle: "The direction of the present path", lead: "As the present path unfolds," }),
+    ]),
+  }),
 });
+
+const CUSTOM_SPREAD_MIN = 1;
+const CUSTOM_SPREAD_MAX = 5;
 
 const SUIT_PATTERNS = Object.freeze({
   Cups: "Cups gather around emotion, relationship, intuition, and the way the heart receives experience.",
@@ -26,14 +83,26 @@ const SUIT_PATTERNS = Object.freeze({
 
 const COURT_RANKS = new Set(["Page", "Knight", "Queen", "King"]);
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+const supportsVibration = typeof navigator.vibrate === "function";
 
 const elements = {
   setupPanel: document.querySelector("#setupPanel"),
   spreadInputs: [...document.querySelectorAll('input[name="spread"]')],
+  customSpreadBuilder: document.querySelector("#customSpreadBuilder"),
+  customPositionList: document.querySelector("#customPositionList"),
+  addCustomPositionButton: document.querySelector("#addCustomPositionButton"),
+  customSpreadStatus: document.querySelector("#customSpreadStatus"),
   intention: document.querySelector("#intention"),
   characterCount: document.querySelector("#characterCount"),
+  hapticOption: document.querySelector("#hapticOption"),
+  hapticToggle: document.querySelector("#hapticToggle"),
   shuffleButton: document.querySelector("#shuffleButton"),
   shuffleButtonLabel: document.querySelector("#shuffleButton .button-label"),
+  cutStage: document.querySelector("#cutStage"),
+  cutTitle: document.querySelector("#cut-title"),
+  cutPiles: document.querySelector("#cutPiles"),
+  cutDropZone: document.querySelector("#cutDropZone"),
+  cutStatus: document.querySelector("#cutStatus"),
   openExplorerButton: document.querySelector("#openExplorerButton"),
   cardExplorer: document.querySelector("#cardExplorer"),
   closeExplorerButton: document.querySelector("#closeExplorerButton"),
@@ -72,13 +141,17 @@ const elements = {
 const state = {
   phase: "setup",
   spreadKey: "single",
+  spread: SPREADS.single,
   intention: "",
   spreadDeck: [],
+  cutPiles: [],
   draw: [],
   revealedCount: 0,
   synthesis: null,
   explorerRendered: false,
 };
+
+let pilePointerDrag = null;
 
 function validateDeck(deck) {
   if (!Array.isArray(deck) || deck.length !== 78) return false;
@@ -110,11 +183,126 @@ function selectedSpreadKey() {
   return elements.spreadInputs.find((input) => input.checked)?.value || "single";
 }
 
+function customPositionInputs() {
+  return [...elements.customPositionList.querySelectorAll(".custom-position-name")];
+}
+
+function updateCustomBuilderControls(message = "") {
+  const rows = [...elements.customPositionList.querySelectorAll(".custom-position-row")];
+  elements.addCustomPositionButton.disabled = rows.length >= CUSTOM_SPREAD_MAX || state.phase !== "setup";
+  rows.forEach((row, index) => {
+    const input = row.querySelector(".custom-position-name");
+    const removeButton = row.querySelector(".remove-custom-position");
+    row.querySelector("label").textContent = `Position ${index + 1}`;
+    input.id = `customPosition${index + 1}`;
+    input.name = `customPosition${index + 1}`;
+    row.querySelector("label").htmlFor = input.id;
+    removeButton.setAttribute("aria-label", `Remove position ${index + 1}${input.value.trim() ? `, ${input.value.trim()}` : ""}`);
+    removeButton.disabled = rows.length <= CUSTOM_SPREAD_MIN || state.phase !== "setup";
+  });
+
+  const countMessage = `${rows.length} of ${CUSTOM_SPREAD_MAX} positions added.`;
+  elements.customSpreadStatus.textContent = message ? `${message} ${countMessage}` : countMessage;
+}
+
+function addCustomPosition(name = "") {
+  if (customPositionInputs().length >= CUSTOM_SPREAD_MAX) return;
+
+  const row = createElement("li", "custom-position-row");
+  const field = createElement("div", "custom-position-field");
+  const label = document.createElement("label");
+  const input = document.createElement("input");
+  input.type = "text";
+  input.className = "custom-position-name";
+  input.maxLength = 40;
+  input.required = true;
+  input.value = name;
+  input.placeholder = "Name this position";
+  input.autocomplete = "off";
+
+  const removeButton = createElement("button", "remove-custom-position", "Remove");
+  removeButton.type = "button";
+  input.addEventListener("input", () => {
+    const positionNumber = [...elements.customPositionList.children].indexOf(row) + 1;
+    removeButton.setAttribute("aria-label", `Remove position ${positionNumber}${input.value.trim() ? `, ${input.value.trim()}` : ""}`);
+  });
+  removeButton.addEventListener("click", () => {
+    const nextFocus = row.previousElementSibling?.querySelector("input")
+      || row.nextElementSibling?.querySelector("input")
+      || elements.addCustomPositionButton;
+    row.remove();
+    updateCustomBuilderControls("Position removed.");
+    nextFocus.focus({ preventScroll: true });
+  });
+
+  field.append(label, input);
+  row.append(field, removeButton);
+  elements.customPositionList.append(row);
+  updateCustomBuilderControls();
+  return input;
+}
+
+function toggleCustomSpreadBuilder() {
+  const isCustom = selectedSpreadKey() === "custom";
+  elements.customSpreadBuilder.hidden = !isCustom;
+  if (isCustom) updateCustomBuilderControls();
+}
+
+function selectedSpread() {
+  const spreadKey = selectedSpreadKey();
+  if (spreadKey !== "custom") return SPREADS[spreadKey];
+
+  const inputs = customPositionInputs();
+  const emptyInput = inputs.find((input) => !input.value.trim());
+  if (emptyInput) {
+    elements.customSpreadStatus.textContent = "Name every position before shuffling.";
+    emptyInput.focus({ preventScroll: false });
+    return null;
+  }
+
+  const positions = inputs.map((input, index) => {
+    const name = input.value.trim();
+    return Object.freeze({
+      name,
+      subtitle: `Your chosen focus · Position ${index + 1}`,
+      lead: `For ${name},`,
+    });
+  });
+
+  return Object.freeze({
+    label: `Custom spread · ${positions.length} ${positions.length === 1 ? "card" : "cards"}`,
+    title: "Turn each card in the order you chose",
+    positions: Object.freeze(positions),
+  });
+}
+
 function normalizedIntention() {
   const value = elements.intention.value.slice(0, 240);
   if (elements.intention.value !== value) elements.intention.value = value;
   elements.characterCount.textContent = `${value.length} / 240`;
   return value.trim();
+}
+
+function pulseHaptics(pattern = 10) {
+  if (!supportsVibration
+    || !elements.hapticToggle.checked
+    || prefersReducedMotion.matches
+    || document.visibilityState !== "visible") return;
+
+  try {
+    navigator.vibrate(pattern);
+  } catch {
+    // The platform may expose the API while declining vibration requests.
+  }
+}
+
+function cancelHaptics() {
+  if (!supportsVibration) return;
+  try {
+    navigator.vibrate(0);
+  } catch {
+    // Device-level settings may reject the cancellation request as well.
+  }
 }
 
 function secureRandomIndex(maxExclusive) {
@@ -141,9 +329,12 @@ function shuffledDeck() {
 
 function setSetupDisabled(disabled) {
   elements.spreadInputs.forEach((input) => { input.disabled = disabled; });
+  customPositionInputs().forEach((input) => { input.disabled = disabled; });
   elements.intention.disabled = disabled;
+  elements.hapticToggle.disabled = disabled;
   elements.shuffleButton.disabled = disabled;
   elements.openExplorerButton.disabled = disabled;
+  updateCustomBuilderControls();
 }
 
 function preloadDraw(draw) {
@@ -234,33 +425,194 @@ function closeCardExplorer() {
 function drawReading() {
   if (state.phase !== "setup") return;
 
+  const spread = selectedSpread();
+  if (!spread) return;
+
   state.phase = "shuffling";
   state.spreadKey = selectedSpreadKey();
+  state.spread = spread;
   state.intention = normalizedIntention();
   state.revealedCount = 0;
   state.synthesis = null;
   state.draw = [];
   state.spreadDeck = shuffledDeck();
+  state.cutPiles = [];
   setSetupDisabled(true);
   elements.setupPanel.classList.add("is-shuffling");
   elements.shuffleButtonLabel.textContent = "Shuffling…";
   setStatus("The deck is being shuffled.");
 
   const shuffleDelay = prefersReducedMotion.matches ? 80 : 1050;
-  window.setTimeout(showSelectionStage, shuffleDelay);
+  window.setTimeout(showCutStage, shuffleDelay);
 }
 
-function showSelectionStage() {
-  const spread = SPREADS[state.spreadKey];
-  const targetCount = spread.positions.length;
+function splitDeckIntoPiles(deck) {
+  const pileSize = Math.ceil(deck.length / 3);
+  return [
+    deck.slice(0, pileSize),
+    deck.slice(pileSize, pileSize * 2),
+    deck.slice(pileSize * 2),
+  ];
+}
+
+function createCutPile(pileIndex) {
+  const pileNames = ["First", "Middle", "Last"];
+  const button = createElement("button", "deck-pile");
+  button.type = "button";
+  button.dataset.pileIndex = String(pileIndex);
+  button.setAttribute("aria-label", `Choose the ${pileNames[pileIndex].toLowerCase()} pile to begin the reading`);
+
+  const stack = createElement("span", "pile-stack");
+  stack.setAttribute("aria-hidden", "true");
+  stack.append(
+    createElement("i", "pile-card"),
+    createElement("i", "pile-card"),
+    createElement("i", "pile-card"),
+    createElement("b", "pile-symbol", "✦"),
+  );
+  button.append(stack, createElement("span", "pile-name", `${pileNames[pileIndex]} pile`));
+  button.addEventListener("click", activateCutPile);
+  button.addEventListener("pointerdown", beginPilePointerDrag);
+  return button;
+}
+
+function renderCutPiles() {
+  elements.cutPiles.replaceChildren();
+  const fragment = document.createDocumentFragment();
+  state.cutPiles.forEach((unusedPile, index) => fragment.append(createCutPile(index)));
+  elements.cutPiles.append(fragment);
+  elements.cutDropZone.classList.remove("is-ready", "is-over", "is-chosen");
+  elements.cutStatus.textContent = "Choose one of the three piles.";
+}
+
+function showCutStage() {
+  state.cutPiles = splitDeckIntoPiles(state.spreadDeck);
   elements.setupPanel.hidden = true;
   elements.setupPanel.classList.remove("is-shuffling");
   elements.shuffleButtonLabel.textContent = "Shuffle the deck";
+  elements.cutStage.hidden = false;
+  elements.selectionStage.hidden = true;
+  renderCutPiles();
+  state.phase = "cutting";
+  elements.cutTitle.focus({ preventScroll: true });
+  setStatus("The deck has been divided into three piles. Tap a pile, or drag one into the begin-here circle.");
+}
+
+function chooseCutPile(eventOrIndex) {
+  if (state.phase !== "cutting") return;
+
+  const pileIndex = typeof eventOrIndex === "number"
+    ? eventOrIndex
+    : Number(eventOrIndex.currentTarget.dataset.pileIndex);
+  if (!Number.isInteger(pileIndex) || !state.cutPiles[pileIndex]) return;
+
+  const reorderedPiles = [
+    ...state.cutPiles.slice(pileIndex),
+    ...state.cutPiles.slice(0, pileIndex),
+  ];
+  state.spreadDeck = reorderedPiles.flat();
+  state.phase = "cut-complete";
+
+  elements.cutPiles.querySelectorAll(".deck-pile").forEach((pileButton) => {
+    const isChosen = Number(pileButton.dataset.pileIndex) === pileIndex;
+    pileButton.disabled = true;
+    pileButton.classList.toggle("is-selected", isChosen);
+    pileButton.classList.toggle("is-dismissed", !isChosen);
+  });
+  elements.cutDropZone.classList.remove("is-ready", "is-over");
+  elements.cutDropZone.classList.add("is-chosen");
+  elements.cutStatus.textContent = "The cut is made. The cards are taking their places.";
+  pulseHaptics(14);
+  setStatus("Pile chosen. The cut is complete and the reading is being prepared.");
+  window.setTimeout(showSelectionStage, prefersReducedMotion.matches ? 80 : 700);
+}
+
+function activateCutPile(event) {
+  if (event.currentTarget.dataset.suppressClick === "true") {
+    delete event.currentTarget.dataset.suppressClick;
+    return;
+  }
+  chooseCutPile(event);
+}
+
+function beginPilePointerDrag(event) {
+  if (state.phase !== "cutting" || (event.pointerType === "mouse" && event.button !== 0)) return;
+
+  const button = event.currentTarget;
+  pilePointerDrag = {
+    button,
+    pointerId: event.pointerId,
+    startX: event.clientX,
+    startY: event.clientY,
+    moved: false,
+  };
+  button.setPointerCapture?.(event.pointerId);
+  button.classList.add("is-dragging");
+  elements.cutDropZone.classList.add("is-ready");
+}
+
+function isPointerOverDropZone(clientX, clientY) {
+  const bounds = elements.cutDropZone.getBoundingClientRect();
+  return clientX >= bounds.left
+    && clientX <= bounds.right
+    && clientY >= bounds.top
+    && clientY <= bounds.bottom;
+}
+
+function movePilePointerDrag(event) {
+  if (!pilePointerDrag || event.pointerId !== pilePointerDrag.pointerId) return;
+  event.preventDefault();
+  const offsetX = event.clientX - pilePointerDrag.startX;
+  const offsetY = event.clientY - pilePointerDrag.startY;
+  if (Math.hypot(offsetX, offsetY) > 6) {
+    pilePointerDrag.moved = true;
+    elements.cutStatus.textContent = "Release the pile inside the circle to begin there.";
+  }
+  pilePointerDrag.button.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(0.97)`;
+  elements.cutDropZone.classList.toggle("is-over", isPointerOverDropZone(event.clientX, event.clientY));
+}
+
+function finishPilePointerDrag(event) {
+  if (!pilePointerDrag || event.pointerId !== pilePointerDrag.pointerId) return;
+  const { button, moved } = pilePointerDrag;
+  const pileIndex = Number(button.dataset.pileIndex);
+  const dropped = moved && isPointerOverDropZone(event.clientX, event.clientY);
+  button.releasePointerCapture?.(event.pointerId);
+  button.classList.remove("is-dragging");
+  button.style.removeProperty("transform");
+  elements.cutDropZone.classList.remove("is-ready", "is-over");
+  pilePointerDrag = null;
+
+  if (moved) button.dataset.suppressClick = "true";
+  if (dropped) {
+    chooseCutPile(pileIndex);
+  } else if (state.phase === "cutting") {
+    elements.cutStatus.textContent = "Choose one of the three piles.";
+  }
+}
+
+function cancelPilePointerDrag(event) {
+  if (!pilePointerDrag || event.pointerId !== pilePointerDrag.pointerId) return;
+  const { button } = pilePointerDrag;
+  button.classList.remove("is-dragging");
+  button.style.removeProperty("transform");
+  elements.cutDropZone.classList.remove("is-ready", "is-over");
+  elements.cutStatus.textContent = "Choose one of the three piles.";
+  pilePointerDrag = null;
+}
+
+function showSelectionStage() {
+  const spread = state.spread;
+  const targetCount = spread.positions.length;
+  elements.setupPanel.hidden = true;
+  elements.cutStage.hidden = true;
+  elements.setupPanel.classList.remove("is-shuffling");
+  elements.shuffleButtonLabel.textContent = "Shuffle the deck";
   elements.selectionStage.hidden = false;
-  elements.selectionTitle.textContent = targetCount === 1 ? "Choose a card" : "Choose three cards";
+  elements.selectionTitle.textContent = targetCount === 1 ? "Choose a card" : `Choose ${targetCount} cards`;
   elements.selectionInstructions.textContent = targetCount === 1
     ? "Move slowly and select the face-down card that draws your attention."
-    : "Move slowly and choose three face-down cards for the past, present, and future.";
+    : "Move slowly and choose one face-down card for each position in your spread.";
   elements.selectionCount.textContent = `0 of ${targetCount} ${targetCount === 1 ? "card" : "cards"} chosen`;
   renderDeckSpread();
   state.phase = "choosing";
@@ -315,7 +667,7 @@ function selectCard(event) {
 
   const button = event.currentTarget;
   const deckIndex = Number(button.dataset.deckIndex);
-  const spread = SPREADS[state.spreadKey];
+  const spread = state.spread;
   const position = spread.positions[state.draw.length];
 
   state.draw.push({
@@ -323,6 +675,7 @@ function selectCard(event) {
     position,
     reversed: secureRandomIndex(2) === 1,
   });
+  pulseHaptics(8);
 
   button.disabled = true;
   button.classList.add("is-selected");
@@ -355,7 +708,7 @@ function selectCard(event) {
 }
 
 function showReadingStage() {
-  const spread = SPREADS[state.spreadKey];
+  const spread = state.spread;
   elements.setupPanel.hidden = true;
   elements.selectionStage.hidden = true;
   elements.setupPanel.classList.remove("is-shuffling");
@@ -376,11 +729,58 @@ function showReadingStage() {
 
 function renderCardTable() {
   elements.cardTable.replaceChildren();
-  elements.cardTable.classList.toggle("single", state.draw.length === 1);
+  const isCelticCross = state.spreadKey === "celticCross";
+  elements.cardTable.classList.toggle("single", state.draw.length === 1 && !isCelticCross);
+  elements.cardTable.classList.toggle("multi", state.draw.length > 1 && !isCelticCross);
+  elements.cardTable.classList.toggle("celtic-cross", isCelticCross);
+  elements.cardTable.style.setProperty("--spread-count", String(state.draw.length));
+
+  if (isCelticCross) {
+    renderCelticCrossTable();
+    return;
+  }
 
   state.draw.forEach((drawn, index) => {
     elements.cardTable.append(createCardSlot(drawn, index));
   });
+}
+
+function renderCelticCrossTable() {
+  const crossSection = createElement("section", "celtic-zone celtic-cross-zone");
+  const crossHeading = createElement("div", "celtic-zone-heading");
+  const crossTitle = createElement("h3", "", "The Cross");
+  crossTitle.id = "celtic-cross-title";
+  crossHeading.append(
+    createElement("p", "step-label", "The inner situation"),
+    crossTitle,
+    createElement("p", "", "The forces forming the heart of the reading."),
+  );
+  crossSection.setAttribute("aria-labelledby", crossTitle.id);
+
+  const crossField = createElement("div", "celtic-cross-field");
+  state.draw.slice(0, 6).forEach((drawn, index) => {
+    crossField.append(createCardSlot(drawn, index));
+  });
+  crossSection.append(crossHeading, crossField);
+
+  const staffSection = createElement("section", "celtic-zone celtic-staff-zone");
+  const staffHeading = createElement("div", "celtic-zone-heading");
+  const staffTitle = createElement("h3", "", "The Staff");
+  staffTitle.id = "celtic-staff-title";
+  staffHeading.append(
+    createElement("p", "step-label", "Your place within it"),
+    staffTitle,
+    createElement("p", "", "How you, the world around you, and the path ahead relate."),
+  );
+  staffSection.setAttribute("aria-labelledby", staffTitle.id);
+
+  const staffField = createElement("div", "celtic-staff-field");
+  state.draw.slice(6).forEach((drawn, offset) => {
+    staffField.append(createCardSlot(drawn, offset + 6));
+  });
+  staffSection.append(staffHeading, staffField);
+
+  elements.cardTable.append(crossSection, staffSection);
 }
 
 function createCardSlot(drawn, index) {
@@ -393,6 +793,7 @@ function createCardSlot(drawn, index) {
   const button = createElement("button", "reveal-button");
   button.type = "button";
   button.disabled = index !== 0;
+  button.classList.toggle("is-next", index === 0);
   button.setAttribute("aria-label", `Reveal ${drawn.position.name.toLowerCase()} card`);
   button.dataset.cardIndex = String(index);
 
@@ -441,6 +842,7 @@ function revealCard(event) {
   const face = drawn.reversed ? drawn.card.reversed : drawn.card.upright;
 
   button.classList.add("is-revealed");
+  button.classList.remove("is-next");
   button.disabled = true;
   button.tabIndex = -1;
   button.setAttribute("aria-label", `${drawn.position.name}: ${drawn.card.name}, ${drawn.reversed ? "reversed" : "upright"}`);
@@ -462,7 +864,9 @@ function revealCard(event) {
     const nextButton = nextSlot.querySelector(".reveal-button");
     const nextPrompt = nextSlot.querySelector(".turn-prompt");
     nextButton.disabled = false;
+    nextButton.classList.add("is-next");
     nextPrompt.textContent = "Turn this card";
+    pulseHaptics(10);
     setStatus(`${drawn.card.name}, ${drawn.reversed ? "reversed" : "upright"}, revealed. The ${state.draw[state.revealedCount].position.name} card is ready.`);
     window.setTimeout(() => nextButton.focus({ preventScroll: false }), prefersReducedMotion.matches ? 20 : 420);
     return;
@@ -531,9 +935,9 @@ function buildSynthesis() {
     }
 
     if (reversedCount === drawSize) {
-      paragraphs.push("All three cards are reversed. The movement is strongly inward, suggesting that recognition, unlearning, and private adjustment should come before visible action.");
+      paragraphs.push("Every card is reversed. The movement is strongly inward, suggesting that recognition, unlearning, and private adjustment should come before visible action.");
     } else if (reversedCount === 0) {
-      paragraphs.push("All three cards are upright. Their energy is relatively direct, favoring visible engagement with the choices and opportunities they describe.");
+      paragraphs.push("Every card is upright. Their energy is relatively direct, favoring visible engagement with the choices and opportunities they describe.");
     } else {
       paragraphs.push(`${reversedCount} ${reversedCount === 1 ? "card is" : "cards are"} reversed, creating a conversation between outward events and inward work. Let the reversals show where reflection must accompany action.`);
     }
@@ -559,7 +963,7 @@ function showSynthesis() {
 }
 
 function buildCopyText() {
-  const spread = SPREADS[state.spreadKey];
+  const spread = state.spread;
   const lines = [
     "MIDNIGHT TAROT",
     spread.label,
@@ -619,16 +1023,19 @@ async function copyReading() {
 function resetReading() {
   state.phase = "setup";
   state.spreadDeck = [];
+  state.cutPiles = [];
   state.draw = [];
   state.revealedCount = 0;
   state.synthesis = null;
   elements.cardTable.replaceChildren();
   elements.deckSpread.replaceChildren();
+  elements.cutPiles.replaceChildren();
   elements.deckSpread.classList.remove("is-complete");
   elements.patternReading.replaceChildren();
   elements.readingSummary.hidden = true;
   elements.readingStage.hidden = true;
   elements.selectionStage.hidden = true;
+  elements.cutStage.hidden = true;
   elements.setupPanel.hidden = false;
   elements.intentionDisplay.hidden = true;
   elements.copyStatus.textContent = "";
@@ -640,6 +1047,22 @@ function resetReading() {
 elements.intention.addEventListener("input", () => {
   normalizedIntention();
 });
+elements.hapticToggle.addEventListener("change", () => {
+  if (!elements.hapticToggle.checked) cancelHaptics();
+  setStatus(elements.hapticToggle.checked
+    ? "Gentle tactile feedback is on when supported by this device."
+    : "Gentle tactile feedback is off.");
+});
+document.addEventListener("pointermove", movePilePointerDrag);
+document.addEventListener("pointerup", finishPilePointerDrag);
+document.addEventListener("pointercancel", cancelPilePointerDrag);
+elements.spreadInputs.forEach((input) => {
+  input.addEventListener("change", toggleCustomSpreadBuilder);
+});
+elements.addCustomPositionButton.addEventListener("click", () => {
+  const input = addCustomPosition();
+  input?.focus({ preventScroll: false });
+});
 elements.openExplorerButton.addEventListener("click", openCardExplorer);
 elements.closeExplorerButton.addEventListener("click", closeCardExplorer);
 elements.cardExplorer.addEventListener("click", (event) => {
@@ -649,6 +1072,13 @@ elements.deckSpread.addEventListener("keydown", navigateDeck);
 elements.shuffleButton.addEventListener("click", drawReading);
 elements.copyButton.addEventListener("click", copyReading);
 elements.resetButton.addEventListener("click", resetReading);
+
+Array.from({ length: 3 }, () => "").forEach(addCustomPosition);
+toggleCustomSpreadBuilder();
+elements.hapticOption.hidden = !supportsVibration;
+prefersReducedMotion.addEventListener?.("change", ({ matches }) => {
+  if (matches) cancelHaptics();
+});
 
 if (!validateDeck(TAROT_DECK)) {
   elements.shuffleButton.disabled = true;

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#070b1c">
-  <meta name="description" content="Draw one or three tarot cards for a private, reflective reading in your browser.">
+  <meta name="description" content="Choose a reflective tarot spread, draw from all 78 cards, or create a custom reading in your browser.">
   <title>Midnight Tarot</title>
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -53,8 +53,69 @@
               <small>Past · Present · Future</small>
             </span>
           </label>
+          <label class="spread-option">
+            <input type="radio" name="spread" value="situation">
+            <span class="spread-card-count three" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="spread-copy">
+              <strong>Clear the path</strong>
+              <small>Situation · Challenge · Guidance</small>
+            </span>
+          </label>
+          <label class="spread-option">
+            <input type="radio" name="spread" value="mindBodySpirit">
+            <span class="spread-card-count three" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="spread-copy">
+              <strong>Inner alignment</strong>
+              <small>Mind · Body · Spirit</small>
+            </span>
+          </label>
+          <label class="spread-option">
+            <input type="radio" name="spread" value="relationship">
+            <span class="spread-card-count three" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="spread-copy">
+              <strong>Relationship</strong>
+              <small>You · Them · Connection</small>
+            </span>
+          </label>
+          <label class="spread-option">
+            <input type="radio" name="spread" value="crossroads">
+            <span class="spread-card-count five" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+            <span class="spread-copy">
+              <strong>Crossroads</strong>
+              <small>Five cards for a choice or turning point</small>
+            </span>
+          </label>
+          <label class="spread-option">
+            <input type="radio" name="spread" value="celticCross">
+            <span class="spread-card-count ten" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+            <span class="spread-copy">
+              <strong>Celtic Cross</strong>
+              <small>Ten cards for a deep, layered reading</small>
+            </span>
+          </label>
+          <label class="spread-option spread-option-custom">
+            <input type="radio" name="spread" value="custom">
+            <span class="spread-card-count custom" aria-hidden="true"><b>+</b></span>
+            <span class="spread-copy">
+              <strong>Create your own</strong>
+              <small>Name one to five positions</small>
+            </span>
+          </label>
         </div>
       </fieldset>
+
+      <section id="customSpreadBuilder" class="custom-spread-builder" aria-labelledby="custom-spread-title" hidden>
+        <div class="custom-builder-heading">
+          <div>
+            <p class="step-label">Your own constellation</p>
+            <h3 id="custom-spread-title">Name each position</h3>
+          </div>
+          <p>Build a spread with up to five cards. The cards will be drawn and revealed in this order.</p>
+        </div>
+        <ol id="customPositionList" class="custom-position-list"></ol>
+        <button id="addCustomPositionButton" class="custom-builder-button" type="button">+ Add a position</button>
+        <p id="customSpreadStatus" class="custom-spread-status" role="status" aria-live="polite"></p>
+      </section>
 
       <div class="intention-field">
         <label for="intention">Hold an intention <span>optional</span></label>
@@ -65,6 +126,17 @@
         </div>
       </div>
 
+      <div id="hapticOption" class="sensory-option" hidden>
+        <label for="hapticToggle">
+          <input id="hapticToggle" type="checkbox">
+          <span>
+            <strong>Gentle tactile feedback</strong>
+            <small>Use brief vibration when a pile or card is chosen</small>
+          </span>
+        </label>
+        <p>Optional and silent. Reduced-motion and your device settings always take priority.</p>
+      </div>
+
       <div class="setup-actions">
         <button id="shuffleButton" class="primary-button" type="button">
           <span class="button-star" aria-hidden="true">✦</span>
@@ -72,6 +144,22 @@
         </button>
         <button id="openExplorerButton" class="secondary-button" type="button">Explore all 78 cards</button>
       </div>
+    </section>
+
+    <section id="cutStage" class="cut-stage" aria-labelledby="cut-title" hidden>
+      <div class="cut-heading">
+        <p class="step-label">The deck is yours</p>
+        <h2 id="cut-title" tabindex="-1">Cut the deck</h2>
+        <p>Tap the pile that draws you, or drag a pile into the circle. Your chosen pile will become the beginning of the deck.</p>
+      </div>
+
+      <div class="cut-layout">
+        <div id="cutPiles" class="cut-piles" role="group" aria-label="Three face-down tarot piles"></div>
+        <div id="cutDropZone" class="cut-drop-zone" aria-hidden="true">
+          <span>Begin here</span>
+        </div>
+      </div>
+      <p id="cutStatus" class="cut-status" role="status" aria-live="polite">Choose one of the three piles.</p>
     </section>
 
     <section id="selectionStage" class="selection-stage" aria-labelledby="selection-title" hidden>
@@ -163,7 +251,7 @@
     <span aria-hidden="true">☽</span>
   </footer>
 
-  <script src="deck.js?v=3" defer></script>
-  <script src="app.js?v=3" defer></script>
+  <script src="deck.js?v=4" defer></script>
+  <script src="app.js?v=5" defer></script>
 </body>
 </html>
