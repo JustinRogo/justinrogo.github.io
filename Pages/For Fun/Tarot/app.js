@@ -846,7 +846,14 @@ function showReadingStage() {
   elements.copyStatus.textContent = "";
   renderCardTable();
   state.phase = "revealing";
-  elements.readingTitle.focus({ preventScroll: true });
+  if (usesMobileDeckLayout.matches) {
+    const firstSlot = elements.cardTable.querySelector('[data-card-index="0"]');
+    const firstRevealButton = firstSlot?.querySelector(".reveal-button");
+    firstSlot?.scrollIntoView({ behavior: "auto", block: "start" });
+    firstRevealButton?.focus({ preventScroll: true });
+  } else {
+    elements.readingTitle.focus({ preventScroll: true });
+  }
   setStatus(`${state.draw.length} ${state.draw.length === 1 ? "card is" : "cards are"} ready. Reveal the first card.`);
 }
 
@@ -1007,68 +1014,139 @@ function countBy(items, selectValue) {
   }, {});
 }
 
-function buildSynthesis() {
-  const drawSize = state.draw.length;
-  const majorCount = state.draw.filter(({ card: drawnCard }) => drawnCard.arcana === "major").length;
-  const reversedCount = state.draw.filter(({ reversed }) => reversed).length;
-  const courtCards = state.draw.filter(({ card: drawnCard }) => COURT_RANKS.has(drawnCard.rank));
-  const suitCounts = countBy(state.draw, ({ card: drawnCard }) => drawnCard.suit);
-  const dominantSuitEntry = Object.entries(suitCounts).sort((a, b) => b[1] - a[1])[0];
-  const hasDominantSuit = drawSize > 1 && dominantSuitEntry?.[1] >= 2;
-  const paragraphs = [];
+function readableList(items) {
+  if (items.length === 0) return "";
+  if (items.length === 1) return items[0];
+  if (items.length === 2) return `${items[0]} and ${items[1]}`;
+  return `${items.slice(0, -1).join(", ")}, and ${items.at(-1)}`;
+}
 
-  if (state.intention) {
-    paragraphs.push(`Held beside your intention—“${state.intention}”—these cards invite reflection rather than a fixed prediction.`);
-  } else {
-    paragraphs.push("Taken together, these cards describe a field of attention rather than a fixed prediction.");
+function faceForDraw(drawn) {
+  return drawn.reversed ? drawn.card.reversed : drawn.card.upright;
+}
+
+function drawLabel(drawn) {
+  return `${drawn.card.name}${drawn.reversed ? " reversed" : " upright"}`;
+}
+
+function lowerFirst(value) {
+  if (!value) return "";
+  return `${value.charAt(0).toLowerCase()}${value.slice(1)}`;
+}
+
+function transitionLead(previous, current) {
+  if (previous.card.suit && previous.card.suit === current.card.suit) {
+    return `Continuing the ${current.card.suit} thread`;
   }
+  if (previous.reversed && !current.reversed) {
+    return "Turning from inward work toward visible movement";
+  }
+  if (!previous.reversed && current.reversed) {
+    return "Turning from outward movement toward something more private";
+  }
+  if (previous.card.arcana !== "major" && current.card.arcana === "major") {
+    return "Widening the question into a larger life lesson";
+  }
+  if (previous.card.arcana === "major" && current.card.arcana !== "major") {
+    return "Bringing that larger lesson into everyday life";
+  }
+  return "Moving the story forward";
+}
+
+function buildPatternParagraphs(entries) {
+  const paragraphs = [];
+  const majorEntries = entries.filter(({ card }) => card.arcana === "major");
+  const reversedEntries = entries.filter(({ reversed }) => reversed);
+  const uprightEntries = entries.filter(({ reversed }) => !reversed);
+  const suitCounts = countBy(entries, ({ card }) => card.suit);
+  const dominantSuitEntry = Object.entries(suitCounts).sort((a, b) => b[1] - a[1])[0];
+  const courtEntries = entries.filter(({ card }) => COURT_RANKS.has(card.rank));
+
+  if (majorEntries.length === 1) {
+    const [major] = majorEntries;
+    paragraphs.push(`${major.card.name} is the reading's Major Arcana hinge. Its place in ${major.position.name} gives that part of the spread a larger, longer-running lesson than the surrounding circumstances alone.`);
+  } else if (majorEntries.length > 1) {
+    const names = readableList(majorEntries.map(({ card }) => card.name));
+    const positions = readableList(majorEntries.map(({ position }) => position.name));
+    paragraphs.push(`The Major Arcana cards—${names}—occupy ${positions}. Those positions carry the reading's deepest changes, suggesting that their themes may outlast the immediate choice or conversation.`);
+  }
+
+  if (reversedEntries.length === entries.length) {
+    paragraphs.push(`Every card turns inward: ${readableList(reversedEntries.map(drawLabel))}. The spread is asking for recognition and adjustment before it asks for a visible result.`);
+  } else if (reversedEntries.length > 0) {
+    const reversedNames = readableList(reversedEntries.map(({ card }) => card.name));
+    const reversedPositions = readableList(reversedEntries.map(({ position }) => position.name));
+    const uprightNames = readableList(uprightEntries.map(({ card }) => card.name));
+    const reversedSubject = reversedEntries.length === 1 ? "The reversal" : "The reversals";
+    const uprightSubject = uprightEntries.length === 1 ? "The upright card" : "The upright cards";
+    paragraphs.push(`${reversedSubject}—${reversedNames}—${reversedEntries.length === 1 ? "sits" : "sit"} in ${reversedPositions}, locating ${reversedEntries.length === 1 ? "the place" : "the places"} where reflection or release may need to come first. ${uprightSubject}—${uprightNames}—${uprightEntries.length === 1 ? "shows" : "show"} where the reading has more direct outward momentum.`);
+  }
+
+  if (dominantSuitEntry?.[1] >= 2) {
+    const [suit, count] = dominantSuitEntry;
+    const suitEntries = entries.filter(({ card }) => card.suit === suit);
+    const positions = readableList(suitEntries.map(({ position }) => position.name));
+    paragraphs.push(`${suit} appears ${count} times, specifically in ${positions}. ${SUIT_PATTERNS[suit]} This repeated suit ties those positions together as one practical thread.`);
+  }
+
+  if (courtEntries.length > 0) {
+    const names = readableList(courtEntries.map(({ card }) => card.name));
+    paragraphs.push(`${names} ${courtEntries.length === 1 ? "adds" : "add"} a human role to the pattern. Consider whether ${courtEntries.length === 1 ? "this card describes a person around you or a quality" : "these cards describe people around you or qualities"} you are being asked to embody.`);
+  }
+
+  if (entries.length === 1 && entries[0].card.suit) {
+    const [entry] = entries;
+    paragraphs.push(`${entry.card.name} speaks through the suit of ${entry.card.suit}. ${SUIT_PATTERNS[entry.card.suit]} This grounds the card's message in a recognizable part of daily life.`);
+  }
+
+  if (paragraphs.length === 0 && entries.length > 1) {
+    const firstKeywords = readableList(faceForDraw(entries[0]).keywords.slice(0, 2));
+    const finalKeywords = readableList(faceForDraw(entries.at(-1)).keywords.slice(0, 2));
+    paragraphs.push(`Across the full sequence, the language moves from ${firstKeywords} toward ${finalKeywords}. That shift is the spread's clearest pattern: the final position answers the atmosphere established by the first.`);
+  }
+
+  return paragraphs;
+}
+
+function buildSynthesis() {
+  const entries = state.draw;
+  const drawSize = entries.length;
+  const paragraphs = [];
+  const opening = entries[0];
+  const openingFace = faceForDraw(opening);
+  const openingContext = state.intention
+    ? `With “${state.intention}” in mind`
+    : `In this ${state.spread.label} reading`;
+
+  paragraphs.push(`${openingContext}, ${drawLabel(opening)} occupies ${opening.position.name}, the place of ${lowerFirst(opening.position.subtitle)}. ${openingFace.meaning} Its keywords—${readableList(openingFace.keywords.slice(0, 3))}—name the atmosphere that the rest of the reading must answer.`);
 
   if (drawSize === 1) {
-    const [{ card: drawnCard, reversed }] = state.draw;
-    if (drawnCard.arcana === "major") {
-      paragraphs.push(`${drawnCard.name} is a Major Arcana card, so the focus reaches beyond a passing circumstance toward a larger lesson in how you are changing.`);
-    } else {
-      paragraphs.push(`${drawnCard.name} places the focus in the realm of ${drawnCard.suit.toLowerCase()}. ${SUIT_PATTERNS[drawnCard.suit]}`);
-    }
-    paragraphs.push(reversed
-      ? "Its reversed orientation turns part of the lesson inward, pointing to a pattern that may need recognition, release, or a more deliberate expression."
-      : "Its upright orientation suggests that the card's energy is available to meet directly and express through conscious action.");
+    paragraphs.push(`${opening.reversed ? "Because the card is reversed, its invitation begins with inward recognition" : "Because the card is upright, its invitation can be met through direct engagement"}. Its counsel is: ${openingFace.guidance}`);
+    paragraphs.push(...buildPatternParagraphs(entries));
   } else {
-    if (majorCount === drawSize) {
-      paragraphs.push("Every position is held by the Major Arcana. This is a concentrated reading about foundational change, with each stage participating in a larger turning point.");
-    } else if (majorCount >= 2) {
-      paragraphs.push(`${majorCount} Major Arcana cards give the spread unusual weight. The immediate situation is connected to a deeper lesson that may continue unfolding beyond a single decision.`);
-    } else if (majorCount === 1) {
-      const majorCard = state.draw.find(({ card: drawnCard }) => drawnCard.arcana === "major");
-      paragraphs.push(`${majorCard.card.name} is the spread's single Major Arcana card, marking its ${majorCard.position.name.toLowerCase()} position as the larger hinge of the story.`);
-    } else {
-      paragraphs.push("With no Major Arcana cards, the reading stays close to everyday choices and conditions—an encouraging sign that practical responses can meaningfully shape what follows.");
+    const groupSize = drawSize <= 5 ? 1 : drawSize <= 7 ? 2 : 3;
+    for (let start = 1; start < entries.length; start += groupSize) {
+      const group = entries.slice(start, start + groupSize);
+      const sentences = group.map((entry, groupIndex) => {
+        const absoluteIndex = start + groupIndex;
+        const previous = entries[absoluteIndex - 1];
+        const face = faceForDraw(entry);
+        const orientationCounsel = entry.reversed
+          ? `Reversed, its counsel turns inward: ${face.guidance}`
+          : `Upright, it offers a direct way to respond: ${face.guidance}`;
+        return `${transitionLead(previous, entry)}, ${drawLabel(entry)} enters ${entry.position.name}, a position concerned with ${lowerFirst(entry.position.subtitle)}. ${face.meaning} ${orientationCounsel}`;
+      });
+      paragraphs.push(sentences.join(" "));
     }
 
-    if (hasDominantSuit) {
-      paragraphs.push(`${dominantSuitEntry[0]} appears ${dominantSuitEntry[1]} times and becomes the spread's dominant language. ${SUIT_PATTERNS[dominantSuitEntry[0]]}`);
-    } else {
-      paragraphs.push("No single suit dominates, so the spread asks several parts of life to be considered together rather than reducing the matter to one theme.");
-    }
-
-    if (courtCards.length >= 2) {
-      paragraphs.push(`${courtCards.length} court cards emphasize roles, personalities, and ways of carrying influence. Consider whether they describe people around you or qualities you are being asked to embody.`);
-    } else if (courtCards.length === 1) {
-      paragraphs.push(`${courtCards[0].card.name} adds a human role to the pattern: a way of behaving or relating that may matter more than circumstances alone.`);
-    }
-
-    if (reversedCount === drawSize) {
-      paragraphs.push("Every card is reversed. The movement is strongly inward, suggesting that recognition, unlearning, and private adjustment should come before visible action.");
-    } else if (reversedCount === 0) {
-      paragraphs.push("Every card is upright. Their energy is relatively direct, favoring visible engagement with the choices and opportunities they describe.");
-    } else {
-      paragraphs.push(`${reversedCount} ${reversedCount === 1 ? "card is" : "cards are"} reversed, creating a conversation between outward events and inward work. Let the reversals show where reflection must accompany action.`);
-    }
+    paragraphs.push(...buildPatternParagraphs(entries));
   }
 
-  const finalDraw = state.draw[state.draw.length - 1];
-  const finalFace = finalDraw.reversed ? finalDraw.card.reversed : finalDraw.card.upright;
-  const closing = `A closing invitation from ${finalDraw.card.name}: ${finalFace.guidance}`;
+  const finalDraw = entries.at(-1);
+  const finalFace = faceForDraw(finalDraw);
+  const closing = drawSize === 1
+    ? `A question to carry from ${finalDraw.card.name}: What would it look like to practice this counsel today? ${finalFace.guidance}`
+    : `A question to carry from ${finalDraw.card.name}: How might its counsel reshape what ${opening.card.name} first brought into view in ${opening.position.name}? ${finalFace.guidance}`;
 
   return { paragraphs, closing };
 }
