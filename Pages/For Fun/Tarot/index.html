@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#070b1c">
   <meta name="description" content="Choose a reflective tarot spread, draw from all 78 cards, or create a custom reading in your browser.">
   <title>Midnight Tarot</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=10">
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to the reading</a>
@@ -134,7 +134,6 @@
             <small>Use brief vibration when a pile or card is chosen</small>
           </span>
         </label>
-        <p>Optional and silent. Reduced-motion and your device settings always take priority.</p>
       </div>
 
       <div class="setup-actions">
@@ -150,23 +149,24 @@
       <div class="cut-heading">
         <p class="step-label">The deck is yours</p>
         <h2 id="cut-title" tabindex="-1">Cut the deck</h2>
-        <p>Tap the pile that draws you, or drag a pile into the circle. Your chosen pile will become the beginning of the deck.</p>
+        <p>Tap the deck to cut it once or twice. Drag piles onto one another to restack them, or drag any pile into the circle to begin.</p>
       </div>
 
       <div class="cut-layout">
-        <div id="cutPiles" class="cut-piles" role="group" aria-label="Three face-down tarot piles"></div>
+        <div id="cutPiles" class="cut-piles" role="group" aria-label="Face-down tarot deck piles"></div>
+        <button id="gatherPilesButton" class="gather-piles-button" type="button" hidden>Gather all piles</button>
         <div id="cutDropZone" class="cut-drop-zone" aria-hidden="true">
           <span>Begin here</span>
         </div>
       </div>
-      <p id="cutStatus" class="cut-status" role="status" aria-live="polite">Choose one of the three piles.</p>
+      <p id="cutStatus" class="cut-status" role="status" aria-live="polite">Tap the deck to cut, or drag it to begin.</p>
     </section>
 
     <section id="selectionStage" class="selection-stage" aria-labelledby="selection-title" hidden>
       <div class="selection-heading">
         <p class="step-label">The deck is spread</p>
         <h2 id="selection-title" tabindex="-1">Choose your card</h2>
-        <p id="selectionInstructions">Move slowly and select the card that draws your attention.</p>
+        <p id="selectionInstructions">The full deck is fanned before you. Select the card that draws your attention.</p>
         <p id="selectionCount" class="selection-count" role="status" aria-live="polite">0 of 1 cards chosen</p>
       </div>
       <div id="deckSpread" class="deck-spread" role="group" aria-label="Face-down tarot deck"></div>
@@ -252,6 +252,6 @@
   </footer>
 
   <script src="deck.js?v=4" defer></script>
-  <script src="app.js?v=5" defer></script>
+  <script src="app.js?v=10" defer></script>
 </body>
 </html>

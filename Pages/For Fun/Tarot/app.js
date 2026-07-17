@@ -83,6 +83,7 @@ const SUIT_PATTERNS = Object.freeze({
 
 const COURT_RANKS = new Set(["Page", "Knight", "Queen", "King"]);
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+const usesMobileDeckLayout = window.matchMedia("(max-width: 440px)");
 const supportsVibration = typeof navigator.vibrate === "function";
 
 const elements = {
@@ -101,6 +102,7 @@ const elements = {
   cutStage: document.querySelector("#cutStage"),
   cutTitle: document.querySelector("#cut-title"),
   cutPiles: document.querySelector("#cutPiles"),
+  gatherPilesButton: document.querySelector("#gatherPilesButton"),
   cutDropZone: document.querySelector("#cutDropZone"),
   cutStatus: document.querySelector("#cutStatus"),
   openExplorerButton: document.querySelector("#openExplorerButton"),
@@ -145,6 +147,7 @@ const state = {
   intention: "",
   spreadDeck: [],
   cutPiles: [],
+  cutCount: 0,
   draw: [],
   revealedCount: 0,
   synthesis: null,
@@ -437,6 +440,7 @@ function drawReading() {
   state.draw = [];
   state.spreadDeck = shuffledDeck();
   state.cutPiles = [];
+  state.cutCount = 0;
   setSetupDisabled(true);
   elements.setupPanel.classList.add("is-shuffling");
   elements.shuffleButtonLabel.textContent = "Shuffling…";
@@ -446,21 +450,26 @@ function drawReading() {
   window.setTimeout(showCutStage, shuffleDelay);
 }
 
-function splitDeckIntoPiles(deck) {
-  const pileSize = Math.ceil(deck.length / 3);
-  return [
-    deck.slice(0, pileSize),
-    deck.slice(pileSize, pileSize * 2),
-    deck.slice(pileSize * 2),
-  ];
+function cutPromptMessage() {
+  if (state.cutCount === 0) {
+    return "Tap the deck to make your first cut, or drag the whole deck to Begin here.";
+  }
+  if (state.cutCount === 1) {
+    return "Tap a pile to cut once more, drag piles together, or drag a pile to Begin here.";
+  }
+  return "The deck has been cut twice. Drag piles together, or drag a pile to Begin here.";
 }
 
-function createCutPile(pileIndex) {
-  const pileNames = ["First", "Middle", "Last"];
+function createCutPile(pile, pileIndex) {
+  const isWholeDeck = state.cutPiles.length === 1;
+  const pileName = isWholeDeck ? "Whole deck" : `Pile ${pileIndex + 1}`;
+  const canCut = state.cutCount < 2 && pile.length > 1;
   const button = createElement("button", "deck-pile");
   button.type = "button";
   button.dataset.pileIndex = String(pileIndex);
-  button.setAttribute("aria-label", `Choose the ${pileNames[pileIndex].toLowerCase()} pile to begin the reading`);
+  button.setAttribute("aria-label", canCut
+    ? `${pileName}, ${pile.length} cards. Tap to cut this stack or drag it to begin.`
+    : `${pileName}, ${pile.length} cards. Drag it onto another pile or to Begin here.`);
 
   const stack = createElement("span", "pile-stack");
   stack.setAttribute("aria-hidden", "true");
@@ -470,32 +479,73 @@ function createCutPile(pileIndex) {
     createElement("i", "pile-card"),
     createElement("b", "pile-symbol", "✦"),
   );
-  button.append(stack, createElement("span", "pile-name", `${pileNames[pileIndex]} pile`));
+  button.append(stack, createElement("span", "pile-name", pileName));
   button.addEventListener("click", activateCutPile);
   button.addEventListener("pointerdown", beginPilePointerDrag);
   return button;
 }
 
-function renderCutPiles() {
+function renderCutPiles(message = cutPromptMessage()) {
   elements.cutPiles.replaceChildren();
+  elements.cutPiles.style.setProperty("--pile-count", String(state.cutPiles.length));
   const fragment = document.createDocumentFragment();
-  state.cutPiles.forEach((unusedPile, index) => fragment.append(createCutPile(index)));
+  state.cutPiles.forEach((pile, index) => fragment.append(createCutPile(pile, index)));
   elements.cutPiles.append(fragment);
+  elements.gatherPilesButton.hidden = state.cutPiles.length <= 1;
   elements.cutDropZone.classList.remove("is-ready", "is-over", "is-chosen");
-  elements.cutStatus.textContent = "Choose one of the three piles.";
+  elements.cutStatus.textContent = message;
 }
 
 function showCutStage() {
-  state.cutPiles = splitDeckIntoPiles(state.spreadDeck);
+  state.cutPiles = [state.spreadDeck];
+  state.cutCount = 0;
   elements.setupPanel.hidden = true;
   elements.setupPanel.classList.remove("is-shuffling");
   elements.shuffleButtonLabel.textContent = "Shuffle the deck";
   elements.cutStage.hidden = false;
   elements.selectionStage.hidden = true;
-  renderCutPiles();
   state.phase = "cutting";
+  renderCutPiles();
   elements.cutTitle.focus({ preventScroll: true });
-  setStatus("The deck has been divided into three piles. Tap a pile, or drag one into the begin-here circle.");
+  setStatus("The shuffled deck is in one stack. Tap it to cut, or drag it into the begin-here circle.");
+}
+
+function cutPileAt(pileIndex) {
+  if (state.phase !== "cutting" || state.cutCount >= 2) return;
+  const pile = state.cutPiles[pileIndex];
+  if (!pile || pile.length < 2) return;
+
+  const cutPoint = Math.ceil(pile.length / 2);
+  state.cutPiles.splice(pileIndex, 1, pile.slice(0, cutPoint), pile.slice(cutPoint));
+  state.cutCount += 1;
+  renderCutPiles(`Cut ${state.cutCount} of 2 complete. ${cutPromptMessage()}`);
+  pulseHaptics(8);
+  const firstNewPile = elements.cutPiles.querySelector(`[data-pile-index="${pileIndex}"]`);
+  firstNewPile?.focus({ preventScroll: true });
+  setStatus(`The deck has been cut ${state.cutCount === 1 ? "once" : "twice"}. ${state.cutPiles.length} piles are on the table.`);
+}
+
+function gatherCutPiles() {
+  if (state.phase !== "cutting" || state.cutPiles.length <= 1) return;
+  state.cutPiles = [state.cutPiles.flat()];
+  renderCutPiles("The full deck is back in one stack. Drag it to Begin here.");
+  pulseHaptics(10);
+  elements.cutPiles.querySelector(".deck-pile")?.focus({ preventScroll: true });
+  setStatus("All piles have been gathered into one deck.");
+}
+
+function mergeCutPiles(sourceIndex, targetIndex) {
+  if (sourceIndex === targetIndex || !state.cutPiles[sourceIndex] || !state.cutPiles[targetIndex]) return;
+  const draggedPile = state.cutPiles[sourceIndex];
+  const remainingPiles = state.cutPiles.filter((unusedPile, index) => index !== sourceIndex);
+  const adjustedTargetIndex = sourceIndex < targetIndex ? targetIndex - 1 : targetIndex;
+  remainingPiles[adjustedTargetIndex] = [...draggedPile, ...remainingPiles[adjustedTargetIndex]];
+  state.cutPiles = remainingPiles;
+  const pileWord = state.cutPiles.length === 1 ? "pile remains" : "piles remain";
+  renderCutPiles(`The piles are restacked. ${state.cutPiles.length} ${pileWord}.`);
+  pulseHaptics(10);
+  elements.cutPiles.querySelector(`[data-pile-index="${adjustedTargetIndex}"]`)?.focus({ preventScroll: true });
+  setStatus(`Two piles were restacked. ${state.cutPiles.length} ${pileWord}.`);
 }
 
 function chooseCutPile(eventOrIndex) {
@@ -532,7 +582,12 @@ function activateCutPile(event) {
     delete event.currentTarget.dataset.suppressClick;
     return;
   }
-  chooseCutPile(event);
+  const pileIndex = Number(event.currentTarget.dataset.pileIndex);
+  if (state.cutCount < 2) {
+    cutPileAt(pileIndex);
+  } else {
+    elements.cutStatus.textContent = cutPromptMessage();
+  }
 }
 
 function beginPilePointerDrag(event) {
@@ -559,6 +614,26 @@ function isPointerOverDropZone(clientX, clientY) {
     && clientY <= bounds.bottom;
 }
 
+function pileIndexAtPoint(clientX, clientY, excludedIndex) {
+  const pileButtons = [...elements.cutPiles.querySelectorAll(".deck-pile")];
+  const target = pileButtons.find((pileButton) => {
+    const pileIndex = Number(pileButton.dataset.pileIndex);
+    if (pileIndex === excludedIndex) return false;
+    const bounds = pileButton.getBoundingClientRect();
+    return clientX >= bounds.left
+      && clientX <= bounds.right
+      && clientY >= bounds.top
+      && clientY <= bounds.bottom;
+  });
+  return target ? Number(target.dataset.pileIndex) : -1;
+}
+
+function clearPileDropTargets() {
+  elements.cutPiles.querySelectorAll(".is-drop-target").forEach((pile) => {
+    pile.classList.remove("is-drop-target");
+  });
+}
+
 function movePilePointerDrag(event) {
   if (!pilePointerDrag || event.pointerId !== pilePointerDrag.pointerId) return;
   event.preventDefault();
@@ -566,28 +641,41 @@ function movePilePointerDrag(event) {
   const offsetY = event.clientY - pilePointerDrag.startY;
   if (Math.hypot(offsetX, offsetY) > 6) {
     pilePointerDrag.moved = true;
-    elements.cutStatus.textContent = "Release the pile inside the circle to begin there.";
+    elements.cutStatus.textContent = "Release over another pile to restack, or inside the circle to begin.";
   }
   pilePointerDrag.button.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(0.97)`;
-  elements.cutDropZone.classList.toggle("is-over", isPointerOverDropZone(event.clientX, event.clientY));
+  const sourceIndex = Number(pilePointerDrag.button.dataset.pileIndex);
+  const overBegin = isPointerOverDropZone(event.clientX, event.clientY);
+  const targetPileIndex = overBegin ? -1 : pileIndexAtPoint(event.clientX, event.clientY, sourceIndex);
+  elements.cutDropZone.classList.toggle("is-over", overBegin);
+  clearPileDropTargets();
+  if (targetPileIndex >= 0) {
+    elements.cutPiles.querySelector(`[data-pile-index="${targetPileIndex}"]`)?.classList.add("is-drop-target");
+  }
 }
 
 function finishPilePointerDrag(event) {
   if (!pilePointerDrag || event.pointerId !== pilePointerDrag.pointerId) return;
   const { button, moved } = pilePointerDrag;
   const pileIndex = Number(button.dataset.pileIndex);
-  const dropped = moved && isPointerOverDropZone(event.clientX, event.clientY);
+  const droppedToBegin = moved && isPointerOverDropZone(event.clientX, event.clientY);
+  const targetPileIndex = moved && !droppedToBegin
+    ? pileIndexAtPoint(event.clientX, event.clientY, pileIndex)
+    : -1;
   button.releasePointerCapture?.(event.pointerId);
   button.classList.remove("is-dragging");
   button.style.removeProperty("transform");
   elements.cutDropZone.classList.remove("is-ready", "is-over");
+  clearPileDropTargets();
   pilePointerDrag = null;
 
   if (moved) button.dataset.suppressClick = "true";
-  if (dropped) {
+  if (droppedToBegin) {
     chooseCutPile(pileIndex);
+  } else if (targetPileIndex >= 0) {
+    mergeCutPiles(pileIndex, targetPileIndex);
   } else if (state.phase === "cutting") {
-    elements.cutStatus.textContent = "Choose one of the three piles.";
+    elements.cutStatus.textContent = cutPromptMessage();
   }
 }
 
@@ -597,7 +685,8 @@ function cancelPilePointerDrag(event) {
   button.classList.remove("is-dragging");
   button.style.removeProperty("transform");
   elements.cutDropZone.classList.remove("is-ready", "is-over");
-  elements.cutStatus.textContent = "Choose one of the three piles.";
+  clearPileDropTargets();
+  elements.cutStatus.textContent = cutPromptMessage();
   pilePointerDrag = null;
 }
 
@@ -610,27 +699,52 @@ function showSelectionStage() {
   elements.shuffleButtonLabel.textContent = "Shuffle the deck";
   elements.selectionStage.hidden = false;
   elements.selectionTitle.textContent = targetCount === 1 ? "Choose a card" : `Choose ${targetCount} cards`;
-  elements.selectionInstructions.textContent = targetCount === 1
-    ? "Move slowly and select the face-down card that draws your attention."
-    : "Move slowly and choose one face-down card for each position in your spread.";
+  if (usesMobileDeckLayout.matches) {
+    elements.selectionInstructions.textContent = targetCount === 1
+      ? "Scroll down through the deck, then select the face-down card that draws your attention."
+      : "Scroll down through the deck and choose one face-down card for each position in your spread.";
+  } else {
+    elements.selectionInstructions.textContent = targetCount === 1
+      ? "The full deck is fanned before you. Select the face-down card that draws your attention."
+      : "The full deck is fanned before you. Choose one face-down card for each position in your spread.";
+  }
   elements.selectionCount.textContent = `0 of ${targetCount} ${targetCount === 1 ? "card" : "cards"} chosen`;
   renderDeckSpread();
   state.phase = "choosing";
   elements.selectionTitle.focus({ preventScroll: true });
+  if (usesMobileDeckLayout.matches) {
+    elements.selectionStage.scrollIntoView({
+      behavior: prefersReducedMotion.matches ? "auto" : "smooth",
+      block: "start",
+    });
+  }
   setStatus(`The full deck is spread face down. Choose ${targetCount === 1 ? "one card" : `${targetCount} cards`}.`);
 }
 
 function renderDeckSpread() {
   elements.deckSpread.replaceChildren();
   elements.deckSpread.classList.remove("is-complete");
+  const fanCenter = (state.spreadDeck.length - 1) / 2;
+  const mobileRowStep = 2.8;
+  const mobileRows = Math.ceil(state.spreadDeck.length / 2);
+  elements.deckSpread.style.setProperty("--mobile-stack-height", `${((mobileRows - 1) * mobileRowStep) + 13}rem`);
 
   state.spreadDeck.forEach((unusedCard, index) => {
     const button = createElement("button", "deck-choice");
+    const normalizedPosition = (index - fanCenter) / fanCenter;
+    const mobileColumn = index % 2;
+    const mobileRow = Math.floor(index / 2);
     button.type = "button";
     button.dataset.deckIndex = String(index);
     button.setAttribute("aria-label", `Choose card ${index + 1} of ${state.spreadDeck.length}`);
-    button.style.setProperty("--tilt", `${((index % 7) - 3) * 0.35}deg`);
-    button.style.setProperty("--deal-delay", `${Math.min(index * 8, 420)}ms`);
+    button.style.setProperty("--fan-angle", `${normalizedPosition * 80}deg`);
+    button.style.setProperty("--fan-angle-tablet", `${normalizedPosition * 72}deg`);
+    button.style.setProperty("--fan-angle-mobile", `${normalizedPosition * 68}deg`);
+    button.style.setProperty("--mobile-top", `${mobileRow * mobileRowStep}rem`);
+    button.style.setProperty("--mobile-column-offset", `${mobileColumn ? 4.15 : -4.15}rem`);
+    button.style.setProperty("--mobile-tilt", `${mobileColumn ? 2.5 : -2.5}deg`);
+    button.style.setProperty("--stack-order", String(index + 1));
+    button.style.setProperty("--deal-delay", `${Math.min(index * 5, 300)}ms`);
     button.append(createElement("span", "mini-card-symbol", "✦"));
     button.addEventListener("click", selectCard, { once: true });
     elements.deckSpread.append(button);
@@ -638,28 +752,29 @@ function renderDeckSpread() {
 }
 
 function navigateDeck(event) {
-  if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) return;
+  if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
   const currentChoice = event.target.closest('.deck-choice');
   if (!currentChoice || currentChoice.disabled) return;
 
   const choices = [...elements.deckSpread.querySelectorAll('.deck-choice')];
   const currentIndex = choices.indexOf(currentChoice);
-  const columnCount = getComputedStyle(elements.deckSpread).gridTemplateColumns.split(' ').length;
-  const delta = {
-    ArrowLeft: -1,
-    ArrowRight: 1,
-    ArrowUp: -columnCount,
-    ArrowDown: columnCount,
-  }[event.key];
-  let nextIndex = currentIndex + delta;
+  let nextIndex = event.key === "Home" ? 0 : event.key === "End" ? choices.length - 1 : currentIndex;
+  const delta = event.key === "ArrowLeft" ? -1 : event.key === "ArrowRight" ? 1 : 0;
+  if (delta) nextIndex += delta;
 
   while (nextIndex >= 0 && nextIndex < choices.length && choices[nextIndex].disabled) {
-    nextIndex += delta;
+    nextIndex += delta || (event.key === "Home" ? 1 : -1);
   }
 
   if (nextIndex < 0 || nextIndex >= choices.length) return;
   event.preventDefault();
-  choices[nextIndex].focus({ preventScroll: false });
+  choices[nextIndex].focus({ preventScroll: true });
+  if (usesMobileDeckLayout.matches) {
+    choices[nextIndex].scrollIntoView({
+      behavior: prefersReducedMotion.matches ? "auto" : "smooth",
+      block: "center",
+    });
+  }
 }
 
 function selectCard(event) {
@@ -691,7 +806,15 @@ function selectCard(event) {
     const choices = [...elements.deckSpread.querySelectorAll(".deck-choice")];
     const nextChoice = choices.slice(deckIndex + 1).find((choice) => !choice.disabled)
       || choices.find((choice) => !choice.disabled);
-    window.setTimeout(() => nextChoice?.focus({ preventScroll: true }), prefersReducedMotion.matches ? 20 : 180);
+    window.setTimeout(() => {
+      nextChoice?.focus({ preventScroll: true });
+      if (nextChoice && usesMobileDeckLayout.matches) {
+        nextChoice.scrollIntoView({
+          behavior: prefersReducedMotion.matches ? "auto" : "smooth",
+          block: "center",
+        });
+      }
+    }, prefersReducedMotion.matches ? 20 : 180);
     return;
   }
 
@@ -1024,12 +1147,14 @@ function resetReading() {
   state.phase = "setup";
   state.spreadDeck = [];
   state.cutPiles = [];
+  state.cutCount = 0;
   state.draw = [];
   state.revealedCount = 0;
   state.synthesis = null;
   elements.cardTable.replaceChildren();
   elements.deckSpread.replaceChildren();
   elements.cutPiles.replaceChildren();
+  elements.gatherPilesButton.hidden = true;
   elements.deckSpread.classList.remove("is-complete");
   elements.patternReading.replaceChildren();
   elements.readingSummary.hidden = true;
@@ -1053,6 +1178,7 @@ elements.hapticToggle.addEventListener("change", () => {
     ? "Gentle tactile feedback is on when supported by this device."
     : "Gentle tactile feedback is off.");
 });
+elements.gatherPilesButton.addEventListener("click", gatherCutPiles);
 document.addEventListener("pointermove", movePilePointerDrag);
 document.addEventListener("pointerup", finishPilePointerDrag);
 document.addEventListener("pointercancel", cancelPilePointerDrag);
