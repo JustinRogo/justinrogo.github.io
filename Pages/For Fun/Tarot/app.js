@@ -1291,3 +1291,15 @@ if (!validateDeck(TAROT_DECK)) {
 } else {
   setStatus("The 78-card deck is ready.");
 }
+
+if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js", { scope: "./", updateViaCache: "none" })
+      .then(() => {
+        document.documentElement.dataset.pwaStatus = "ready";
+      })
+      .catch(() => {
+        document.documentElement.dataset.pwaStatus = "unavailable";
+      });
+  });
+}

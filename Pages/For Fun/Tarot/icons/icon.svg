@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title description">
+  <title id="title">Midnight Tarot</title>
+  <desc id="description">A gold star inside a moonlit circle on a midnight blue field.</desc>
+  <defs>
+    <radialGradient id="sky" cx="50%" cy="38%" r="72%">
+      <stop offset="0" stop-color="#1f2855"/>
+      <stop offset="0.58" stop-color="#0c122d"/>
+      <stop offset="1" stop-color="#050816"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f6dda2"/>
+      <stop offset="0.52" stop-color="#d6ad63"/>
+      <stop offset="1" stop-color="#a87933"/>
+    </linearGradient>
+    <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="512" height="512" fill="url(#sky)"/>
+  <g fill="#f0d28f" opacity="0.7">
+    <circle cx="111" cy="126" r="4"/>
+    <circle cx="399" cy="151" r="3"/>
+    <circle cx="381" cy="369" r="4"/>
+    <circle cx="130" cy="382" r="3"/>
+  </g>
+  <g fill="none" stroke="url(#gold)">
+    <circle cx="256" cy="256" r="151" stroke-width="5"/>
+    <circle cx="256" cy="256" r="126" stroke-width="2" opacity="0.48"/>
+  </g>
+  <path d="M256 169l14 73 73 14-73 14-14 73-14-73-73-14 73-14z" fill="url(#gold)" filter="url(#glow)"/>
+  <g fill="#f0d28f">
+    <path d="M91 256l10 10-10 10-10-10z"/>
+    <path d="M421 256l10 10-10 10-10-10z"/>
+  </g>
+</svg>
