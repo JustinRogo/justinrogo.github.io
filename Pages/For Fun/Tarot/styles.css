@@ -772,17 +772,11 @@ textarea:focus {
   gap: 0.8rem;
   justify-items: center;
   padding: 0.5rem;
-  touch-action: none;
-  cursor: grab;
+  cursor: pointer;
   border: 0;
   outline: 0;
   background: transparent;
   transition: opacity 260ms ease, transform 260ms ease;
-}
-
-.deck-pile:active,
-.deck-pile.is-dragging {
-  cursor: grabbing;
 }
 
 .pile-stack {
@@ -843,86 +837,28 @@ textarea:focus {
   border-radius: 0.6rem;
 }
 
-.deck-pile.is-dragging {
-  z-index: 10;
-  opacity: 0.5;
-  transform: scale(0.96);
+.cut-piles.is-opening .deck-pile {
+  pointer-events: none;
 }
 
-.deck-pile.is-drop-target .pile-stack {
-  filter: drop-shadow(0 0 28px rgba(240, 210, 143, 0.62));
-  transform: translateY(-0.4rem) scale(1.05);
+.cut-piles.is-opening .deck-pile:first-child {
+  animation: open-cut-left 720ms cubic-bezier(0.2, 0.78, 0.25, 1) both;
 }
 
-.deck-pile.is-selected .pile-stack {
-  filter: drop-shadow(0 0 25px rgba(240, 210, 143, 0.55));
-  transform: translateY(-0.5rem) scale(1.04);
+.cut-piles.is-opening .deck-pile:last-child {
+  animation: open-cut-right 720ms cubic-bezier(0.2, 0.78, 0.25, 1) both;
 }
 
-.deck-pile.is-dismissed {
-  opacity: 0.22;
+@keyframes open-cut-left {
+  0% { opacity: 0.95; transform: translateX(4.5rem) rotate(0deg) scale(1); }
+  62% { opacity: 1; transform: translateX(-0.45rem) rotate(-3deg) scale(1.02); }
+  100% { opacity: 0; transform: translateX(-1.5rem) translateY(0.8rem) rotate(-7deg) scale(0.92); }
 }
 
-.gather-piles-button {
-  display: block;
-  min-height: 2.7rem;
-  margin: 1.25rem auto 0;
-  padding: 0.55rem 1rem;
-  cursor: pointer;
-  color: var(--gold-bright);
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: rgba(214, 173, 99, 0.05);
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-}
-
-.gather-piles-button[hidden] {
-  display: none;
-}
-
-.gather-piles-button:hover {
-  border-color: var(--gold);
-  background: rgba(214, 173, 99, 0.1);
-}
-
-.gather-piles-button:focus-visible {
-  outline: 2px solid var(--gold-bright);
-  outline-offset: 3px;
-}
-
-.cut-drop-zone {
-  display: grid;
-  width: 8rem;
-  aspect-ratio: 1;
-  margin: 2rem auto 0;
-  place-items: center;
-  color: var(--parchment-dim);
-  border: 1px dashed rgba(214, 173, 99, 0.45);
-  border-radius: 50%;
-  background: rgba(214, 173, 99, 0.03);
-  font-size: 0.67rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  transition: border-color 180ms ease, background 180ms ease, box-shadow 180ms ease, transform 180ms ease;
-}
-
-.cut-drop-zone.is-ready {
-  border-color: var(--gold);
-  box-shadow: 0 0 24px rgba(214, 173, 99, 0.13);
-}
-
-.cut-drop-zone.is-over,
-.cut-drop-zone.is-chosen {
-  color: var(--gold-bright);
-  border-style: solid;
-  border-color: var(--gold-bright);
-  background: rgba(214, 173, 99, 0.1);
-  box-shadow: 0 0 32px rgba(214, 173, 99, 0.25);
-  transform: scale(1.05);
+@keyframes open-cut-right {
+  0% { opacity: 0.95; transform: translateX(-4.5rem) rotate(0deg) scale(1); }
+  62% { opacity: 1; transform: translateX(0.45rem) rotate(3deg) scale(1.02); }
+  100% { opacity: 0; transform: translateX(1.5rem) translateY(0.8rem) rotate(7deg) scale(0.92); }
 }
 
 .cut-status {
@@ -1907,30 +1843,32 @@ textarea:focus {
   }
 
   .deck-spread {
-    --fan-card-width: 7.4rem;
-    --fan-card-height: 11.1rem;
-    height: var(--mobile-stack-height, 119rem);
-    margin-top: 1.5rem;
+    --fan-card-width: 4.7rem;
+    --fan-card-height: 7.05rem;
+    --mobile-fan-radius: 5.7rem;
+    height: 23.5rem;
+    margin-top: 0.75rem;
   }
 
   .deck-choice {
-    top: var(--mobile-top);
+    --active-fan-angle: var(--mobile-fan-angle);
+    top: calc(3.2rem + (var(--mobile-fan-row) * 11.3rem));
     bottom: auto;
-    transform: translateX(calc(-50% + var(--mobile-column-offset))) rotate(var(--mobile-tilt));
-    transform-origin: 50% 50%;
-    animation-name: deal-card-mobile;
+    transform: translateX(-50%) rotate(var(--mobile-fan-angle));
+    transform-origin: 50% calc(100% + var(--mobile-fan-radius));
+    animation-name: deal-card-mobile-fan;
   }
 
   .deck-choice:not(:disabled):hover {
-    transform: translateX(calc(-50% + var(--mobile-column-offset))) translateY(-0.45rem) rotate(var(--mobile-tilt)) scale(1.05);
+    transform: translateX(-50%) rotate(var(--mobile-fan-angle)) translateY(-0.55rem) scale(1.08);
   }
 
   .deck-choice:focus-visible {
-    transform: translateX(calc(-50% + var(--mobile-column-offset))) translateY(-0.35rem) rotate(var(--mobile-tilt)) scale(1.04);
+    transform: translateX(-50%) rotate(var(--mobile-fan-angle)) translateY(-0.45rem) scale(1.07);
   }
 
   .deck-choice.is-selected {
-    transform: translateX(calc(-50% + var(--mobile-column-offset))) translateY(-0.6rem) rotate(var(--mobile-tilt)) scale(1.06);
+    transform: translateX(-50%) rotate(var(--mobile-fan-angle)) translateY(-0.7rem) scale(1.1);
   }
 
   .explorer-header h2 {
@@ -1955,14 +1893,14 @@ textarea:focus {
   }
 }
 
-@keyframes deal-card-mobile {
+@keyframes deal-card-mobile-fan {
   from {
     opacity: 0;
-    transform: translateX(calc(-50% + var(--mobile-column-offset))) translateY(1.2rem) rotate(0deg) scale(0.94);
+    transform: translateX(-50%) translateY(1.1rem) rotate(0deg) scale(0.94);
   }
   to {
     opacity: 1;
-    transform: translateX(calc(-50% + var(--mobile-column-offset))) rotate(var(--mobile-tilt));
+    transform: translateX(-50%) rotate(var(--mobile-fan-angle));
   }
 }
 

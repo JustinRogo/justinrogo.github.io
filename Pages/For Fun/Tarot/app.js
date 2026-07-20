@@ -100,10 +100,10 @@ const elements = {
   shuffleButton: document.querySelector("#shuffleButton"),
   shuffleButtonLabel: document.querySelector("#shuffleButton .button-label"),
   cutStage: document.querySelector("#cutStage"),
+  cutIntro: document.querySelector("#cutIntro"),
   cutTitle: document.querySelector("#cut-title"),
+  cutLayout: document.querySelector("#cutLayout"),
   cutPiles: document.querySelector("#cutPiles"),
-  gatherPilesButton: document.querySelector("#gatherPilesButton"),
-  cutDropZone: document.querySelector("#cutDropZone"),
   cutStatus: document.querySelector("#cutStatus"),
   openExplorerButton: document.querySelector("#openExplorerButton"),
   cardExplorer: document.querySelector("#cardExplorer"),
@@ -153,8 +153,6 @@ const state = {
   synthesis: null,
   explorerRendered: false,
 };
-
-let pilePointerDrag = null;
 
 function validateDeck(deck) {
   if (!Array.isArray(deck) || deck.length !== 78) return false;
@@ -450,26 +448,16 @@ function drawReading() {
   window.setTimeout(showCutStage, shuffleDelay);
 }
 
-function cutPromptMessage() {
-  if (state.cutCount === 0) {
-    return "Tap the deck to make your first cut, or drag the whole deck to Begin here.";
-  }
-  if (state.cutCount === 1) {
-    return "Tap a pile to cut once more, drag piles together, or drag a pile to Begin here.";
-  }
-  return "The deck has been cut twice. Drag piles together, or drag a pile to Begin here.";
-}
-
 function createCutPile(pile, pileIndex) {
   const isWholeDeck = state.cutPiles.length === 1;
   const pileName = isWholeDeck ? "Whole deck" : `Pile ${pileIndex + 1}`;
-  const canCut = state.cutCount < 2 && pile.length > 1;
   const button = createElement("button", "deck-pile");
   button.type = "button";
   button.dataset.pileIndex = String(pileIndex);
-  button.setAttribute("aria-label", canCut
-    ? `${pileName}, ${pile.length} cards. Tap to cut this stack or drag it to begin.`
-    : `${pileName}, ${pile.length} cards. Drag it onto another pile or to Begin here.`);
+  button.disabled = !isWholeDeck || state.phase !== "cutting";
+  button.setAttribute("aria-label", isWholeDeck
+    ? `Whole deck, ${pile.length} cards. Tap to cut the deck.`
+    : `${pileName}, ${pile.length} cards. The cut is opening.`);
 
   const stack = createElement("span", "pile-stack");
   stack.setAttribute("aria-hidden", "true");
@@ -481,18 +469,16 @@ function createCutPile(pile, pileIndex) {
   );
   button.append(stack, createElement("span", "pile-name", pileName));
   button.addEventListener("click", activateCutPile);
-  button.addEventListener("pointerdown", beginPilePointerDrag);
   return button;
 }
 
-function renderCutPiles(message = cutPromptMessage()) {
+function renderCutPiles(message = "Tap the deck to make the cut.") {
+  elements.cutPiles.classList.remove("is-opening");
   elements.cutPiles.replaceChildren();
   elements.cutPiles.style.setProperty("--pile-count", String(state.cutPiles.length));
   const fragment = document.createDocumentFragment();
   state.cutPiles.forEach((pile, index) => fragment.append(createCutPile(pile, index)));
   elements.cutPiles.append(fragment);
-  elements.gatherPilesButton.hidden = state.cutPiles.length <= 1;
-  elements.cutDropZone.classList.remove("is-ready", "is-over", "is-chosen");
   elements.cutStatus.textContent = message;
 }
 
@@ -503,206 +489,56 @@ function showCutStage() {
   elements.setupPanel.classList.remove("is-shuffling");
   elements.shuffleButtonLabel.textContent = "Shuffle the deck";
   elements.cutStage.hidden = false;
+  elements.cutIntro.hidden = false;
+  elements.cutLayout.hidden = false;
+  elements.cutStatus.hidden = false;
   elements.selectionStage.hidden = true;
   state.phase = "cutting";
   renderCutPiles();
   elements.cutTitle.focus({ preventScroll: true });
-  setStatus("The shuffled deck is in one stack. Tap it to cut, or drag it into the begin-here circle.");
+  setStatus("The shuffled deck is in one stack. Tap it once to cut and open the fan.");
 }
 
 function cutPileAt(pileIndex) {
-  if (state.phase !== "cutting" || state.cutCount >= 2) return;
+  if (state.phase !== "cutting" || state.cutCount > 0) return;
   const pile = state.cutPiles[pileIndex];
   if (!pile || pile.length < 2) return;
 
   const cutPoint = Math.ceil(pile.length / 2);
-  state.cutPiles.splice(pileIndex, 1, pile.slice(0, cutPoint), pile.slice(cutPoint));
-  state.cutCount += 1;
-  renderCutPiles(`Cut ${state.cutCount} of 2 complete. ${cutPromptMessage()}`);
-  pulseHaptics(8);
-  const firstNewPile = elements.cutPiles.querySelector(`[data-pile-index="${pileIndex}"]`);
-  firstNewPile?.focus({ preventScroll: true });
-  setStatus(`The deck has been cut ${state.cutCount === 1 ? "once" : "twice"}. ${state.cutPiles.length} piles are on the table.`);
-}
-
-function gatherCutPiles() {
-  if (state.phase !== "cutting" || state.cutPiles.length <= 1) return;
-  state.cutPiles = [state.cutPiles.flat()];
-  renderCutPiles("The full deck is back in one stack. Drag it to Begin here.");
-  pulseHaptics(10);
-  elements.cutPiles.querySelector(".deck-pile")?.focus({ preventScroll: true });
-  setStatus("All piles have been gathered into one deck.");
-}
-
-function mergeCutPiles(sourceIndex, targetIndex) {
-  if (sourceIndex === targetIndex || !state.cutPiles[sourceIndex] || !state.cutPiles[targetIndex]) return;
-  const draggedPile = state.cutPiles[sourceIndex];
-  const remainingPiles = state.cutPiles.filter((unusedPile, index) => index !== sourceIndex);
-  const adjustedTargetIndex = sourceIndex < targetIndex ? targetIndex - 1 : targetIndex;
-  remainingPiles[adjustedTargetIndex] = [...draggedPile, ...remainingPiles[adjustedTargetIndex]];
-  state.cutPiles = remainingPiles;
-  const pileWord = state.cutPiles.length === 1 ? "pile remains" : "piles remain";
-  renderCutPiles(`The piles are restacked. ${state.cutPiles.length} ${pileWord}.`);
-  pulseHaptics(10);
-  elements.cutPiles.querySelector(`[data-pile-index="${adjustedTargetIndex}"]`)?.focus({ preventScroll: true });
-  setStatus(`Two piles were restacked. ${state.cutPiles.length} ${pileWord}.`);
-}
-
-function chooseCutPile(eventOrIndex) {
-  if (state.phase !== "cutting") return;
-
-  const pileIndex = typeof eventOrIndex === "number"
-    ? eventOrIndex
-    : Number(eventOrIndex.currentTarget.dataset.pileIndex);
-  if (!Number.isInteger(pileIndex) || !state.cutPiles[pileIndex]) return;
-
-  const reorderedPiles = [
-    ...state.cutPiles.slice(pileIndex),
-    ...state.cutPiles.slice(0, pileIndex),
-  ];
-  state.spreadDeck = reorderedPiles.flat();
-  state.phase = "cut-complete";
-
-  elements.cutPiles.querySelectorAll(".deck-pile").forEach((pileButton) => {
-    const isChosen = Number(pileButton.dataset.pileIndex) === pileIndex;
-    pileButton.disabled = true;
-    pileButton.classList.toggle("is-selected", isChosen);
-    pileButton.classList.toggle("is-dismissed", !isChosen);
-  });
-  elements.cutDropZone.classList.remove("is-ready", "is-over");
-  elements.cutDropZone.classList.add("is-chosen");
-  elements.cutStatus.textContent = "The cut is made. The cards are taking their places.";
+  const firstHalf = pile.slice(0, cutPoint);
+  const secondHalf = pile.slice(cutPoint);
+  state.cutPiles = [firstHalf, secondHalf];
+  state.spreadDeck = [...secondHalf, ...firstHalf];
+  state.cutCount = 1;
+  state.phase = "cut-opening";
+  renderCutPiles("The cut is made. Watch the deck open into the draw.");
+  elements.cutPiles.classList.add("is-opening");
   pulseHaptics(14);
-  setStatus("Pile chosen. The cut is complete and the reading is being prepared.");
-  window.setTimeout(showSelectionStage, prefersReducedMotion.matches ? 80 : 700);
+  setStatus("The deck has been cut once and is opening into a face-down fan.");
+  window.setTimeout(showSelectionStage, prefersReducedMotion.matches ? 80 : 720);
 }
 
 function activateCutPile(event) {
-  if (event.currentTarget.dataset.suppressClick === "true") {
-    delete event.currentTarget.dataset.suppressClick;
-    return;
-  }
   const pileIndex = Number(event.currentTarget.dataset.pileIndex);
-  if (state.cutCount < 2) {
-    cutPileAt(pileIndex);
-  } else {
-    elements.cutStatus.textContent = cutPromptMessage();
-  }
-}
-
-function beginPilePointerDrag(event) {
-  if (state.phase !== "cutting" || (event.pointerType === "mouse" && event.button !== 0)) return;
-
-  const button = event.currentTarget;
-  pilePointerDrag = {
-    button,
-    pointerId: event.pointerId,
-    startX: event.clientX,
-    startY: event.clientY,
-    moved: false,
-  };
-  button.setPointerCapture?.(event.pointerId);
-  button.classList.add("is-dragging");
-  elements.cutDropZone.classList.add("is-ready");
-}
-
-function isPointerOverDropZone(clientX, clientY) {
-  const bounds = elements.cutDropZone.getBoundingClientRect();
-  return clientX >= bounds.left
-    && clientX <= bounds.right
-    && clientY >= bounds.top
-    && clientY <= bounds.bottom;
-}
-
-function pileIndexAtPoint(clientX, clientY, excludedIndex) {
-  const pileButtons = [...elements.cutPiles.querySelectorAll(".deck-pile")];
-  const target = pileButtons.find((pileButton) => {
-    const pileIndex = Number(pileButton.dataset.pileIndex);
-    if (pileIndex === excludedIndex) return false;
-    const bounds = pileButton.getBoundingClientRect();
-    return clientX >= bounds.left
-      && clientX <= bounds.right
-      && clientY >= bounds.top
-      && clientY <= bounds.bottom;
-  });
-  return target ? Number(target.dataset.pileIndex) : -1;
-}
-
-function clearPileDropTargets() {
-  elements.cutPiles.querySelectorAll(".is-drop-target").forEach((pile) => {
-    pile.classList.remove("is-drop-target");
-  });
-}
-
-function movePilePointerDrag(event) {
-  if (!pilePointerDrag || event.pointerId !== pilePointerDrag.pointerId) return;
-  event.preventDefault();
-  const offsetX = event.clientX - pilePointerDrag.startX;
-  const offsetY = event.clientY - pilePointerDrag.startY;
-  if (Math.hypot(offsetX, offsetY) > 6) {
-    pilePointerDrag.moved = true;
-    elements.cutStatus.textContent = "Release over another pile to restack, or inside the circle to begin.";
-  }
-  pilePointerDrag.button.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(0.97)`;
-  const sourceIndex = Number(pilePointerDrag.button.dataset.pileIndex);
-  const overBegin = isPointerOverDropZone(event.clientX, event.clientY);
-  const targetPileIndex = overBegin ? -1 : pileIndexAtPoint(event.clientX, event.clientY, sourceIndex);
-  elements.cutDropZone.classList.toggle("is-over", overBegin);
-  clearPileDropTargets();
-  if (targetPileIndex >= 0) {
-    elements.cutPiles.querySelector(`[data-pile-index="${targetPileIndex}"]`)?.classList.add("is-drop-target");
-  }
-}
-
-function finishPilePointerDrag(event) {
-  if (!pilePointerDrag || event.pointerId !== pilePointerDrag.pointerId) return;
-  const { button, moved } = pilePointerDrag;
-  const pileIndex = Number(button.dataset.pileIndex);
-  const droppedToBegin = moved && isPointerOverDropZone(event.clientX, event.clientY);
-  const targetPileIndex = moved && !droppedToBegin
-    ? pileIndexAtPoint(event.clientX, event.clientY, pileIndex)
-    : -1;
-  button.releasePointerCapture?.(event.pointerId);
-  button.classList.remove("is-dragging");
-  button.style.removeProperty("transform");
-  elements.cutDropZone.classList.remove("is-ready", "is-over");
-  clearPileDropTargets();
-  pilePointerDrag = null;
-
-  if (moved) button.dataset.suppressClick = "true";
-  if (droppedToBegin) {
-    chooseCutPile(pileIndex);
-  } else if (targetPileIndex >= 0) {
-    mergeCutPiles(pileIndex, targetPileIndex);
-  } else if (state.phase === "cutting") {
-    elements.cutStatus.textContent = cutPromptMessage();
-  }
-}
-
-function cancelPilePointerDrag(event) {
-  if (!pilePointerDrag || event.pointerId !== pilePointerDrag.pointerId) return;
-  const { button } = pilePointerDrag;
-  button.classList.remove("is-dragging");
-  button.style.removeProperty("transform");
-  elements.cutDropZone.classList.remove("is-ready", "is-over");
-  clearPileDropTargets();
-  elements.cutStatus.textContent = cutPromptMessage();
-  pilePointerDrag = null;
+  cutPileAt(pileIndex);
 }
 
 function showSelectionStage() {
   const spread = state.spread;
   const targetCount = spread.positions.length;
   elements.setupPanel.hidden = true;
-  elements.cutStage.hidden = true;
+  elements.cutStage.hidden = false;
+  elements.cutIntro.hidden = true;
+  elements.cutLayout.hidden = true;
+  elements.cutStatus.hidden = true;
   elements.setupPanel.classList.remove("is-shuffling");
   elements.shuffleButtonLabel.textContent = "Shuffle the deck";
   elements.selectionStage.hidden = false;
   elements.selectionTitle.textContent = targetCount === 1 ? "Choose a card" : `Choose ${targetCount} cards`;
   if (usesMobileDeckLayout.matches) {
     elements.selectionInstructions.textContent = targetCount === 1
-      ? "Scroll down through the deck, then select the face-down card that draws your attention."
-      : "Scroll down through the deck and choose one face-down card for each position in your spread.";
+      ? "The cut has opened into two face-down fans. Select the card that draws your attention."
+      : "The cut has opened into two face-down fans. Choose one card for each position in your spread.";
   } else {
     elements.selectionInstructions.textContent = targetCount === 1
       ? "The full deck is fanned before you. Select the face-down card that draws your attention."
@@ -725,24 +561,22 @@ function renderDeckSpread() {
   elements.deckSpread.replaceChildren();
   elements.deckSpread.classList.remove("is-complete");
   const fanCenter = (state.spreadDeck.length - 1) / 2;
-  const mobileRowStep = 2.8;
-  const mobileRows = Math.ceil(state.spreadDeck.length / 2);
-  elements.deckSpread.style.setProperty("--mobile-stack-height", `${((mobileRows - 1) * mobileRowStep) + 13}rem`);
+  const mobileCardsPerRow = Math.ceil(state.spreadDeck.length / 2);
+  const mobileFanCenter = (mobileCardsPerRow - 1) / 2;
 
   state.spreadDeck.forEach((unusedCard, index) => {
     const button = createElement("button", "deck-choice");
     const normalizedPosition = (index - fanCenter) / fanCenter;
-    const mobileColumn = index % 2;
-    const mobileRow = Math.floor(index / 2);
+    const mobileFanRow = Math.floor(index / mobileCardsPerRow);
+    const mobileIndexInRow = index % mobileCardsPerRow;
+    const mobileNormalizedPosition = (mobileIndexInRow - mobileFanCenter) / mobileFanCenter;
     button.type = "button";
     button.dataset.deckIndex = String(index);
     button.setAttribute("aria-label", `Choose card ${index + 1} of ${state.spreadDeck.length}`);
     button.style.setProperty("--fan-angle", `${normalizedPosition * 80}deg`);
     button.style.setProperty("--fan-angle-tablet", `${normalizedPosition * 72}deg`);
-    button.style.setProperty("--fan-angle-mobile", `${normalizedPosition * 68}deg`);
-    button.style.setProperty("--mobile-top", `${mobileRow * mobileRowStep}rem`);
-    button.style.setProperty("--mobile-column-offset", `${mobileColumn ? 4.15 : -4.15}rem`);
-    button.style.setProperty("--mobile-tilt", `${mobileColumn ? 2.5 : -2.5}deg`);
+    button.style.setProperty("--mobile-fan-angle", `${mobileNormalizedPosition * 52}deg`);
+    button.style.setProperty("--mobile-fan-row", String(mobileFanRow));
     button.style.setProperty("--stack-order", String(index + 1));
     button.style.setProperty("--deal-delay", `${Math.min(index * 5, 300)}ms`);
     button.append(createElement("span", "mini-card-symbol", "✦"));
@@ -752,14 +586,24 @@ function renderDeckSpread() {
 }
 
 function navigateDeck(event) {
-  if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+  if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(event.key)) return;
   const currentChoice = event.target.closest('.deck-choice');
   if (!currentChoice || currentChoice.disabled) return;
 
   const choices = [...elements.deckSpread.querySelectorAll('.deck-choice')];
   const currentIndex = choices.indexOf(currentChoice);
   let nextIndex = event.key === "Home" ? 0 : event.key === "End" ? choices.length - 1 : currentIndex;
-  const delta = event.key === "ArrowLeft" ? -1 : event.key === "ArrowRight" ? 1 : 0;
+  const mobileRowLength = Math.ceil(choices.length / 2);
+  const delta = event.key === "ArrowLeft"
+    ? -1
+    : event.key === "ArrowRight"
+      ? 1
+      : event.key === "ArrowUp" && usesMobileDeckLayout.matches
+        ? -mobileRowLength
+        : event.key === "ArrowDown" && usesMobileDeckLayout.matches
+          ? mobileRowLength
+          : 0;
+  if (!delta && ["ArrowUp", "ArrowDown"].includes(event.key)) return;
   if (delta) nextIndex += delta;
 
   while (nextIndex >= 0 && nextIndex < choices.length && choices[nextIndex].disabled) {
@@ -833,6 +677,7 @@ function selectCard(event) {
 function showReadingStage() {
   const spread = state.spread;
   elements.setupPanel.hidden = true;
+  elements.cutStage.hidden = true;
   elements.selectionStage.hidden = true;
   elements.setupPanel.classList.remove("is-shuffling");
   elements.shuffleButtonLabel.textContent = "Shuffle the deck";
@@ -1232,7 +1077,7 @@ function resetReading() {
   elements.cardTable.replaceChildren();
   elements.deckSpread.replaceChildren();
   elements.cutPiles.replaceChildren();
-  elements.gatherPilesButton.hidden = true;
+  elements.cutPiles.classList.remove("is-opening");
   elements.deckSpread.classList.remove("is-complete");
   elements.patternReading.replaceChildren();
   elements.readingSummary.hidden = true;
@@ -1256,10 +1101,6 @@ elements.hapticToggle.addEventListener("change", () => {
     ? "Gentle tactile feedback is on when supported by this device."
     : "Gentle tactile feedback is off.");
 });
-elements.gatherPilesButton.addEventListener("click", gatherCutPiles);
-document.addEventListener("pointermove", movePilePointerDrag);
-document.addEventListener("pointerup", finishPilePointerDrag);
-document.addEventListener("pointercancel", cancelPilePointerDrag);
 elements.spreadInputs.forEach((input) => {
   input.addEventListener("change", toggleCustomSpreadBuilder);
 });

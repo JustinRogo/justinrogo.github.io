@@ -1,14 +1,14 @@
 const CACHE_PREFIX = "midnight-tarot";
-const CACHE_VERSION = "v3";
+const CACHE_VERSION = "v7";
 const APP_CACHE = `${CACHE_PREFIX}-${CACHE_VERSION}`;
 const OFFLINE_PAGE = new URL("./index.html", self.location).href;
 
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./styles.css?v=12",
+  "./styles.css?v=14",
   "./deck.js?v=4",
-  "./app.js?v=14",
+  "./app.js?v=17",
   "./manifest.webmanifest",
   "./icons/icon.svg",
   "./icons/icon-192.png",

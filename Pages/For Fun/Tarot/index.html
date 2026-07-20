@@ -15,7 +15,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-  <link rel="stylesheet" href="styles.css?v=12">
+  <link rel="stylesheet" href="styles.css?v=14">
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to the reading</a>
@@ -155,30 +155,26 @@
     </section>
 
     <section id="cutStage" class="cut-stage" aria-labelledby="cut-title" hidden>
-      <div class="cut-heading">
+      <div id="cutIntro" class="cut-heading">
         <p class="step-label">The deck is yours</p>
         <h2 id="cut-title" tabindex="-1">Cut the deck</h2>
-        <p>Tap the deck to cut it once or twice. Drag piles onto one another to restack them, or drag any pile into the circle to begin.</p>
+        <p>Tap the deck once. The cut will open into a face-down fan so you can choose your cards here.</p>
       </div>
 
-      <div class="cut-layout">
+      <div id="cutLayout" class="cut-layout">
         <div id="cutPiles" class="cut-piles" role="group" aria-label="Face-down tarot deck piles"></div>
-        <button id="gatherPilesButton" class="gather-piles-button" type="button" hidden>Gather all piles</button>
-        <div id="cutDropZone" class="cut-drop-zone" aria-hidden="true">
-          <span>Begin here</span>
-        </div>
       </div>
-      <p id="cutStatus" class="cut-status" role="status" aria-live="polite">Tap the deck to cut, or drag it to begin.</p>
-    </section>
+      <p id="cutStatus" class="cut-status" role="status" aria-live="polite">Tap the deck to make the cut.</p>
 
-    <section id="selectionStage" class="selection-stage" aria-labelledby="selection-title" hidden>
-      <div class="selection-heading">
-        <p class="step-label">The deck is spread</p>
-        <h2 id="selection-title" tabindex="-1">Choose your card</h2>
-        <p id="selectionInstructions">The full deck is fanned before you. Select the card that draws your attention.</p>
-        <p id="selectionCount" class="selection-count" role="status" aria-live="polite">0 of 1 cards chosen</p>
+      <div id="selectionStage" class="selection-stage" aria-labelledby="selection-title" hidden>
+        <div class="selection-heading">
+          <p class="step-label">The cut becomes the draw</p>
+          <h2 id="selection-title" tabindex="-1">Choose your card</h2>
+          <p id="selectionInstructions">The full deck is fanned before you. Select the card that draws your attention.</p>
+          <p id="selectionCount" class="selection-count" role="status" aria-live="polite">0 of 1 cards chosen</p>
+        </div>
+        <div id="deckSpread" class="deck-spread" role="group" aria-label="Face-down tarot deck"></div>
       </div>
-      <div id="deckSpread" class="deck-spread" role="group" aria-label="Face-down tarot deck"></div>
     </section>
 
     <section id="readingStage" class="reading-stage" aria-labelledby="reading-title" hidden>
@@ -261,6 +257,6 @@
   </footer>
 
   <script src="deck.js?v=4" defer></script>
-  <script src="app.js?v=14" defer></script>
+  <script src="app.js?v=17" defer></script>
 </body>
 </html>
