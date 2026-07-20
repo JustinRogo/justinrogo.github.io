@@ -327,6 +327,57 @@ aside {
   box-shadow: none;
 }
 
+.hero-strengths {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+  width: 100%;
+}
+
+.hero-strengths__bar {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-pill);
+  display: flex;
+  height: 8px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.hero-strengths__bar span {
+  flex: var(--domain-weight, 1) 1 0;
+  min-width: 2px;
+}
+
+.hero-strengths__bar .green { background: var(--green); }
+.hero-strengths__bar .blue { background: var(--blue); }
+.hero-strengths__bar .purple { background: var(--purple); }
+.hero-strengths__bar .orange { background: var(--orange); }
+
+.hero-strengths__button {
+  width: 100%;
+}
+
+.container.about-open .hero {
+  align-items: center;
+}
+
+.container.about-open .avatar {
+  margin-inline: auto;
+}
+
+.container.about-open .hgroup {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  max-width: 760px;
+  text-align: center;
+  width: 100%;
+}
+
+.container.about-open .about-intro__copy {
+  max-width: none;
+}
+
 /* ===================================================================
    Interactive Buttons
    =================================================================== */
@@ -378,6 +429,12 @@ aside {
   color: var(--cyan);
   border: 1px solid rgba(0, 242, 254, 0.2);
   width: fit-content;
+}
+
+body:not(.light) .chip {
+  background: rgba(255, 126, 95, 0.08);
+  border-color: rgba(255, 126, 95, 0.22);
+  color: var(--orange);
 }
 
 /* ===================================================================
@@ -709,6 +766,10 @@ aside {
   text-transform: uppercase;
 }
 
+body:not(.light) .about-resume__panel .about-resume__label {
+  color: var(--orange);
+}
+
 .about-resume__panel h3 {
   color: var(--text-strong);
   font-family: 'Fraunces', Georgia, serif;
@@ -793,6 +854,10 @@ body.light .about-resume__tools span {
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+}
+
+body:not(.light) .eyebrow {
+  color: var(--orange);
 }
 
 .section-link {
@@ -992,51 +1057,51 @@ body.light .about-resume__tools span {
    =================================================================== */
 .page-tree {
   display: grid;
-  gap: 10px;
+  gap: clamp(22px, 4cqw, 32px);
 }
 
-.page-group {
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  background: rgba(255, 255, 255, 0.01);
-  overflow: hidden;
-  transition: border-color var(--speed);
+.page-branch {
+  padding-left: 28px;
+  position: relative;
 }
 
-.page-group:hover {
-  border-color: var(--line-strong);
+.page-branch::before {
+  background: linear-gradient(180deg, var(--orange), rgba(255, 126, 95, 0.16));
+  bottom: 20px;
+  content: '';
+  left: 7px;
+  position: absolute;
+  top: 10px;
+  width: 1px;
 }
 
-.page-group summary {
-  display: flex;
+.page-branch__header {
   align-items: center;
-  justify-content: space-between;
+  display: flex;
   gap: 10px;
-  cursor: pointer;
-  padding: 12px 16px;
-  font-weight: 700;
-  user-select: none;
-  outline: none;
+  justify-content: space-between;
+  min-height: 24px;
+  position: relative;
 }
 
-.page-group summary::before {
-  content: '+';
-  display: inline-grid;
-  place-items: center;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  color: #030712;
-  background: var(--cyan);
-  font-weight: 800;
-  font-size: 0.8rem;
-  line-height: 1;
-  transition: transform var(--speed);
-}
-
-.page-group[open] > summary::before {
-  content: '-';
+.page-branch__header::before {
   background: var(--orange);
+  border: 3px solid var(--bg-2);
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(255, 126, 95, 0.4);
+  content: '';
+  height: 14px;
+  left: -28px;
+  position: absolute;
+  width: 14px;
+}
+
+.page-branch__header h3 {
+  color: var(--text-strong);
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.15rem;
+  line-height: 1.2;
+  margin: 0;
 }
 
 .page-count {
@@ -1049,14 +1114,25 @@ body.light .about-resume__tools span {
   border-radius: var(--radius-pill);
 }
 
-.page-group-items {
+.page-branch__items {
   display: grid;
   gap: 8px;
-  padding: 0 12px 12px 12px;
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
 }
 
-.page-group .page-group {
-  background: rgba(255, 255, 255, 0.02);
+.page-branch__items li {
+  position: relative;
+}
+
+.page-branch__items li::before {
+  border-top: 1px solid rgba(255, 126, 95, 0.34);
+  content: '';
+  left: -20px;
+  position: absolute;
+  top: 50%;
+  width: 20px;
 }
 
 .page-link {
@@ -1731,15 +1807,6 @@ body.light #eventsList a {
 body.light #eventsList a:hover,
 body.light #eventsList a:focus-visible {
   color: #0066ff;
-}
-
-body.light .page-group summary::before {
-  color: #ffffff;
-  background: #0066ff;
-}
-
-body.light .page-group[open] > summary::before {
-  background: #ff7e5f;
 }
 
 body.light #csMount .controls,

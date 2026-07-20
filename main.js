@@ -60,29 +60,31 @@ function escapeHtml(value) {
   const mount = document.getElementById('pageTree');
   if (!mount) return;
 
-  function countPages(nodes) {
-    return nodes.reduce((total, node) => total + (node.href ? 1 : countPages(node.children || [])), 0);
+  function collectPages(nodes) {
+    return nodes.flatMap(node => (node.href ? [node] : collectPages(node.children || [])));
   }
 
-  function renderNodes(nodes, depth = 0) {
-    return nodes.map(node => {
-      if (node.href) {
-        return `<a class="page-link" href="${escapeHtml(node.href)}">
-          <span class="dot" aria-hidden="true"></span>
-          <span>${escapeHtml(node.title)}</span>
-        </a>`;
-      }
+  function renderNodes(nodes) {
+    return nodes.map((node, index) => {
+      const pages = (node.href ? [node] : collectPages(node.children || []))
+        .sort((a, b) => a.title.localeCompare(b.title));
+      if (!pages.length) return '';
 
-      const childCount = countPages(node.children || []);
-      return `<details class="page-group" ${depth === 0 ? 'open' : ''}>
-        <summary>
-          <span>${escapeHtml(node.title)}</span>
-          <span class="page-count">${childCount}</span>
-        </summary>
-        <div class="page-group-items">
-          ${renderNodes(node.children || [], depth + 1)}
+      const headingId = `page-branch-${index}`;
+      return `<section class="page-branch" aria-labelledby="${headingId}">
+        <div class="page-branch__header">
+          <h3 id="${headingId}">${escapeHtml(node.href ? 'Other' : node.title)}</h3>
+          <span class="page-count">${pages.length} ${pages.length === 1 ? 'page' : 'pages'}</span>
         </div>
-      </details>`;
+        <ul class="page-branch__items">
+          ${pages.map(page => `<li>
+            <a class="page-link" href="${escapeHtml(page.href)}">
+              <span class="dot" aria-hidden="true"></span>
+              <span>${escapeHtml(page.title)}</span>
+            </a>
+          </li>`).join('')}
+        </ul>
+      </section>`;
     }).join('');
   }
 
@@ -334,6 +336,7 @@ function escapeHtml(value) {
   // Size the domain bar from the ranked profile. A #1 theme receives 34 points,
   // a #2 theme receives 33, and so on through #34 receiving 1 point.
   const domainBar = mount.querySelector('.bar');
+  const heroDomainBar = document.querySelector('.hero-strengths__bar');
   const rankedItems = [...mount.querySelectorAll('.item[data-domain]')];
   const maxRank = Math.max(...rankedItems.map(item => (
     parseInt(item.querySelector('.rank')?.textContent || '0', 10)
@@ -346,16 +349,17 @@ function escapeHtml(value) {
   }, {});
   const totalDomainScore = Object.values(domainScores).reduce((total, score) => total + score, 0);
 
-  if (domainBar && totalDomainScore) {
-    const labels = [...domainBar.querySelectorAll('[data-domain]')].map(segment => {
+  [domainBar, heroDomainBar].filter(Boolean).forEach(bar => {
+    if (!totalDomainScore) return;
+    const labels = [...bar.querySelectorAll('[data-domain]')].map(segment => {
       const score = domainScores[segment.dataset.domain] || 0;
       const percentage = Math.round((score / totalDomainScore) * 1000) / 10;
       segment.style.setProperty('--domain-weight', score);
       segment.title = `${segment.dataset.label}: ${percentage}%`;
       return `${segment.dataset.label} ${percentage}%`;
     });
-    domainBar.setAttribute('aria-label', `Rank-weighted CliftonStrengths domain balance: ${labels.join(', ')}`);
-  }
+    bar.setAttribute('aria-label', `Rank-weighted CliftonStrengths domain balance: ${labels.join(', ')}`);
+  });
 
   // Strengths filter controls
   const controlBtns = mount.querySelectorAll('.controls button');
@@ -619,6 +623,19 @@ fetch('https://justinrogo.github.io/data/cards_count.json')
       if (e.key === 'End')        { e.preventDefault(); tabs[tabs.length - 1].click(); }
     });
   });
+
+  const strengthsButton = document.getElementById('viewStrengthsBtn');
+  const strengthsTab = document.getElementById('tbtn-cs');
+  if (strengthsButton && strengthsTab) {
+    strengthsButton.addEventListener('click', () => {
+      strengthsTab.click();
+      const tabsCard = strengthsTab.closest('.tabs');
+      if (tabsCard) {
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        tabsCard.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+      }
+    });
+  }
 
   // Prime the initially-active tab's iframe
   const firstActive = document.querySelector('.tabpanel.active iframe[data-src]');
