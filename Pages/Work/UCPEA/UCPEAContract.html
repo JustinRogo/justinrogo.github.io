@@ -4,40 +4,104 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>UCPEA Collective Bargaining Agreement, 2025-2029</title>
+<script>
+(() => {
+  let theme;
+  try {
+    theme = localStorage.getItem('ucpea-contract-theme');
+  } catch(error) {
+    // Local storage may be unavailable when previewing from a local file.
+  }
+  if(!['light', 'dark'].includes(theme)){
+    theme = window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  document.documentElement.dataset.theme = theme;
+})();
+</script>
 <style>
-:root { --navy:#000E2F; --gold:#FFB81C; --accent:#013ECD; --border:#d8dee9; --bg:#f6f8fb; --text:#182233; --muted:#5b6678; --card:#ffffff; --mark:#fff3a3; }
+:root {
+  --navy:#000E2F;
+  --gold:#FFB81C;
+  --accent:#013ECD;
+  --border:#d8dee9;
+  --bg:#f6f8fb;
+  --text:#182233;
+  --muted:#5b6678;
+  --card:#ffffff;
+  --mark:#fff3a3;
+  --surface:#ffffff;
+  --surface-soft:#f0f4ff;
+  --toolbar-bg:rgba(246,248,251,.97);
+  --heading:#000E2F;
+  --toc-text:#22304a;
+  --subhead:#253858;
+  --divider:#edf1f7;
+  --target:#fff8d9;
+  --target-outline:rgba(255,184,28,.2);
+  --permalink-hover:#eef3ff;
+  --success-bg:#e8f7ed;
+  --success:#14733c;
+  --table-head:#f1f5fb;
+  color-scheme:light;
+}
+html[data-theme="dark"] {
+  --accent:#79a7ff;
+  --border:#35425a;
+  --bg:#0d1320;
+  --text:#e6ebf4;
+  --muted:#a9b4c7;
+  --card:#151d2a;
+  --mark:#6e5d00;
+  --surface:#151d2a;
+  --surface-soft:#202b40;
+  --toolbar-bg:rgba(13,19,32,.97);
+  --heading:#f1f5ff;
+  --toc-text:#d8e0ef;
+  --subhead:#d5def0;
+  --divider:#29354b;
+  --target:#3a3217;
+  --target-outline:rgba(255,184,28,.28);
+  --permalink-hover:#263552;
+  --success-bg:#173a29;
+  --success:#7fe1a7;
+  --table-head:#202b40;
+  color-scheme:dark;
+}
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
-body { margin:0; font-family: Arial, Helvetica, sans-serif; color:var(--text); background:var(--bg); line-height:1.55; }
+body { margin:0; font-family: Arial, Helvetica, sans-serif; color:var(--text); background:var(--bg); line-height:1.55; transition:color .15s ease, background .15s ease; }
 .site-header { background:linear-gradient(135deg, var(--navy), #071b4d); color:#fff; padding:34px 24px 30px; border-bottom:6px solid var(--gold); }
 .site-header .wrap, main.wrap { max-width:1180px; margin:0 auto; }
 h1 { margin:0 0 10px; font-size:32px; line-height:1.15; letter-spacing:-0.02em; }
 .subtitle { max-width:820px; margin:0; color:#dce6ff; font-size:16px; }
-.toolbar { position:sticky; top:0; z-index:5; background:rgba(246,248,251,.97); backdrop-filter:blur(8px); border-bottom:1px solid var(--border); padding:16px 24px; }
-.toolbar-inner { max-width:1180px; margin:0 auto; display:grid; grid-template-columns: minmax(250px,1fr) auto auto; gap:12px; align-items:center; }
-.searchbox { display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid var(--border); border-radius:14px; background:#fff; box-shadow:0 2px 10px rgba(0,14,47,.06); }
-.searchbox input { width:100%; border:0; outline:0; font-size:16px; }
-button { border:1px solid var(--border); background:#fff; color:var(--navy); border-radius:12px; padding:10px 14px; font-weight:700; cursor:pointer; box-shadow:0 2px 8px rgba(0,14,47,.05); }
+.toolbar { position:sticky; top:0; z-index:5; background:var(--toolbar-bg); backdrop-filter:blur(8px); border-bottom:1px solid var(--border); padding:16px 24px; }
+.toolbar-inner { max-width:1180px; margin:0 auto; display:grid; grid-template-columns:minmax(250px,1fr) auto auto auto; gap:12px; align-items:center; }
+.searchbox { display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid var(--border); border-radius:14px; background:var(--surface); box-shadow:0 2px 10px rgba(0,14,47,.06); }
+.searchbox input { width:100%; border:0; outline:0; font-size:16px; color:var(--text); background:transparent; }
+button { border:1px solid var(--border); background:var(--surface); color:var(--heading); border-radius:12px; padding:10px 14px; font-weight:700; cursor:pointer; box-shadow:0 2px 8px rgba(0,14,47,.05); }
 button:hover { border-color:var(--accent); }
-.result-count { color:var(--muted); font-size:14px; }
+.icon-button { display:grid; place-items:center; width:42px; height:42px; padding:0; }
+.icon-button svg { width:20px; height:20px; pointer-events:none; }
+.result-count { grid-column:1 / -1; color:var(--muted); font-size:14px; }
+.result-count:empty { display:none; }
 .layout { display:grid; grid-template-columns:280px 1fr; gap:24px; padding:24px; }
-nav.toc { position:sticky; top:86px; align-self:start; max-height:calc(100vh - 110px); overflow:auto; background:#fff; border:1px solid var(--border); border-radius:18px; padding:16px; box-shadow:0 8px 22px rgba(0,14,47,.06); }
-nav.toc h2 { margin:0 0 10px; font-size:15px; color:var(--navy); }
-nav.toc a { display:block; padding:7px 8px; color:#22304a; text-decoration:none; border-radius:9px; font-size:14px; }
-nav.toc a:hover { background:#f0f4ff; color:var(--accent); }
+nav.toc { position:sticky; top:86px; align-self:start; max-height:calc(100vh - 110px); overflow:auto; background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:16px; box-shadow:0 8px 22px rgba(0,14,47,.06); }
+nav.toc h2 { margin:0 0 10px; font-size:15px; color:var(--heading); }
+nav.toc a { display:block; padding:7px 8px; color:var(--toc-text); text-decoration:none; border-radius:9px; font-size:14px; }
+nav.toc a:hover { background:var(--surface-soft); color:var(--accent); }
 .article { scroll-margin-top:112px; margin-bottom:14px; border:1px solid var(--border); border-radius:18px; background:var(--card); box-shadow:0 8px 24px rgba(0,14,47,.07); overflow:hidden; }
 .article[hidden] { display:none; }
-.article summary { list-style:none; cursor:pointer; padding:18px 22px; display:flex; align-items:center; justify-content:space-between; gap:18px; background:#fff; }
+.article summary { list-style:none; cursor:pointer; padding:18px 22px; display:flex; align-items:center; justify-content:space-between; gap:18px; background:var(--surface); }
 .article summary::-webkit-details-marker { display:none; }
-.article-title { color:var(--navy); font-weight:800; font-size:18px; }
+.article-title { color:var(--heading); font-weight:800; font-size:18px; }
 .article-count { color:var(--muted); font-size:13px; white-space:nowrap; }
-.article summary::after { content:'+'; display:grid; place-items:center; width:28px; height:28px; border-radius:50%; background:#f0f4ff; color:var(--accent); font-weight:800; flex:0 0 auto; }
+.article summary::after { content:'+'; display:grid; place-items:center; width:28px; height:28px; border-radius:50%; background:var(--surface-soft); color:var(--accent); font-weight:800; flex:0 0 auto; }
 .article[open] summary::after { content:'-'; }
 .article-body { padding:4px 24px 24px; border-top:1px solid var(--border); }
-.section-block { display:grid; grid-template-columns:64px 1fr; gap:10px; margin:18px 0 10px; padding-top:12px; border-top:1px solid #edf1f7; }
+.section-block { display:grid; grid-template-columns:64px 1fr; gap:10px; margin:18px 0 10px; padding-top:12px; border-top:1px solid var(--divider); }
 .section-number { color:var(--accent); font-weight:800; text-align:right; line-height:1.55; }
 .section-block p { margin:0 0 13px; font-size:16px; font-weight:400; color:var(--text); }
-.subhead { margin:18px 0 6px; color:#253858; font-size:17px; }
+.subhead { margin:18px 0 6px; color:var(--subhead); font-size:17px; }
 p { margin:9px 0 13px; font-size:16px; font-weight:400; color:var(--text); }
 .article-body > p { margin-left:74px; }
 .clause { display:grid; grid-template-columns:64px 1fr; gap:10px; margin:10px 0; }
@@ -45,12 +109,62 @@ p { margin:9px 0 13px; font-size:16px; font-weight:400; color:var(--text); }
 .clause.deep { margin-left:52px; }
 .label { color:var(--accent); font-weight:800; text-align:right; }
 .label.bullet { color:var(--text); }
+.permalink-target { position:relative; scroll-margin-top:112px; padding-right:40px; border-radius:8px; }
+.permalink-target:target { background:var(--target); outline:4px solid var(--target-outline); }
+.permalink-button {
+  position:absolute;
+  top:-3px;
+  right:0;
+  display:grid;
+  place-items:center;
+  width:32px;
+  height:32px;
+  padding:0;
+  border:0;
+  border-radius:8px;
+  background:transparent;
+  color:var(--muted);
+  box-shadow:none;
+  opacity:0;
+  transform:translateX(4px);
+  transition:opacity .15s ease, transform .15s ease, color .15s ease, background .15s ease;
+}
+.section-block > .permalink-button { top:8px; }
+.subhead > .permalink-button { top:-2px; }
+.permalink-target:hover > .permalink-button,
+.permalink-target:focus-within > .permalink-button,
+.permalink-button:focus-visible,
+.permalink-button.is-copied {
+  opacity:1;
+  transform:translateX(0);
+}
+.permalink-button:hover { border:0; background:var(--permalink-hover); color:var(--accent); }
+.permalink-button:focus-visible { outline:3px solid rgba(1,62,205,.25); outline-offset:2px; }
+.permalink-button.is-copied { background:var(--success-bg); color:var(--success); }
+.permalink-button svg { width:18px; height:18px; pointer-events:none; }
+.copy-toast {
+  position:fixed;
+  right:20px;
+  bottom:20px;
+  z-index:20;
+  margin:0;
+  padding:10px 14px;
+  border-radius:10px;
+  background:var(--navy);
+  color:#fff;
+  font-size:14px;
+  font-weight:700;
+  box-shadow:0 8px 24px rgba(0,14,47,.22);
+}
+.copy-toast[hidden] { display:none; }
 table { width:100%; border-collapse:collapse; margin:16px 0 20px; font-size:15px; }
 th, td { border:1px solid var(--border); padding:9px 10px; text-align:left; }
-th { background:#f1f5fb; color:var(--navy); }
+th { background:var(--table-head); color:var(--heading); }
 mark { background:var(--mark); padding:0 2px; border-radius:3px; }
-.no-results { display:none; padding:20px; background:#fff; border:1px solid var(--border); border-radius:18px; }
-@media (max-width: 880px) { .toolbar-inner { grid-template-columns:1fr; } .layout { grid-template-columns:1fr; padding:16px; } nav.toc { position:static; max-height:none; } .clause, .section-block { grid-template-columns:52px 1fr; } .article-body > p { margin-left:62px; } }
+.no-results { display:none; padding:20px; background:var(--surface); border:1px solid var(--border); border-radius:18px; }
+@media (hover:none) { .permalink-button { opacity:.7; transform:none; } }
+@media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } body, .permalink-button { transition:none; } }
+@media (max-width: 880px) { .toolbar-inner { grid-template-columns:1fr 1fr auto; } .searchbox { grid-column:1 / -1; } .layout { grid-template-columns:1fr; padding:16px; } nav.toc { position:static; max-height:none; } .clause, .section-block { grid-template-columns:52px 1fr; } .article-body > p { margin-left:62px; } }
 @media (max-width: 560px) { .article-body > p { margin-left:0; } }
 </style>
 </head>
@@ -62,6 +176,7 @@ mark { background:var(--mark); padding:0 2px; border-radius:3px; }
 <div class="toolbar"><div class="toolbar-inner">
 <label class="searchbox" aria-label="Search contract language"><span aria-hidden="true">Search</span><input id="contract-search" type="search" placeholder="Search contract language, e.g., telecommuting, sick leave, salary"></label>
 <button id="expand-all" type="button">Expand all</button><button id="collapse-all" type="button">Collapse all</button>
+<button id="theme-toggle" class="icon-button" type="button" aria-label="Switch to dark mode" aria-pressed="false" title="Switch to dark mode"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.4 15.2A8.5 8.5 0 0 1 8.8 3.6 8.5 8.5 0 1 0 20.4 15.2Z" fill="currentColor"/></svg></button>
 <div id="result-count" class="result-count" aria-live="polite"></div>
 </div></div>
 <main class="wrap layout">
@@ -524,13 +639,14 @@ mark { background:var(--mark); padding:0 2px; border-radius:3px; }
 <p>University parking permits will be honored at all campus locations.</p>
 <div class="section-block"><div class="section-number">30.6</div><p>An employee with an Area 2 University parking permit, using a state-issued handicap parking permit, and registered with Facilities Operations, shall be permitted to park at any handicap designated parking spot in surface lots, without incurring additional costs.</p></div>
 <div class="section-block"><div class="section-number">30.7</div><p>The University will establish dedicated parking spaces—identified as special parking—for use by Residence Hall Directors within reasonable proximity to their assigned residential dwelling. Special Residence Hall Director spaces will be available at the Area 2 rate.</p></div>
-<div class="section-block"><div class="section-number">30.8</div><p>Classification System</p></div></div>
+</div>
 </details><details class="article" id="article-31" data-title="article 31. job classification">
 <summary><span class="article-title">Article 31. Job Classification</span><span class="article-count"></span></summary>
-<div class="article-body"><div class="clause nested"><div class="label">a.</div><div>Nothing in this Article will diminish the Board’s prerogatives described in Article 3, including, but not limited to, the power to determine for the University what jobs are needed, what the content of a job description should be, or how a particular job should be structured.</div></div>
+<div class="article-body"><div class="section-block"><div class="section-number">31.1</div><p>Classification System</p></div>
+<div class="clause nested"><div class="label">a.</div><div>Nothing in this Article will diminish the Board’s prerogatives described in Article 3, including, but not limited to, the power to determine for the University what jobs are needed, what the content of a job description should be, or how a particular job should be structured.</div></div>
 <div class="clause nested"><div class="label">b.</div><div>A description of the Job Classification System is available to all employees through the Human Resources Web Page.</div></div>
-<div class="section-block"><div class="section-number">31.1</div><p>Career Progression Career progression will include three (3) ranks: proficient, advanced, and expert. Employees are hired at the proficient rank. The salary increase for progression from proficient to advanced is $1,000. The salary increase for progression from advanced to expert is $1,500. These salary increases are independent of any merit awards that may be made through Article 32, Salary. Salary increases for progression will be subject to fiscal constraints, and resulting salaries will not exceed the pay-band maximum. Any denial of a request for a progression in rank shall be accompanied by a written reason for the denial. Denials shall not be arbitrary or capricious. Decisions about progression shall be final and not subject to appeal.</p></div>
-<div class="section-block"><div class="section-number">31.2</div><p>Position Audit Process</p></div>
+<div class="section-block"><div class="section-number">31.2</div><p>Career Progression Career progression will include three (3) ranks: proficient, advanced, and expert. Employees are hired at the proficient rank. The salary increase for progression from proficient to advanced is $1,000. The salary increase for progression from advanced to expert is $1,500. These salary increases are independent of any merit awards that may be made through Article 32, Salary. Salary increases for progression will be subject to fiscal constraints, and resulting salaries will not exceed the pay-band maximum. Any denial of a request for a progression in rank shall be accompanied by a written reason for the denial. Denials shall not be arbitrary or capricious. Decisions about progression shall be final and not subject to appeal.</p></div>
+<div class="section-block"><div class="section-number">31.3</div><p>Position Audit Process</p></div>
 <div class="clause nested"><div class="label">a.</div><div>DEFINITION: A position audit to determine whether an employee’s position is appropriately classified may be requested when:</div></div>
 <p>The opinion of the employee and/or their supervisor is that a majority of the job duties and responsibilities have changed to such a degree that the existing classification does not appropriately describe the work that is being done.</p>
 <p>The method of classification analysis shall be a position audit performed by the Department of Human Resources. It is at the University’s discretion to determine the methodology for collecting position information and the protocol by which the review is performed.</p>
@@ -545,8 +661,8 @@ mark { background:var(--mark); padding:0 2px; border-radius:3px; }
 <p>Following the meeting the employee will have fourteen (14) calendar days to supplement the discussion with additional evidence.</p>
 <p>The Chief Human Resources Officer, or designee, shall respond in writing within six (6) weeks. The written decision may confirm the original decision, or it may determine that the employee’s duties are not appropriately classified. The decision will provide justification for this determination. This decision is final and not subject to appeal, grievance, or arbitration.</p>
 <div class="clause nested"><div class="label">h.</div><div>All time limits in this Section may be extended by mutual agreement between the UCPEA and the University.</div></div>
-<div class="section-block"><div class="section-number">31.3</div><p>Reclassification Salary Increases If the position audit results in an employee’s position being reclassified to a higher level, the employee’s salary may be increased by up to 10%, as approved by Human Resources and the manager outside of the bargaining unit, on the effective date of the reclassification. The salary increase shall not be more than the maximum of the salary band into which the position is reclassified. Otherwise, the salary increase shall not be less than 3% of the employee’s salary on the effective date of the reclassification, or the minimum of the pay-band into which the employee is reclassified, whichever is greater.</p></div>
-<div class="section-block"><div class="section-number">31.4</div><p>Temporary Service in a Higher Classification It is within the University’s discretion to appoint employees to temporary positions or temporarily assign them higher-level additional duties to cover for someone on a leave of absence, to address departmental reorganizations, to fill a need while a full recruitment effort is underway, or for other reasons the University deems appropriate. The University will make every effort to limit temporary appointments to no more than 18 months but reserves the right to exceed 18 months.</p></div>
+<div class="section-block"><div class="section-number">31.4</div><p>Reclassification Salary Increases If the position audit results in an employee’s position being reclassified to a higher level, the employee’s salary may be increased by up to 10%, as approved by Human Resources and the manager outside of the bargaining unit, on the effective date of the reclassification. The salary increase shall not be more than the maximum of the salary band into which the position is reclassified. Otherwise, the salary increase shall not be less than 3% of the employee’s salary on the effective date of the reclassification, or the minimum of the pay-band into which the employee is reclassified, whichever is greater.</p></div>
+<div class="section-block"><div class="section-number">31.5</div><p>Temporary Service in a Higher Classification It is within the University’s discretion to appoint employees to temporary positions or temporarily assign them higher-level additional duties to cover for someone on a leave of absence, to address departmental reorganizations, to fill a need while a full recruitment effort is underway, or for other reasons the University deems appropriate. The University will make every effort to limit temporary appointments to no more than 18 months but reserves the right to exceed 18 months.</p></div>
 <p>An employee will be compensated for a temporary appointment by a minimum 3% increase or equal compensation to the minimum of the pay band determined by Human Resources for the temporary appointment, whichever is greater on the effective date of the temporary appointment.</p></div>
 </details><details class="article" id="article-32" data-title="article 32. salary">
 <summary><span class="article-title">Article 32. Salary</span><span class="article-count"></span></summary>
@@ -588,7 +704,7 @@ mark { background:var(--mark); padding:0 2px; border-radius:3px; }
 <div class="section-block"><div class="section-number">33.3</div><p>In addition to the disability insurance available to all employees, the University shall provide, at no cost to the employee, a long-term disability policy for those employees who participate in the Alternative Retirement Program. The plan shall be equivalent to that offered other University employees in 1996 and thereafter, but in no case less than the benefits offered in 1996.</p></div></div>
 </details><details class="article" id="article-34" data-title="article 34. tuition reimbursement and professional development">
 <summary><span class="article-title">Article 34. Tuition Reimbursement And Professional Development</span><span class="article-count"></span></summary>
-<div class="article-body"><p>34.1</p>
+<div class="article-body"><div class="section-block section-marker"><div class="section-number">34.1</div><p></p></div>
 <div class="clause nested"><div class="label">a.</div><div>Effective July 1, 2026, the amount available per contract year for professional development and training shall be $450,000. Funds remaining in the professional development pool at the end of each contract year will be rolled over to the next contract year. There shall be no rollover at the end of the contract period.</div></div>
 <div class="clause nested deep"><div class="label">1.</div><div>Ten (10) percent of the professional development pool may be utilized for University sponsored programs open to and accessible by all UCPEA members. The University’s designee shall consult and review with UCPEA’s Vice President for Professional Issues concerning University sponsored programs.</div></div>
 <div class="clause nested deep"><div class="label">2.</div><div>The employee shall submit a written request for funding of reimbursement to attend or participate in professional development and training in accordance with the guidelines established by the UCPEA Professional Issues Committee and approved by the University administration.</div></div>
@@ -596,9 +712,9 @@ mark { background:var(--mark); padding:0 2px; border-radius:3px; }
 <p>Either party may request a review of the guidelines at any time, but not more than once in any fiscal year. The parties will meet collaboratively to consider revisions, and any agreed changes will take effect at the start of the next fiscal year unless otherwise mutually agreed. The first review shall begin in July 2026.</p>
 <p>Effective July 1, 2026, and in each subsequent year of the agreement, $50,000 shall be available per contract year for reimbursement of tuition and fees for courses taken by employees.</p>
 <p>Employees taking courses at the University of Connecticut may defer payment of 50% of their tuition or fee rate until one month after completion of the course.</p>
-<div class="section-block"><div class="section-number">34.1</div><p>No more than one-half of the professional development fund may be allotted during the first six (6) months of each contract year.</p></div>
-<div class="section-block"><div class="section-number">34.2</div><p>When management requires the employee to obtain work related training, it shall be paid for by the University.</p></div>
-<div class="section-block"><div class="section-number">34.3</div><p>Employees who wish to take credit courses shall be allowed to request temporary flexible schedules to take such courses. The University shall attempt to accommodate requests within its operating needs. Denials shall be given to employees within five (5) workdays of the request and shall not be arbitrary or capricious or without a good business reason. There shall be a form for employees who wish to take credit courses with a temporary flexible schedule.</p></div></div>
+<div class="section-block"><div class="section-number">34.2</div><p>No more than one-half of the professional development fund may be allotted during the first six (6) months of each contract year.</p></div>
+<div class="section-block"><div class="section-number">34.3</div><p>When management requires the employee to obtain work related training, it shall be paid for by the University.</p></div>
+<div class="section-block"><div class="section-number">34.4</div><p>Employees who wish to take credit courses shall be allowed to request temporary flexible schedules to take such courses. The University shall attempt to accommodate requests within its operating needs. Denials shall be given to employees within five (5) workdays of the request and shall not be arbitrary or capricious or without a good business reason. There shall be a form for employees who wish to take credit courses with a temporary flexible schedule.</p></div></div>
 </details><details class="article" id="article-35" data-title="article 35. tuition waivers">
 <summary><span class="article-title">Article 35. Tuition Waivers</span><span class="article-count"></span></summary>
 <div class="article-body"><div class="section-block"><div class="section-number">35.1</div><p>Employee The University shall provide a waiver of tuition and a partial waiver of credit fees equivalent to tuition for all undergraduate and graduate courses on a space available basis. The availability of space shall be determined on the first day of class for tuition-based classes. For classes paid for on a credit fee basis, space availability shall be determined on the second day of classes. Intersession, summer, and laboratory classes are specifically excluded. To qualify for a graduate waiver the UCPEA member must either be a matriculated student or the class must be work related. UCPEA employees shall be reimbursed the Recreation Center Fee. The portion of the Transit Fee associated with the U-Pass CT program will be waived for UCPEA employees. There shall be no waiver of the General University Fee or any other fees except as noted above.</p></div>
@@ -662,16 +778,16 @@ mark { background:var(--mark); padding:0 2px; border-radius:3px; }
 </details><details class="article" id="article-42" data-title="article 42. ucpea security and payroll deductions">
 <summary><span class="article-title">Article 42. Ucpea Security And Payroll Deductions</span><span class="article-count"></span></summary>
 <div class="article-body"><div class="section-block"><div class="section-number">42.1</div><p>During the life of this Agreement, a member of the bargaining unit shall retain the freedom to decide whether or not to become or remain a member of the UCPEA.</p></div>
-<p>42.2</p>
+<div class="section-block section-marker"><div class="section-number">42.2</div><p></p></div>
 <div class="clause nested"><div class="label">a.</div><div>The University shall deduct UCPEA dues bi-weekly from the gross paycheck of each person who authorizes membership deduction.</div></div>
 <div class="clause nested"><div class="label">b.</div><div>The UCPEA shall provide the University a digital list of dues deduction changes, including any new dues deduction authorizations or revocations on a biweekly basis. The University shall implement all dues deduction changes as soon as possible but no later than 30 days after notification from the UCPEA.</div></div>
 <div class="clause nested"><div class="label">c.</div><div>The University shall deduct contributions bi-weekly, in the amount specified from the gross paycheck of each person in the unit who authorizes it, payments to fund-raising drives sponsored by the University of Connecticut Foundation.</div></div>
 <div class="clause nested"><div class="label">d.</div><div>The University shall deduct contributions bi-weekly, in the amount specified from the gross paycheck of each person in the unit who authorizes it, payments to the Union’s COPE (Committee on Political Education) fund.</div></div>
-<div class="section-block"><div class="section-number">42.2</div><p>The University shall provide the UCPEA a time, no less than one hour, to present at New Employee Orientation. If the University needs to change the time or location of the UCPEA’s presentation, it shall provide the UCPEA with as much notice as practicable.</p></div>
-<div class="section-block"><div class="section-number">42.3</div><p>The amount of dues or agency service fee deducted under this article shall be remitted to the Treasurer of the UCPEA as soon as practicable after the pay period of the employees for whom such deduction is made.</p></div>
-<div class="section-block"><div class="section-number">42.4</div><p>No payroll deduction of dues shall be made during a payroll period in which earnings are insufficient to cover the amount of deduction, nor shall such be made from subsequent payrolls to cover the period in question. The UCPEA shall be notified when such a situation exists.</p></div>
-<div class="section-block"><div class="section-number">42.5</div><p>The University shall continue its practice of payroll deductions as authorized by employees for purposes other than payment of Union dues, provided any such payroll deduction has been approved by the State in advance.</p></div>
-<div class="section-block"><div class="section-number">42.6</div><p>With the exception of Section 42.2 (a), the UCPEA shall hold the University harmless from any liability or damages incurred by the Board of Trustees or its agents in complying with this Article and will reimburse the University for legal expenses incurred in legal defense of any provision of this Article or any action taken by the University in complying with it.</p></div></div>
+<div class="section-block"><div class="section-number">42.3</div><p>The University shall provide the UCPEA a time, no less than one hour, to present at New Employee Orientation. If the University needs to change the time or location of the UCPEA’s presentation, it shall provide the UCPEA with as much notice as practicable.</p></div>
+<div class="section-block"><div class="section-number">42.4</div><p>The amount of dues or agency service fee deducted under this article shall be remitted to the Treasurer of the UCPEA as soon as practicable after the pay period of the employees for whom such deduction is made.</p></div>
+<div class="section-block"><div class="section-number">42.5</div><p>No payroll deduction of dues shall be made during a payroll period in which earnings are insufficient to cover the amount of deduction, nor shall such be made from subsequent payrolls to cover the period in question. The UCPEA shall be notified when such a situation exists.</p></div>
+<div class="section-block"><div class="section-number">42.6</div><p>The University shall continue its practice of payroll deductions as authorized by employees for purposes other than payment of Union dues, provided any such payroll deduction has been approved by the State in advance.</p></div>
+<div class="section-block"><div class="section-number">42.7</div><p>With the exception of Section 42.2 (a), the UCPEA shall hold the University harmless from any liability or damages incurred by the Board of Trustees or its agents in complying with this Article and will reimburse the University for legal expenses incurred in legal defense of any provision of this Article or any action taken by the University in complying with it.</p></div></div>
 </details><details class="article" id="article-43" data-title="article 43. savings clause">
 <summary><span class="article-title">Article 43. Savings Clause</span><span class="article-count"></span></summary>
 <div class="article-body"><div class="section-block"><div class="section-number">43.1</div><p>If any provision of this agreement is, or shall at any time be, contrary to law, then such provision shall not be applicable or performed or enforced, except to the extent permitted by law. Any substitute action shall be subject to appropriate consultation and negotiation with the UCPEA.</p></div>
@@ -739,7 +855,172 @@ const searchInput = document.getElementById('contract-search');
 const articles = Array.from(document.querySelectorAll('.article'));
 const resultCount = document.getElementById('result-count');
 const noResults = document.getElementById('no-results');
+const themeToggle = document.getElementById('theme-toggle');
+const themeIcons = {
+  dark:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.4 15.2A8.5 8.5 0 0 1 8.8 3.6 8.5 8.5 0 1 0 20.4 15.2Z" fill="currentColor"/></svg>',
+  light:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="currentColor"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'
+};
+const permalinkIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.6 13.4a1 1 0 0 1 0-1.4l3.3-3.3a3 3 0 1 1 4.2 4.2l-2.3 2.3a3 3 0 0 1-4.2 0 1 1 0 1 1 1.4-1.4 1 1 0 0 0 1.4 0l2.3-2.3a1 1 0 1 0-1.4-1.4L12 13.4a1 1 0 0 1-1.4 0Zm2.8-2.8a1 1 0 0 1 0 1.4l-3.3 3.3a3 3 0 1 1-4.2-4.2l2.3-2.3a3 3 0 0 1 4.2 0 1 1 0 1 1-1.4 1.4 1 1 0 0 0-1.4 0l-2.3 2.3a1 1 0 1 0 1.4 1.4l3.3-3.3a1 1 0 0 1 1.4 0Z" fill="currentColor"/></svg>';
+const copiedIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9.2 16.6-4.1-4.1 1.4-1.4 2.7 2.7 8.3-8.3 1.4 1.4-9.7 9.7Z" fill="currentColor"/></svg>';
+let copyStatusTimer;
 const escapeRegExp = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+function applyTheme(theme, persist = false){
+  const isDark = theme === 'dark';
+  const action = isDark ? 'light' : 'dark';
+  document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+  themeToggle.innerHTML = themeIcons[action];
+  themeToggle.setAttribute('aria-label', `Switch to ${action} mode`);
+  themeToggle.setAttribute('aria-pressed', String(isDark));
+  themeToggle.title = `Switch to ${action} mode`;
+  if(persist){
+    try {
+      localStorage.setItem('ucpea-contract-theme', isDark ? 'dark' : 'light');
+    } catch(error) {
+      // The selected theme still applies for this page view.
+    }
+  }
+}
+
+applyTheme(document.documentElement.dataset.theme);
+themeToggle.addEventListener('click', () => {
+  applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark', true);
+});
+
+function slugify(value){
+  return value.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+function uniqueId(preferred){
+  let id = preferred;
+  let suffix = 2;
+  while(document.getElementById(id)){
+    id = `${preferred}-${suffix}`;
+    suffix++;
+  }
+  return id;
+}
+
+function addPermalink(target, id, description){
+  target.id = uniqueId(id);
+  target.classList.add('permalink-target');
+
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'permalink-button';
+  button.setAttribute('aria-label', `Copy link to ${description}`);
+  button.title = `Copy link to ${description}`;
+  button.innerHTML = permalinkIcon;
+  button.addEventListener('click', async event => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const url = new URL(window.location.href);
+    url.hash = target.id;
+    const copied = await copyText(url.href);
+    const message = copied ? 'Link copied to clipboard' : 'Unable to copy link';
+
+    button.classList.toggle('is-copied', copied);
+    button.innerHTML = copied ? copiedIcon : permalinkIcon;
+    button.setAttribute('aria-label', message);
+    showCopyStatus(message);
+
+    setTimeout(() => {
+      button.classList.remove('is-copied');
+      button.innerHTML = permalinkIcon;
+      button.setAttribute('aria-label', `Copy link to ${description}`);
+    }, 2000);
+  });
+  target.appendChild(button);
+}
+
+function initializePermalinks(){
+  articles.forEach(article => {
+    const body = article.querySelector('.article-body');
+    if(!body) return;
+
+    let baseId = article.id;
+    let sectionId = article.id;
+    let counters = { paragraph:0, clause:0 };
+
+    Array.from(body.children).forEach(block => {
+      if(block.classList.contains('section-block')){
+        const number = block.querySelector('.section-number')?.textContent.trim();
+        baseId = number ? `section-${slugify(number)}` : article.id;
+        counters = { paragraph:0, clause:0 };
+        addPermalink(block, baseId, number ? `section ${number}` : 'this section');
+        sectionId = baseId = block.id;
+        return;
+      }
+
+      if(block.matches('.subhead')){
+        const heading = block.childNodes[0]?.textContent.trim() || block.textContent.trim();
+        baseId = `${sectionId}-${slugify(heading) || 'heading'}`;
+        counters = { paragraph:0, clause:0 };
+        addPermalink(block, baseId, `"${heading}"`);
+        baseId = block.id;
+        return;
+      }
+
+      if(block.matches('p')){
+        counters.paragraph++;
+        addPermalink(block, `${baseId}-paragraph-${counters.paragraph}`, 'this paragraph');
+        return;
+      }
+
+      if(block.classList.contains('clause')){
+        counters.clause++;
+        addPermalink(block, `${baseId}-clause-${counters.clause}`, 'this clause');
+      }
+    });
+  });
+}
+
+async function copyText(text){
+  try {
+    if(navigator.clipboard?.writeText){
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch(error){
+    // Use the legacy fallback below when clipboard access is unavailable.
+  }
+
+  const textarea = document.createElement('textarea');
+  const previousFocus = document.activeElement;
+  textarea.value = text;
+  textarea.setAttribute('readonly', '');
+  textarea.style.position = 'fixed';
+  textarea.style.opacity = '0';
+  document.body.appendChild(textarea);
+  textarea.select();
+  let copied = false;
+  try {
+    copied = document.execCommand('copy');
+  } catch(error){
+    copied = false;
+  }
+  textarea.remove();
+  previousFocus?.focus({ preventScroll:true });
+  return copied;
+}
+
+function showCopyStatus(message){
+  let status = document.getElementById('copy-status');
+  if(!status){
+    status = document.createElement('p');
+    status.id = 'copy-status';
+    status.className = 'copy-toast';
+    status.setAttribute('role', 'status');
+    status.setAttribute('aria-live', 'polite');
+    document.body.appendChild(status);
+  }
+  status.textContent = message;
+  status.hidden = false;
+  clearTimeout(copyStatusTimer);
+  copyStatusTimer = setTimeout(() => { status.hidden = true; }, 2400);
+}
+
 function clearMarks(root){
   root.querySelectorAll('mark').forEach(mark => mark.replaceWith(document.createTextNode(mark.textContent)));
   root.normalize();
@@ -820,14 +1101,27 @@ document.querySelectorAll('nav.toc a[href^="#"]').forEach(link => {
 });
 
 
-window.addEventListener('DOMContentLoaded', () => {
-  const hashId = window.location.hash ? window.location.hash.slice(1) : '';
+function revealHashTarget(){
+  const hashId = window.location.hash ? decodeURIComponent(window.location.hash.slice(1)) : '';
   const target = hashId ? document.getElementById(hashId) : null;
-  if(target && target.matches('details.article')){
-    target.open = true;
-    setTimeout(() => target.scrollIntoView({ behavior: 'auto', block: 'start' }), 0);
+  if(!target) return;
+
+  const article = target.matches('details.article') ? target : target.closest('details.article');
+  if(article){
+    if(article.hidden && searchInput.value.trim()){
+      searchInput.value = '';
+      runSearch();
+    }
+    article.open = true;
   }
+  setTimeout(() => target.scrollIntoView({ behavior: 'auto', block: 'start' }), 0);
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  initializePermalinks();
+  revealHashTarget();
 });
+window.addEventListener('hashchange', revealHashTarget);
 
 document.getElementById('expand-all').addEventListener('click', () => articles.forEach(a => { if(!a.hidden) a.open=true; }));
 document.getElementById('collapse-all').addEventListener('click', () => articles.forEach(a => a.open=false));
