@@ -82,13 +82,68 @@ button { border:1px solid var(--border); background:var(--surface); color:var(--
 button:hover { border-color:var(--accent); }
 .icon-button { display:grid; place-items:center; width:42px; height:42px; padding:0; }
 .icon-button svg { width:20px; height:20px; pointer-events:none; }
-.result-count { grid-column:1 / -1; color:var(--muted); font-size:14px; }
+.search-results-bar { grid-column:1 / -1; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.search-results-bar[hidden] { display:none; }
+.result-count { color:var(--muted); font-size:14px; }
 .result-count:empty { display:none; }
+.search-navigation { display:flex; align-items:center; gap:8px; }
+.search-navigation[hidden] { display:none; }
+.search-navigation button { display:grid; place-items:center; width:36px; height:36px; padding:0; box-shadow:none; }
+.search-navigation button svg { width:18px; height:18px; pointer-events:none; }
+.match-position { min-width:72px; color:var(--muted); font-size:13px; font-weight:700; text-align:center; }
 .layout { display:grid; grid-template-columns:280px 1fr; gap:24px; padding:24px; }
 nav.toc { position:sticky; top:86px; align-self:start; max-height:calc(100vh - 110px); overflow:auto; background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:16px; box-shadow:0 8px 22px rgba(0,14,47,.06); }
 nav.toc h2 { margin:0 0 10px; font-size:15px; color:var(--heading); }
 nav.toc a { display:block; padding:7px 8px; color:var(--toc-text); text-decoration:none; border-radius:9px; font-size:14px; }
 nav.toc a:hover { background:var(--surface-soft); color:var(--accent); }
+nav.toc a.is-active, .mobile-article-nav a.is-active { background:var(--surface-soft); color:var(--accent); font-weight:800; box-shadow:inset 3px 0 0 var(--accent); }
+.mobile-nav-toggle {
+  display:none;
+  position:fixed;
+  right:max(18px, env(safe-area-inset-right));
+  bottom:max(18px, env(safe-area-inset-bottom));
+  z-index:15;
+  width:58px;
+  height:58px;
+  padding:0;
+  place-items:center;
+  border:0;
+  border-radius:50%;
+  background:var(--accent);
+  color:#fff;
+  box-shadow:0 10px 28px rgba(0,14,47,.3);
+}
+.mobile-nav-toggle:hover { border:0; filter:brightness(1.08); }
+.mobile-nav-toggle:focus-visible { outline:3px solid var(--gold); outline-offset:3px; }
+.mobile-nav-toggle svg { width:26px; height:26px; pointer-events:none; }
+html[data-theme="dark"] .mobile-nav-toggle { color:#07152f; }
+.mobile-nav-dialog {
+  width:min(calc(100% - 24px), 440px);
+  max-height:min(78dvh, 720px);
+  margin:auto;
+  padding:0;
+  overflow:hidden;
+  border:1px solid var(--border);
+  border-radius:22px;
+  background:var(--surface);
+  color:var(--text);
+  box-shadow:0 24px 70px rgba(0,14,47,.35);
+}
+.mobile-nav-dialog::backdrop { background:rgba(4,10,23,.64); backdrop-filter:blur(3px); }
+.mobile-nav-header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:16px 16px 12px 20px;
+  border-bottom:1px solid var(--border);
+}
+.mobile-nav-header h2 { margin:0; color:var(--heading); font-size:19px; }
+.mobile-nav-close { width:42px; height:42px; padding:0; display:grid; place-items:center; box-shadow:none; }
+.mobile-nav-close svg { width:20px; height:20px; pointer-events:none; }
+.mobile-article-nav { max-height:calc(min(78dvh, 720px) - 71px); padding:10px 12px 16px; overflow-y:auto; overscroll-behavior:contain; }
+.mobile-article-nav a { display:block; padding:10px 12px; color:var(--toc-text); text-decoration:none; border-radius:10px; font-size:15px; }
+.mobile-article-nav a:hover, .mobile-article-nav a:focus-visible { background:var(--surface-soft); color:var(--accent); }
 .article { scroll-margin-top:112px; margin-bottom:14px; border:1px solid var(--border); border-radius:18px; background:var(--card); box-shadow:0 8px 24px rgba(0,14,47,.07); overflow:hidden; }
 .article[hidden] { display:none; }
 .article summary { list-style:none; cursor:pointer; padding:18px 22px; display:flex; align-items:center; justify-content:space-between; gap:18px; background:var(--surface); }
@@ -165,11 +220,54 @@ table { width:100%; border-collapse:collapse; margin:16px 0 20px; font-size:15px
 th, td { border:1px solid var(--border); padding:9px 10px; text-align:left; }
 th { background:var(--table-head); color:var(--heading); }
 mark { background:var(--mark); padding:0 2px; border-radius:3px; }
+mark.active-match { outline:2px solid var(--accent); outline-offset:2px; }
+.table-container { margin:16px 0 20px; }
+.table-scroll { max-width:100%; overflow-x:auto; overscroll-behavior-inline:contain; }
+.table-container table { margin:0; }
+.table-scroll-hint { display:none; color:var(--muted); font-size:12px; text-align:right; }
+.table-scroll-hint::after { content:'Swipe to view all columns \2192'; }
 .no-results { display:none; padding:20px; background:var(--surface); border:1px solid var(--border); border-radius:18px; }
 @media (hover:none) { .permalink-button { opacity:.7; transform:none; } }
 @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } body, .permalink-button { transition:none; } }
-@media (max-width: 880px) { .toolbar-inner { grid-template-columns:1fr 1fr auto; } .searchbox { grid-column:1 / -1; } .layout { grid-template-columns:1fr; padding:16px; } nav.toc { position:static; max-height:none; } .clause, .section-block { grid-template-columns:52px 1fr; } .article-body > p { margin-left:62px; } }
-@media (max-width: 560px) { .article-body > p { margin-left:0; } }
+@media (max-width: 880px) {
+  .toolbar-inner { grid-template-columns:1fr 1fr auto; }
+  .searchbox { grid-column:1 / -1; }
+  .layout { grid-template-columns:1fr; padding:16px 16px 90px; }
+  nav.toc { display:none; }
+  .mobile-nav-toggle { display:grid; }
+  .clause, .section-block { grid-template-columns:52px minmax(0,1fr); }
+  .article-body > p { margin-left:62px; }
+  .copy-toast { right:88px; bottom:max(24px, env(safe-area-inset-bottom)); }
+}
+@media (max-width: 560px) {
+  .site-header { padding:26px 16px 24px; }
+  h1 { font-size:27px; }
+  .toolbar { padding:12px; }
+  .toolbar-inner { gap:10px; }
+  .search-results-bar { flex-wrap:wrap; }
+  .search-navigation { margin-left:auto; }
+  .layout { padding:10px 8px 88px; }
+  .article { border-radius:14px; margin-bottom:10px; }
+  .article summary { padding:15px 14px; gap:10px; }
+  .article-title { font-size:17px; }
+  .article-body { padding:2px 12px 16px; }
+  .section-block, .clause { grid-template-columns:38px minmax(0,1fr); gap:8px; }
+  .section-block { margin:14px 0 8px; padding-top:10px; }
+  .clause { margin:9px 0; }
+  .clause.nested { grid-template-columns:28px minmax(0,1fr); gap:8px; margin-left:0; }
+  .clause.deep { margin-left:16px; }
+  .article-body > p { margin-left:0; }
+  .permalink-target { padding-right:30px; }
+  .permalink-button { width:28px; height:28px; }
+  .section-block > .permalink-button { top:7px; }
+  .table-scroll-hint { display:block; margin:0 2px 5px; }
+  .table-scroll { border:1px solid var(--border); border-radius:10px; box-shadow:inset -14px 0 12px -14px rgba(0,14,47,.4); }
+  .table-scroll table { min-width:580px; }
+  .table-scroll th:first-child, .table-scroll td:first-child { position:sticky; left:0; z-index:1; background:var(--card); box-shadow:1px 0 0 var(--border); }
+  .table-scroll th:first-child { z-index:2; background:var(--table-head); }
+  .mobile-nav-dialog { max-height:82dvh; }
+  .mobile-article-nav { max-height:calc(82dvh - 71px); }
+}
 </style>
 </head>
 <body>
@@ -181,10 +279,14 @@ mark { background:var(--mark); padding:0 2px; border-radius:3px; }
 <label class="searchbox" aria-label="Search contract language"><span aria-hidden="true">Search</span><input id="contract-search" type="search" placeholder="Search contract language, e.g., telecommuting, sick leave, salary"></label>
 <button id="expand-all" type="button">Expand all</button><button id="collapse-all" type="button">Collapse all</button>
 <button id="theme-toggle" class="icon-button" type="button" aria-label="Switch to dark mode" aria-pressed="false" title="Switch to dark mode"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.4 15.2A8.5 8.5 0 0 1 8.8 3.6 8.5 8.5 0 1 0 20.4 15.2Z" fill="currentColor"/></svg></button>
-<div id="result-count" class="result-count" aria-live="polite"></div>
+<div id="search-results-bar" class="search-results-bar" hidden><div id="result-count" class="result-count" aria-live="polite"></div><div id="search-navigation" class="search-navigation" hidden>
+<button id="previous-match" type="button" aria-label="Previous search match" title="Previous match (Shift+Enter)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+<span id="match-position" class="match-position" aria-live="polite"></span>
+<button id="next-match" type="button" aria-label="Next search match" title="Next match (Enter)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+</div></div>
 </div></div>
 <main class="wrap layout">
-<nav class="toc" aria-label="Article navigation"><h2>Articles</h2><a href="#article-1">Article 1. Recognition</a><a href="#article-2">Article 2. Role Of Professional Staff</a><a href="#article-3">Article 3. Board Prerogatives</a><a href="#article-4">Article 4. Professional Freedom</a><a href="#article-5">Article 5. Nondiscrimination, Anti-Harassment, And Diversity, Equity &amp; Inclusion (DEI)</a><a href="#article-6">Article 6. Vacation Leave</a><a href="#article-7">Article 7. Notice Of Intent To Leave</a><a href="#article-8">Article 8. Holidays</a><a href="#article-9">Article 9. Personal Leave</a><a href="#article-10">Article 10. Civic And Legal Obligations</a><a href="#article-11">Article 11. Sick Leave</a><a href="#article-12">Article 12. Childbirth And Parental Benefits</a><a href="#article-13">Article 13. Educational Leave</a><a href="#article-14">Article 14. Maintenance Of Status While On Paid Leave</a><a href="#article-15">Article 15. Leaves Without Pay</a><a href="#article-16">Article 16. Work Schedules</a><a href="#article-17">Article 17. Student Health And Wellness</a><a href="#article-18">Article 18. Compensatory Time</a><a href="#article-19">Article 19. Employee Files</a><a href="#article-20">Article 20. Probationary Employees</a><a href="#article-21">Article 21. Evaluation</a><a href="#article-22">Article 22. Dismissal Or Other Disciplinary Action</a><a href="#article-23">Article 23. Grievance Procedure</a><a href="#article-24">Article 24. No Work Stoppage</a><a href="#article-25">Article 25. Career Ladders</a><a href="#article-26">Article 26. Vacancies And Job Posting</a><a href="#article-27">Article 27. Reduction Of Professional Staff</a><a href="#article-28">Article 28. Mergers And Acquisitions</a><a href="#article-29">Article 29. Meet And Discuss</a><a href="#article-30">Article 30. Parking</a><a href="#article-31">Article 31. Job Classification</a><a href="#article-32">Article 32. Salary</a><a href="#article-33">Article 33. Retirement, Medical Benefits And Disability Insurance</a><a href="#article-34">Article 34. Tuition Reimbursement And Professional Development</a><a href="#article-35">Article 35. Tuition Waivers</a><a href="#article-36">Article 36. Child Care</a><a href="#article-37">Article 37. Travel</a><a href="#article-38">Article 38. Health And Safety</a><a href="#article-39">Article 39. Consulting Policy</a><a href="#article-40">Article 40. Union Leave</a><a href="#article-41">Article 41. Representation Rights And Responsibilities</a><a href="#article-42">Article 42. UCPEA Security And Payroll Deductions</a><a href="#article-43">Article 43. Savings Clause</a><a href="#article-44">Article 44. Temporary And End-Date Employees</a><a href="#article-45">Article 45. Pay Equity</a><a href="#article-46">Article 46. Wireless Communication Device Stipends</a><a href="#article-47">Article 47. Phased Retirement Program</a><a href="#article-48">Article 48. Zipper Clause</a><a href="#article-49">Article 49. Duration</a><a href="#memoranda">Memoranda of Agreement</a></nav>
+<nav id="desktop-article-nav" class="toc" aria-label="Article navigation"><h2>Articles</h2><a href="#article-1">Article 1. Recognition</a><a href="#article-2">Article 2. Role Of Professional Staff</a><a href="#article-3">Article 3. Board Prerogatives</a><a href="#article-4">Article 4. Professional Freedom</a><a href="#article-5">Article 5. Nondiscrimination, Anti-Harassment, And Diversity, Equity &amp; Inclusion (DEI)</a><a href="#article-6">Article 6. Vacation Leave</a><a href="#article-7">Article 7. Notice Of Intent To Leave</a><a href="#article-8">Article 8. Holidays</a><a href="#article-9">Article 9. Personal Leave</a><a href="#article-10">Article 10. Civic And Legal Obligations</a><a href="#article-11">Article 11. Sick Leave</a><a href="#article-12">Article 12. Childbirth And Parental Benefits</a><a href="#article-13">Article 13. Educational Leave</a><a href="#article-14">Article 14. Maintenance Of Status While On Paid Leave</a><a href="#article-15">Article 15. Leaves Without Pay</a><a href="#article-16">Article 16. Work Schedules</a><a href="#article-17">Article 17. Student Health And Wellness</a><a href="#article-18">Article 18. Compensatory Time</a><a href="#article-19">Article 19. Employee Files</a><a href="#article-20">Article 20. Probationary Employees</a><a href="#article-21">Article 21. Evaluation</a><a href="#article-22">Article 22. Dismissal Or Other Disciplinary Action</a><a href="#article-23">Article 23. Grievance Procedure</a><a href="#article-24">Article 24. No Work Stoppage</a><a href="#article-25">Article 25. Career Ladders</a><a href="#article-26">Article 26. Vacancies And Job Posting</a><a href="#article-27">Article 27. Reduction Of Professional Staff</a><a href="#article-28">Article 28. Mergers And Acquisitions</a><a href="#article-29">Article 29. Meet And Discuss</a><a href="#article-30">Article 30. Parking</a><a href="#article-31">Article 31. Job Classification</a><a href="#article-32">Article 32. Salary</a><a href="#article-33">Article 33. Retirement, Medical Benefits And Disability Insurance</a><a href="#article-34">Article 34. Tuition Reimbursement And Professional Development</a><a href="#article-35">Article 35. Tuition Waivers</a><a href="#article-36">Article 36. Child Care</a><a href="#article-37">Article 37. Travel</a><a href="#article-38">Article 38. Health And Safety</a><a href="#article-39">Article 39. Consulting Policy</a><a href="#article-40">Article 40. Union Leave</a><a href="#article-41">Article 41. Representation Rights And Responsibilities</a><a href="#article-42">Article 42. UCPEA Security And Payroll Deductions</a><a href="#article-43">Article 43. Savings Clause</a><a href="#article-44">Article 44. Temporary And End-Date Employees</a><a href="#article-45">Article 45. Pay Equity</a><a href="#article-46">Article 46. Wireless Communication Device Stipends</a><a href="#article-47">Article 47. Phased Retirement Program</a><a href="#article-48">Article 48. Zipper Clause</a><a href="#article-49">Article 49. Duration</a><a href="#memoranda">Memoranda of Agreement</a></nav>
 <section>
 <div id="no-results" class="no-results">No matching contract language found. Try a broader search term.</div>
 <details class="article" id="article-1" open data-title="article 1. recognition">
@@ -857,12 +959,30 @@ mark { background:var(--mark); padding:0 2px; border-radius:3px; }
 </details>
 </section>
 </main>
+<button id="mobile-nav-toggle" class="mobile-nav-toggle" type="button" aria-label="Open article navigation" aria-controls="mobile-nav-dialog" aria-expanded="false">
+<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round"/></svg>
+</button>
+<dialog id="mobile-nav-dialog" class="mobile-nav-dialog" aria-labelledby="mobile-nav-title">
+<div class="mobile-nav-header"><h2 id="mobile-nav-title">Articles</h2><button id="mobile-nav-close" class="mobile-nav-close" type="button" aria-label="Close article navigation"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></div>
+<nav id="mobile-article-nav" class="mobile-article-nav" aria-label="Article navigation"></nav>
+</dialog>
 <script>
 const searchInput = document.getElementById('contract-search');
 const articles = Array.from(document.querySelectorAll('.article'));
 const resultCount = document.getElementById('result-count');
 const noResults = document.getElementById('no-results');
 const themeToggle = document.getElementById('theme-toggle');
+const toolbar = document.querySelector('.toolbar');
+const searchResultsBar = document.getElementById('search-results-bar');
+const searchNavigation = document.getElementById('search-navigation');
+const previousMatchButton = document.getElementById('previous-match');
+const nextMatchButton = document.getElementById('next-match');
+const matchPosition = document.getElementById('match-position');
+const desktopArticleNav = document.getElementById('desktop-article-nav');
+const mobileNavToggle = document.getElementById('mobile-nav-toggle');
+const mobileNavDialog = document.getElementById('mobile-nav-dialog');
+const mobileNavClose = document.getElementById('mobile-nav-close');
+const mobileArticleNav = document.getElementById('mobile-article-nav');
 const themeIcons = {
   dark:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.4 15.2A8.5 8.5 0 0 1 8.8 3.6 8.5 8.5 0 1 0 20.4 15.2Z" fill="currentColor"/></svg>',
   light:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="currentColor"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'
@@ -870,6 +990,9 @@ const themeIcons = {
 const permalinkIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.6 13.4a1 1 0 0 1 0-1.4l3.3-3.3a3 3 0 1 1 4.2 4.2l-2.3 2.3a3 3 0 0 1-4.2 0 1 1 0 1 1 1.4-1.4 1 1 0 0 0 1.4 0l2.3-2.3a1 1 0 1 0-1.4-1.4L12 13.4a1 1 0 0 1-1.4 0Zm2.8-2.8a1 1 0 0 1 0 1.4l-3.3 3.3a3 3 0 1 1-4.2-4.2l2.3-2.3a3 3 0 0 1 4.2 0 1 1 0 1 1-1.4 1.4 1 1 0 0 0-1.4 0l-2.3 2.3a1 1 0 1 0 1.4 1.4l3.3-3.3a1 1 0 0 1 1.4 0Z" fill="currentColor"/></svg>';
 const copiedIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9.2 16.6-4.1-4.1 1.4-1.4 2.7 2.7 8.3-8.3 1.4 1.4-9.7 9.7Z" fill="currentColor"/></svg>';
 let copyStatusTimer;
+let searchMatches = [];
+let activeMatchIndex = -1;
+let activeArticleFrame;
 const escapeRegExp = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 function applyTheme(theme, persist = false){
@@ -1039,6 +1162,7 @@ function highlight(root, term){
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
     acceptNode(node){
       if(!node.nodeValue.trim() || ['SCRIPT','STYLE','SUMMARY'].includes(node.parentElement?.tagName)) return NodeFilter.FILTER_REJECT;
+      rx.lastIndex = 0;
       return rx.test(node.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
     }
   });
@@ -1061,9 +1185,37 @@ function highlight(root, term){
   });
   return count;
 }
+
+function activateSearchMatch(index, scroll = true){
+  document.querySelector('mark.active-match')?.classList.remove('active-match');
+  if(!searchMatches.length){
+    activeMatchIndex = -1;
+    matchPosition.textContent = '';
+    return;
+  }
+
+  activeMatchIndex = (index + searchMatches.length) % searchMatches.length;
+  const activeMatch = searchMatches[activeMatchIndex];
+  activeMatch.classList.add('active-match');
+  matchPosition.textContent = `${activeMatchIndex + 1} of ${searchMatches.length}`;
+
+  if(scroll){
+    activeMatch.closest('details.article')?.setAttribute('open', '');
+    activeMatch.scrollIntoView({ behavior:'smooth', block:'center' });
+  }
+}
+
+function moveSearchMatch(direction){
+  if(searchMatches.length){
+    activateSearchMatch(activeMatchIndex + direction);
+  }
+}
+
 function runSearch(){
   const term = searchInput.value.trim();
   let visible=0, matches=0;
+  searchMatches = [];
+  activeMatchIndex = -1;
   articles.forEach(article => {
     clearMarks(article);
     article.querySelector('.article-count').textContent='';
@@ -1079,13 +1231,109 @@ function runSearch(){
       article.querySelector('.article-count').textContent = `${m} match${m===1?'':'es'}`;
     }
   });
-  if(!term){ resultCount.textContent=''; noResults.style.display='none'; return; }
-  resultCount.textContent = `${matches} match${matches===1?'':'es'} in ${visible} section${visible===1?'':'s'}`;
+  if(!term){
+    resultCount.textContent='';
+    matchPosition.textContent='';
+    searchResultsBar.hidden=true;
+    searchNavigation.hidden=true;
+    noResults.style.display='none';
+    requestActiveArticleUpdate();
+    return;
+  }
+
+  searchResultsBar.hidden=false;
+  resultCount.textContent = `${matches} match${matches===1?'':'es'} in ${visible} article${visible===1?'':'s'}`;
   noResults.style.display = visible ? 'none' : 'block';
+  searchMatches = Array.from(document.querySelectorAll('.article:not([hidden]) mark'));
+  searchNavigation.hidden = !searchMatches.length;
+
+  if(searchMatches.length){
+    const toolbarBottom = toolbar.getBoundingClientRect().bottom;
+    const nearestVisibleMatch = searchMatches.findIndex(match => match.getBoundingClientRect().bottom >= toolbarBottom);
+    activateSearchMatch(nearestVisibleMatch >= 0 ? nearestVisibleMatch : 0, false);
+  } else {
+    matchPosition.textContent = '';
+  }
+  requestActiveArticleUpdate();
 }
 searchInput.addEventListener('input', runSearch);
+searchInput.addEventListener('keydown', event => {
+  if(event.key === 'Enter' && searchMatches.length){
+    event.preventDefault();
+    moveSearchMatch(event.shiftKey ? -1 : 1);
+  }
+});
+previousMatchButton.addEventListener('click', () => moveSearchMatch(-1));
+nextMatchButton.addEventListener('click', () => moveSearchMatch(1));
 
-document.querySelectorAll('nav.toc a[href^="#"]').forEach(link => {
+desktopArticleNav.querySelectorAll('a').forEach(link => {
+  mobileArticleNav.appendChild(link.cloneNode(true));
+});
+const articleNavLinks = Array.from(document.querySelectorAll('nav.toc a[href^="#"], .mobile-article-nav a[href^="#"]'));
+
+function setActiveArticle(articleId){
+  let activeLabel = '';
+  articleNavLinks.forEach(link => {
+    const isActive = link.getAttribute('href') === `#${articleId}`;
+    link.classList.toggle('is-active', isActive);
+    if(isActive){
+      link.setAttribute('aria-current', 'location');
+      activeLabel ||= link.textContent.trim();
+    } else {
+      link.removeAttribute('aria-current');
+    }
+  });
+  if(activeLabel){
+    mobileNavToggle.setAttribute('aria-label', `Open article navigation. Current: ${activeLabel}`);
+  }
+}
+
+function updateActiveArticle(){
+  const visibleArticles = articles.filter(article => !article.hidden);
+  if(!visibleArticles.length) return;
+
+  const readingLine = toolbar.getBoundingClientRect().bottom + 8;
+  const currentArticle = visibleArticles.find(article => article.getBoundingClientRect().bottom > readingLine) || visibleArticles[visibleArticles.length - 1];
+  setActiveArticle(currentArticle.id);
+}
+
+function requestActiveArticleUpdate(){
+  if(activeArticleFrame) cancelAnimationFrame(activeArticleFrame);
+  activeArticleFrame = requestAnimationFrame(() => {
+    activeArticleFrame = null;
+    updateActiveArticle();
+  });
+}
+
+function closeMobileNav(){
+  if(mobileNavDialog.open){
+    mobileNavDialog.close();
+  }
+}
+
+mobileNavToggle.addEventListener('click', () => {
+  if(!mobileNavDialog.open){
+    updateActiveArticle();
+    mobileNavDialog.showModal();
+    mobileNavToggle.setAttribute('aria-expanded', 'true');
+    const activeLink = mobileArticleNav.querySelector('.is-active');
+    if(activeLink){
+      mobileArticleNav.scrollTop = Math.max(0, activeLink.offsetTop - (mobileArticleNav.clientHeight / 2));
+    }
+  }
+});
+mobileNavClose.addEventListener('click', closeMobileNav);
+mobileNavDialog.addEventListener('close', () => {
+  mobileNavToggle.setAttribute('aria-expanded', 'false');
+  mobileNavToggle.focus({ preventScroll:true });
+});
+mobileNavDialog.addEventListener('click', event => {
+  const bounds = mobileNavDialog.getBoundingClientRect();
+  const outside = event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom;
+  if(outside) closeMobileNav();
+});
+
+articleNavLinks.forEach(link => {
   link.addEventListener('click', event => {
     const targetId = link.getAttribute('href').slice(1);
     const target = document.getElementById(targetId);
@@ -1102,6 +1350,7 @@ document.querySelectorAll('nav.toc a[href^="#"]').forEach(link => {
       target.open = true;
     }
 
+    closeMobileNav();
     target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     history.pushState(null, '', `#${targetId}`);
   });
@@ -1124,11 +1373,61 @@ function revealHashTarget(){
   setTimeout(() => target.scrollIntoView({ behavior: 'auto', block: 'start' }), 0);
 }
 
+function initializeScrollableTables(){
+  document.querySelectorAll('.article-body table').forEach((table, index) => {
+    if(table.closest('.table-scroll')) return;
+
+    const heading = table.previousElementSibling?.textContent.trim();
+    const label = heading ? `${heading} salary schedule` : `Contract table ${index + 1}`;
+    const container = document.createElement('div');
+    const hint = document.createElement('div');
+    const scroller = document.createElement('div');
+
+    container.className = 'table-container';
+    hint.className = 'table-scroll-hint';
+    hint.setAttribute('aria-hidden', 'true');
+    scroller.className = 'table-scroll';
+    scroller.dataset.label = label;
+    scroller.setAttribute('aria-label', label);
+
+    table.before(container);
+    container.append(hint, scroller);
+    scroller.appendChild(table);
+  });
+}
+
+function updateTableScrollability(){
+  document.querySelectorAll('.table-scroll').forEach(scroller => {
+    const isScrollable = scroller.scrollWidth > scroller.clientWidth + 1;
+    if(isScrollable){
+      scroller.tabIndex = 0;
+      scroller.setAttribute('role', 'region');
+    } else {
+      scroller.removeAttribute('tabindex');
+      scroller.removeAttribute('role');
+    }
+  });
+}
+
 window.addEventListener('DOMContentLoaded', () => {
+  initializeScrollableTables();
   initializePermalinks();
   revealHashTarget();
+  updateTableScrollability();
+  requestActiveArticleUpdate();
 });
 window.addEventListener('hashchange', revealHashTarget);
+window.addEventListener('scroll', requestActiveArticleUpdate, { passive:true });
+window.addEventListener('resize', () => {
+  requestActiveArticleUpdate();
+  updateTableScrollability();
+});
+articles.forEach(article => {
+  article.addEventListener('toggle', () => {
+    requestActiveArticleUpdate();
+    updateTableScrollability();
+  });
+});
 
 document.getElementById('expand-all').addEventListener('click', () => articles.forEach(a => { if(!a.hidden) a.open=true; }));
 document.getElementById('collapse-all').addEventListener('click', () => articles.forEach(a => a.open=false));
