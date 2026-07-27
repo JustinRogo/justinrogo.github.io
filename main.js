@@ -33,6 +33,7 @@ const PAGE_TREE_FALLBACK = [
       {
         title: 'UCPEA',
         children: [
+          { title: 'UCPEA Member Dashboard', href: 'Pages/Work/UCPEA/index.html' },
           { title: 'Salary Increase Calculator', href: 'Pages/Work/UCPEA/salary_calculator.html' },
           { title: 'UCPEA Collective Bargaining Agreement, 2025-2029', href: 'Pages/Work/UCPEA/UCPEAContract.html' },
         ],

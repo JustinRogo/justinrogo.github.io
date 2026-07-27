@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-26T18:42:30.427Z",
+  "sourceUrl": "https://ucpea.ct.aft.org/union-wire",
+  "items": [
+    {
+      "title": "A Word From Our 2026 UCPEA Award-Winning Members",
+      "url": "https://ucpea.ct.aft.org/union-wire/word-our-2026-ucpea-award-winning-members",
+      "excerpt": "Congratulations to the UCPEA Unionists of the Year, Daniel Lis and Harrison Goodale, Advocacy Awardee, Christianne Smith and Campus Connection Awardee, Kimberly Miller. We hope their stories inspire others.",
+      "category": "community",
+      "label": "Recognition",
+      "visual": "★",
+      "colorIndex": 0
+    },
+    {
+      "title": "UCPEA Produce and Craft Swap",
+      "url": "https://ucpea.ct.aft.org/union-wire/ucpea-produce-and-craft-swap",
+      "excerpt": "Starting July 8, the UCPEA Produce Swap returns, giving members a chance to share or trade extra garden produce. Membership Services is also launching a new Craft Swap, an eco-friendly event where sewers, knitters, painters, DIYers, scrapbookers, jewelry makers, and other crafters can exchange supplies and creative materials.",
+      "category": "community",
+      "label": "Community",
+      "visual": "SWAP",
+      "colorIndex": 1
+    },
+    {
+      "title": "Join the UCPEA Book Club!",
+      "url": "https://ucpea.ct.aft.org/union-wire/join-ucpea-book-club",
+      "excerpt": "The UCPEA Book Club is launching this July! The book club will meet virtually on the third Wednesday of each month to discuss books and connect with colleagues. Whether an avid reader or simply looking for an enjoyable conversation with fellow members, we welcome you to join!",
+      "category": "community",
+      "label": "Community",
+      "visual": "BOOK",
+      "colorIndex": 2
+    },
+    {
+      "title": "Hardship Fund Policy Update",
+      "url": "https://ucpea.ct.aft.org/union-wire/hardship-fund-policy-update",
+      "excerpt": "New Award and Eligibility Requirements starting fiscal year 2027",
+      "category": "benefits",
+      "label": "Member support",
+      "visual": "HELP",
+      "colorIndex": 3
+    },
+    {
+      "title": "FY2027 Professional Development Award Application",
+      "url": "https://ucpea.ct.aft.org/union-wire/fy2027-professional-development-award-application",
+      "excerpt": "The Professional Development Award application for July 1, 2026, through June 30, 2027, is open.",
+      "category": "benefits",
+      "label": "Member benefit",
+      "visual": "PD",
+      "colorIndex": 4
+    },
+    {
+      "title": "Contract Corner: Article 11- Sick Leave",
+      "url": "https://ucpea.ct.aft.org/union-wire/contract-corner-article-11-sick-leave",
+      "excerpt": "Contractual benefits without all the legalese. Article 11 protects an employee’s right to take time off for sick leave. This is an overview on the substantive changes.",
+      "category": "contract",
+      "label": "Article",
+      "visual": "11",
+      "colorIndex": 5
+    },
+    {
+      "title": "All Eyes on the Delaney Hall Hunger Strike",
+      "url": "https://ucpea.ct.aft.org/union-wire/all-eyes-delaney-hall-hunger-strike",
+      "excerpt": "A humanitarian crisis is unfolding at Delaney Hall, the East Coast’s largest ICE detention center, where a massive hunger and labor strike has ignited violent clashes between law enforcement and protesters outside, alongside reports of brutal retaliation against detainees inside.",
+      "category": "community",
+      "label": "Union Wire",
+      "visual": "UW",
+      "colorIndex": 0
+    },
+    {
+      "title": "ICE out of Connecticut: Hands Off CT",
+      "url": "https://ucpea.ct.aft.org/union-wire/ice-out-connecticut-hands-ct",
+      "excerpt": "On Wednesday June 3rd at 4pm join community members and neighbors around the state as we declare that we want ICE out of Connecticut. This action is part of Hands Off CT, a network united around protecting communities from the violence of the immigration enforcement system.",
+      "category": "community",
+      "label": "Union Wire",
+      "visual": "UW",
+      "colorIndex": 1
+    },
+    {
+      "title": "Contract Corner: Understanding Article 32",
+      "url": "https://ucpea.ct.aft.org/union-wire/contract-corner-understanding-article-32",
+      "excerpt": "The Union Wire is bringing back the “Contract Corner” column. The goal is to explain contractual benefits without all the legalese. We will be starting with some of the contract articles with the most substantive changes in the new iteration of the Collective Bargaining Agreement. What better way to start than to review the key points of Article 32, the Salary Article.",
+      "category": "contract",
+      "label": "Article",
+      "visual": "32",
+      "colorIndex": 2
+    }
+  ]
+}
