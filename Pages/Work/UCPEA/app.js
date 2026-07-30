@@ -6,7 +6,11 @@ let updateCards = Array.from(document.querySelectorAll('[data-category]'));
 const noUpdates = document.getElementById('no-updates');
 const currentYear = document.getElementById('current-year');
 const updatesGrid = document.getElementById('updates-grid');
-const feedStatus = document.getElementById('feed-status');
+const heroUpdateLabel = document.getElementById('hero-update-label');
+const heroUpdateVisual = document.getElementById('hero-update-visual');
+const heroUpdateTitle = document.getElementById('hero-update-title');
+const heroUpdateExcerpt = document.getElementById('hero-update-excerpt');
+const heroUpdateLink = document.getElementById('hero-update-link');
 const FEED_URL = 'union-wire.json';
 
 function setTheme(theme, persist = true) {
@@ -110,22 +114,20 @@ function createFeedCard(item) {
   return article;
 }
 
-function formatFeedTime(value) {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return 'Latest snapshot';
-  return `Updated ${new Intl.DateTimeFormat(undefined, {
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-  }).format(date)}`;
+function updateHeroStory(item) {
+  if (!heroUpdateLabel || !heroUpdateVisual || !heroUpdateTitle || !heroUpdateExcerpt || !heroUpdateLink) return;
+
+  heroUpdateLabel.textContent = item.label || 'Union Wire';
+  heroUpdateVisual.textContent = item.visual || 'UW';
+  heroUpdateTitle.textContent = item.title;
+  heroUpdateExcerpt.textContent = item.excerpt;
+  heroUpdateLink.href = item.url;
 }
 
 async function loadUnionWire() {
-  if (!updatesGrid || !feedStatus) return;
+  if (!updatesGrid) return;
 
   if (window.location.protocol === 'file:') {
-    feedStatus.lastChild.textContent = ' Preview snapshot — live refreshes on the published site';
     return;
   }
 
@@ -138,14 +140,13 @@ async function loadUnionWire() {
       throw new Error('The feed did not contain any posts');
     }
 
+    updateHeroStory(feed.items[0]);
     updatesGrid.replaceChildren(...feed.items.map(createFeedCard));
     updateCards = Array.from(updatesGrid.querySelectorAll('[data-category]'));
     const activeFilter = document.querySelector('[data-filter].is-active')?.dataset.filter || 'all';
     applyFilter(activeFilter);
-    feedStatus.lastChild.textContent = ` ${formatFeedTime(feed.generatedAt)}`;
   } catch (error) {
-    feedStatus.classList.add('feed-status-stale');
-    feedStatus.lastChild.textContent = ' Showing saved snapshot';
+    // Keep the saved dashboard cards visible if the live feed is unavailable.
   }
 }
 
@@ -154,3 +155,171 @@ if (currentYear) {
 }
 
 loadUnionWire();
+
+const salaryCalculator = document.getElementById('salary-calculator');
+
+if (salaryCalculator) {
+  const baseSalaryInput = salaryCalculator.querySelector('#baseSalary');
+  const meritAmountInput = salaryCalculator.querySelector('#meritAmount');
+  const reclassPercentInput = salaryCalculator.querySelector('#reclassPercent');
+  const reclassYearInput = salaryCalculator.querySelector('#reclassYear');
+  const calculateButton = salaryCalculator.querySelector('#calculateSalary');
+  const resetButton = salaryCalculator.querySelector('#resetSalary');
+  const errorBox = salaryCalculator.querySelector('#salaryError');
+  const rows = salaryCalculator.querySelector('#salaryRows');
+  const finalSalary = salaryCalculator.querySelector('#finalSalary');
+  const totalIncrease = salaryCalculator.querySelector('#totalIncrease');
+  const percentChange = salaryCalculator.querySelector('#percentChange');
+
+  const currency = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
+  function getNumber(input) {
+    const value = Number(input.value);
+    return Number.isFinite(value) ? value : 0;
+  }
+
+  function formatPercent(value) {
+    return `${value.toFixed(2)}%`;
+  }
+
+  function showSalaryError(message) {
+    errorBox.textContent = message;
+    errorBox.hidden = false;
+  }
+
+  function clearSalaryError() {
+    errorBox.textContent = '';
+    errorBox.hidden = true;
+  }
+
+  function addSalaryRow(date, label, salaryBefore, increaseAmount, salaryAfter) {
+    const row = document.createElement('tr');
+
+    [date, label, currency.format(salaryBefore), currency.format(increaseAmount)].forEach(value => {
+      const cell = document.createElement('td');
+      cell.textContent = value;
+      row.append(cell);
+    });
+
+    const afterCell = document.createElement('td');
+    const afterValue = document.createElement('strong');
+    afterValue.textContent = currency.format(salaryAfter);
+    afterCell.append(afterValue);
+    row.append(afterCell);
+    rows.append(row);
+  }
+
+  function calculateSalary() {
+    clearSalaryError();
+
+    const baseSalary = getNumber(baseSalaryInput);
+    const meritAmount = getNumber(meritAmountInput);
+    const reclassPercent = getNumber(reclassPercentInput);
+    const reclassYear = Number(reclassYearInput.value);
+
+    if (baseSalary <= 0) {
+      showSalaryError('Please enter a current annual salary greater than $0.');
+      return;
+    }
+
+    if (meritAmount < 0 || meritAmount > 5000) {
+      showSalaryError('Please enter a 2027 merit component between $0 and $5,000.');
+      return;
+    }
+
+    if (reclassPercent < 0 || reclassPercent > 10) {
+      showSalaryError('Please enter a reclassification increase between 0% and 10%.');
+      return;
+    }
+
+    rows.replaceChildren();
+    let salary = baseSalary;
+
+    function applyReclassification(year) {
+      if (reclassPercent <= 0 || reclassYear !== year) return;
+
+      const salaryBefore = salary;
+      const increaseAmount = salaryBefore * (reclassPercent / 100);
+      salary = salaryBefore + increaseAmount;
+      addSalaryRow(
+        `Before July 1, ${year}`,
+        `${formatPercent(reclassPercent)} reclassification increase`,
+        salaryBefore,
+        increaseAmount,
+        salary,
+      );
+    }
+
+    applyReclassification(2025);
+    const salaryBefore2025 = salary;
+    const increase2025 = salaryBefore2025 * 0.045;
+    salary = salaryBefore2025 + increase2025;
+    addSalaryRow('July 1, 2025', '2.5% GWI + 2% PBC = 4.5%', salaryBefore2025, increase2025, salary);
+
+    applyReclassification(2026);
+    const salaryBefore2026 = salary;
+    const increase2026 = salaryBefore2026 * 0.045;
+    salary = salaryBefore2026 + increase2026;
+    addSalaryRow('July 1, 2026', '2.5% GWI + 2% PBC = 4.5%', salaryBefore2026, increase2026, salary);
+
+    applyReclassification(2027);
+    const salaryBefore2027 = salary;
+    const percentageIncrease2027 = salaryBefore2027 * 0.04;
+    salary = salaryBefore2027 + percentageIncrease2027 + meritAmount;
+    addSalaryRow(
+      'July 1, 2027',
+      `2.5% GWI + 1.5% PBC = 4%, plus ${currency.format(meritAmount)} merit component`,
+      salaryBefore2027,
+      percentageIncrease2027 + meritAmount,
+      salary,
+    );
+
+    const increaseTotal = salary - baseSalary;
+    finalSalary.textContent = currency.format(salary);
+    totalIncrease.textContent = currency.format(increaseTotal);
+    percentChange.textContent = formatPercent((increaseTotal / baseSalary) * 100);
+  }
+
+  function resetSalary() {
+    clearSalaryError();
+    baseSalaryInput.value = '';
+    meritAmountInput.value = '';
+    reclassPercentInput.value = '';
+    reclassYearInput.value = '2025';
+    finalSalary.textContent = '$0';
+    totalIncrease.textContent = '$0';
+    percentChange.textContent = '0%';
+
+    const row = document.createElement('tr');
+    const cell = document.createElement('td');
+    cell.colSpan = 5;
+    cell.className = 'salary-calculator__empty';
+    cell.textContent = 'Enter values and select Calculate salary.';
+    row.append(cell);
+    rows.replaceChildren(row);
+  }
+
+  function openSalaryCalculatorFromHash() {
+    if (window.location.hash === '#salary-calculator') {
+      salaryCalculator.open = true;
+    }
+  }
+
+  calculateButton.addEventListener('click', calculateSalary);
+  resetButton.addEventListener('click', resetSalary);
+
+  [baseSalaryInput, meritAmountInput, reclassPercentInput, reclassYearInput].forEach(input => {
+    input.addEventListener('keydown', event => {
+      if (event.key === 'Enter') calculateSalary();
+    });
+  });
+
+  window.addEventListener('hashchange', openSalaryCalculatorFromHash);
+  openSalaryCalculatorFromHash();
+  clearSalaryError();
+}
