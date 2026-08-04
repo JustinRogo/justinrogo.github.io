@@ -92,6 +92,81 @@
             white-space: nowrap;
         }
 
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .sync-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            min-height: 32px;
+            padding: 0.3rem 0.65rem;
+            border: 1px solid var(--border);
+            border-radius: 99px;
+            background: rgba(0, 0, 0, 0.18);
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        .sync-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.12);
+        }
+
+        .sync-status[data-state="saved"] .sync-dot { background: var(--primary); }
+        .sync-status[data-state="sending"] .sync-dot { background: #f59e0b; animation: pulse 1s ease-in-out infinite; }
+        .sync-status[data-state="sent"] .sync-dot { background: #10b981; }
+        .sync-status[data-state="offline"] .sync-dot,
+        .sync-status[data-state="error"] .sync-dot { background: var(--danger); }
+
+        @keyframes pulse {
+            50% { opacity: 0.35; }
+        }
+
+        .mode-switch {
+            display: inline-flex;
+            padding: 3px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .mode-switch button {
+            min-height: 38px;
+            padding: 0.4rem 0.75rem;
+            border: 0;
+            background: transparent;
+            color: var(--text-muted);
+        }
+
+        .mode-switch button.active {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: var(--shadow);
+        }
+
+        .panel .mode-switch {
+            width: 100%;
+        }
+
+        .panel .mode-switch button {
+            flex: 1;
+            min-height: 44px;
+        }
+
+        body[data-mode="count"] .analyze-only,
+        body[data-mode="analyze"] .count-only {
+            display: none !important;
+        }
+
         /* --- Scrollable Tabs --- */
         .tabs-container {
             flex: 1;
@@ -160,6 +235,15 @@
             cursor: crosshair;
         }
 
+        body[data-mode="analyze"] #wrap,
+        #wrap.is-panning {
+            cursor: grab;
+        }
+
+        #wrap.is-panning {
+            cursor: grabbing;
+        }
+
         #floor, #heat {
             position: absolute;
             top: 0; left: 0;
@@ -167,6 +251,58 @@
             display: block;
         }
         #heat { pointer-events: none; }
+
+        .map-controls {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.3rem;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: rgba(15, 23, 42, 0.88);
+            backdrop-filter: blur(8px);
+            box-shadow: var(--shadow);
+        }
+
+        .map-controls button {
+            min-width: 44px;
+            min-height: 44px;
+            padding: 0.45rem 0.65rem;
+        }
+
+        .zoom-readout {
+            min-width: 48px;
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            font-variant-numeric: tabular-nums;
+            text-align: center;
+        }
+
+        .undo-toast {
+            position: absolute;
+            left: 50%;
+            bottom: 0.75rem;
+            z-index: 12;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            min-width: min(360px, calc(100% - 2rem));
+            padding: 0.55rem 0.65rem 0.55rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: rgba(15, 23, 42, 0.96);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.42);
+            color: var(--text-main);
+        }
+
+        .undo-toast[hidden] { display: none; }
+        .undo-toast span { flex: 1; font-size: 0.88rem; }
+        .undo-toast button { min-width: 64px; }
 
         /* --- Footer / Controls --- */
         footer {
@@ -180,6 +316,7 @@
             align-items: center;
             z-index: 20;
         }
+        footer[hidden] { display: none; }
 
         .toolbar-group {
             display: flex;
@@ -201,6 +338,7 @@
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
+            min-height: 44px;
         }
 
         button:hover:not(:disabled) {
@@ -218,6 +356,7 @@
             padding: 0.6rem;
             font-size: 1.2rem;
             line-height: 1;
+            min-width: 44px;
         }
 
         /* Submit Button Special Styling */
@@ -251,7 +390,7 @@
             font-size: 0.9rem;
             resize: none;
             width: 100%;
-            height: 42px; /* Compact by default */
+            height: 44px; /* Compact, with a tablet-sized touch target */
             transition: height 0.2s, border-color 0.2s;
         }
         #notes:focus {
@@ -292,9 +431,10 @@
             background: var(--bg-body);
             border: 1px solid var(--border);
             color: white;
-            padding: 4px;
+            padding: 0.5rem;
             border-radius: 4px;
             width: 100%;
+            min-height: 44px;
             font-family: inherit;
         }
 
@@ -312,6 +452,11 @@
             opacity: 0;
             pointer-events: none;
             visibility: hidden;
+        }
+
+        .panel button[hidden],
+        .panel input[hidden] {
+            display: none !important;
         }
 
         .panel h3 {
@@ -340,6 +485,7 @@
         input[type="range"] {
             -webkit-appearance: none;
             width: 100%;
+            height: 44px;
             background: transparent;
         }
         input[type="range"]::-webkit-slider-runnable-track {
@@ -350,11 +496,11 @@
         }
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            height: 16px;
-            width: 16px;
+            height: 24px;
+            width: 24px;
             border-radius: 50%;
             background: var(--primary);
-            margin-top: -5px;
+            margin-top: -9px;
             cursor: pointer;
             box-shadow: 0 0 5px rgba(0,0,0,0.3);
         }
@@ -369,7 +515,7 @@
             background: var(--bg-element);
             color: var(--text-main);
             border-radius: 4px;
-            padding: 0.2rem 0.5rem;
+            padding: 0.65rem 0.75rem;
             margin-right: 0.5rem;
             cursor: pointer;
         }
@@ -480,6 +626,17 @@
         /* --- Mobile Tweaks --- */
         @media (max-width: 768px) {
 
+            header { gap: 0.5rem; padding-inline: 0.5rem; }
+            .header-left { gap: 0.5rem; }
+            .header-actions { gap: 0.4rem; }
+            .stat-badge { padding-inline: 0.5rem; }
+            .stat-label { display: none; }
+
+            .map-controls {
+                top: 0.5rem;
+                right: 0.5rem;
+            }
+            .map-controls .wide-control { display: none; }
             footer {
                 grid-template-columns: 1fr 1fr; /* Two columns */
                 grid-template-areas: 
@@ -498,7 +655,7 @@
     </style>
 </head>
 
-<body>
+<body data-mode="count">
     <header>
         <div class="header-left">
             <button id="menuBtn" type="button" class="icon-only" aria-label="Menu" aria-expanded="false" aria-controls="controlsPanel">
@@ -510,14 +667,32 @@
             </div>
         </div>
 
-        <div class="stat-badge">
-            Total: <strong id="totalCount" style="color: var(--primary); margin-left:4px;">0</strong>
+        <div class="header-actions">
+            <div id="syncStatus" class="sync-status" data-state="ready" role="status" aria-live="polite">
+                <span class="sync-dot" aria-hidden="true"></span>
+                <span id="syncStatusText">Ready</span>
+            </div>
+            <div class="stat-badge">
+                <span id="totalLabel" class="stat-label">Current count:</span>
+                <strong id="totalCount" style="color: var(--primary); margin-left:4px;">0</strong>
+            </div>
         </div>
     </header>
 
     <div id="wrap">
         <canvas id="floor"></canvas>
         <canvas id="heat"></canvas>
+        <div class="map-controls" aria-label="Map view controls">
+            <button id="zoomOut" type="button" class="icon-only" aria-label="Zoom out" title="Zoom out">−</button>
+            <span id="zoomReadout" class="zoom-readout" aria-live="polite">Fit</span>
+            <button id="zoomIn" type="button" class="icon-only" aria-label="Zoom in" title="Zoom in">+</button>
+            <button id="zoomFit" type="button" class="wide-control" title="Fit the whole floor plan">Fit floor</button>
+            <button id="zoomActual" type="button" class="wide-control" title="Show one image pixel per screen pixel">100%</button>
+        </div>
+        <div id="clearToast" class="undo-toast" role="status" aria-live="polite" hidden>
+            <span id="clearToastText">Floor cleared.</span>
+            <button id="restoreClear" type="button">Undo clear</button>
+        </div>
     </div>
 
     <div id="playbackBar" hidden>
@@ -529,7 +704,7 @@
         <button id="pbAll" class="active-mode" title="Show all sessions aggregated">Σ All</button>
     </div>
 
-    <footer>
+    <footer class="count-only">
         <div class="toolbar-group">
             <button id="undo" disabled title="Undo last point">
                 <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
@@ -545,14 +720,19 @@
             <textarea id="notes" placeholder="Add optional notes here..."></textarea>
         </div>
 
-        <button id="submit" class="submitbtn">
-            Submit
-            <span id="status" style="font-weight: 400; font-size: 0.8em; opacity: 0.8;"></span>
-        </button>
+        <button id="submit" class="submitbtn">Submit</button>
     </footer>
 
     <div id="controlsPanel" class="panel" hidden>
         <div class="control-row">
+            <label>Workspace</label>
+            <div class="mode-switch" role="group" aria-label="Workspace mode">
+                <button id="countMode" type="button" class="active" aria-pressed="true">Count</button>
+                <button id="analyzeMode" type="button" aria-pressed="false">Analyze</button>
+            </div>
+        </div>
+
+        <div class="control-row analyze-only">
             <button id="analyticsBtn" type="button" hidden style="width:100%; border-color:var(--primary); color:var(--primary);">📊 Open Trend Analytics</button>
         </div>
 
@@ -574,45 +754,45 @@
             <input id="blur" type="range" min="0" max="30" value="8" oninput="document.getElementById('val-blur').innerText=this.value+'px'">
         </div>
 
-        <h3>Data Management</h3>
-        <div class="control-row">
+        <h3 class="count-only">Current Count</h3>
+        <div class="control-row count-only">
             <button id="resetAll" style="width:100%; border-color:var(--danger); color:var(--danger);">Reset All Floors</button>
         </div>
         
-        <h3>Load History</h3>
-        <div class="control-row">
+        <h3 class="analyze-only">Load History</h3>
+        <div class="control-row analyze-only">
             <button id="loadFolder" style="width:100%;">📂 Load OneDrive folder…</button>
             <button id="rescanFolder" style="width:100%;" hidden>🔄 Rescan “<span id="folderName"></span>”</button>
             <button id="clearSessions" style="width:100%;" hidden>Clear loaded sessions</button>
             <div id="loadStatus" style="font-size:0.8rem; color:var(--text-muted);"></div>
             <input id="loadFolderFallback" type="file" webkitdirectory multiple hidden>
         </div>
-        <div class="control-row">
+        <div class="control-row analyze-only">
             <label>Single JSON</label>
             <input id="loadJSON" type="file" accept="application/json">
         </div>
-        <div class="control-row">
+        <div class="control-row analyze-only">
             <label>Multiple JSONs</label>
             <input id="loadMany" type="file" accept="application/json" multiple>
         </div>
         
-        <h3>Filters</h3>
-        <div class="control-row">
+        <h3 class="analyze-only">Filters</h3>
+        <div class="control-row analyze-only">
             <label>Date Start</label>
             <input id="from" type="datetime-local">
         </div>
-        <div class="control-row">
+        <div class="control-row analyze-only">
             <label>Date End</label>
             <input id="to" type="datetime-local">
         </div>
-        <div class="control-row">
+        <div class="control-row analyze-only">
             <label>Time of Day (start – end)</label>
             <div style="display:flex; gap:0.5rem;">
                 <input id="todFrom" type="time" aria-label="Time of day start">
                 <input id="todTo" type="time" aria-label="Time of day end">
             </div>
         </div>
-        <div class="control-row">
+        <div class="control-row analyze-only">
             <label>Days of Week <span style="text-transform:none;">(none = all)</span></label>
             <div class="dow-filter" id="dowFilter">
                 <button type="button" data-dow="0">Su</button>
@@ -624,12 +804,8 @@
                 <button type="button" data-dow="6">Sa</button>
             </div>
         </div>
-        <div class="control-row">
+        <div class="control-row analyze-only">
             <button id="clearFilters" style="width:100%;">Clear filters</button>
-        </div>
-        <div class="control-row" style="flex-direction:row; align-items:center;">
-             <input id="includeSessions" type="checkbox" checked style="width:auto;">
-             <label for="includeSessions" style="margin-left:0.5rem; margin-bottom:0;">Include loaded sessions</label>
         </div>
     </div>
 
@@ -673,14 +849,19 @@
             };
 
             // --- Floors ---------------------------------------------------------------
+            const DEFAULT_FLOOR_INDEX = 2;
             const FLOORS = [
-                { id: '1F', label: '1st Floor', img: new Image(), imgSrc: null, points: [] },
-                { id: '2F', label: '2nd Floor', img: new Image(), imgSrc: null, points: [] },
-                { id: '3F', label: '3rd Floor', img: new Image(), imgSrc: null, points: [] },
-                { id: '4F', label: '4th Floor', img: new Image(), imgSrc: null, points: [] },
-                { id: '5F', label: '5th Floor', img: new Image(), imgSrc: null, points: [] },
+                { id: '1F', label: '1st Floor', img: new Image(), imgSrc: null, points: [], view: { zoom: 1, panX: 0, panY: 0 } },
+                { id: '2F', label: '2nd Floor', img: new Image(), imgSrc: null, points: [], view: { zoom: 1, panX: 0, panY: 0 } },
+                { id: '3F', label: '3rd Floor', img: new Image(), imgSrc: null, points: [], view: { zoom: 1, panX: 0, panY: 0 } },
+                { id: '4F', label: '4th Floor', img: new Image(), imgSrc: null, points: [], view: { zoom: 1, panX: 0, panY: 0 } },
+                { id: '5F', label: '5th Floor', img: new Image(), imgSrc: null, points: [], view: { zoom: 1, panX: 0, panY: 0 } },
             ];
-            let current = 0;
+            let current = DEFAULT_FLOOR_INDEX;
+            let appMode = 'count';
+            let syncState = 'ready';
+            let syncResetTimer = null;
+            let clearUndo = null;
 
             // Sessions loaded for trend review
             const SESSIONS = []; 
@@ -695,7 +876,11 @@
             const clearBtn = document.getElementById('clear');
             const resetAll = document.getElementById('resetAll');
             const submitBtn = document.getElementById('submit');
-            const statusEl = document.getElementById('status');
+            const syncStatusEl = document.getElementById('syncStatus');
+            const syncStatusTextEl = document.getElementById('syncStatusText');
+            const clearToastEl = document.getElementById('clearToast');
+            const clearToastTextEl = document.getElementById('clearToastText');
+            const restoreClearBtn = document.getElementById('restoreClear');
             const radiusEl = document.getElementById('radius');
             const intenEl = document.getElementById('intensity');
             const opacEl = document.getElementById('opacity');
@@ -704,15 +889,23 @@
             const loadMany = document.getElementById('loadMany');
             const fromEl = document.getElementById('from');
             const toEl = document.getElementById('to');
-            const includeSessionsEl = document.getElementById('includeSessions');
             const notesEl = document.getElementById('notes');
+            const countModeBtn = document.getElementById('countMode');
+            const analyzeModeBtn = document.getElementById('analyzeMode');
+            const totalLabelEl = document.getElementById('totalLabel');
+            const zoomOutBtn = document.getElementById('zoomOut');
+            const zoomInBtn = document.getElementById('zoomIn');
+            const zoomFitBtn = document.getElementById('zoomFit');
+            const zoomActualBtn = document.getElementById('zoomActual');
+            const zoomReadoutEl = document.getElementById('zoomReadout');
+            const DRAFT_KEY = 'multi-floor-heatmap-embedded';
             const FLOW_URL = "https://default17f1a87e2a254eaab9df9d439034b0.80.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/8a4d2abd61de4fceb5cb6d2a4b2b31a8/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=EhX0b_ECMsXs08oSiwPJKO3H5KMRI3O0l3V1lLtdM6Q";
 
             // Tabs with counters
             const tabs = document.getElementById('tabs');
             FLOORS.forEach((fl, i) => {
                 const b = document.createElement('button');
-                b.className = 'tab' + (i === 0 ? ' active' : '');
+                b.className = 'tab' + (i === current ? ' active' : '');
                 // Using div to allow flex styling
                 b.innerHTML = `<span>${fl.label}</span> <span class="badge" id="count-${fl.id}">0</span>`;
                 b.onclick = () => { current = i; updateTabs(); fitCanvas(); redraw(); };
@@ -728,6 +921,23 @@
                 });
             }
 
+            function setMode(mode) {
+                if (mode !== 'count' && mode !== 'analyze') return;
+                appMode = mode;
+                document.body.dataset.mode = mode;
+                countModeBtn.classList.toggle('active', mode === 'count');
+                analyzeModeBtn.classList.toggle('active', mode === 'analyze');
+                countModeBtn.setAttribute('aria-pressed', String(mode === 'count'));
+                analyzeModeBtn.setAttribute('aria-pressed', String(mode === 'analyze'));
+                if (mode === 'count') stopTimer();
+                if (mode === 'analyze') dismissClearUndo();
+                updatePlaybackUI();
+                redraw();
+            }
+
+            countModeBtn.onclick = () => setMode('count');
+            analyzeModeBtn.onclick = () => setMode('analyze');
+
             // Preload embedded images
             FLOORS.forEach(fl => {
                 if (EMBEDDED[fl.id]) {
@@ -740,14 +950,39 @@
             // Resize handling
             window.addEventListener('resize', () => { fitCanvas(); redraw(); });
 
-            // Input: only inside fitted image rect
-            wrap.addEventListener('pointerdown', e => {
-                const fl = FLOORS[current];
-                if (!fl.img.naturalWidth) return;
-                const rect = floor.getBoundingClientRect();
-                const px = e.clientX - rect.left, py = e.clientY - rect.top;
+            // Map gestures: a stationary single-pointer release adds a point in
+            // Count mode. Dragging pans; two pointers pan and pinch in either mode.
+            const activePointers = new Map();
+            const TAP_SLOP = 8;
+            let pinchGesture = null;
 
-                const fit = imageFitRect(fl.img.naturalWidth, fl.img.naturalHeight, floor.width, floor.height);
+            function pointerPosition(e) {
+                const rect = floor.getBoundingClientRect();
+                return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+            }
+
+            function startPinch() {
+                const [a, b] = [...activePointers.values()];
+                if (!a || !b) return;
+                const center = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+                const distance = Math.hypot(b.x - a.x, b.y - a.y);
+                const view = FLOORS[current].view;
+                pinchGesture = {
+                    distance: Math.max(1, distance),
+                    zoom: view.zoom,
+                    localX: (center.x - floor.width / 2 - view.panX) / view.zoom,
+                    localY: (center.y - floor.height / 2 - view.panY) / view.zoom,
+                };
+                activePointers.forEach(p => { p.cancelTap = true; });
+            }
+
+            function addPointAt(clientX, clientY) {
+                const fl = FLOORS[current];
+                if (appMode !== 'count' || !fl.img.naturalWidth) return;
+                const rect = floor.getBoundingClientRect();
+                const px = clientX - rect.left, py = clientY - rect.top;
+
+                const fit = currentImageRect();
                 if (px < fit.x || px > fit.x + fit.w || py < fit.y || py > fit.y + fit.h) return;
 
                 const x = (px - fit.x) * (fl.img.naturalWidth / fit.w);
@@ -755,17 +990,185 @@
 
                 fl.points.push({ x, y, t: Date.now() });
                 persist(); redraw();
+            }
+
+            wrap.addEventListener('pointerdown', e => {
+                if (e.target.closest('.map-controls, .undo-toast')) return;
+                if (e.pointerType === 'mouse' && e.button !== 0) return;
+                const pos = pointerPosition(e);
+                activePointers.set(e.pointerId, {
+                    ...pos,
+                    startX: pos.x,
+                    startY: pos.y,
+                    lastX: pos.x,
+                    lastY: pos.y,
+                    moved: false,
+                    cancelTap: false,
+                    clientX: e.clientX,
+                    clientY: e.clientY,
+                });
+                wrap.setPointerCapture(e.pointerId);
+                if (activePointers.size >= 2) startPinch();
             });
 
+            wrap.addEventListener('pointermove', e => {
+                const pointer = activePointers.get(e.pointerId);
+                if (!pointer) return;
+                const pos = pointerPosition(e);
+                const dx = pos.x - pointer.lastX;
+                const dy = pos.y - pointer.lastY;
+                pointer.x = pos.x;
+                pointer.y = pos.y;
+                pointer.clientX = e.clientX;
+                pointer.clientY = e.clientY;
+                pointer.lastX = pos.x;
+                pointer.lastY = pos.y;
+
+                if (Math.hypot(pos.x - pointer.startX, pos.y - pointer.startY) > TAP_SLOP) {
+                    pointer.moved = true;
+                }
+
+                if (activePointers.size >= 2) {
+                    if (!pinchGesture) startPinch();
+                    const [a, b] = [...activePointers.values()];
+                    const center = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+                    const distance = Math.max(1, Math.hypot(b.x - a.x, b.y - a.y));
+                    const view = FLOORS[current].view;
+                    view.zoom = clampZoom(pinchGesture.zoom * distance / pinchGesture.distance);
+                    view.panX = center.x - floor.width / 2 - pinchGesture.localX * view.zoom;
+                    view.panY = center.y - floor.height / 2 - pinchGesture.localY * view.zoom;
+                    clampView();
+                    wrap.classList.add('is-panning');
+                    redraw();
+                    e.preventDefault();
+                    return;
+                }
+
+                if (pointer.moved && FLOORS[current].view.zoom > 1) {
+                    const view = FLOORS[current].view;
+                    view.panX += dx;
+                    view.panY += dy;
+                    clampView();
+                    wrap.classList.add('is-panning');
+                    redraw();
+                    e.preventDefault();
+                }
+            });
+
+            function finishPointer(e, cancelled = false) {
+                const pointer = activePointers.get(e.pointerId);
+                if (!pointer) return;
+                const wasOnlyPointer = activePointers.size === 1;
+                activePointers.delete(e.pointerId);
+
+                if (!cancelled && wasOnlyPointer && !pointer.moved && !pointer.cancelTap) {
+                    addPointAt(pointer.clientX, pointer.clientY);
+                }
+
+                if (activePointers.size === 1) {
+                    const remaining = [...activePointers.values()][0];
+                    remaining.startX = remaining.lastX = remaining.x;
+                    remaining.startY = remaining.lastY = remaining.y;
+                    remaining.moved = false;
+                    remaining.cancelTap = true;
+                }
+                pinchGesture = null;
+                if (activePointers.size === 0) wrap.classList.remove('is-panning');
+            }
+
+            wrap.addEventListener('pointerup', e => finishPointer(e));
+            wrap.addEventListener('pointercancel', e => finishPointer(e, true));
+
+            wrap.addEventListener('wheel', e => {
+                if (e.target.closest('.map-controls')) return;
+                const pos = pointerPosition(e);
+                zoomAt(FLOORS[current].view.zoom * Math.exp(-e.deltaY * 0.0015), pos.x, pos.y);
+                e.preventDefault();
+            }, { passive: false });
+
+            function dismissClearUndo() {
+                if (clearUndo?.timer) clearTimeout(clearUndo.timer);
+                clearUndo = null;
+                clearToastEl.hidden = true;
+            }
+
+            function showClearUndo(floorIndex, points) {
+                dismissClearUndo();
+                const state = { floorIndex, points, timer: null };
+                clearUndo = state;
+                clearToastTextEl.textContent = `${FLOORS[floorIndex].label} cleared.`;
+                clearToastEl.hidden = false;
+                state.timer = setTimeout(() => {
+                    if (clearUndo === state) dismissClearUndo();
+                }, 7000);
+            }
+
             undoBtn.onclick = () => { FLOORS[current].points.pop(); persist(); redraw(); };
-            clearBtn.onclick = () => { FLOORS[current].points = []; persist(); redraw(); };
+            clearBtn.onclick = () => {
+                const points = FLOORS[current].points;
+                if (!points.length) return;
+                showClearUndo(current, points.map(point => ({ ...point })));
+                FLOORS[current].points = [];
+                persist();
+                redraw();
+            };
+
+            restoreClearBtn.onclick = () => {
+                if (!clearUndo) return;
+                const { floorIndex, points } = clearUndo;
+                FLOORS[floorIndex].points = [...points, ...FLOORS[floorIndex].points];
+                dismissClearUndo();
+                persist();
+                redraw();
+            };
 
             resetAll.onclick = () => {
                 if(confirm("Are you sure you want to clear all data from ALL floors?")) {
+                    dismissClearUndo();
                     FLOORS.forEach(fl => fl.points = []);
                     persist(); redraw();
                 }
             };
+
+            function hasDraft() {
+                return computeTotalCount() > 0 || Boolean(notesEl.value.trim());
+            }
+
+            function updateSyncStatus() {
+                let state = syncState;
+                let text = 'Ready';
+
+                if (!navigator.onLine && state !== 'sending') {
+                    state = 'offline';
+                    text = hasDraft() ? 'Offline · draft saved' : 'Offline';
+                } else if (state === 'sending') {
+                    text = 'Sending…';
+                } else if (state === 'sent') {
+                    text = 'Submitted';
+                } else if (state === 'error') {
+                    text = 'Send failed · draft saved';
+                } else if (hasDraft()) {
+                    state = 'saved';
+                    text = 'Draft saved';
+                } else {
+                    state = 'ready';
+                }
+
+                syncStatusEl.dataset.state = state;
+                syncStatusTextEl.textContent = text;
+            }
+
+            function setSyncState(state, resetAfter = 0) {
+                clearTimeout(syncResetTimer);
+                syncState = state;
+                updateSyncStatus();
+                if (resetAfter) {
+                    syncResetTimer = setTimeout(() => {
+                        syncState = 'ready';
+                        updateSyncStatus();
+                    }, resetAfter);
+                }
+            }
 
             async function sendToFlow(payload) {
                 const r = await fetch(FLOW_URL, {
@@ -778,6 +1181,11 @@
             }
 
             submitBtn.onclick = async () => {
+                if (!navigator.onLine) {
+                    updateSyncStatus();
+                    return;
+                }
+
                 const payload = {
                     submitted_at: new Date().toISOString(),
                     note: (notesEl?.value || "").trim(),
@@ -790,30 +1198,25 @@
                     TotalCount: computeTotalCount()
                 };
 
-                const originalText = submitBtn.innerHTML;
                 submitBtn.disabled = true;
-                statusEl.textContent = " (Sending...)";
-                
+                setSyncState('sending');
+
                 try {
                     await sendToFlow(payload);
-                    statusEl.textContent = " (Done!)";
-                    
-                    // Visual feedback success
-                    submitBtn.style.background = "#10b981"; // Green
+                    dismissClearUndo();
+                    FLOORS.forEach(fl => fl.points = []);
+                    notesEl.value = "";
+                    persist();
+                    redraw();
+                    setSyncState('sent', 2500);
+
+                    submitBtn.style.background = "#10b981";
                     setTimeout(() => {
-                        submitBtn.style.background = ""; // Reset
-                        statusEl.textContent = "";
+                        submitBtn.style.background = "";
                         submitBtn.disabled = false;
                     }, 2000);
-
-                    // reset points only
-                    FLOORS.forEach(fl => fl.points = []);
-                    persist(); redraw();
-
-                    // clear note
-                    if (notesEl) notesEl.value = "";
                 } catch (e) {
-                    statusEl.textContent = " Error";
+                    setSyncState('error');
                     alert(`Flow error: ${e.message}`);
                     submitBtn.disabled = false;
                 }
@@ -822,20 +1225,8 @@
             // Load a single JSON
             loadJSON.onchange = e => {
                 const [f] = e.target.files || [];
-                if (!f) return;
-                f.text().then(txt => {
-                    try {
-                        const data = JSON.parse(txt);
-                        if (!data.floors) throw new Error("Bad format");
-                        data.floors.forEach((fl, i) => {
-                            if (!FLOORS[i]) return;
-                            FLOORS[i].points = Array.isArray(fl.points) ? fl.points : [];
-                            if (fl.image_data_url) { FLOORS[i].imgSrc = fl.image_data_url; FLOORS[i].img.src = fl.image_data_url; }
-                        });
-                        current = 0; updateTabs(); fitCanvas(); redraw();
-                        alert(`Loaded ${f.name}`);
-                    } catch (err) { alert("Invalid JSON file"); console.error(err); }
-                });
+                if (f) loadFiles([f]);
+                e.target.value = '';
             };
 
             // Load many JSONs (manual multi-select)
@@ -847,20 +1238,14 @@
             
             // Listeners for sliders that trigger redraw
             [radiusEl, intenEl, opacEl, blurEl].forEach(el => el.addEventListener('input', redraw));
-            [fromEl, toEl, includeSessionsEl].forEach(el => el.addEventListener('input', redraw));
+            [fromEl, toEl].forEach(el => el.addEventListener('input', redraw));
+            notesEl.addEventListener('input', persist);
+            window.addEventListener('online', updateSyncStatus);
+            window.addEventListener('offline', updateSyncStatus);
 
             // --- Helpers --------------------------------------------------------------
             function computeTotalCount() {
-                let total = 0;
-                FLOORS.forEach(fl => {
-                    let n = fl.points.length;
-                    for (const sess of filteredSessions()) {
-                        const sf = (sess.floors || []).find(f => f.id === fl.id);
-                        if (sf && Array.isArray(sf.points)) n += sf.points.length;
-                    }
-                    total += n;
-                });
-                return total;
+                return FLOORS.reduce((total, fl) => total + fl.points.length, 0);
             }
 
             function fitCanvas() {
@@ -870,6 +1255,8 @@
                 heat.width = floor.width; heat.height = floor.height;
                 fctx.imageSmoothingEnabled = true;
                 fctx.imageSmoothingQuality = 'high';
+                clampView();
+                updateZoomControls();
             }
 
             function imageFitRect(iw, ih, cw, ch) {
@@ -880,12 +1267,86 @@
                 return { x, y, w, h };
             }
 
-            function filteredSessions() {
+            const MIN_ZOOM = 1;
+            const MAX_ZOOM = 8;
+
+            function clampZoom(zoom) {
+                return Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, zoom));
+            }
+
+            function currentImageRect() {
+                const fl = FLOORS[current];
+                const base = imageFitRect(fl.img.naturalWidth, fl.img.naturalHeight, floor.width, floor.height);
+                const view = fl.view;
+                const w = base.w * view.zoom;
+                const h = base.h * view.zoom;
+                return {
+                    x: (floor.width - w) / 2 + view.panX,
+                    y: (floor.height - h) / 2 + view.panY,
+                    w,
+                    h,
+                };
+            }
+
+            function clampView() {
+                const fl = FLOORS[current];
+                const view = fl.view;
+                view.zoom = clampZoom(view.zoom);
+                if (!fl.img.naturalWidth) return;
+                const base = imageFitRect(fl.img.naturalWidth, fl.img.naturalHeight, floor.width, floor.height);
+                const maxX = Math.max(0, (base.w * view.zoom - floor.width) / 2);
+                const maxY = Math.max(0, (base.h * view.zoom - floor.height) / 2);
+                view.panX = Math.max(-maxX, Math.min(maxX, view.panX));
+                view.panY = Math.max(-maxY, Math.min(maxY, view.panY));
+            }
+
+            function zoomAt(nextZoom, screenX = floor.width / 2, screenY = floor.height / 2) {
+                const view = FLOORS[current].view;
+                const oldZoom = view.zoom;
+                nextZoom = clampZoom(nextZoom);
+                const localX = (screenX - floor.width / 2 - view.panX) / oldZoom;
+                const localY = (screenY - floor.height / 2 - view.panY) / oldZoom;
+                view.zoom = nextZoom;
+                view.panX = screenX - floor.width / 2 - localX * nextZoom;
+                view.panY = screenY - floor.height / 2 - localY * nextZoom;
+                clampView();
+                redraw();
+            }
+
+            function fitFloor() {
+                const view = FLOORS[current].view;
+                view.zoom = 1;
+                view.panX = 0;
+                view.panY = 0;
+                redraw();
+            }
+
+            function showActualSize() {
+                const fl = FLOORS[current];
+                if (!fl.img.naturalWidth) return;
+                const base = imageFitRect(fl.img.naturalWidth, fl.img.naturalHeight, floor.width, floor.height);
+                const baseScale = base.w / fl.img.naturalWidth;
+                zoomAt(baseScale ? 1 / baseScale : 1);
+            }
+
+            function updateZoomControls() {
+                const zoom = FLOORS[current].view.zoom;
+                zoomReadoutEl.textContent = Math.abs(zoom - 1) < 0.01 ? 'Fit' : `${Math.round(zoom * 100)}%`;
+                zoomOutBtn.disabled = zoom <= MIN_ZOOM + 0.001;
+                zoomInBtn.disabled = zoom >= MAX_ZOOM - 0.001;
+            }
+
+            zoomOutBtn.onclick = () => zoomAt(FLOORS[current].view.zoom / 1.25);
+            zoomInBtn.onclick = () => zoomAt(FLOORS[current].view.zoom * 1.25);
+            zoomFitBtn.onclick = fitFloor;
+            zoomActualBtn.onclick = showActualSize;
+
+            function displayedSessions() {
+                if (appMode !== 'analyze') return [];
                 if (playback.active) {
                     const list = analyticsSessions();
                     return list.length ? [list[Math.min(playback.index, list.length - 1)]] : [];
                 }
-                if (!includeSessionsEl.checked) return [];
                 return analyticsSessions();
             }
 
@@ -916,26 +1377,28 @@
             function redraw() {
                 const fl = FLOORS[current];
 
-                const aggPoints = [...fl.points];
-                for (const sess of filteredSessions()) {
+                const aggPoints = appMode === 'count' ? [...fl.points] : [];
+                for (const sess of displayedSessions()) {
                     const sf = (sess.floors || []).find(f => f.id === fl.id);
                     if (sf && Array.isArray(sf.points)) aggPoints.push(...sf.points);
                 }
 
-                undoBtn.disabled = fl.points.length === 0;
-                clearBtn.disabled = fl.points.length === 0;
+                undoBtn.disabled = appMode !== 'count' || fl.points.length === 0;
+                clearBtn.disabled = appMode !== 'count' || fl.points.length === 0;
 
                 fctx.clearRect(0, 0, floor.width, floor.height);
                 hctx.clearRect(0, 0, heat.width, heat.height);
 
                 if (!fl.img.naturalWidth) { updateCounts(); return; }
 
-                const fit = imageFitRect(fl.img.naturalWidth, fl.img.naturalHeight, floor.width, floor.height);
+                const fit = currentImageRect();
                 fctx.drawImage(fl.img, 0, 0, fl.img.naturalWidth, fl.img.naturalHeight, fit.x, fit.y, fit.w, fit.h);
 
                 const down = 0.5;
-                const hw = Math.max(1, (fit.w * down) | 0);
-                const hh = Math.max(1, (fit.h * down) | 0);
+                // Keep the heat buffer viewport-sized so pinch gestures stay
+                // responsive even when the floor plan is deeply zoomed.
+                const hw = Math.max(1, (floor.width * down) | 0);
+                const hh = Math.max(1, (floor.height * down) | 0);
                 const acc = document.createElement('canvas'); acc.width = hw; acc.height = hh;
                 const actx = acc.getContext('2d', { willReadFrequently: true });
                 actx.clearRect(0, 0, hw, hh);
@@ -953,8 +1416,8 @@
                 const sx = fit.w / iw, sy = fit.h / ih;
 
                 for (const p of aggPoints) {
-                    const x = p.x * sx * k;
-                    const y = p.y * sy * k;
+                    const x = (fit.x + p.x * sx) * k;
+                    const y = (fit.y + p.y * sy) * k;
                     actx.globalAlpha = Math.min(1, I / 100);
                     actx.drawImage(sprScaled, x - sR, y - sR);
                 }
@@ -976,7 +1439,7 @@
                     actx.clearRect(0, 0, hw, hh); actx.drawImage(tmp, 0, 0);
                 }
 
-                hctx.drawImage(acc, 0, 0, hw, hh, fit.x, fit.y, fit.w, fit.h);
+                hctx.drawImage(acc, 0, 0, hw, hh, 0, 0, floor.width, floor.height);
 
                 // QA markers - improved visibility
                 fctx.fillStyle = '#0f172a'; // dark center
@@ -989,6 +1452,7 @@
                 }
 
                 updateCounts();
+                updateZoomControls();
             }
 
             function makeKernelSprite(R) {
@@ -1028,10 +1492,12 @@
             function updateCounts() {
                 let total = 0;
                 FLOORS.forEach(fl => {
-                    let n = fl.points.length;
-                    for (const sess of filteredSessions()) {
-                        const sf = (sess.floors || []).find(f => f.id === fl.id);
-                        if (sf && Array.isArray(sf.points)) n += sf.points.length;
+                    let n = appMode === 'count' ? fl.points.length : 0;
+                    if (appMode === 'analyze') {
+                        for (const sess of displayedSessions()) {
+                            const sf = (sess.floors || []).find(f => f.id === fl.id);
+                            if (sf && Array.isArray(sf.points)) n += sf.points.length;
+                        }
                     }
                     total += n;
                     const el = document.getElementById(`count-${fl.id}`);
@@ -1039,16 +1505,36 @@
                 });
                 const t = document.getElementById('totalCount');
                 if (t) t.textContent = total;
+                if (appMode === 'count') {
+                    totalLabelEl.textContent = 'Current count:';
+                } else if (!SESSIONS.length) {
+                    totalLabelEl.textContent = 'Loaded total:';
+                } else if (playback.active) {
+                    totalLabelEl.textContent = 'Session total:';
+                } else {
+                    totalLabelEl.textContent = 'Filtered total:';
+                }
             }
 
             function persist() {
                 const minimal = FLOORS.map(fl => ({ id: fl.id, points: fl.points }));
-                localStorage.setItem('multi-floor-heatmap-embedded', JSON.stringify(minimal));
+                localStorage.setItem(DRAFT_KEY, JSON.stringify({
+                    floors: minimal,
+                    note: notesEl.value,
+                    updated_at: new Date().toISOString(),
+                }));
+                if (syncState !== 'sending') {
+                    clearTimeout(syncResetTimer);
+                    syncState = 'ready';
+                }
+                updateSyncStatus();
             }
             function restore() {
                 try {
-                    const arr = JSON.parse(localStorage.getItem('multi-floor-heatmap-embedded') || "[]");
+                    const saved = JSON.parse(localStorage.getItem(DRAFT_KEY) || "[]");
+                    const arr = Array.isArray(saved) ? saved : (saved.floors || []);
                     arr.forEach((o, i) => { if (FLOORS[i]) FLOORS[i].points = o.points || []; });
+                    if (!Array.isArray(saved) && typeof saved.note === 'string') notesEl.value = saved.note;
                 } catch { }
             }
 
@@ -1253,7 +1739,7 @@
             }
             function updatePlaybackUI() {
                 const list = analyticsSessions();
-                playbackBar.hidden = SESSIONS.length === 0;
+                playbackBar.hidden = appMode !== 'analyze' || SESSIONS.length === 0;
                 pbSlider.max = Math.max(0, list.length - 1);
                 pbSlider.value = Math.min(playback.index, list.length - 1);
                 pbSlider.disabled = !list.length;
@@ -1299,6 +1785,7 @@
 
             // --- Analytics overlay -------------------------------------------
             analyticsBtn.onclick = () => {
+                setMode('analyze');
                 // close the settings menu underneath before opening the overlay
                 document.getElementById('controlsPanel').setAttribute('hidden', '');
                 document.getElementById('menuBtn').setAttribute('aria-expanded', 'false');
@@ -1496,6 +1983,7 @@
             restore();
             fitCanvas();
             redraw();
+            updateSyncStatus();
         })();
 
         // --- Panel Toggle Logic ---
