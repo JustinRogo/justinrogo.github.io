@@ -22,12 +22,29 @@
     <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
     <title>Occupancy Heatmap | Dashboard</title>
+    <script>
+        (() => {
+            const allowedThemes = new Set(['dark', 'light', 'oled']);
+            let savedTheme = 'dark';
+            try { savedTheme = localStorage.getItem('occupancy-heatmap-theme') || savedTheme; } catch {}
+            const initialTheme = allowedThemes.has(savedTheme) ? savedTheme : 'dark';
+            document.documentElement.dataset.theme = initialTheme;
+            document.querySelector('meta[name="theme-color"]').content =
+                initialTheme === 'light' ? '#f1f5f9' : initialTheme === 'oled' ? '#000000' : '#0f172a';
+        })();
+    </script>
     <style>
         :root {
-            /* Modern Dark Palette */
+            color-scheme: dark;
             --bg-body: #0f172a;       /* Slate 900 */
             --bg-panel: rgba(30, 41, 59, 0.85); /* Slate 800 with alpha */
             --bg-element: #334155;    /* Slate 700 */
+            --bg-overlay: rgba(15, 23, 42, 0.94);
+            --bg-hover: #475569;
+            --bg-input: rgba(0, 0, 0, 0.2);
+            --bg-input-focus: rgba(0, 0, 0, 0.3);
+            --bg-subtle: rgba(255, 255, 255, 0.05);
+            --chart-grid: rgba(255, 255, 255, 0.08);
             --primary: #3b82f6;       /* Blue 500 */
             --primary-hover: #2563eb; /* Blue 600 */
             --danger: #ef4444;        /* Red 500 */
@@ -36,6 +53,46 @@
             --border: #1e293b;        /* Slate 800 */
             --radius: 12px;
             --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        :root[data-theme="light"] {
+            color-scheme: light;
+            --bg-body: #f1f5f9;
+            --bg-panel: rgba(255, 255, 255, 0.92);
+            --bg-element: #e2e8f0;
+            --bg-overlay: rgba(255, 255, 255, 0.96);
+            --bg-hover: #cbd5e1;
+            --bg-input: rgba(15, 23, 42, 0.06);
+            --bg-input-focus: rgba(15, 23, 42, 0.1);
+            --bg-subtle: rgba(15, 23, 42, 0.06);
+            --chart-grid: rgba(15, 23, 42, 0.12);
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --danger: #dc2626;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #cbd5e1;
+            --shadow: 0 4px 10px -2px rgba(15, 23, 42, 0.16);
+        }
+
+        :root[data-theme="oled"] {
+            color-scheme: dark;
+            --bg-body: #000;
+            --bg-panel: rgba(0, 0, 0, 0.96);
+            --bg-element: #171717;
+            --bg-overlay: rgba(0, 0, 0, 0.97);
+            --bg-hover: #262626;
+            --bg-input: #0a0a0a;
+            --bg-input-focus: #111;
+            --bg-subtle: rgba(255, 255, 255, 0.08);
+            --chart-grid: rgba(255, 255, 255, 0.12);
+            --primary: #60a5fa;
+            --primary-hover: #3b82f6;
+            --danger: #f87171;
+            --text-main: #fff;
+            --text-muted: #a3a3a3;
+            --border: #262626;
+            --shadow: none;
         }
 
         * { box-sizing: border-box; }
@@ -107,7 +164,7 @@
             padding: 0.3rem 0.65rem;
             border: 1px solid var(--border);
             border-radius: 99px;
-            background: rgba(0, 0, 0, 0.18);
+            background: var(--bg-input);
             color: var(--text-muted);
             font-size: 0.8rem;
             white-space: nowrap;
@@ -131,15 +188,17 @@
             50% { opacity: 0.35; }
         }
 
-        .mode-switch {
+        .mode-switch,
+        .theme-switch {
             display: inline-flex;
             padding: 3px;
             border: 1px solid var(--border);
             border-radius: 10px;
-            background: rgba(0, 0, 0, 0.2);
+            background: var(--bg-input);
         }
 
-        .mode-switch button {
+        .mode-switch button,
+        .theme-switch button {
             min-height: 38px;
             padding: 0.4rem 0.75rem;
             border: 0;
@@ -147,17 +206,20 @@
             color: var(--text-muted);
         }
 
-        .mode-switch button.active {
+        .mode-switch button.active,
+        .theme-switch button.active {
             background: var(--primary);
             color: #fff;
             box-shadow: var(--shadow);
         }
 
-        .panel .mode-switch {
+        .panel .mode-switch,
+        .panel .theme-switch {
             width: 100%;
         }
 
-        .panel .mode-switch button {
+        .panel .mode-switch button,
+        .panel .theme-switch button {
             flex: 1;
             min-height: 44px;
         }
@@ -201,7 +263,7 @@
         }
 
         .tab:hover {
-            background: rgba(255,255,255,0.05);
+            background: var(--bg-subtle);
             color: var(--text-main);
         }
 
@@ -213,7 +275,7 @@
         }
 
         .tab .badge {
-            background: rgba(0,0,0,0.3);
+            background: var(--bg-input-focus);
             font-size: 0.75rem;
             padding: 0.1rem 0.4rem;
             border-radius: 99px;
@@ -263,7 +325,7 @@
             padding: 0.3rem;
             border: 1px solid var(--border);
             border-radius: 10px;
-            background: rgba(15, 23, 42, 0.88);
+            background: var(--bg-overlay);
             backdrop-filter: blur(8px);
             box-shadow: var(--shadow);
         }
@@ -295,7 +357,7 @@
             padding: 0.55rem 0.65rem 0.55rem 1rem;
             border: 1px solid var(--border);
             border-radius: 12px;
-            background: rgba(15, 23, 42, 0.96);
+            background: var(--bg-overlay);
             box-shadow: 0 12px 28px rgba(0, 0, 0, 0.42);
             color: var(--text-main);
         }
@@ -342,7 +404,7 @@
         }
 
         button:hover:not(:disabled) {
-            background: #475569;
+            background: var(--bg-hover);
         }
         button:active:not(:disabled) {
             transform: scale(0.97);
@@ -381,7 +443,7 @@
         }
         
         #notes {
-            background: rgba(0,0,0,0.2);
+            background: var(--bg-input);
             border: 1px solid var(--border);
             color: var(--text-main);
             border-radius: 8px;
@@ -396,7 +458,7 @@
         #notes:focus {
             outline: none;
             border-color: var(--primary);
-            background: rgba(0,0,0,0.3);
+            background: var(--bg-input-focus);
             height: 80px; /* Expands on focus */
             position: absolute;
             bottom: 0;
@@ -430,7 +492,7 @@
         .panel input[type="time"] {
             background: var(--bg-body);
             border: 1px solid var(--border);
-            color: white;
+            color: var(--text-main);
             padding: 0.5rem;
             border-radius: 4px;
             width: 100%;
@@ -607,7 +669,7 @@
             gap: 2px;
             min-width: 540px;
         }
-        .dow-cell { aspect-ratio: 1; border-radius: 3px; background: rgba(255, 255, 255, 0.04); }
+        .dow-cell { aspect-ratio: 1; border-radius: 3px; background: var(--bg-subtle); }
         .dow-lbl {
             font-size: 0.7rem;
             color: var(--text-muted);
@@ -619,7 +681,7 @@
         .floor-row { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem; font-size: 0.85rem; }
         .floor-row:last-child { margin-bottom: 0; }
         .floor-row .fl-name { width: 64px; color: var(--text-muted); flex-shrink: 0; }
-        .floor-row .fl-bar-wrap { flex: 1; background: rgba(255, 255, 255, 0.05); border-radius: 99px; height: 14px; overflow: hidden; }
+        .floor-row .fl-bar-wrap { flex: 1; background: var(--bg-subtle); border-radius: 99px; height: 14px; overflow: hidden; }
         .floor-row .fl-bar { height: 100%; border-radius: 99px; }
         .floor-row .fl-val { width: 120px; text-align: right; font-variant-numeric: tabular-nums; flex-shrink: 0; }
 
@@ -650,6 +712,60 @@
             #notes:focus {
                 position: static; /* Don't pop up on mobile, keeps flow */
                 height: 60px;
+            }
+        }
+
+        /* Phone portrait: show every floor at once and prioritize notes. */
+        @media (max-width: 768px) and (orientation: portrait) {
+            header {
+                display: grid;
+                grid-template-columns: auto 1fr;
+                grid-template-areas:
+                    "menu actions"
+                    "floors floors";
+                align-items: center;
+                gap: 0.5rem;
+                padding: 0.5rem;
+            }
+
+            .header-left { display: contents; }
+            #menuBtn { grid-area: menu; }
+
+            .header-actions {
+                grid-area: actions;
+                justify-self: end;
+            }
+
+            .tabs-container {
+                grid-area: floors;
+                width: 100%;
+                overflow: visible;
+                mask-image: none;
+                -webkit-mask-image: none;
+            }
+
+            .tabs {
+                flex-direction: column;
+                gap: 0.25rem;
+                padding: 0;
+            }
+
+            .tab {
+                width: 100%;
+                min-height: 44px;
+                justify-content: space-between;
+                padding-inline: 0.9rem;
+            }
+
+            footer {
+                grid-template-areas:
+                    "notes notes"
+                    "tools submit";
+            }
+
+            .notes-wrap {
+                margin-top: 0;
+                margin-bottom: 0.25rem;
             }
         }
     </style>
@@ -729,6 +845,15 @@
             <div class="mode-switch" role="group" aria-label="Workspace mode">
                 <button id="countMode" type="button" class="active" aria-pressed="true">Count</button>
                 <button id="analyzeMode" type="button" aria-pressed="false">Analyze</button>
+            </div>
+        </div>
+
+        <div class="control-row">
+            <label>Appearance</label>
+            <div class="theme-switch" role="group" aria-label="Appearance theme">
+                <button id="themeDark" type="button" aria-pressed="false">Dark</button>
+                <button id="themeLight" type="button" aria-pressed="false">Light</button>
+                <button id="themeOled" type="button" aria-pressed="false">OLED</button>
             </div>
         </div>
 
@@ -850,6 +975,8 @@
 
             // --- Floors ---------------------------------------------------------------
             const DEFAULT_FLOOR_INDEX = 2;
+            const THEMES = ['dark', 'light', 'oled'];
+            const THEME_KEY = 'occupancy-heatmap-theme';
             const FLOORS = [
                 { id: '1F', label: '1st Floor', img: new Image(), imgSrc: null, points: [], view: { zoom: 1, panX: 0, panY: 0 } },
                 { id: '2F', label: '2nd Floor', img: new Image(), imgSrc: null, points: [], view: { zoom: 1, panX: 0, panY: 0 } },
@@ -859,6 +986,9 @@
             ];
             let current = DEFAULT_FLOOR_INDEX;
             let appMode = 'count';
+            let theme = THEMES.includes(document.documentElement.dataset.theme)
+                ? document.documentElement.dataset.theme
+                : 'dark';
             let syncState = 'ready';
             let syncResetTimer = null;
             let clearUndo = null;
@@ -892,6 +1022,10 @@
             const notesEl = document.getElementById('notes');
             const countModeBtn = document.getElementById('countMode');
             const analyzeModeBtn = document.getElementById('analyzeMode');
+            const themeDarkBtn = document.getElementById('themeDark');
+            const themeLightBtn = document.getElementById('themeLight');
+            const themeOledBtn = document.getElementById('themeOled');
+            const themeColorMeta = document.querySelector('meta[name="theme-color"]');
             const totalLabelEl = document.getElementById('totalLabel');
             const zoomOutBtn = document.getElementById('zoomOut');
             const zoomInBtn = document.getElementById('zoomIn');
@@ -900,6 +1034,31 @@
             const zoomReadoutEl = document.getElementById('zoomReadout');
             const DRAFT_KEY = 'multi-floor-heatmap-embedded';
             const FLOW_URL = "https://default17f1a87e2a254eaab9df9d439034b0.80.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/8a4d2abd61de4fceb5cb6d2a4b2b31a8/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=EhX0b_ECMsXs08oSiwPJKO3H5KMRI3O0l3V1lLtdM6Q";
+
+            function setTheme(nextTheme, persist = true) {
+                if (!THEMES.includes(nextTheme)) return;
+                theme = nextTheme;
+                document.documentElement.dataset.theme = theme;
+                themeColorMeta?.setAttribute('content', theme === 'light' ? '#f1f5f9' : theme === 'oled' ? '#000000' : '#0f172a');
+                [
+                    [themeDarkBtn, 'dark'],
+                    [themeLightBtn, 'light'],
+                    [themeOledBtn, 'oled'],
+                ].forEach(([button, value]) => {
+                    const active = theme === value;
+                    button.classList.toggle('active', active);
+                    button.setAttribute('aria-pressed', String(active));
+                });
+                if (persist) {
+                    try { localStorage.setItem(THEME_KEY, theme); } catch {}
+                }
+                redraw();
+                if (!document.getElementById('analyticsOverlay').hasAttribute('hidden')) renderAnalytics();
+            }
+
+            themeDarkBtn.onclick = () => setTheme('dark');
+            themeLightBtn.onclick = () => setTheme('light');
+            themeOledBtn.onclick = () => setTheme('oled');
 
             // Tabs with counters
             const tabs = document.getElementById('tabs');
@@ -1392,7 +1551,10 @@
                 if (!fl.img.naturalWidth) { updateCounts(); return; }
 
                 const fit = currentImageRect();
+                fctx.save();
+                fctx.filter = theme === 'oled' ? 'invert(1) hue-rotate(180deg) brightness(0.72) contrast(1.12)' : 'none';
                 fctx.drawImage(fl.img, 0, 0, fl.img.naturalWidth, fl.img.naturalHeight, fit.x, fit.y, fit.w, fit.h);
+                fctx.restore();
 
                 const down = 0.5;
                 // Keep the heat buffer viewport-sized so pinch gestures stay
@@ -1849,8 +2011,9 @@
                 const y = v => T + (1 - v / ymax) * (H - T - B);
 
                 ctx.font = '11px sans-serif';
-                ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-                ctx.fillStyle = '#94a3b8';
+                const styles = getComputedStyle(document.documentElement);
+                ctx.strokeStyle = styles.getPropertyValue('--chart-grid').trim();
+                ctx.fillStyle = styles.getPropertyValue('--text-muted').trim();
                 ctx.textAlign = 'right';
                 for (let i = 0; i <= 4; i++) {
                     const v = ymax * i / 4, yy = y(v);
@@ -1980,6 +2143,7 @@
                 afterSessionsChanged();
             }
 
+            setTheme(theme, false);
             restore();
             fitCanvas();
             redraw();
