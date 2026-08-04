@@ -12,6 +12,15 @@
     </script>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Record and review library occupancy across five floors, online or offline.">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Occupancy">
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
     <title>Occupancy Heatmap | Dashboard</title>
     <style>
         :root {
@@ -656,11 +665,11 @@
         (() => {
             // --- Embedded floor images (replace placeholders) ------------------------
             const EMBEDDED = {
-                '1F': 'https://raw.githubusercontent.com/JustinRogo/justinrogo.github.io/refs/heads/main/Maps/1F.png',
-                '2F': 'https://raw.githubusercontent.com/JustinRogo/justinrogo.github.io/refs/heads/main/Maps/2F.png',
-                '3F': 'https://raw.githubusercontent.com/JustinRogo/justinrogo.github.io/refs/heads/main/Maps/3F.png',
-                '4F': 'https://raw.githubusercontent.com/JustinRogo/justinrogo.github.io/refs/heads/main/Maps/4F.png',
-                '5F': 'https://raw.githubusercontent.com/JustinRogo/justinrogo.github.io/refs/heads/main/Maps/5F.png',
+                '1F': '../../../Maps/1F.png',
+                '2F': '../../../Maps/2F.png',
+                '3F': '../../../Maps/3F.png',
+                '4F': '../../../Maps/4F.png',
+                '5F': '../../../Maps/5F.png',
             };
 
             // --- Floors ---------------------------------------------------------------
@@ -1512,6 +1521,14 @@
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && !controlsPanel.hasAttribute('hidden')) closePanel();
         });
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').catch((error) => {
+                    console.warn('Service worker registration failed:', error);
+                });
+            });
+        }
     </script>
 </body>
 </html>
