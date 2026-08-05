@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>UCPEA Tentative Agreement Redline and Article Summaries</title>
+<title>UCPEA Contract Comparison: 2022–2025 and 2025–2029</title>
 <style>
 :root {
   color-scheme: light;
@@ -32,7 +32,8 @@ a { color: var(--blue); }
 .skip-link:focus { top: 1rem; }
 .hero { background: var(--navy); color: white; }
 .hero-inner { max-width: 1440px; margin: 0 auto; padding: 1.1rem 1.25rem 2.2rem; }
-.back-link { display: inline-block; margin-bottom: 1.2rem; color: #d9e6f5; text-decoration: none; font-size: .92rem; }
+.hero-links { display: flex; flex-wrap: wrap; gap: .65rem 1.2rem; margin-bottom: 1.2rem; }
+.back-link { display: inline-block; color: #d9e6f5; text-decoration: none; font-size: .92rem; }
 .back-link:hover { text-decoration: underline; }
 h1 { max-width: 900px; margin: 0; font-size: clamp(1.8rem, 4vw, 3rem); line-height: 1.08; letter-spacing: -.025em; }
 .hero p { max-width: 780px; margin: .8rem 0 0; color: #d9e2ef; font-size: 1rem; }
@@ -85,6 +86,13 @@ ins { color: var(--add); background: var(--add-bg); text-decoration-thickness: 1
 del + ins, ins + del { margin-left: .12em; }
 body.view-original ins { display: none; }
 body.view-revised del { display: none; }
+body.view-summary .sidebar-actions, body.view-summary .legend { display: none; }
+body.view-summary .articles { gap: 1rem; }
+body.view-summary .article summary { cursor: default; pointer-events: none; }
+body.view-summary .article summary::before, body.view-summary .change-counts { display: none; }
+body.view-summary .article-body { padding: 1rem; font-family: Arial, Helvetica, sans-serif; }
+body.view-summary .article-body > :not(.change-summary) { display: none; }
+body.view-summary .change-summary { max-width: none; margin: 0; }
 .article.is-hidden, .article-jump.is-hidden { display: none; }
 .no-results { display: none; margin: 1rem 0; padding: 2rem 1rem; text-align: center; color: var(--muted); background: white; border: 1px solid var(--line); border-radius: .7rem; }
 .no-results.is-visible { display: block; }
@@ -112,7 +120,9 @@ body.view-revised del { display: none; }
 .reader-layout { display: grid; grid-template-columns: minmax(240px, 300px) minmax(0, 1fr); gap: 1.35rem; align-items: start; }
 .reader-sidebar { min-width: 0; }
 .sidebar-panel { position: sticky; top: 1rem; max-height: calc(100vh - 2rem); overflow: hidden; display: flex; flex-direction: column; padding: 1rem; background: var(--surface); border: 1px solid var(--line); border-radius: .8rem; box-shadow: 0 8px 22px rgba(16, 24, 40, .07); }
-.sidebar-heading { margin: 0 0 .85rem; font-size: 1.08rem; }
+.sidebar-heading-row { display: flex; align-items: center; justify-content: space-between; gap: .75rem; margin-bottom: .85rem; }
+.sidebar-heading { margin: 0; font-size: 1.08rem; }
+.mobile-nav-toggle, .mobile-nav-close, .mobile-nav-backdrop { display: none; }
 .sidebar-panel .search-label { flex: 0 0 auto; }
 .sidebar-actions { display: grid; grid-template-columns: 1fr 1fr; gap: .45rem; margin-top: .7rem; }
 .sidebar-actions button { min-width: 0; padding-inline: .55rem; }
@@ -142,9 +152,19 @@ body.view-revised del { display: none; }
 .change-kind--unchanged { color: var(--add); background: var(--add-bg); }
 body.view-original .change-summary, body.view-revised .change-summary { display: block; }
 @media (max-width: 760px) {
+  body.mobile-nav-open { overflow: hidden; }
   .reader-layout { grid-template-columns: 1fr; }
-  .sidebar-panel { position: static; max-height: none; overflow: visible; }
-  .article-index { max-height: 22rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .reader-sidebar { position: fixed; right: .75rem; bottom: calc(5.25rem + env(safe-area-inset-bottom)); left: .75rem; z-index: 45; max-height: min(76vh, 44rem); visibility: hidden; opacity: 0; transform: translateY(1rem) scale(.98); transition: opacity .18s ease, transform .18s ease, visibility .18s; }
+  body.mobile-nav-open .reader-sidebar { visibility: visible; opacity: 1; transform: translateY(0) scale(1); }
+  .sidebar-panel { position: static; max-height: min(76vh, 44rem); overflow: hidden; border-radius: 1rem; box-shadow: 0 22px 70px rgba(0, 14, 47, .3); }
+  .mobile-nav-close { display: grid; place-items: center; width: 2.35rem; min-height: 2.35rem; padding: 0; border-radius: 50%; color: var(--navy); font-size: 1.4rem; line-height: 1; }
+  .mobile-nav-toggle { position: fixed; right: 1rem; bottom: calc(1rem + env(safe-area-inset-bottom)); z-index: 50; display: grid; place-items: center; width: 3.65rem; min-height: 3.65rem; padding: 0; border: 0; border-radius: 50%; background: var(--navy); color: white; box-shadow: 0 12px 30px rgba(0, 14, 47, .3); }
+  .mobile-nav-toggle:hover { background: var(--blue); }
+  .mobile-nav-toggle__icon { display: grid; gap: .27rem; width: 1.35rem; }
+  .mobile-nav-toggle__icon span { display: block; height: 2px; border-radius: 999px; background: currentColor; }
+  .mobile-nav-backdrop { position: fixed; inset: 0; z-index: 40; display: block; visibility: hidden; opacity: 0; background: rgba(0, 14, 47, .58); backdrop-filter: blur(2px); transition: opacity .18s ease, visibility .18s; }
+  body.mobile-nav-open .mobile-nav-backdrop { visibility: visible; opacity: 1; }
+  .article-index { flex: 1; max-height: none; grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .reader-toolbar { position: static; padding-top: 0; }
 }
 @media (max-width: 620px) {
@@ -166,13 +186,18 @@ body.view-original .change-summary, body.view-revised .change-summary { display:
 <a class="skip-link" href="#contract-articles">Skip to agreement</a>
 <header class="hero">
 <div class="hero-inner">
-<a class="back-link" href="UCPEAContract.html">← Current agreement</a>
-<div class="version-badge" role="status">Updated layout: left navigation + article summaries</div>
-<h1>UCPEA Tentative Agreement Language Comparison</h1>
-<p>Compare prior contract language with the tentative agreement dated March 12, 2026. Deleted text appears in red with strikethrough, added text appears in green with underline, and each article includes a plain-language summary of the changes.</p>
+<nav class="hero-links" aria-label="UCPEA contract navigation">
+<a class="back-link" href="index.html">← UCPEA dashboard</a>
+<a class="back-link" href="UCPEAContract.html">View current agreement</a>
+</nav>
+<div class="version-badge" role="status">2022–2025 → 2025–2029</div>
+<h1>UCPEA Contract Language Comparison</h1>
+<p>Compare the 2022–2025 UCPEA contract with the newly enacted 2025–2029 contract.</p>
 </div>
 </header>
-<main class="page-shell"><div class="reader-layout"><aside aria-label="Agreement navigation" class="reader-sidebar"><div class="sidebar-panel"><h2 class="sidebar-heading">Browse the agreement</h2><label class="search-label" for="contract-search"><span>Search</span><input autocomplete="off" class="search-input" id="contract-search" placeholder="Search agreement language, e.g., telecommuting, sick leave, salary" type="search"/></label><div class="action-buttons sidebar-actions">
+<button aria-controls="agreement-navigation" aria-expanded="false" aria-label="Open agreement navigation" class="mobile-nav-toggle" id="mobile-nav-toggle" type="button"><span aria-hidden="true" class="mobile-nav-toggle__icon"><span></span><span></span><span></span></span></button>
+<div aria-hidden="true" class="mobile-nav-backdrop" id="mobile-nav-backdrop"></div>
+<main class="page-shell"><div class="reader-layout"><aside aria-label="Agreement navigation" class="reader-sidebar" id="agreement-navigation"><div class="sidebar-panel"><div class="sidebar-heading-row"><h2 class="sidebar-heading">Browse the agreement</h2><button aria-label="Close agreement navigation" class="mobile-nav-close" id="mobile-nav-close" type="button">×</button></div><label class="search-label" for="contract-search"><span>Search</span><input autocomplete="off" class="search-input" id="contract-search" placeholder="Search agreement language, e.g., telecommuting, sick leave, salary" type="search"/></label><div class="action-buttons sidebar-actions">
 <button id="expand-all" type="button">Expand all</button>
 <button id="collapse-all" type="button">Collapse all</button>
 </div><div aria-live="polite" class="search-status sidebar-status" id="search-status">50 sections</div><h3 class="article-nav-heading">Articles</h3><nav aria-label="Articles" class="article-index">
@@ -227,10 +252,11 @@ body.view-original .change-summary, body.view-revised .change-summary { display:
 <a class="article-jump" data-target="article-49" href="#article-49"><span>49</span>Duration</a>
 <a class="article-jump" data-target="article-moa" href="#article-moa"><span>MOA</span>Memoranda of Agreement</a>
 </nav></div></aside><div class="reader-main"><section aria-label="Language comparison controls" class="reader-toolbar"><div class="reader-toolbar__inner"><div aria-label="Language view" class="view-buttons" role="group">
-<button aria-pressed="true" class="view-button" data-view="redline" type="button">Changes</button>
-<button aria-pressed="false" class="view-button" data-view="original" type="button">Original</button>
-<button aria-pressed="false" class="view-button" data-view="revised" type="button">New language</button>
-</div><div aria-label="Change legend" class="legend"><span><del>deleted text</del> deletion</span><span><ins>added text</ins> addition</span></div></div></section><aside class="reader-note"><p><strong>About the summaries: </strong>Each article includes a plain-language interpretation based only on the redlined tentative agreement. The summaries are informational, are not part of the negotiated language, and should not be treated as legal advice.</p></aside><section aria-label="Tentative agreement articles" class="articles" id="contract-articles">
+<button aria-pressed="true" class="view-button" data-view="redline" type="button">Compare</button>
+<button aria-pressed="false" class="view-button" data-view="original" type="button">Old contract</button>
+<button aria-pressed="false" class="view-button" data-view="revised" type="button">New contract</button>
+<button aria-pressed="false" class="view-button" data-view="summary" type="button">Summary changes</button>
+</div><div aria-label="Change legend" class="legend"><span><del>deleted text</del> deletion</span><span><ins>added text</ins> addition</span></div></div></section><aside class="reader-note"><p>Summaries and interpretations are generated.</p></aside><section aria-label="Contract comparison articles" class="articles" id="contract-articles">
 <details class="article" data-search="1.1 pursuant to the provisions of connecticut general statute §§ 5-270, et seq., and as certified by the connecticut state board of labor relations in case no. se-3541, decision no. 1481, dated january 24, 1977, the board of trustees of the university of connecticut (hereinafter referred to as “the university” or referred to as “the board”) hereby recognizes the university of connecticut professional employees association, local 3695, american federation of teachers connecticut (aft-ct), american federation of teachers, afl-cio (hereinafter referred to as “the union” or referred to as “the bargaining agent” or referred to as the “ucpea”) as the exclusive bargaining agent for all professional employees excluding those in the faculty unit or with faculty rank, faculty in the law school, those in the university of connecticut health center (farmington) and the following titles: president provost vice provost associate vice provost assistant vice provost vice president executive vice president &amp; chief financial officer executive vice president associate vice president chief of staff deputy chief of staff associate vice provost president assistant vice president chief of staff deputy chief of staff general counsel dean campus dean associate dean assistant dean dean of students associate dean of students executive director university director police chief specialist i-iv university staff professionals i – - vi * university educational assistants i – - iii * coaches university technicians i – - ii any director , associate director, or assistant director s who meet s the criteria for management and/or confidential exclusions under c.g.s. § 5-270 . . part-time professional employees who are employed less than 1/2 time. any other employee who meets the criteria for management and/or confidential exclusions under c.g.s. § 5-270. *if the university changes its management/confidential classification system during the life of this agreement to utilize other titles, the exclusion will continue to apply to these positions as they may be renamed. 1.2 notwithstanding the exclusions listed above, the board of trustees reserves its right under the state collective bargaining statute, section 5-270, to exclude additional positions which are or which may become managerial during the life of this contract. associate directors who meet the criteria for management and/or confidential exclusions under c.g.s. § 5-270. assistant directors who meet the criteria for management and/or confidential exclusions under c.g.s. § 5-270. part-time professional employees on the regular payroll who are employed less than 1/2 time. any other employee who meets the criteria for management and/or confidential exclusions under c.g.s. § 5-270. 1.2 notwithstanding the exclusions listed above, the board of trustees reserves its right under the state collective bargaining statute, section 5-270, to exclude additional positions which are or which may become managerial during the life of this contract. updates the list of titles excluded from bargaining-unit recognition. the redline adds and removes specific leadership titles, consolidates director-level and part-time exclusions, and states that an exclusion continues if a covered management or confidential classification is renamed. actual bargaining-unit status remains tied to the statutory management and confidential criteria. substantive change" id="article-1">
 <summary>
 <span class="article-heading"><span class="article-number">1</span><span>Recognition</span></span>
@@ -1433,7 +1459,7 @@ body.view-original .change-summary, body.view-revised .change-summary { display:
 <p class="contract-paragraph list-item indented">8. No activities performed by state employees with Big Brothers or Big Sisters shall  be on state time and such activities shall be outside the scope of their employment.</p>
 </div>
 </details>
-</section><div class="no-results" id="no-results">No matching agreement language found. Try a broader search term.</div><p class="footer">Tentative Agreement dated March 12, 2026 · 49 articles and memoranda</p></div></div></main>
+</section><div class="no-results" id="no-results">No matching agreement language found. Try a broader search term.</div><p class="footer">2022–2025 and 2025–2029 contract comparison · 49 articles and memoranda</p></div></div></main>
 <script>
 (() => {
   const articles = [...document.querySelectorAll('.article')];
@@ -1442,19 +1468,66 @@ body.view-original .change-summary, body.view-revised .change-summary { display:
   const status = document.getElementById('search-status');
   const noResults = document.getElementById('no-results');
   const viewButtons = [...document.querySelectorAll('.view-button')];
+  const articleIndex = document.querySelector('.article-index');
+  const sidebar = document.getElementById('agreement-navigation');
+  const mobileNavToggle = document.getElementById('mobile-nav-toggle');
+  const mobileNavClose = document.getElementById('mobile-nav-close');
+  const mobileNavBackdrop = document.getElementById('mobile-nav-backdrop');
+  const mobileNavMedia = window.matchMedia('(max-width: 760px)');
   let activeArticleId = '';
+  let openArticleIdsBeforeSummary = null;
+
+  function setMobileNav(open, restoreFocus = false) {
+    const shouldOpen = open && mobileNavMedia.matches;
+    document.body.classList.toggle('mobile-nav-open', shouldOpen);
+    mobileNavToggle.setAttribute('aria-expanded', String(shouldOpen));
+    mobileNavToggle.setAttribute('aria-label', shouldOpen ? 'Close agreement navigation' : 'Open agreement navigation');
+    if (shouldOpen) {
+      sidebar.setAttribute('role', 'dialog');
+      sidebar.setAttribute('aria-modal', 'true');
+      requestAnimationFrame(() => search.focus());
+    } else {
+      sidebar.removeAttribute('role');
+      sidebar.removeAttribute('aria-modal');
+      if (restoreFocus) mobileNavToggle.focus();
+    }
+  }
+
+  function keepJumpVisible(jump) {
+    if (!jump || !articleIndex) return;
+    const indexBounds = articleIndex.getBoundingClientRect();
+    const jumpBounds = jump.getBoundingClientRect();
+    if (jumpBounds.top < indexBounds.top) {
+      articleIndex.scrollTop -= indexBounds.top - jumpBounds.top;
+    } else if (jumpBounds.bottom > indexBounds.bottom) {
+      articleIndex.scrollTop += jumpBounds.bottom - indexBounds.bottom;
+    }
+  }
 
   function setActiveArticle(id) {
     if (!id || activeArticleId === id) return;
     activeArticleId = id;
     jumps.forEach(jump => jump.classList.toggle('is-active', jump.dataset.target === id));
     const activeJump = jumps.find(jump => jump.dataset.target === id);
-    activeJump?.scrollIntoView({ block: 'nearest' });
+    keepJumpVisible(activeJump);
   }
 
   function setView(view) {
-    document.body.classList.remove('view-redline', 'view-original', 'view-revised');
+    const wasSummaryView = document.body.classList.contains('view-summary');
+    if (view === 'summary' && !wasSummaryView) {
+      openArticleIdsBeforeSummary = new Set(articles.filter(article => article.open).map(article => article.id));
+    }
+
+    document.body.classList.remove('view-redline', 'view-original', 'view-revised', 'view-summary');
     document.body.classList.add(`view-${view}`);
+
+    if (view === 'summary') {
+      articles.forEach(article => article.open = true);
+    } else if (wasSummaryView && openArticleIdsBeforeSummary) {
+      articles.forEach(article => article.open = openArticleIdsBeforeSummary.has(article.id));
+      openArticleIdsBeforeSummary = null;
+    }
+
     viewButtons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.view === view)));
   }
 
@@ -1481,6 +1554,34 @@ body.view-original .change-summary, body.view-revised .change-summary { display:
   document.getElementById('expand-all').addEventListener('click', () => articles.filter(a => !a.classList.contains('is-hidden')).forEach(a => a.open = true));
   document.getElementById('collapse-all').addEventListener('click', () => articles.forEach(a => a.open = false));
   search.addEventListener('input', applySearch);
+  mobileNavToggle.addEventListener('click', () => setMobileNav(!document.body.classList.contains('mobile-nav-open'), true));
+  mobileNavClose.addEventListener('click', () => setMobileNav(false, true));
+  mobileNavBackdrop.addEventListener('click', () => setMobileNav(false, true));
+  mobileNavMedia.addEventListener('change', event => {
+    if (!event.matches) setMobileNav(false);
+  });
+
+  document.addEventListener('keydown', event => {
+    if (!document.body.classList.contains('mobile-nav-open')) return;
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      setMobileNav(false, true);
+      return;
+    }
+    if (event.key !== 'Tab') return;
+    const focusable = [...sidebar.querySelectorAll('a[href], button:not([disabled]), input:not([disabled])')]
+      .filter(element => element.offsetParent !== null);
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
 
   jumps.forEach(jump => jump.addEventListener('click', event => {
     event.preventDefault();
@@ -1488,13 +1589,19 @@ body.view-original .change-summary, body.view-revised .change-summary { display:
     if (!target) return;
     target.open = true;
     setActiveArticle(target.id);
+    setMobileNav(false);
     requestAnimationFrame(() => requestAnimationFrame(() => {
       target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      target.querySelector('summary')?.focus({ preventScroll: true });
     }));
     history.replaceState(null, '', `#${target.id}`);
   }));
 
   articles.forEach(article => article.addEventListener('toggle', () => {
+    if (document.body.classList.contains('view-summary')) {
+      if (!article.open) article.open = true;
+      return;
+    }
     if (article.open) setActiveArticle(article.id);
   }));
 
@@ -1503,7 +1610,7 @@ body.view-original .change-summary, body.view-revised .change-summary { display:
     if (target?.matches('.article')) {
       target.open = true;
       setActiveArticle(target.id);
-      requestAnimation(() => target.scrollIntoView({ block: 'start' }));
+      requestAnimationFrame(() => target.scrollIntoView({ block: 'start' }));
     }
   } else if (articles[0]) {
     setActiveArticle(articles[0].id);

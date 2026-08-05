@@ -982,6 +982,24 @@ html[data-theme="dark"] .pill {
   background: var(--blue);
 }
 
+.contract-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.contract-content .button-secondary {
+  border-color: var(--border);
+  background: var(--surface-soft);
+  color: var(--ink);
+}
+
+.contract-content .button-secondary:hover {
+  border-color: var(--blue);
+  background: var(--surface);
+  color: var(--blue);
+}
+
 .article-links {
   display: grid;
   border-left: 1px solid var(--border);
@@ -1679,6 +1697,11 @@ html[data-theme="dark"] .update-state {
 
   .contract-content {
     padding: 32px 24px 38px;
+  }
+
+  .contract-actions {
+    display: grid;
+    width: 100%;
   }
 
   .article-links {
