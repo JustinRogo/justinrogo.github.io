@@ -28,7 +28,8 @@ The site includes:
 ├── style.css
 ├── main.js
 ├── data/
-│   └── cards_count.json
+│   ├── cards_count.json
+│   └── pages.json
 └── Pages/
     ├── For Fun/
     │   ├── Birds.html
@@ -72,9 +73,9 @@ Key homepage areas include:
 
 ### Dynamic page tree
 
-The site automatically builds a page tree from HTML files inside the `Pages/` directory using the GitHub tree API. If the API is unavailable, `main.js` renders a fallback page list.
+The site builds its page tree from `data/pages.json`, which defines each page's title, source path, and optional external destination. This keeps navigation ordering and external links independent of the repository API.
 
-This makes it easier to add new project pages without manually updating the homepage every time.
+Folder index pages are automatically treated as parents of the other pages in the same folder. For example, the UCPEA member dashboard is the parent of the UCPEA contract and salary tools.
 
 ### UConn Law Library search widget
 
@@ -104,9 +105,9 @@ The site uses a custom CSS system with:
 
 ### CT General Statutes Explorer
 
-Path: `Pages/Work/cgs/`
+Live site: `https://uconn-law-library.github.io/CGS/#/`
 
-A static, installable web app for browsing and searching the Connecticut General Statutes, subject index, and infractions schedule.
+A static, installable web app for browsing and searching the Connecticut General Statutes, subject index, and infractions schedule. The former `Pages/Work/cgs/` entry point redirects to the project's new repository site.
 
 Features include:
 
@@ -198,10 +199,10 @@ Typical edits:
 - Update homepage structure in `index.html`
 - Update visual styling in `style.css`
 - Update widgets, page tree behavior, tabs, search, weather, and events logic in `main.js`
-- Add new standalone pages under `Pages/`
+- Add new standalone pages under `Pages/` and list them in `data/pages.json`
 - Add or update generated/static data under `data/`
 
-When adding a new HTML page under `Pages/`, the homepage page tree should detect it automatically as long as the GitHub API call succeeds.
+When a folder contains an `index.html` entry in the manifest, the homepage automatically renders that page as the parent of the folder's other listed pages.
 
 ## Data and external services
 

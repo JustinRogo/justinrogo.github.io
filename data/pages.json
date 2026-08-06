@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "pages": [
+    {
+      "path": "Pages/For Fun/Birds.html",
+      "title": "Evolutionary Flocking Ecosystem"
+    },
+    {
+      "path": "Pages/For Fun/Game-of-Life.html",
+      "title": "Game of Life - Ultimate Cosmos"
+    },
+    {
+      "path": "Pages/For Fun/StrategicFramework2.html",
+      "title": "UConn Law Library & IT - Multi-Gen Strategic Framework 2026"
+    },
+    {
+      "path": "Pages/For Fun/Tarot/index.html",
+      "title": "Midnight Tarot"
+    },
+    {
+      "path": "Pages/Work/Library/Desk Planner/index.html",
+      "title": "Front Desk Planner"
+    },
+    {
+      "path": "Pages/Work/Library/heatmap.html",
+      "title": "Occupancy Heatmap Dashboard"
+    },
+    {
+      "path": "Pages/Work/Library/Timeline_LawLib.html",
+      "title": "UConn School of Law Library Centennial Timeline"
+    },
+    {
+      "path": "Pages/Work/UCPEA/index.html",
+      "title": "UCPEA Member Dashboard"
+    },
+    {
+      "path": "Pages/Work/UCPEA/salary_calculator.html",
+      "title": "Salary Increase Calculator"
+    },
+    {
+      "path": "Pages/Work/UCPEA/UCPEA_Contract_Comparison.html",
+      "title": "UCPEA Contract Comparison: 2022–2025 and 2025–2029"
+    },
+    {
+      "path": "Pages/Work/UCPEA/UCPEAContract.html",
+      "title": "UCPEA Collective Bargaining Agreement, 2025-2029"
+    },
+    {
+      "path": "Pages/Work/cgs/index.html",
+      "title": "CT General Statutes Explorer",
+      "href": "https://uconn-law-library.github.io/CGS/#/"
+    }
+  ]
+}

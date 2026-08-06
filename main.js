@@ -3,49 +3,8 @@
 /* ===================================================================
    Page Tree
    =================================================================== */
-const PAGE_TREE_FALLBACK = [
-  {
-    title: 'For Fun',
-    children: [
-      { title: 'Evolutionary Flocking Ecosystem', href: 'Pages/For Fun/Birds.html' },
-      { title: 'Game of Life - Ultimate Cosmos', href: 'Pages/For Fun/Game-of-Life.html' },
-      { title: 'Midnight Tarot', href: 'Pages/For Fun/Tarot/index.html' },
-      { title: 'UConn Law Library & IT - Multi-Gen Strategic Framework 2026', href: 'Pages/For Fun/StrategicFramework2.html' },
-    ],
-  },
-  {
-    title: 'Work',
-    children: [
-      {
-        title: 'CGS',
-        children: [
-          { title: 'CT General Statutes Explorer', href: 'Pages/Work/cgs/index.html' },
-        ],
-      },
-      {
-        title: 'Library',
-        children: [
-          { title: 'Front Desk Planner', href: 'Pages/Work/Library/Desk Planner/index.html' },
-          { title: 'Occupancy Heatmap Dashboard', href: 'Pages/Work/Library/heatmap.html' },
-          { title: 'UConn School of Law Library Centennial Timeline', href: 'Pages/Work/Library/Timeline_LawLib.html' },
-        ],
-      },
-      {
-        title: 'UCPEA',
-        children: [
-          { title: 'UCPEA Member Dashboard', href: 'Pages/Work/UCPEA/index.html' },
-          { title: 'Salary Increase Calculator', href: 'Pages/Work/UCPEA/salary_calculator.html' },
-          { title: 'UCPEA Collective Bargaining Agreement, 2025-2029', href: 'Pages/Work/UCPEA/UCPEAContract.html' },
-        ],
-      },
-    ],
-  },
-];
 const PAGE_TREE_ROOT = 'Pages/';
-const PAGE_TREE_API = 'https://api.github.com/repos/JustinRogo/justinrogo.github.io/git/trees/main?recursive=1';
-const PAGE_TREE_EXCLUDE = /\.bak\.html$/i;
-const PAGE_TREE_CACHE_KEY = 'pageTree.v1';
-const PAGE_TREE_CACHE_TTL = 6 * 60 * 60 * 1000; // 6 hours
+const PAGE_TREE_MANIFEST = 'data/pages.json';
 
 function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, char => ({
@@ -65,25 +24,56 @@ function escapeHtml(value) {
     return nodes.flatMap(node => (node.href ? [node] : collectPages(node.children || [])));
   }
 
+  function organizePages(nodes) {
+    const pages = [];
+
+    nodes.forEach(node => {
+      if (node.href) {
+        pages.push(node);
+        return;
+      }
+
+      const children = node.children || [];
+      const indexPage = children.find(child => child.href && /(?:^|\/)index\.html$/i.test(child.path));
+      const descendants = organizePages(children.filter(child => child !== indexPage));
+
+      if (indexPage) {
+        pages.push({ ...indexPage, children: descendants });
+      } else {
+        pages.push(...descendants);
+      }
+    });
+
+    return pages.sort((a, b) => a.title.localeCompare(b.title));
+  }
+
+  function renderPage(page) {
+    const children = page.children || [];
+    return `<li${children.length ? ' class="page-tree__parent"' : ''}>
+      <a class="page-link${children.length ? ' page-link--parent' : ''}" href="${escapeHtml(page.href)}">
+        <span class="dot" aria-hidden="true"></span>
+        <span>${escapeHtml(page.title)}</span>
+      </a>
+      ${children.length ? `<ul class="page-branch__children">
+        ${children.map(renderPage).join('')}
+      </ul>` : ''}
+    </li>`;
+  }
+
   function renderNodes(nodes) {
     return nodes.map((node, index) => {
-      const pages = (node.href ? [node] : collectPages(node.children || []))
-        .sort((a, b) => a.title.localeCompare(b.title));
-      if (!pages.length) return '';
+      const allPages = node.href ? [node] : collectPages(node.children || []);
+      const pages = node.href ? [node] : organizePages(node.children || []);
+      if (!allPages.length) return '';
 
       const headingId = `page-branch-${index}`;
       return `<section class="page-branch" aria-labelledby="${headingId}">
         <div class="page-branch__header">
           <h3 id="${headingId}">${escapeHtml(node.href ? 'Other' : node.title)}</h3>
-          <span class="page-count">${pages.length} ${pages.length === 1 ? 'page' : 'pages'}</span>
+          <span class="page-count">${allPages.length} ${allPages.length === 1 ? 'page' : 'pages'}</span>
         </div>
         <ul class="page-branch__items">
-          ${pages.map(page => `<li>
-            <a class="page-link" href="${escapeHtml(page.href)}">
-              <span class="dot" aria-hidden="true"></span>
-              <span>${escapeHtml(page.title)}</span>
-            </a>
-          </li>`).join('')}
+          ${pages.map(renderPage).join('')}
         </ul>
       </section>`;
     }).join('');
@@ -98,8 +88,8 @@ function escapeHtml(value) {
       .join(' ');
   }
 
-  function insertPage(tree, path, title) {
-    const parts = path.split('/').slice(1);
+  function insertPage(tree, page) {
+    const parts = page.path.split('/').slice(1);
     const fileName = parts.pop();
     let cursor = tree;
 
@@ -112,7 +102,11 @@ function escapeHtml(value) {
       cursor = group.children;
     });
 
-    cursor.push({ title: title || titleFromPathPart(fileName), href: path });
+    cursor.push({
+      title: page.title || titleFromPathPart(fileName),
+      href: page.href || page.path,
+      path: page.path,
+    });
   }
 
   function sortTree(nodes) {
@@ -127,73 +121,36 @@ function escapeHtml(value) {
     return nodes;
   }
 
-  async function fetchPageTitle(path) {
-    try {
-      const response = await fetch(encodeURI(path));
-      if (!response.ok) throw new Error('Title fetch failed');
-      const doc = new DOMParser().parseFromString(await response.text(), 'text/html');
-      return doc.querySelector('title')?.textContent?.trim() || '';
-    } catch {
-      return '';
-    }
-  }
-
   async function loadPageTree() {
-    const response = await fetch(PAGE_TREE_API);
-    if (!response.ok) throw new Error('Page tree API failed');
+    const response = await fetch(PAGE_TREE_MANIFEST, { cache: 'no-cache' });
+    if (!response.ok) throw new Error('Page manifest failed to load');
     const data = await response.json();
-    const paths = (data.tree || [])
-      .filter(item => item.type === 'blob')
-      .map(item => item.path)
-      .filter(path => path.startsWith(PAGE_TREE_ROOT) && /\.html$/i.test(path) && !PAGE_TREE_EXCLUDE.test(path));
+    const pages = Array.isArray(data.pages) ? data.pages : [];
+    const validPages = pages.filter(page => (
+      page
+      && typeof page.path === 'string'
+      && page.path.startsWith(PAGE_TREE_ROOT)
+      && /\.html$/i.test(page.path)
+      && typeof page.title === 'string'
+      && page.title.trim()
+      && (page.href === undefined || typeof page.href === 'string')
+    ));
 
-    const pages = await Promise.all(paths.map(async path => ({
-      path,
-      title: await fetchPageTitle(path),
-    })));
+    if (!validPages.length) throw new Error('Page manifest contains no valid pages');
 
     const tree = [];
-    pages.forEach(page => insertPage(tree, page.path, page.title));
+    validPages.forEach(page => insertPage(tree, page));
     return sortTree(tree);
-  }
-
-  function readCachedTree() {
-    try {
-      const raw = localStorage.getItem(PAGE_TREE_CACHE_KEY);
-      if (!raw) return null;
-      const { savedAt, tree } = JSON.parse(raw);
-      if (!Array.isArray(tree) || !tree.length || Date.now() - savedAt > PAGE_TREE_CACHE_TTL) return null;
-      return tree;
-    } catch {
-      return null;
-    }
-  }
-
-  function writeCachedTree(tree) {
-    try {
-      localStorage.setItem(PAGE_TREE_CACHE_KEY, JSON.stringify({ savedAt: Date.now(), tree }));
-    } catch { /* storage blocked or full */ }
-  }
-
-  const cached = readCachedTree();
-  if (cached) {
-    mount.innerHTML = renderNodes(cached);
-    return;
   }
 
   mount.innerHTML = '<span class="info-note">Loading pages...</span>';
 
   loadPageTree()
     .then(tree => {
-      if (tree.length) {
-        writeCachedTree(tree);
-        mount.innerHTML = renderNodes(tree);
-      } else {
-        mount.innerHTML = renderNodes(PAGE_TREE_FALLBACK);
-      }
+      mount.innerHTML = renderNodes(tree);
     })
     .catch(() => {
-      mount.innerHTML = renderNodes(PAGE_TREE_FALLBACK);
+      mount.innerHTML = '<span class="info-note">The page directory is temporarily unavailable.</span>';
     });
 })();
 
