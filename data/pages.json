@@ -1,53 +1,71 @@
 {
-  "version": 1,
+  "version": 2,
   "pages": [
     {
       "path": "Pages/For Fun/Birds.html",
-      "title": "Evolutionary Flocking Ecosystem"
+      "title": "Evolutionary Flocking Ecosystem",
+      "category": "Simulation",
+      "description": "Experiment with evolving flocking behavior and ecosystem dynamics."
     },
     {
       "path": "Pages/For Fun/Game-of-Life.html",
-      "title": "Game of Life - Ultimate Cosmos"
+      "title": "Game of Life - Ultimate Cosmos",
+      "category": "Interactive Experiment",
+      "description": "Explore Conway's Game of Life in a customizable cosmic sandbox."
     },
     {
       "path": "Pages/For Fun/StrategicFramework2.html",
-      "title": "UConn Law Library & IT - Multi-Gen Strategic Framework 2026"
+      "title": "UConn Law Library & IT - Multi-Gen Strategic Framework 2026",
+      "category": "Planning Framework",
+      "description": "Explore a multigenerational strategic framework for library and IT work."
     },
     {
       "path": "Pages/For Fun/Tarot/index.html",
-      "title": "Midnight Tarot"
+      "title": "Midnight Tarot",
+      "category": "Card App",
+      "description": "Draw and interpret tarot cards in a focused interactive experience."
     },
     {
       "path": "Pages/Work/Library/Desk Planner/index.html",
-      "title": "Front Desk Planner"
+      "title": "Front Desk Planner",
+      "category": "Planning Tool",
+      "description": "Coordinate front desk coverage and visualize staffing assignments."
     },
     {
       "path": "Pages/Work/Library/heatmap.html",
-      "title": "Occupancy Heatmap Dashboard"
+      "title": "Occupancy Heatmap Dashboard",
+      "category": "Dashboard",
+      "description": "Explore library occupancy patterns and space-use activity."
     },
     {
       "path": "Pages/Work/Library/Timeline_LawLib.html",
-      "title": "UConn School of Law Library Centennial Timeline"
+      "title": "UConn School of Law Library Centennial Timeline",
+      "category": "Interactive Timeline",
+      "description": "Browse milestones from the UConn School of Law Library's history."
     },
     {
       "path": "Pages/Work/UCPEA/index.html",
-      "title": "UCPEA Member Dashboard"
-    },
-    {
-      "path": "Pages/Work/UCPEA/salary_calculator.html",
-      "title": "Salary Increase Calculator"
+      "title": "UCPEA Member Dashboard",
+      "category": "Member Dashboard",
+      "description": "Access union updates, contract tools, benefits, and the salary calculator."
     },
     {
       "path": "Pages/Work/UCPEA/UCPEA_Contract_Comparison.html",
-      "title": "UCPEA Contract Comparison: 2022–2025 and 2025–2029"
+      "title": "UCPEA Contract Comparison: 2022–2025 and 2025–2029",
+      "category": "Contract Redline",
+      "description": "Compare changes between the 2022–2025 and 2025–2029 agreements."
     },
     {
       "path": "Pages/Work/UCPEA/UCPEAContract.html",
-      "title": "UCPEA Collective Bargaining Agreement, 2025-2029"
+      "title": "UCPEA Collective Bargaining Agreement, 2025-2029",
+      "category": "Reference",
+      "description": "Search and browse the 2025–2029 collective bargaining agreement."
     },
     {
       "path": "Pages/Work/cgs/index.html",
       "title": "CT General Statutes Explorer",
+      "category": "Statutes Explorer",
+      "description": "Browse and search Connecticut statutes, indexes, and infractions.",
       "href": "https://uconn-law-library.github.io/CGS/#/"
     }
   ]

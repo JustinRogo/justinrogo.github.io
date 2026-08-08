@@ -52,7 +52,13 @@ function escapeHtml(value) {
     return `<li${children.length ? ' class="page-tree__parent"' : ''}>
       <a class="page-link${children.length ? ' page-link--parent' : ''}" href="${escapeHtml(page.href)}">
         <span class="dot" aria-hidden="true"></span>
-        <span>${escapeHtml(page.title)}</span>
+        <span class="page-link__content">
+          <span class="page-link__heading">
+            <span class="page-link__title">${escapeHtml(page.title)}</span>
+            <span class="page-link__category">${escapeHtml(page.category)}</span>
+          </span>
+          <span class="page-link__description">${escapeHtml(page.description)}</span>
+        </span>
       </a>
       ${children.length ? `<ul class="page-branch__children">
         ${children.map(renderPage).join('')}
@@ -106,6 +112,8 @@ function escapeHtml(value) {
       title: page.title || titleFromPathPart(fileName),
       href: page.href || page.path,
       path: page.path,
+      category: page.category,
+      description: page.description,
     });
   }
 
@@ -133,6 +141,10 @@ function escapeHtml(value) {
       && /\.html$/i.test(page.path)
       && typeof page.title === 'string'
       && page.title.trim()
+      && typeof page.category === 'string'
+      && page.category.trim()
+      && typeof page.description === 'string'
+      && page.description.trim()
       && (page.href === undefined || typeof page.href === 'string')
     ));
 

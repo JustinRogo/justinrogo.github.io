@@ -41,7 +41,6 @@ The site includes:
         │   └── Timeline_LawLib.html
         ├── UCPEA/
         │   ├── index.html
-        │   ├── salary_calculator.html
         │   └── UCPEAContract.html
         └── cgs/
             ├── index.html
@@ -73,7 +72,7 @@ Key homepage areas include:
 
 ### Dynamic page tree
 
-The site builds its page tree from `data/pages.json`, which defines each page's title, source path, and optional external destination. This keeps navigation ordering and external links independent of the repository API.
+The site builds its page tree from `data/pages.json`, which defines each page's title, category, short description, source path, and optional external destination. This keeps navigation content, ordering, and external links independent of the repository API.
 
 Folder index pages are automatically treated as parents of the other pages in the same folder. For example, the UCPEA member dashboard is the parent of the UCPEA contract and salary tools.
 
@@ -138,17 +137,11 @@ Path: `Pages/Work/Library/Timeline_LawLib.html`
 
 An interactive timeline page for the UConn School of Law Library’s centennial history.
 
-### UCPEA Salary Increase Calculator
-
-Path: `Pages/Work/UCPEA/salary_calculator.html`
-
-A calculator for estimating salary changes based on scheduled wage increases, optional merit amount, and optional reclassification percentage.
-
 ### UCPEA Member Dashboard
 
 Path: `Pages/Work/UCPEA/index.html`
 
-A member-focused dashboard with current UCPEA updates, quick access to the searchable contract and salary calculator, and links to official benefits and support resources. A dependency-free feed adapter refreshes the latest public Union Wire posts during each deployment and scheduled site update.
+A member-focused dashboard with current UCPEA updates, an integrated salary calculator, quick access to the searchable contract, and links to official benefits and support resources. A dependency-free feed adapter refreshes the latest public Union Wire posts during each deployment and scheduled site update.
 
 ### UCPEA Contract Page
 
