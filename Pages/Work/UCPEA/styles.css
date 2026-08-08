@@ -563,6 +563,411 @@ h1 em {
   font-size: 16px;
 }
 
+.start-section {
+  padding-bottom: 52px;
+}
+
+.help-launcher {
+  display: grid;
+  grid-template-columns: minmax(300px, .8fr) minmax(440px, 1.2fr);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.help-topics {
+  display: grid;
+  padding: 14px;
+  border-right: 1px solid var(--border);
+  background: var(--surface-soft);
+}
+
+.help-topic {
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 17px 16px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color .18s ease, color .18s ease, transform .18s ease;
+}
+
+.help-topic:hover {
+  background: var(--surface);
+}
+
+.help-topic.is-active {
+  background: var(--navy-950);
+  color: #fff;
+  transform: translateX(4px);
+}
+
+.help-topic__mark {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.help-topic.is-active .help-topic__mark {
+  border-color: rgba(255, 255, 255, .35);
+  background: rgba(255, 255, 255, .08);
+  color: var(--gold);
+}
+
+.help-topic strong,
+.help-topic small {
+  display: block;
+}
+
+.help-topic strong {
+  font-size: 15px;
+}
+
+.help-topic small {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.help-topic.is-active small {
+  color: #c5d2e8;
+}
+
+.help-result {
+  min-height: 100%;
+  padding: clamp(32px, 5vw, 62px);
+}
+
+.help-result__eyebrow {
+  margin: 0 0 12px;
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+}
+
+.help-result h3 {
+  max-width: 680px;
+  margin: 0 0 14px;
+  font-family: Montserrat, Arial, sans-serif;
+  font-size: clamp(27px, 3.2vw, 42px);
+  line-height: 1.08;
+  letter-spacing: -.035em;
+}
+
+.help-result > p:not(.help-result__eyebrow):not(.help-result__note) {
+  max-width: 720px;
+  margin: 0;
+  color: var(--muted);
+}
+
+.help-steps {
+  display: grid;
+  gap: 14px;
+  margin: 30px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.help-steps li {
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  gap: 13px;
+  align-items: start;
+}
+
+.help-steps li > span {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--gold-pale);
+  color: var(--navy-950);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.help-steps p {
+  margin: 0;
+}
+
+.help-steps strong,
+.help-steps small {
+  display: block;
+}
+
+.help-steps small {
+  margin-top: 2px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.help-result__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.help-result__note {
+  margin: 24px 0 0;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.deadline-section {
+  padding-top: 52px;
+}
+
+.deadline-planner {
+  display: grid;
+  grid-template-columns: minmax(340px, .9fr) minmax(400px, 1.1fr);
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: var(--navy-950);
+  box-shadow: var(--shadow);
+}
+
+.deadline-form,
+.deadline-result {
+  padding: clamp(28px, 4vw, 48px);
+}
+
+.deadline-form {
+  background: var(--surface);
+}
+
+.deadline-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.deadline-fields[hidden] {
+  display: none;
+}
+
+.deadline-field label,
+.deadline-field small {
+  display: block;
+}
+
+.deadline-field label {
+  margin-bottom: 7px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.deadline-field small {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.deadline-field input,
+.deadline-field select {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+}
+
+.deadline-field input:focus,
+.deadline-field select:focus {
+  border-color: var(--blue);
+  outline: 3px solid rgba(158, 186, 249, .35);
+}
+
+.deadline-helper {
+  margin: 20px 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.deadline-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.deadline-actions button {
+  min-height: 46px;
+  padding: 10px 18px;
+  border: 0;
+  border-radius: 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.deadline-calculate {
+  background: var(--gold);
+  color: var(--navy-950);
+}
+
+.deadline-reset {
+  background: var(--border);
+  color: var(--ink);
+}
+
+.deadline-error {
+  margin-top: 16px;
+  padding: 11px 13px;
+  border-left: 4px solid #d92d20;
+  border-radius: 8px;
+  background: #fff1f0;
+  color: #7a1b13;
+  font-size: 13px;
+}
+
+.deadline-error[hidden] {
+  display: none;
+}
+
+.deadline-result {
+  color: #fff;
+}
+
+.deadline-result__topline {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 26px;
+  color: #c5d2e8;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.deadline-result h3 {
+  margin: 0 0 10px;
+  font-family: Montserrat, Arial, sans-serif;
+  font-size: clamp(28px, 3.5vw, 44px);
+  line-height: 1.08;
+  letter-spacing: -.035em;
+}
+
+.deadline-result > p {
+  margin: 0;
+  color: #c5d2e8;
+}
+
+.deadline-dates {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 28px 0;
+}
+
+.deadline-dates div {
+  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, .18);
+  border-radius: 13px;
+  background: rgba(255, 255, 255, .06);
+}
+
+.deadline-dates span,
+.deadline-dates strong {
+  display: block;
+}
+
+.deadline-dates span {
+  margin-bottom: 6px;
+  color: #c5d2e8;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.deadline-dates strong {
+  color: #fff;
+  font-size: 20px;
+}
+
+.deadline-result__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.deadline-result__actions [hidden] {
+  display: none;
+}
+
+.deadline-result .button-secondary {
+  border-color: rgba(255, 255, 255, .28);
+  background: rgba(255, 255, 255, .08);
+  color: #fff;
+}
+
+.deadline-result__note {
+  margin-top: 20px !important;
+  font-size: 12px;
+}
+
+.deadline-shortcuts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 18px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.deadline-shortcuts a {
+  display: grid;
+  gap: 4px;
+  padding: 19px 20px;
+  border-right: 1px solid var(--border);
+  text-decoration: none;
+}
+
+.deadline-shortcuts a:last-child {
+  border-right: 0;
+}
+
+.deadline-shortcuts a:hover strong {
+  text-decoration: underline;
+}
+
+.deadline-shortcuts span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.deadline-shortcuts strong {
+  color: var(--ink);
+  font-size: 13px;
+}
+
 .salary-calculator {
   overflow: hidden;
   margin-top: 40px;
@@ -980,6 +1385,36 @@ html[data-theme="dark"] .pill {
 
 .contract-content .button-primary:hover {
   background: var(--blue);
+}
+
+.salary-calculator__field--checks {
+  grid-column: span 2;
+  margin: 0;
+}
+
+.salary-calculator__field--checks legend {
+  padding: 0;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.salary-calculator__field--checks label {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin: 10px 0 0;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.salary-calculator__field--checks input {
+  flex: 0 0 auto;
+  width: 18px;
+  min-height: 18px;
+  margin: 1px 0 0;
+  padding: 0;
+  accent-color: var(--navy-950);
 }
 
 .contract-actions {
@@ -1503,6 +1938,19 @@ html[data-theme="dark"] .update-state {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .salary-calculator__summary--four,
+  .deadline-shortcuts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .deadline-shortcuts a:nth-child(2) {
+    border-right: 0;
+  }
+
+  .deadline-shortcuts a:nth-child(-n+2) {
+    border-bottom: 1px solid var(--border);
+  }
+
   .contract-panel {
     grid-template-columns: 230px 1fr;
   }
@@ -1587,9 +2035,37 @@ html[data-theme="dark"] .update-state {
     align-items: flex-start;
   }
 
+  .help-launcher,
+  .deadline-planner {
+    grid-template-columns: 1fr;
+  }
+
+  .help-topics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .help-topic.is-active {
+    transform: none;
+  }
+
   .salary-calculator__grid,
   .salary-calculator__summary {
     grid-template-columns: 1fr;
+  }
+
+  .salary-calculator__field--checks {
+    grid-column: auto;
+  }
+
+  .salary-band {
+    grid-template-columns: 1fr;
+  }
+
+  .salary-band p {
+    grid-column: auto;
+    margin-top: 0;
   }
 
   .contract-panel {
@@ -1616,6 +2092,76 @@ html[data-theme="dark"] .update-state {
     grid-template-columns: 1fr;
     gap: 40px;
   }
+}
+
+.salary-calculator__summary--four {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.salary-calculator__eligibility {
+  margin-bottom: 18px;
+  padding: 13px 15px;
+  border-left: 4px solid var(--blue);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.salary-band {
+  display: grid;
+  grid-template-columns: minmax(210px, .6fr) minmax(240px, 1fr);
+  align-items: center;
+  gap: 18px 28px;
+  margin-bottom: 22px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+
+.salary-band[hidden] {
+  display: none;
+}
+
+.salary-band > div:first-child span,
+.salary-band > div:first-child strong {
+  display: block;
+}
+
+.salary-band > div:first-child span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.salary-band > div:first-child strong {
+  margin-top: 4px;
+  font-size: 18px;
+}
+
+.salary-band__meter {
+  overflow: hidden;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--border);
+}
+
+.salary-band__meter span {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--blue), var(--gold));
+}
+
+.salary-band p {
+  grid-column: 1 / -1;
+  margin: -8px 0 0;
+  color: var(--muted);
+  font-size: 13px;
 }
 
 @media (max-width: 590px) {
@@ -1646,6 +2192,38 @@ html[data-theme="dark"] .update-state {
 
   .button {
     width: 100%;
+  }
+
+  .help-topics,
+  .deadline-fields,
+  .deadline-dates,
+  .deadline-shortcuts {
+    grid-template-columns: 1fr;
+  }
+
+  .help-topic {
+    padding: 15px 12px;
+  }
+
+  .help-result,
+  .deadline-form,
+  .deadline-result {
+    padding: 28px 22px;
+  }
+
+  .help-result__actions,
+  .deadline-result__actions {
+    display: grid;
+  }
+
+  .deadline-shortcuts a,
+  .deadline-shortcuts a:nth-child(2) {
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .deadline-shortcuts a:last-child {
+    border-bottom: 0;
   }
 
   .salary-calculator__header,

@@ -49,10 +49,10 @@
       </a>
 
       <nav class="primary-nav" aria-label="Dashboard navigation">
+        <a href="#start-here">Start here</a>
+        <a href="#deadlines">Deadlines</a>
         <a href="#contract">Contract</a>
-        <a href="#updates">Updates</a>
         <a href="#resources">Resources</a>
-        <a href="#contact">Get help</a>
       </nav>
 
       <div class="header-actions">
@@ -114,6 +114,142 @@
       </div>
     </section>
 
+    <section class="start-section section-shell" id="start-here" aria-labelledby="start-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">Start with your situation</p>
+          <h2 id="start-title">What do you need help with?</h2>
+        </div>
+        <p>Choose a topic for a short, practical path to the relevant contract language, official resource, and UCPEA support.</p>
+      </div>
+
+      <div class="help-launcher">
+        <div class="help-topics" role="group" aria-label="Choose a help topic">
+          <button class="help-topic is-active" type="button" data-help-topic="workplace" aria-pressed="true" aria-controls="help-result">
+            <span class="help-topic__mark" aria-hidden="true">01</span>
+            <span><strong>Workplace concern</strong><small>Representation, discipline, or a possible grievance</small></span>
+          </button>
+          <button class="help-topic" type="button" data-help-topic="duties" aria-pressed="false" aria-controls="help-result">
+            <span class="help-topic__mark" aria-hidden="true">02</span>
+            <span><strong>My duties changed</strong><small>Reclassification or temporary higher-level work</small></span>
+          </button>
+          <button class="help-topic" type="button" data-help-topic="leave" aria-pressed="false" aria-controls="help-result">
+            <span class="help-topic__mark" aria-hidden="true">03</span>
+            <span><strong>I need leave</strong><small>Sick, parental, vacation, or personal leave</small></span>
+          </button>
+          <button class="help-topic" type="button" data-help-topic="development" aria-pressed="false" aria-controls="help-result">
+            <span class="help-topic__mark" aria-hidden="true">04</span>
+            <span><strong>Professional development</strong><small>Funding, eligibility, and application timing</small></span>
+          </button>
+          <button class="help-topic" type="button" data-help-topic="benefits" aria-pressed="false" aria-controls="help-result">
+            <span class="help-topic__mark" aria-hidden="true">05</span>
+            <span><strong>Tuition or childcare</strong><small>Benefit information and official workflows</small></span>
+          </button>
+          <button class="help-topic" type="button" data-help-topic="membership" aria-pressed="false" aria-controls="help-result">
+            <span class="help-topic__mark" aria-hidden="true">06</span>
+            <span><strong>Join or get involved</strong><small>Membership, stewards, and participation</small></span>
+          </button>
+        </div>
+
+        <article class="help-result" id="help-result" aria-live="polite" aria-labelledby="help-result-title">
+          <p class="help-result__eyebrow" id="help-result-eyebrow">Workplace support</p>
+          <h3 id="help-result-title">Start with a steward or the UCPEA office</h3>
+          <p id="help-result-summary">You do not need to decide whether an issue is a formal grievance before asking for guidance. A union representative can help you understand the process and applicable timelines.</p>
+          <ol class="help-steps" id="help-result-steps">
+            <li><span>1</span><p><strong>Write down the facts</strong><small>Keep relevant dates, messages, documents, and the names of people involved.</small></p></li>
+            <li><span>2</span><p><strong>Contact UCPEA promptly</strong><small>Contractual timelines can be short, so do not wait for the situation to resolve itself.</small></p></li>
+            <li><span>3</span><p><strong>Review the governing language</strong><small>Articles 23 and 41 cover grievances and representation rights.</small></p></li>
+          </ol>
+          <div class="help-result__actions" id="help-result-actions">
+            <a class="button button-primary" href="https://ucpea.ct.aft.org/stewards" target="_blank" rel="noopener noreferrer">Find a steward <span aria-hidden="true">↗</span></a>
+            <a class="button button-secondary" href="UCPEAContract.html#article-23">Open Article 23 <span aria-hidden="true">→</span></a>
+          </div>
+          <p class="help-result__note">This dashboard provides general information, not legal advice. Contact UCPEA for guidance about your circumstances.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="deadline-section section-shell" id="deadlines" aria-labelledby="deadlines-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">Plan ahead</p>
+          <h2 id="deadlines-title">Benefits Deadline Planner</h2>
+        </div>
+        <p>Calculate common filing dates, create a calendar reminder, and continue to the official application instructions.</p>
+      </div>
+
+      <div class="deadline-planner">
+        <div class="deadline-form" aria-describedby="deadline-helper">
+          <div class="deadline-field">
+            <label for="deadlineBenefit">Benefit</label>
+            <select id="deadlineBenefit">
+              <option value="professional-development">Professional development</option>
+              <option value="childcare">Childcare reimbursement</option>
+            </select>
+          </div>
+
+          <div class="deadline-fields" id="professionalDevelopmentFields">
+            <div class="deadline-field">
+              <label for="activityStart">Activity or membership start date</label>
+              <input id="activityStart" type="date">
+            </div>
+            <div class="deadline-field">
+              <label for="activityEnd">Activity end date</label>
+              <input id="activityEnd" type="date">
+              <small>For a one-day activity, use the same date.</small>
+            </div>
+          </div>
+
+          <div class="deadline-fields" id="childcareFields" hidden>
+            <div class="deadline-field">
+              <label for="childcarePeriod">Expense period</label>
+              <select id="childcarePeriod">
+                <option value="jan-apr">January–April</option>
+                <option value="may-aug">May–August</option>
+                <option value="sep-dec">September–December</option>
+              </select>
+            </div>
+            <div class="deadline-field">
+              <label for="childcareYear">Expense year</label>
+              <input id="childcareYear" type="number" min="2025" max="2100" step="1">
+            </div>
+          </div>
+
+          <p class="deadline-helper" id="deadline-helper">Professional-development requests are due at least 15 days before the activity or membership due date; reimbursement or expense reallocation is due within 28 calendar days after the activity ends.</p>
+          <div class="deadline-actions">
+            <button class="deadline-calculate" id="calculateDeadline" type="button">Calculate deadlines</button>
+            <button class="deadline-reset" id="resetDeadline" type="button">Reset</button>
+          </div>
+          <div class="deadline-error" id="deadlineError" role="alert" hidden></div>
+        </div>
+
+        <div class="deadline-result" id="deadlineResult" aria-live="polite">
+          <div class="deadline-result__topline">
+            <span id="deadlineResultLabel">Professional development</span>
+            <span>Guidance checked August 8, 2026</span>
+          </div>
+          <h3 id="deadlineResultTitle">Enter your activity dates</h3>
+          <p id="deadlineResultSummary">The planner will show the application and reimbursement dates here.</p>
+          <div class="deadline-dates" id="deadlineDates">
+            <div><span>Application due</span><strong>—</strong></div>
+            <div><span>Reimbursement due</span><strong>—</strong></div>
+          </div>
+          <div class="deadline-result__actions">
+            <a class="button button-primary" id="deadlineOfficialLink" href="https://ucpea.ct.aft.org/professional-development" target="_blank" rel="noopener noreferrer">Official instructions <span aria-hidden="true">↗</span></a>
+            <a class="button button-secondary" id="deadlineCalendar" href="#" download="ucpea-deadline.ics" hidden>Save calendar reminder</a>
+          </div>
+          <p class="deadline-result__note" id="deadlineResultNote">Always confirm eligibility and dates on the official UCPEA page before submitting.</p>
+        </div>
+      </div>
+
+      <nav class="deadline-shortcuts" aria-label="Other benefit resources">
+        <a href="https://ucpea.ct.aft.org/tuition-benefits/tuition-waiver-and-reimbursement" target="_blank" rel="noopener noreferrer"><span>Tuition benefits</span><strong>Official workflow ↗</strong></a>
+        <a href="https://ucpea.ct.aft.org/sick-bank" target="_blank" rel="noopener noreferrer"><span>Sick leave bank</span><strong>Eligibility &amp; application ↗</strong></a>
+        <a href="https://ucpea.ct.aft.org/hardship-fund" target="_blank" rel="noopener noreferrer"><span>Hardship fund</span><strong>Current policy ↗</strong></a>
+        <a href="https://ucpea.ct.aft.org/scholarships/ucpea-scholarships" target="_blank" rel="noopener noreferrer"><span>Scholarships</span><strong>Current opportunities ↗</strong></a>
+      </nav>
+    </section>
+
     <section class="contract-section section-shell" id="contract" aria-labelledby="contract-title">
       <div class="section-heading section-heading-single">
         <h2 id="contract-title">The Contract</h2>
@@ -153,32 +289,59 @@
       <details class="salary-calculator" id="salary-calculator">
         <summary class="salary-calculator__header">
           <span>
-            <strong id="salary-calculator-title">Salary Increase Calculator</strong>
-            <small>Estimate your annual salary after scheduled increases.</small>
+            <strong id="salary-calculator-title">Salary &amp; Band Planner</strong>
+            <small>Estimate eligible increases and compare your salary with the 2027 band.</small>
           </span>
           <span class="salary-calculator__toggle" aria-hidden="true"></span>
         </summary>
 
         <div class="salary-calculator__body">
-          <p class="salary-calculator__intro">Enter a current annual salary, optional merit amount, and optional reclassification percentage to estimate annual salary after scheduled increases.</p>
+          <p class="salary-calculator__intro">Choose the first July increase you want to model. The planner separates general wage increases, performance-based compensation, discretionary merit, and any reclassification estimate.</p>
 
           <div class="salary-calculator__grid">
             <div class="salary-calculator__field">
-              <label for="baseSalary">Current annual salary</label>
+              <label for="baseSalary">Salary before the first modeled increase</label>
               <input id="baseSalary" type="number" min="0" step="100" placeholder="65000">
-              <p class="salary-calculator__hint">Enter salary before the July 1, 2025 increase.</p>
+              <p class="salary-calculator__hint">Use your annual base salary, before any July increase selected below.</p>
             </div>
 
             <div class="salary-calculator__field">
-              <label for="meritAmount">2027 merit component</label>
-              <input id="meritAmount" type="number" min="0" max="5000" step="100" placeholder="0">
-              <p class="salary-calculator__hint">Dollar amount</p>
+              <label for="startingYear">First increase to model</label>
+              <select id="startingYear">
+                <option value="2025">July 1, 2025</option>
+                <option value="2026">July 1, 2026</option>
+                <option value="2027" selected>July 1, 2027</option>
+              </select>
+              <p class="salary-calculator__hint">The estimate continues through July 1, 2027.</p>
+            </div>
+
+            <div class="salary-calculator__field">
+              <label for="salaryLevel">2027 salary level</label>
+              <select id="salaryLevel">
+                <option value="">Not sure / do not compare</option>
+                <option value="1">Level 1</option>
+                <option value="2">Level 2</option>
+                <option value="3">Level 3</option>
+                <option value="4">Level 4</option>
+                <option value="5">Level 5</option>
+                <option value="6">Level 6</option>
+                <option value="7">Level 7</option>
+                <option value="8">Level 8</option>
+                <option value="9">Level 9</option>
+              </select>
+              <p class="salary-calculator__hint">Used for band position and PBC maximum handling.</p>
+            </div>
+
+            <div class="salary-calculator__field">
+              <label for="meritAmount">2027 discretionary merit estimate</label>
+              <input id="meritAmount" type="number" min="0" step="100" placeholder="0">
+              <p class="salary-calculator__hint">Optional award amount; the 0.5% pool is not an automatic individual increase.</p>
             </div>
 
             <div class="salary-calculator__field">
               <label for="reclassPercent">Reclassification increase</label>
               <input id="reclassPercent" type="number" min="0" max="10" step="0.1" placeholder="0">
-              <p class="salary-calculator__hint">Percentage from 0% to 10%.</p>
+              <p class="salary-calculator__hint">Optional estimate: enter 3%–10%, or leave blank.</p>
             </div>
 
             <div class="salary-calculator__field">
@@ -186,10 +349,17 @@
               <select id="reclassYear">
                 <option value="2025">2025</option>
                 <option value="2026">2026</option>
-                <option value="2027">2027</option>
+                <option value="2027" selected>2027</option>
               </select>
               <p class="salary-calculator__hint">Applied before that year’s July 1 increase.</p>
             </div>
+
+            <fieldset class="salary-calculator__field salary-calculator__field--checks">
+              <legend>Article 32 conditions</legend>
+              <label><input id="membershipEligible" type="checkbox" checked> Met the applicable January 1 bargaining-unit date</label>
+              <label><input id="satisfactoryPerformance" type="checkbox" checked> No overall unsatisfactory evaluation</label>
+              <label><input id="probationComplete" type="checkbox" checked> Not in the initial probationary period</label>
+            </fieldset>
           </div>
 
           <div class="salary-calculator__actions">
@@ -199,19 +369,34 @@
 
           <div class="salary-calculator__error" id="salaryError" role="alert" hidden></div>
 
-          <div class="salary-calculator__summary" aria-live="polite">
+          <div class="salary-calculator__eligibility" id="salaryEligibility" aria-live="polite">Eligibility assumptions have not been evaluated yet.</div>
+
+          <div class="salary-calculator__summary salary-calculator__summary--four" aria-live="polite">
             <div class="salary-calculator__summary-card">
-              <span>Estimated final salary</span>
+              <span>Estimated 2027 base salary</span>
               <strong id="finalSalary">$0</strong>
             </div>
             <div class="salary-calculator__summary-card">
-              <span>Total increase</span>
+              <span>Base salary increase</span>
               <strong id="totalIncrease">$0</strong>
             </div>
             <div class="salary-calculator__summary-card">
               <span>Percent change</span>
               <strong id="percentChange">0%</strong>
             </div>
+            <div class="salary-calculator__summary-card">
+              <span>Gross biweekly difference</span>
+              <strong id="biweeklyIncrease">$0</strong>
+            </div>
+          </div>
+
+          <div class="salary-band" id="salaryBand" hidden>
+            <div>
+              <span id="salaryBandLabel">2027 level</span>
+              <strong id="salaryBandRange">—</strong>
+            </div>
+            <div class="salary-band__meter" aria-hidden="true"><span id="salaryBandMeter"></span></div>
+            <p id="salaryBandMessage"></p>
           </div>
 
           <div class="salary-calculator__table-wrap">
@@ -233,14 +418,14 @@
             </table>
           </div>
 
-          <p class="salary-calculator__note">Calculation method: percentage increases are compounded year over year. The 2027 merit component is added as a dollar amount after the 2027 percentage increase. The reclassification increase is applied immediately before the selected year’s July 1 increase.</p>
+          <p class="salary-calculator__note">Calculation method: eligible increases are compounded. General wage increases and performance-based compensation are shown separately. When a salary level is selected, estimated PBC above the applicable band maximum is shown as a non-base lump sum. Reclassification is applied immediately before the selected year’s July increase.</p>
 
           <div class="salary-calculator__note">
             <p>Scheduled increases:</p>
             <ul>
               <li>July 1, 2025: 2.5% General Wage Increase (GWI) + 2% Performance-Based Compensation (PBC)</li>
               <li>July 1, 2026: 2.5% GWI + 2% PBC</li>
-              <li>July 1, 2027: 2.5% GWI + 1.5% PBC + 0.5% merit component</li>
+              <li>July 1, 2027: 2.5% GWI + 1.5% PBC, plus a discretionary performance-based compensation pool equal to 0.5% of gross salaries</li>
             </ul>
             <a href="UCPEAContract.html#article-32">Article 32 - Salary Increases</a>
           </div>

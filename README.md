@@ -141,7 +141,7 @@ An interactive timeline page for the UConn School of Law Library’s centennial 
 
 Path: `Pages/Work/UCPEA/index.html`
 
-A member-focused dashboard with current UCPEA updates, an integrated salary calculator, quick access to the searchable contract, and links to official benefits and support resources. A dependency-free feed adapter refreshes the latest public Union Wire posts during each deployment and scheduled site update.
+A member-focused dashboard with current UCPEA updates, a task-based help launcher, benefits deadline planning, an eligibility-aware salary and pay-band tool, quick access to the searchable contract, and links to official benefits and support resources. A dependency-free feed adapter refreshes the latest public Union Wire posts during each deployment and scheduled site update.
 
 ### UCPEA Contract Page
 
