@@ -129,6 +129,7 @@ nav.toc h2 { margin:0 0 10px; font-size:15px; color:var(--heading); }
 nav.toc a { display:block; padding:7px 8px; color:var(--toc-text); text-decoration:none; border-radius:9px; font-size:14px; }
 nav.toc a:hover { background:var(--surface-soft); color:var(--accent); }
 nav.toc a.is-active, .mobile-article-nav a.is-active { background:var(--surface-soft); color:var(--accent); font-weight:800; box-shadow:inset 3px 0 0 var(--accent); }
+.toc-sebac { margin-left:8px; padding-left:12px !important; border-left:2px solid var(--divider); border-radius:0 9px 9px 0 !important; font-size:13px !important; }
 .mobile-nav-toggle {
   display:none;
   position:fixed;
@@ -177,6 +178,7 @@ html[data-theme="dark"] .mobile-nav-toggle { color:#07152f; }
 .mobile-article-nav a { display:block; padding:10px 12px; color:var(--toc-text); text-decoration:none; border-radius:10px; font-size:15px; }
 .mobile-article-nav a:hover, .mobile-article-nav a:focus-visible { background:var(--surface-soft); color:var(--accent); }
 .article { scroll-margin-top:112px; margin-bottom:14px; border:1px solid var(--border); border-radius:18px; background:var(--card); box-shadow:0 8px 24px rgba(0,14,47,.07); overflow:hidden; }
+.article.sebac-article { border-left:3px solid var(--accent); }
 .article[hidden] { display:none; }
 .article summary { list-style:none; cursor:pointer; padding:18px 22px; display:flex; align-items:center; justify-content:space-between; gap:18px; background:var(--surface); }
 .article summary::-webkit-details-marker { display:none; }
@@ -343,7 +345,7 @@ mark.active-match { outline:2px solid var(--accent); outline-offset:2px; }
 </div></div>
 </div></div>
 <main class="wrap layout">
-<nav id="desktop-article-nav" class="toc" aria-label="Article navigation"><h2>Articles</h2><a href="#article-1">Article 1. Recognition</a><a href="#article-2">Article 2. Role Of Professional Staff</a><a href="#article-3">Article 3. Board Prerogatives</a><a href="#article-4">Article 4. Professional Freedom</a><a href="#article-5">Article 5. Nondiscrimination, Anti-Harassment, And Diversity, Equity &amp; Inclusion (DEI)</a><a href="#article-6">Article 6. Vacation Leave</a><a href="#article-7">Article 7. Notice Of Intent To Leave</a><a href="#article-8">Article 8. Holidays</a><a href="#article-9">Article 9. Personal Leave</a><a href="#article-10">Article 10. Civic And Legal Obligations</a><a href="#article-11">Article 11. Sick Leave</a><a href="#article-12">Article 12. Childbirth And Parental Benefits</a><a href="#article-13">Article 13. Educational Leave</a><a href="#article-14">Article 14. Maintenance Of Status While On Paid Leave</a><a href="#article-15">Article 15. Leaves Without Pay</a><a href="#article-16">Article 16. Work Schedules</a><a href="#article-17">Article 17. Student Health And Wellness</a><a href="#article-18">Article 18. Compensatory Time</a><a href="#article-19">Article 19. Employee Files</a><a href="#article-20">Article 20. Probationary Employees</a><a href="#article-21">Article 21. Evaluation</a><a href="#article-22">Article 22. Dismissal Or Other Disciplinary Action</a><a href="#article-23">Article 23. Grievance Procedure</a><a href="#article-24">Article 24. No Work Stoppage</a><a href="#article-25">Article 25. Career Ladders</a><a href="#article-26">Article 26. Vacancies And Job Posting</a><a href="#article-27">Article 27. Reduction Of Professional Staff</a><a href="#article-28">Article 28. Mergers And Acquisitions</a><a href="#article-29">Article 29. Meet And Discuss</a><a href="#article-30">Article 30. Parking</a><a href="#article-31">Article 31. Job Classification</a><a href="#article-32">Article 32. Salary</a><a href="#article-33">Article 33. Retirement, Medical Benefits And Disability Insurance</a><a href="#article-34">Article 34. Tuition Reimbursement And Professional Development</a><a href="#article-35">Article 35. Tuition Waivers</a><a href="#article-36">Article 36. Child Care</a><a href="#article-37">Article 37. Travel</a><a href="#article-38">Article 38. Health And Safety</a><a href="#article-39">Article 39. Consulting Policy</a><a href="#article-40">Article 40. Union Leave</a><a href="#article-41">Article 41. Representation Rights And Responsibilities</a><a href="#article-42">Article 42. UCPEA Security And Payroll Deductions</a><a href="#article-43">Article 43. Savings Clause</a><a href="#article-44">Article 44. Temporary And End-Date Employees</a><a href="#article-45">Article 45. Pay Equity</a><a href="#article-46">Article 46. Wireless Communication Device Stipends</a><a href="#article-47">Article 47. Phased Retirement Program</a><a href="#article-48">Article 48. Zipper Clause</a><a href="#article-49">Article 49. Duration</a><a href="#sebac-2017">SEBAC 2017 Agreement</a><a href="#memoranda">Memoranda of Agreement</a></nav>
+<nav id="desktop-article-nav" class="toc" aria-label="Article navigation"><h2>Articles</h2><a href="#article-1">Article 1. Recognition</a><a href="#article-2">Article 2. Role Of Professional Staff</a><a href="#article-3">Article 3. Board Prerogatives</a><a href="#article-4">Article 4. Professional Freedom</a><a href="#article-5">Article 5. Nondiscrimination, Anti-Harassment, And Diversity, Equity &amp; Inclusion (DEI)</a><a href="#article-6">Article 6. Vacation Leave</a><a href="#article-7">Article 7. Notice Of Intent To Leave</a><a href="#article-8">Article 8. Holidays</a><a href="#article-9">Article 9. Personal Leave</a><a href="#article-10">Article 10. Civic And Legal Obligations</a><a href="#article-11">Article 11. Sick Leave</a><a href="#article-12">Article 12. Childbirth And Parental Benefits</a><a href="#article-13">Article 13. Educational Leave</a><a href="#article-14">Article 14. Maintenance Of Status While On Paid Leave</a><a href="#article-15">Article 15. Leaves Without Pay</a><a href="#article-16">Article 16. Work Schedules</a><a href="#article-17">Article 17. Student Health And Wellness</a><a href="#article-18">Article 18. Compensatory Time</a><a href="#article-19">Article 19. Employee Files</a><a href="#article-20">Article 20. Probationary Employees</a><a href="#article-21">Article 21. Evaluation</a><a href="#article-22">Article 22. Dismissal Or Other Disciplinary Action</a><a href="#article-23">Article 23. Grievance Procedure</a><a href="#article-24">Article 24. No Work Stoppage</a><a href="#article-25">Article 25. Career Ladders</a><a href="#article-26">Article 26. Vacancies And Job Posting</a><a href="#article-27">Article 27. Reduction Of Professional Staff</a><a href="#article-28">Article 28. Mergers And Acquisitions</a><a href="#article-29">Article 29. Meet And Discuss</a><a href="#article-30">Article 30. Parking</a><a href="#article-31">Article 31. Job Classification</a><a href="#article-32">Article 32. Salary</a><a href="#article-33">Article 33. Retirement, Medical Benefits And Disability Insurance</a><a href="#article-34">Article 34. Tuition Reimbursement And Professional Development</a><a href="#article-35">Article 35. Tuition Waivers</a><a href="#article-36">Article 36. Child Care</a><a href="#article-37">Article 37. Travel</a><a href="#article-38">Article 38. Health And Safety</a><a href="#article-39">Article 39. Consulting Policy</a><a href="#article-40">Article 40. Union Leave</a><a href="#article-41">Article 41. Representation Rights And Responsibilities</a><a href="#article-42">Article 42. UCPEA Security And Payroll Deductions</a><a href="#article-43">Article 43. Savings Clause</a><a href="#article-44">Article 44. Temporary And End-Date Employees</a><a href="#article-45">Article 45. Pay Equity</a><a href="#article-46">Article 46. Wireless Communication Device Stipends</a><a href="#article-47">Article 47. Phased Retirement Program</a><a href="#article-48">Article 48. Zipper Clause</a><a href="#article-49">Article 49. Duration</a><a href="#memoranda">Memoranda of Agreement</a><a class="toc-sebac" href="#sebac-section-i">SEBAC I. Pension and Health Care Agreement Modifications</a><a class="toc-sebac" href="#sebac-section-ii">SEBAC II. Job Security</a><a class="toc-sebac" href="#sebac-section-iii">SEBAC III. Ratification and General Assembly Approval</a><a class="toc-sebac" href="#sebac-section-iv">SEBAC IV. Duration</a><a class="toc-sebac" href="#sebac-attachment-a">SEBAC Attachment A. Health Insurance Design Specifications</a><a class="toc-sebac" href="#sebac-attachment-b">SEBAC Attachment B. Retiree Healthcare Trust Fund Repayment Schedule</a><a class="toc-sebac" href="#sebac-attachment-c">SEBAC Attachment C. Effect on ARP Contributions</a><a class="toc-sebac" href="#sebac-attachment-d">SEBAC Attachment D. Examples of 18 Month COLA Review</a><a class="toc-sebac" href="#sebac-attachment-e">SEBAC Attachment E. Provisions Affecting New Employees</a><a class="toc-sebac" href="#sebac-attachment-f">SEBAC Attachment F. 2017 Agreement Framework</a><a class="toc-sebac" href="#sebac-attachment-g">SEBAC Attachment G. Unit Agreements</a></nav>
 <section>
 <div id="no-results" class="no-results">No matching contract language found. Try a broader search term.</div>
 <details class="article" id="article-1" open data-title="article 1. recognition">
@@ -996,13 +998,31 @@ mark.active-match { outline:2px solid var(--accent); outline-offset:2px; }
 <summary><span class="article-title">Article 49. Duration</span><span class="article-count"></span></summary>
 <div class="article-body"><div class="section-block"><div class="section-number">49.1</div><p>This agreement shall be in full force and effect from July 1, 2025 through June 30, 2029.</p></div></div>
 </details>
-<details class="article" id="sebac-2017" data-title="sebac 2017 agreement pension health care job security attachments">
-<summary><span class="article-title">SEBAC 2017 Agreement</span><span class="article-count"></span></summary>
+<details class="article" id="memoranda" data-title="memoranda of agreement">
+<summary><span class="article-title">Memoranda of Agreement</span><span class="article-count"></span></summary>
+<div class="article-body"><p>All prior memoranda of agreement not incorporated into this agreement are null and void.</p>
+<h3 class="subhead">Memorandum of Agreement #1 Merit Pool</h3>
+<p>The parties agree that money withheld as the result of unsatisfactory performance shall be added to the merit pool.</p>
+<h3 class="subhead">Memorandum of Agreement #2 Weekend and Evening Hours for the Library</h3>
+<p>To meet the requirements and responsibilities of their work, many staff in the Research and Information Services Department of the University Library, who are regularly assigned to work on evening and weekends, find it impossible to take compensatory time and repeatedly work extraordinary hours during the fall and spring semesters.</p>
+<p>In order to respond to this, UCPEA and the University agree that permanent RISD staff, who meet the above criteria, shall be eligible to accrue up to 4 days compensatory time each year. Use of such compensatory time shall be arranged as a mutually agreeable time, when service demands are slower, within two years of the staff member having worked the extraordinary hours.</p>
+<h3 class="subhead">Memorandum of Agreement #3 Big Brothers/Big Sisters</h3>
+<p>The State of Connecticut (hereinafter referred to as the “State”) and the University of Connecticut Professional Employees Association (hereinafter referred to as “UCPEA”) have herein agreed that UCPEA members employed by the University of Connecticut may participate in Big Brothers or Big Sisters programs as provided by P.A. Nos. 99-1 and 00-112. There shall be no expansion of benefits for such participating employees beyond those specifically provided within the Act. The general guidelines applied for participants shall be:</p>
+<div class="clause nested"><div class="label">1.</div><div>The participating employee must have a minimum of one year of state service.</div></div>
+<div class="clause nested"><div class="label">2.</div><div>The employee must be a full-time employee with permanent status.</div></div>
+<div class="clause nested"><div class="label">3.</div><div>Following each year of active participation in the Big Brother or Big Sister program the employee will be granted one week of additional annual vacation.</div></div>
+<div class="clause nested"><div class="label">4.</div><div>For purposes of the program the first annual period (year) for program participation runs from September 1, 1998. Effective January 1, 1999, the year period shall be measured annually from the first full month of participation by the employee in the program. In no event shall an individual receive more than one week of vacation for any full year of participation in the program.</div></div>
+<div class="clause nested"><div class="label">5.</div><div>Failure to complete a full year of program participation will constitute basis for denial of the grant of the additional vacation. Failure to satisfy expected time commitments associated with the program will also constitute denial of the grant of the additional vacation.</div></div>
+<div class="clause nested"><div class="label">6.</div><div>Big Brothers or Big Sisters will be totally responsible for the program and shall provide the State employer with certification of participants.</div></div>
+<div class="clause nested"><div class="label">7.</div><div>The grant of the additional vacation will be by OPM and shall not be subject to any appeal. The regulations regarding the utilization of vacation shall govern the utilization of the additional time earned under this program.</div></div>
+<div class="clause nested"><div class="label">8.</div><div>No activities performed by state employees with Big Brothers or Big Sisters shall be on state time and such activities shall be outside the scope of their employment.</div></div></div>
+</details>
+<details class="article sebac-article" id="sebac-section-i" data-title="sebac 2017 i. modifications to the current sebac pension and health care agreement">
+<summary><span class="article-title">SEBAC I. Pension and Health Care Agreement Modifications</span><span class="article-count"></span></summary>
 <div class="article-body sebac-document">
 <p class="document-source"><a href="https://ucpea.ct.aft.org/sites/default/files/article_pdf_files/2018-01/sebac_2017.pdf" target="_blank" rel="noopener noreferrer">View the official SEBAC 2017 Agreement PDF</a></p>
 <div class="sebac-parties"><strong>State of Connecticut</strong><span>and</span><strong>State Employees Bargaining Agent Coalition (SEBAC)</strong></div>
 <p>In order to assist in resolving the financial issues currently facing the State of Connecticut while preserving public services, in order to provide long term stability for state employee benefits programs which are an asset to the State as well as its employees, the State of Connecticut and the State Employees Bargaining Agent Coalition agree to the following provisions. This agreement shall amend previous SEBAC Agreements as necessary to carry out the specific changes set forth herein.</p>
-<h3 class="sebac-heading sebac-h3">I. Modifications to the Current SEBAC Pension and Health Care Agreement</h3>
 <p><strong>Reaffirmation of the Independence of the Plans.</strong> The parties reaffirm that the State Employee Pension and Health Care plans are set forth in contract, and are intended to and shall remain independent of any other pension or health care plans that may or may not be created by state government. Neither the Legislature nor the Governor shall have the ability to include the state employees' health care plan in any other program.</p>
 <ul class="sebac-list">
 <li>A. <strong>Health Care Preservation and Enhancement of Current Plans and Joint Efforts.</strong></li>
@@ -1198,7 +1218,11 @@ mark.active-match { outline:2px solid var(--accent); outline-offset:2px; }
 <p><strong>H. Furlough Days -</strong> The parties to unit agreements which are or will be attached hereto have negotiated for three furlough days in FY 2018, provided that notwithstanding any furlough day language in any local bargaining unit agreement, units may substitute accrual reductions or other means that produce equivalent savings.</p>
 </li>
 </ul>
-<h3 class="sebac-heading sebac-h3">II. Job Security</h3>
+</div>
+</details>
+<details class="article sebac-article" id="sebac-section-ii" data-title="sebac 2017 ii. job security">
+<summary><span class="article-title">SEBAC II. Job Security</span><span class="article-count"></span></summary>
+<div class="article-body sebac-document">
 <ul class="sebac-list">
 <li><strong>A. Job Security for Office of Labor Relations -Covered Units.</strong> The following job security provisions shall apply to all OLR Covered units which agree or have agreed to contracts in accordance with the 2017 Agreement Framework including the provisions for wages and other changes which are summarized in Attachment F.</li>
 </ul>
@@ -1349,13 +1373,25 @@ mark.active-match { outline:2px solid var(--accent); outline-offset:2px; }
 </ul>
 <h4 class="sebac-heading sebac-h4">C. Job Security for Units Not Covered by OLR</h4>
 <p>Job security for other units has been or shall be negotiated on a unit-by-unit basis consistent with the 2017 Agreement Framework, including the provisions for wages and other matters which are summarized in Attachment F.</p>
-<h3 class="sebac-heading sebac-h3">III. Tentative Agreement, Subject to Ratification and Approval by the General Assembly</h3>
+</div>
+</details>
+<details class="article sebac-article" id="sebac-section-iii" data-title="sebac 2017 iii. tentative agreement, subject to ratification and approval by the general assembly">
+<summary><span class="article-title">SEBAC III. Ratification and General Assembly Approval</span><span class="article-count"></span></summary>
+<div class="article-body sebac-document">
 <p>By their signatures below, the parties indicate that this tentative agreement has been approved by the Governor, and preliminarily recommended by SEBAC Leadership for ratification by the membership. This Agreement shall be deemed to include, as Attachment G, all bargaining unit agreements tentatively agreed to in accordance with Attachment F by their appropriate negotiating parties. Those agreements are subject to approval in accordance with their local bargaining unit processes and procedures, and shall become effective if and when this tentative agreement is ratified by SEBAC Leadership and approved by the General Assembly. Final ratification by SEBAC Leadership will occur in accordance with SEBAC rules following membership voting on this Tentative Agreement. This agreement is further subject to the approval of the General Assembly in accordance with the provisions of Connecticut General Statutes §5-278(b).</p>
-<h3 class="sebac-heading sebac-h3">IV. Duration</h3>
+</div>
+</details>
+<details class="article sebac-article" id="sebac-section-iv" data-title="sebac 2017 iv. duration">
+<summary><span class="article-title">SEBAC IV. Duration</span><span class="article-count"></span></summary>
+<div class="article-body sebac-document">
 <p>The provisions of the current SEBAC Agreement shall be extended until June 30, 2027.</p>
 <div class="sebac-signatures"><p><strong>Daniel E. Livingston</strong><br/>Chief Negotiator, SEBAC</p><p><strong>Lisa Grasso Egan</strong><br/>Undersecretary of Labor Relations, State of Connecticut</p></div>
 <p>Dated this 25th day of June, 2017.</p>
-<h3 class="sebac-heading sebac-h3">Attachment A - Health Insurance Design Specifications</h3>
+</div>
+</details>
+<details class="article sebac-article" id="sebac-attachment-a" data-title="sebac 2017 attachment a - health insurance design specifications">
+<summary><span class="article-title">SEBAC Attachment A. Health Insurance Design Specifications</span><span class="article-count"></span></summary>
+<div class="article-body sebac-document">
 <h4 class="sebac-heading sebac-h4">I. Further Explanation of Pharmacy Changes</h4>
 <h5 class="sebac-heading sebac-h5">a. The Formulary Change</h5>
 <p>The state employees' health care plan will adopt a standard formulary that allows for prior authorizations of certain drugs to ensure appropriate use and in certain instances when lower cost clinically equivalent alternatives are available. Prior authorization denials can be appealed through the pharmacy benefit manager's standard appeal process. A plan member who receives an adverse second level appeal from the pharmacy benefit manager may further appeal to the Health Care Cost Containment Committee. The Health Care Cost Containment Committee will approve the payment of claims in which the prescribing physician attests that the non-formulary option is medically necessary for the patient.</p>
@@ -1380,9 +1416,17 @@ mark.active-match { outline:2px solid var(--accent); outline-offset:2px; }
 <p>d. Current out-of-area protections apply to participants who are out of area so that Site of Service rules will not apply out of area unless there is a network in that area which fully meets plan access requirement.</p>
 </li>
 </ul>
-<h3 class="sebac-heading sebac-h3">Attachment B - Repayment Schedule for the Retiree Healthcare Trust Fund</h3>
+</div>
+</details>
+<details class="article sebac-article" id="sebac-attachment-b" data-title="sebac 2017 attachment b - repayment schedule for the retiree healthcare trust fund">
+<summary><span class="article-title">SEBAC Attachment B. Retiree Healthcare Trust Fund Repayment Schedule</span><span class="article-count"></span></summary>
+<div class="article-body sebac-document">
 <p>The parties have agreed that for those choosing to lower their retiree healthcare contributions by 1.5% for one year (7/1/17 to 6/30/18) to offset the effects of a 1.5% pension contribution increase that year, the repayment will be 2% of salary paid as 1/2 % for four years beginning on 7/1/19. The parties have further agreed that this repayment schedule will be adjusted for employees who make full payment prior to 6/30/2022 to provide for a similar pro-rated return on investment for the Retiree Healthcare Fund. That schedule shall be prepared by the Office of the State Comptroller.</p>
-<h3 class="sebac-heading sebac-h3">Attachment C - Effect on ARP Contributions</h3>
+</div>
+</details>
+<details class="article sebac-article" id="sebac-attachment-c" data-title="sebac 2017 attachment c - effect on arp contributions">
+<summary><span class="article-title">SEBAC Attachment C. Effect on ARP Contributions</span><span class="article-count"></span></summary>
+<div class="article-body sebac-document">
 <ol class="sebac-list sebac-numbered-list">
 <li>
 <p>On the same effective dates as SERS Employee contributions increase, ARP Employer Contributions decrease by one half the amount of SERS employee contribution increases to a total of 1%.</p>
@@ -1397,7 +1441,11 @@ mark.active-match { outline:2px solid var(--accent); outline-offset:2px; }
 <p>Pursuant to IRS regulations, employees who bought into the Hybrid plan which is parallel to SERS Tier 2 have been making 3% contribution to SERS, and 2% Employee contributions to the ARP. In July of 2017, and July of 2019, when their SERS contributions increase by 1.5%, and .5% respectively, such employee's ARP contributions shall remain at 2%, unless such employee affirmatively opts out of continuing ARP contributions on a form to be provided by the office of the State Comptroller.</p>
 </li>
 </ol>
-<h3 class="sebac-heading sebac-h3">Attachment D - Examples of 18 Month COLA Review</h3>
+</div>
+</details>
+<details class="article sebac-article" id="sebac-attachment-d" data-title="sebac 2017 attachment d - examples of 18 month cola review">
+<summary><span class="article-title">SEBAC Attachment D. Examples of 18 Month COLA Review</span><span class="article-count"></span></summary>
+<div class="article-body sebac-document">
 <ul class="sebac-list">
 <li>
 <p>Lowest CPI Circuit Breaker -- CPI-W for 18 months goes up annualized 5.5%. Using already existing COLA formula: COLA=5.5<em>60%=33%. Subtract 2.5%=.8%. Multiply by 1.5 (for 18 month period)=1.2% </em><em>circuit breaker COLA</em>* (paid in addition to normal COLA one time at 30 months after retirement)</p>
@@ -1406,7 +1454,11 @@ mark.active-match { outline:2px solid var(--accent); outline-offset:2px; }
 <p>Highest CPI Circuit Breaker -- CPI-W for 18 months goes up annualized 11.2%. Using already existing COLA formula: COLA=6<em>60%(=3.6%), plus 5.2</em>75%(=3.9%)=7.5% (current maximum). Subtract 2.5%=5%. Multiply by 1.5 (for 18 months)=7.5% <strong>circuit breaker COLA</strong> (paid in addition to normal COLA one time at 30 months after retirement)</p>
 </li>
 </ul>
-<h3 class="sebac-heading sebac-h3">Attachment E - Pension, Health Care, and Retiree Healthcare Provisions Affecting New Employees First Hired On or After 7/1/2017</h3>
+</div>
+</details>
+<details class="article sebac-article" id="sebac-attachment-e" data-title="sebac 2017 attachment e - pension, health care, and retiree healthcare provisions affecting new employees first hired on or after 7/1/2017">
+<summary><span class="article-title">SEBAC Attachment E. Provisions Affecting New Employees</span><span class="article-count"></span></summary>
+<div class="article-body sebac-document">
 <p>Except as specifically set forth in this Attachment, health care, retiree health care, and pension benefits for employees hired on or after 7/1/17 shall be identical to those hired on 6/30/17. The changes specific to such new employees shall be:</p>
 <h4 class="sebac-heading sebac-h4">I. Pension</h4>
 <ul class="sebac-list">
@@ -1460,7 +1512,11 @@ mark.active-match { outline:2px solid var(--accent); outline-offset:2px; }
 <p><strong>III. Retiree Health Care</strong> -The 3% Retiree Health Care contribution for new employees shall be paid for 15 years.</p>
 </li>
 </ul>
-<h3 class="sebac-heading sebac-h3">Attachment F</h3>
+</div>
+</details>
+<details class="article sebac-article" id="sebac-attachment-f" data-title="sebac 2017 attachment f">
+<summary><span class="article-title">SEBAC Attachment F. 2017 Agreement Framework</span><span class="article-count"></span></summary>
+<div class="article-body sebac-document">
 <p><strong>State of Connecticut and SEBAC -Framework Concerning Wages and Other Matters and Their Relationship to Job Security (hereinafter referred to as the "2017 Agreement Framework")</strong></p>
 <p>The State and SEBAC recognize that wages and other matters are negotiated on a bargaining unit basis by the union designated as the exclusive bargaining representative for that unit. However, the State and SEBAC have agreed that the following parameters shall apply to all units seeking the job security protections of the SEBAC 2017 Agreement.</p>
 <ul class="sebac-list">
@@ -1504,28 +1560,13 @@ mark.active-match { outline:2px solid var(--accent); outline-offset:2px; }
 <p>b. Options for telecommuting consistent with job duties where such is operationally feasible.</p>
 </li>
 </ul>
-<h3 class="sebac-heading sebac-h3">Attachment G - Unit Agreements</h3>
-<p>Bargaining unit agreements which have been negotiated and ratified in connection with the 2017 discussions between the State and SEBAC are will be attached hereto along with their required supporting documents.</p>
 </div>
 </details>
-<details class="article" id="memoranda" data-title="memoranda of agreement">
-<summary><span class="article-title">Memoranda of Agreement</span><span class="article-count"></span></summary>
-<div class="article-body"><p>All prior memoranda of agreement not incorporated into this agreement are null and void.</p>
-<h3 class="subhead">Memorandum of Agreement #1 Merit Pool</h3>
-<p>The parties agree that money withheld as the result of unsatisfactory performance shall be added to the merit pool.</p>
-<h3 class="subhead">Memorandum of Agreement #2 Weekend and Evening Hours for the Library</h3>
-<p>To meet the requirements and responsibilities of their work, many staff in the Research and Information Services Department of the University Library, who are regularly assigned to work on evening and weekends, find it impossible to take compensatory time and repeatedly work extraordinary hours during the fall and spring semesters.</p>
-<p>In order to respond to this, UCPEA and the University agree that permanent RISD staff, who meet the above criteria, shall be eligible to accrue up to 4 days compensatory time each year. Use of such compensatory time shall be arranged as a mutually agreeable time, when service demands are slower, within two years of the staff member having worked the extraordinary hours.</p>
-<h3 class="subhead">Memorandum of Agreement #3 Big Brothers/Big Sisters</h3>
-<p>The State of Connecticut (hereinafter referred to as the “State”) and the University of Connecticut Professional Employees Association (hereinafter referred to as “UCPEA”) have herein agreed that UCPEA members employed by the University of Connecticut may participate in Big Brothers or Big Sisters programs as provided by P.A. Nos. 99-1 and 00-112. There shall be no expansion of benefits for such participating employees beyond those specifically provided within the Act. The general guidelines applied for participants shall be:</p>
-<div class="clause nested"><div class="label">1.</div><div>The participating employee must have a minimum of one year of state service.</div></div>
-<div class="clause nested"><div class="label">2.</div><div>The employee must be a full-time employee with permanent status.</div></div>
-<div class="clause nested"><div class="label">3.</div><div>Following each year of active participation in the Big Brother or Big Sister program the employee will be granted one week of additional annual vacation.</div></div>
-<div class="clause nested"><div class="label">4.</div><div>For purposes of the program the first annual period (year) for program participation runs from September 1, 1998. Effective January 1, 1999, the year period shall be measured annually from the first full month of participation by the employee in the program. In no event shall an individual receive more than one week of vacation for any full year of participation in the program.</div></div>
-<div class="clause nested"><div class="label">5.</div><div>Failure to complete a full year of program participation will constitute basis for denial of the grant of the additional vacation. Failure to satisfy expected time commitments associated with the program will also constitute denial of the grant of the additional vacation.</div></div>
-<div class="clause nested"><div class="label">6.</div><div>Big Brothers or Big Sisters will be totally responsible for the program and shall provide the State employer with certification of participants.</div></div>
-<div class="clause nested"><div class="label">7.</div><div>The grant of the additional vacation will be by OPM and shall not be subject to any appeal. The regulations regarding the utilization of vacation shall govern the utilization of the additional time earned under this program.</div></div>
-<div class="clause nested"><div class="label">8.</div><div>No activities performed by state employees with Big Brothers or Big Sisters shall be on state time and such activities shall be outside the scope of their employment.</div></div></div>
+<details class="article sebac-article" id="sebac-attachment-g" data-title="sebac 2017 attachment g - unit agreements">
+<summary><span class="article-title">SEBAC Attachment G. Unit Agreements</span><span class="article-count"></span></summary>
+<div class="article-body sebac-document">
+<p>Bargaining unit agreements which have been negotiated and ratified in connection with the 2017 discussions between the State and SEBAC are will be attached hereto along with their required supporting documents.</p>
+</div>
 </details>
 </section>
 </main>
@@ -1796,7 +1837,7 @@ function runSearch(){
     if(isMatch){
       visible++;
       article.open = true;
-      const m = highlight(article.querySelector('.article-body'), term);
+      const m = highlight(article.querySelector('.article-title'), term) + highlight(article.querySelector('.article-body'), term);
       matches += m;
       article.querySelector('.article-count').textContent = `${m} match${m===1?'':'es'}`;
     }
@@ -1862,8 +1903,9 @@ function updateActiveArticle(){
   const visibleArticles = articles.filter(article => !article.hidden);
   if(!visibleArticles.length) return;
 
-  const readingLine = toolbar.getBoundingClientRect().bottom + 8;
-  const currentArticle = visibleArticles.find(article => article.getBoundingClientRect().bottom > readingLine) || visibleArticles[visibleArticles.length - 1];
+  const readingLine = toolbar.getBoundingClientRect().bottom + 36;
+  const atPageEnd = Math.ceil(window.scrollY + window.innerHeight) >= document.documentElement.scrollHeight - 2;
+  const currentArticle = atPageEnd ? visibleArticles[visibleArticles.length - 1] : visibleArticles.find(article => article.getBoundingClientRect().bottom > readingLine) || visibleArticles[visibleArticles.length - 1];
   setActiveArticle(currentArticle.id);
 }
 
