@@ -195,6 +195,21 @@ html[data-theme="dark"] .mobile-nav-toggle { color:#07152f; }
 p { margin:9px 0 13px; font-size:16px; font-weight:400; color:var(--text); }
 .article-body > p { margin-left:74px; }
 .article-body > .table-note { margin:-12px 0 20px; color:var(--muted); font-size:14px; font-style:italic; }
+.sebac-document > p { margin-left:0; }
+.document-source { display:flex; justify-content:flex-end; margin:18px 0 20px !important; }
+.document-source a { display:inline-flex; align-items:center; min-height:42px; padding:9px 14px; border:1px solid var(--border); border-radius:11px; background:var(--surface-soft); color:var(--accent); font-size:14px; font-weight:800; text-decoration:none; }
+.document-source a:hover { border-color:var(--accent); text-decoration:underline; text-underline-offset:3px; }
+.sebac-parties { display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:8px 14px; margin:0 0 22px; padding:16px 18px; border:1px solid var(--border); border-radius:14px; background:var(--surface-soft); color:var(--heading); text-align:center; }
+.sebac-parties span { color:var(--muted); font-size:14px; text-transform:uppercase; letter-spacing:.08em; }
+.sebac-heading { scroll-margin-top:112px; color:var(--subhead); line-height:1.35; }
+.sebac-h3 { margin:30px 0 12px; padding-top:18px; border-top:1px solid var(--divider); font-size:20px; }
+.sebac-h4 { margin:24px 0 9px; font-size:17px; }
+.sebac-h5 { margin:18px 0 8px; font-size:16px; }
+.sebac-list { margin:10px 0 16px; padding-left:30px; color:var(--text); }
+.sebac-list li { margin:8px 0; padding-left:3px; font-size:16px; line-height:1.65; }
+.sebac-list p { margin:0 0 8px; }
+.sebac-signatures { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin:20px 0; }
+.sebac-signatures p { margin:0; padding:14px 16px; border:1px solid var(--border); border-radius:12px; background:var(--surface-soft); }
 .clause { display:grid; grid-template-columns:64px 1fr; gap:10px; margin:10px 0; }
 .clause.nested { grid-template-columns:44px 1fr; margin-left:24px; }
 .clause.deep { margin-left:52px; }
@@ -272,6 +287,7 @@ mark.active-match { outline:2px solid var(--accent); outline-offset:2px; }
   .mobile-nav-toggle { display:grid; }
   .clause, .section-block { grid-template-columns:52px minmax(0,1fr); }
   .article-body > p { margin-left:62px; }
+  .sebac-document > p { margin-left:0; }
   .copy-toast { right:88px; bottom:max(24px, env(safe-area-inset-bottom)); }
 }
 @media (max-width: 560px) {
@@ -292,6 +308,12 @@ mark.active-match { outline:2px solid var(--accent); outline-offset:2px; }
   .clause.nested { grid-template-columns:28px minmax(0,1fr); gap:8px; margin-left:0; }
   .clause.deep { margin-left:16px; }
   .article-body > p { margin-left:0; }
+  .document-source { justify-content:stretch; }
+  .document-source a { width:100%; justify-content:center; text-align:center; }
+  .sebac-parties { align-items:stretch; flex-direction:column; }
+  .sebac-signatures { grid-template-columns:1fr; }
+  .sebac-h3 { font-size:18px; }
+  .sebac-list { padding-left:22px; }
   .permalink-target { padding-right:30px; }
   .permalink-button { width:28px; height:28px; }
   .section-block > .permalink-button { top:7px; }
@@ -321,7 +343,7 @@ mark.active-match { outline:2px solid var(--accent); outline-offset:2px; }
 </div></div>
 </div></div>
 <main class="wrap layout">
-<nav id="desktop-article-nav" class="toc" aria-label="Article navigation"><h2>Articles</h2><a href="#article-1">Article 1. Recognition</a><a href="#article-2">Article 2. Role Of Professional Staff</a><a href="#article-3">Article 3. Board Prerogatives</a><a href="#article-4">Article 4. Professional Freedom</a><a href="#article-5">Article 5. Nondiscrimination, Anti-Harassment, And Diversity, Equity &amp; Inclusion (DEI)</a><a href="#article-6">Article 6. Vacation Leave</a><a href="#article-7">Article 7. Notice Of Intent To Leave</a><a href="#article-8">Article 8. Holidays</a><a href="#article-9">Article 9. Personal Leave</a><a href="#article-10">Article 10. Civic And Legal Obligations</a><a href="#article-11">Article 11. Sick Leave</a><a href="#article-12">Article 12. Childbirth And Parental Benefits</a><a href="#article-13">Article 13. Educational Leave</a><a href="#article-14">Article 14. Maintenance Of Status While On Paid Leave</a><a href="#article-15">Article 15. Leaves Without Pay</a><a href="#article-16">Article 16. Work Schedules</a><a href="#article-17">Article 17. Student Health And Wellness</a><a href="#article-18">Article 18. Compensatory Time</a><a href="#article-19">Article 19. Employee Files</a><a href="#article-20">Article 20. Probationary Employees</a><a href="#article-21">Article 21. Evaluation</a><a href="#article-22">Article 22. Dismissal Or Other Disciplinary Action</a><a href="#article-23">Article 23. Grievance Procedure</a><a href="#article-24">Article 24. No Work Stoppage</a><a href="#article-25">Article 25. Career Ladders</a><a href="#article-26">Article 26. Vacancies And Job Posting</a><a href="#article-27">Article 27. Reduction Of Professional Staff</a><a href="#article-28">Article 28. Mergers And Acquisitions</a><a href="#article-29">Article 29. Meet And Discuss</a><a href="#article-30">Article 30. Parking</a><a href="#article-31">Article 31. Job Classification</a><a href="#article-32">Article 32. Salary</a><a href="#article-33">Article 33. Retirement, Medical Benefits And Disability Insurance</a><a href="#article-34">Article 34. Tuition Reimbursement And Professional Development</a><a href="#article-35">Article 35. Tuition Waivers</a><a href="#article-36">Article 36. Child Care</a><a href="#article-37">Article 37. Travel</a><a href="#article-38">Article 38. Health And Safety</a><a href="#article-39">Article 39. Consulting Policy</a><a href="#article-40">Article 40. Union Leave</a><a href="#article-41">Article 41. Representation Rights And Responsibilities</a><a href="#article-42">Article 42. UCPEA Security And Payroll Deductions</a><a href="#article-43">Article 43. Savings Clause</a><a href="#article-44">Article 44. Temporary And End-Date Employees</a><a href="#article-45">Article 45. Pay Equity</a><a href="#article-46">Article 46. Wireless Communication Device Stipends</a><a href="#article-47">Article 47. Phased Retirement Program</a><a href="#article-48">Article 48. Zipper Clause</a><a href="#article-49">Article 49. Duration</a><a href="#memoranda">Memoranda of Agreement</a></nav>
+<nav id="desktop-article-nav" class="toc" aria-label="Article navigation"><h2>Articles</h2><a href="#article-1">Article 1. Recognition</a><a href="#article-2">Article 2. Role Of Professional Staff</a><a href="#article-3">Article 3. Board Prerogatives</a><a href="#article-4">Article 4. Professional Freedom</a><a href="#article-5">Article 5. Nondiscrimination, Anti-Harassment, And Diversity, Equity &amp; Inclusion (DEI)</a><a href="#article-6">Article 6. Vacation Leave</a><a href="#article-7">Article 7. Notice Of Intent To Leave</a><a href="#article-8">Article 8. Holidays</a><a href="#article-9">Article 9. Personal Leave</a><a href="#article-10">Article 10. Civic And Legal Obligations</a><a href="#article-11">Article 11. Sick Leave</a><a href="#article-12">Article 12. Childbirth And Parental Benefits</a><a href="#article-13">Article 13. Educational Leave</a><a href="#article-14">Article 14. Maintenance Of Status While On Paid Leave</a><a href="#article-15">Article 15. Leaves Without Pay</a><a href="#article-16">Article 16. Work Schedules</a><a href="#article-17">Article 17. Student Health And Wellness</a><a href="#article-18">Article 18. Compensatory Time</a><a href="#article-19">Article 19. Employee Files</a><a href="#article-20">Article 20. Probationary Employees</a><a href="#article-21">Article 21. Evaluation</a><a href="#article-22">Article 22. Dismissal Or Other Disciplinary Action</a><a href="#article-23">Article 23. Grievance Procedure</a><a href="#article-24">Article 24. No Work Stoppage</a><a href="#article-25">Article 25. Career Ladders</a><a href="#article-26">Article 26. Vacancies And Job Posting</a><a href="#article-27">Article 27. Reduction Of Professional Staff</a><a href="#article-28">Article 28. Mergers And Acquisitions</a><a href="#article-29">Article 29. Meet And Discuss</a><a href="#article-30">Article 30. Parking</a><a href="#article-31">Article 31. Job Classification</a><a href="#article-32">Article 32. Salary</a><a href="#article-33">Article 33. Retirement, Medical Benefits And Disability Insurance</a><a href="#article-34">Article 34. Tuition Reimbursement And Professional Development</a><a href="#article-35">Article 35. Tuition Waivers</a><a href="#article-36">Article 36. Child Care</a><a href="#article-37">Article 37. Travel</a><a href="#article-38">Article 38. Health And Safety</a><a href="#article-39">Article 39. Consulting Policy</a><a href="#article-40">Article 40. Union Leave</a><a href="#article-41">Article 41. Representation Rights And Responsibilities</a><a href="#article-42">Article 42. UCPEA Security And Payroll Deductions</a><a href="#article-43">Article 43. Savings Clause</a><a href="#article-44">Article 44. Temporary And End-Date Employees</a><a href="#article-45">Article 45. Pay Equity</a><a href="#article-46">Article 46. Wireless Communication Device Stipends</a><a href="#article-47">Article 47. Phased Retirement Program</a><a href="#article-48">Article 48. Zipper Clause</a><a href="#article-49">Article 49. Duration</a><a href="#sebac-2017">SEBAC 2017 Agreement</a><a href="#memoranda">Memoranda of Agreement</a></nav>
 <section>
 <div id="no-results" class="no-results">No matching contract language found. Try a broader search term.</div>
 <details class="article" id="article-1" open data-title="article 1. recognition">
@@ -973,7 +995,520 @@ mark.active-match { outline:2px solid var(--accent); outline-offset:2px; }
 </details><details class="article" id="article-49" data-title="article 49. duration">
 <summary><span class="article-title">Article 49. Duration</span><span class="article-count"></span></summary>
 <div class="article-body"><div class="section-block"><div class="section-number">49.1</div><p>This agreement shall be in full force and effect from July 1, 2025 through June 30, 2029.</p></div></div>
-</details><details class="article" id="memoranda" data-title="memoranda of agreement">
+</details>
+<details class="article" id="sebac-2017" data-title="sebac 2017 agreement pension health care job security attachments">
+<summary><span class="article-title">SEBAC 2017 Agreement</span><span class="article-count"></span></summary>
+<div class="article-body sebac-document">
+<p class="document-source"><a href="https://ucpea.ct.aft.org/sites/default/files/article_pdf_files/2018-01/sebac_2017.pdf" target="_blank" rel="noopener noreferrer">View the official SEBAC 2017 Agreement PDF</a></p>
+<div class="sebac-parties"><strong>State of Connecticut</strong><span>and</span><strong>State Employees Bargaining Agent Coalition (SEBAC)</strong></div>
+<p>In order to assist in resolving the financial issues currently facing the State of Connecticut while preserving public services, in order to provide long term stability for state employee benefits programs which are an asset to the State as well as its employees, the State of Connecticut and the State Employees Bargaining Agent Coalition agree to the following provisions. This agreement shall amend previous SEBAC Agreements as necessary to carry out the specific changes set forth herein.</p>
+<h3 class="sebac-heading sebac-h3">I. Modifications to the Current SEBAC Pension and Health Care Agreement</h3>
+<p><strong>Reaffirmation of the Independence of the Plans.</strong> The parties reaffirm that the State Employee Pension and Health Care plans are set forth in contract, and are intended to and shall remain independent of any other pension or health care plans that may or may not be created by state government. Neither the Legislature nor the Governor shall have the ability to include the state employees' health care plan in any other program.</p>
+<ul class="sebac-list">
+<li>A. <strong>Health Care Preservation and Enhancement of Current Plans and Joint Efforts.</strong></li>
+</ul>
+<p>Except as specifically referenced herein, all the provisions of 1997-2017 Pension and Health Care Agreement, as amended, shall apply. The basic plan choices between "POS Plans" and "POE Plans" will continue, with both types of plans having the same network, POS plans allowing out of network coverage, and POE plans allowing coverage only in network. All of those choices remain exactly as currently set forth except as modified below. Changes to Health Care are:</p>
+<ul class="sebac-list">
+<li><strong>i. Affecting Active Employees:</strong></li>
+</ul>
+<ol class="sebac-list sebac-numbered-list">
+<li>Premium Shares shall increase as follows.</li>
+</ol>
+<ul class="sebac-list">
+<li>
+<p>a. By 1% 7/1/19, but this shall not increase premium share to over 15%.</p>
+</li>
+<li>
+<p>b. By 1% 7/1/20 but this shall not increase premium share to over 15%.</p>
+</li>
+<li>
+<p>c. By 1% 7/1/21 but this shall not increase premium share to over 15%.</p>
+</li>
+<li>
+<p>d. Notwithstanding the above, current premium shares which are over the cap for a given year shall neither be raised nor lowered by this agreement.</p>
+</li>
+</ul>
+<ol class="sebac-list sebac-numbered-list" start="2">
+<li>Design Changes to Save Money and Improve Health. The parties shall implement the following changes as soon as administratively feasible.</li>
+</ol>
+<ul class="sebac-list">
+<li>
+<p>a. Implement the CVS/Caremark standard formulary. The member's doctor is final appeal step if the doctor certifies non-formulary drug is medically necessary. The parties may substitute the formula of another PBM provider as applicable through the normal RFP process.</p>
+</li>
+<li>
+<p>b. Non-HEP drugs co-pays shall go to $5/10/25/40. First two tiers are clinically equivalent generics, with the first to incent choosing lower priced generics. The next two tiers are preferred and non-preferred brand names. The co-pays for drugs prescribed to treat conditions under the HEP Chronic Disease Program shall not be affected by this change. There shall be no change to current physician waiver process.</p>
+</li>
+<li>
+<p>c. The co-pay for unnecessary emergency room visits increase to $250; current waiver rules shall apply.</p>
+</li>
+<li>
+<p>d. The Plan's Physical and Occupational Therapy ("PT/OT") medical necessity standard shall be implemented consistently through a utilization management program.</p>
+</li>
+<li>
+<p>e. Adopt a Design structure that encourages treatment choice of high quality, high value providers by:</p>
+</li>
+<li>
+<p>i. Vendor recommended ranking of primary care doctors and specialists to reduce co-pays for high value providers. Current co-pays remain for all other providers</p>
+</li>
+<li>
+<p>ii. "Smart shopper" provides rebates for numerous procedures based on quality and safety standards and cost of provider. Non smart-shopper providers remain at current cost.</p>
+</li>
+<li>
+<p>iii. "Site of service" continues 100% coverage for all labs, diagnostic, and high cost imaging, for preferred in network labs, institutes higher co-share for non-preferred and non-network labs. Statewide coverage required for preferred labs.</p>
+</li>
+<li>
+<p>iv. Specifications for the above three changes are set forth in Attachment A, below.</p>
+</li>
+<li>
+<p>ii. <strong>Health Care Changes Affecting Retirees</strong></p>
+</li>
+</ul>
+<ol class="sebac-list sebac-numbered-list">
+<li><strong>Current Retirees.</strong> Only the following changes will affect current retirees.</li>
+</ol>
+<ul class="sebac-list">
+<li>
+<p><strong>a. Non-Medicare Covered Retirees</strong> shall be affected only by items d. and e.i and e.ii in paragraph (i)(2), above.</p>
+</li>
+<li>
+<p><strong>b. Medicare-Covered Retirees.</strong> Effective 1/1/18, the parties will provide the state employee health plan design to Medicare-covered retirees through a Medicare Advantage vehicle. The parties have adopted a "passive PPO" network model, and enhanced certain benefits in order to maximize overall savings, and comply with current plan network access rules. The parties will adopt the results of the current HCCC Medicare RFP. Future vendor selection shall be by the existing HCCC RFP Process.</p>
+</li>
+</ul>
+<h5 class="sebac-heading sebac-h5">2. Future Retirees</h5>
+<ul class="sebac-list">
+<li><strong>a. Design Changes.</strong> All design changes affecting Active Employees shall affect future retirees who retire on or after the "RHC Effective date." That date shall be October 2, 2017, or the 2nd of the month at least 60 days after legislative approval of this agreement, whichever is later.</li>
+</ul>
+<p><strong>b. Premium (Equivalent) Shares</strong></p>
+<ul class="sebac-list">
+<li>
+<p>i. Medicare-Covered Retirees. Nothing in this agreement affects the state health plan premium share of Medicare-covered retirees.</p>
+</li>
+<li>
+<p>ii. Non-Medicare-Covered Retirees.</p>
+</li>
+</ul>
+<ol class="sebac-list sebac-numbered-list">
+<li>
+<p>Effective for employees retiring on or after the RHC Effective Date but before 7/1/22. Premium shares of non-hazardous duty employees who retire with fewer than 25 years of service shall increase by 1.5%.</p>
+</li>
+<li>
+<p>Effective for employees retiring on or after 7/1/22. Hazardous Duty Employees premium share shall be 3%. Non-Hazardous duty employees shall be 5%.</p>
+</li>
+</ol>
+<ul class="sebac-list">
+<li>
+<p><strong>c. Medicare Part B Premium.</strong> Effective 7/1/22:</p>
+</li>
+<li>
+<p>i. The State will continue reimbursing the full standard Medicare Part B Premium for all Medicare-covered-retirees.</p>
+</li>
+<li>
+<p>ii. The State will reduce its reimbursement to half of the additional charges imposed by Medicare beyond the standard premium on high earners.</p>
+</li>
+</ul>
+<ol class="sebac-list sebac-numbered-list" start="2">
+<li><strong>Pilots.</strong> The parties agree to explore adding new HEP opportunities for members to choose to sign up for, or not sign up for, on a totally voluntary basis (choosing not to sign up would have no impact on whether a member can remain in the HEP). If new voluntary opportunities are created, they will be studied for their impacts on health and cost-effectiveness to see if they should remain an option for members who choose them.</li>
+</ol>
+<ul class="sebac-list">
+<li>
+<p>B. <strong>Pension Plan Stabilization and Savings.</strong> The parties acknowledge that as a result of the funding agreement approved by the General Assembly on February 1, 2017, substantial progress was made in the problem of dealing with unfunded liabilities which began accumulating when the Plan was created by the General Assembly and funded on a "Pay as you go" basis beginning in 1939. The changes below are intended to provide savings in the actuarily determined employer contribution, and to further stabilize the Fund as an important asset to the State and it employees.</p>
+</li>
+<li>
+<p><strong>a. Current employees</strong></p>
+</li>
+</ul>
+<h5 class="sebac-heading sebac-h5">1. Pension Contributions</h5>
+<ul class="sebac-list">
+<li>
+<p>a. Effective 7/1/17 Contributions in all SERS Tiers, (including the Hybrid Plan for those in Higher Education), shall increase by 1.5% of salary. Member may choose to reduce Retiree Health Care contribution for the 7/1/17 through 6/30/18 fiscal year by the same amount by signing an election form so indicating. A member so choosing pays the RHC Fund back by paying an additional<sup>1/2%</sup> of salary towards RHC for 4 years, beginning 7/1/19. The form shall indicate the repayment schedule, and give the Trust Fund the ability to collect the amount due from terminal pay should the employee leave state service before the full amount is returned to the Fund. The repayment schedule is Attachment B.</p>
+</li>
+<li>
+<p>b. Effective 7/1/19, Pension contribution increases by an additional 1/2% of salary (total increase is 2%).</p>
+</li>
+<li>
+<p>c. The effect on ARP contributions is shown at Attachment C.</p>
+</li>
+</ul>
+<ol class="sebac-list sebac-numbered-list" start="2">
+<li>Pension Structure. For all current employees, benefits upon retirement shall be as set forth for their respective tiers, except</li>
+</ol>
+<p>for employees retiring on or after 7/1/22, the following changes to COLA shall occur.</p>
+<ul class="sebac-list">
+<li>
+<p>a. Revised Cost of Living Formula.</p>
+</li>
+<li>
+<p>i. The revised Cost of Living Adjustment (COLA) for eligible employees retiring 7/1/22 or later shall be based on a formula which uses the annual increase of the Consumer Price Index for Urban Wage Earners and Clerical Workers (CPI-W) for the twelve-month period prior to the effective date of the COLA.</p>
+</li>
+<li>
+<p>ii. Where such Index increases 2% or less, the COLA will be the actual increase in the CPI-W, if any.</p>
+</li>
+<li>
+<p>iii. Where the CPI-W increases by more than 2%, there will be a minimum COLA increase of 2% and a maximum COLA increase of 7.5%. Within this range, the COLA will be calculated based on 60% of the annual increase of the CPI-W up to 6%, and 75% of the annual increase in the CPI-W over 6%.</p>
+</li>
+<li>
+<p>iv. The CPI-W shall be defined as that utilized by the Social Security Administration as of June 29, 1996.</p>
+</li>
+<li>
+<p>b. Post 6/30/22 Retirees shall receive their first COLA effective 30 months after retirement, and annually thereafter. The first COLA is:</p>
+</li>
+<li>
+<p>i. A standard annual COLA as described in paragraph 2a above, and</p>
+</li>
+<li>
+<p>ii. if during the retiree's first 18 months of retirement, the CPI-W goes up more than an annualized 5.5% an additional COLA shall be paid. The additional COLA is computed using the above formula, minus 2.5%, multiplied by 1.5 (to cover the 18 month or 1.5 year delay). Examples are shown at Attachment C.</p>
+</li>
+<li>
+<p>b. Disability Retirement Modification and Continuing Discussions</p>
+</li>
+<li>
+<p>i. Current plan provisions which impose Social Security Disability Retirement Offsets on retirees' spouses or designated dependent following the passing of the retiree are removed from the Plan.</p>
+</li>
+<li>
+<p>ii. Effective as soon as administratively feasible, current disability retirees shall be required to apply for Social Security Disability. Future disability retirees shall be required to apply within two years of their receipt of State Disability retirement. No retiree shall be required to sustain any cost in order to apply, nor shall any retiree be penalized if such</p>
+</li>
+</ul>
+<p>application is not granted. A retiree may be requested to appeal a denial of disability retirement if in the opinion of the Retirement and Benefit Services Division, such denial is inappropriate, in which case the Division shall assist the Retiree in filing the appeal at no cost to the retiree. No disability retiree who applies for Social Security Disability shall receive less in total benefits as a result of this provision.</p>
+<ul class="sebac-list">
+<li>
+<p>iii. The parties shall continue discussing the appropriateness of the differing offset rules that affect state disability retirement.</p>
+</li>
+<li>
+<p><strong>C. New Employees effective 7/1/17.</strong> Changes to the health care, retiree health care, and pension benefits for employees hired on or after 7/1/17 shall be as set forth in Attachment E. Except as specifically set forth in that Appendix, health care, retiree health care, and pension benefits for employees hired on or after 7/1/17 shall be identical to those hired on 6/30/17.</p>
+</li>
+<li>
+<p><strong>D. Reaffirmation of the Transformation Process.</strong> The parties recognize and reaffirm their commitment to the purposes and processes set forth in section I of SEBAC 2011. They will meet no later than October 1, 2017, to establish and then maintain the mutual structures necessary to reflect that commitment.</p>
+</li>
+<li>
+<p><strong>E. Use of Sick Leave to Care for Family Member Requiring Care.</strong> Bargaining unit employees may use their sick leave to care for an immediate family member in circumstances which would meet the requirement for qualified family care under the Family and Medical Leave Act or other state or federal family medical leave provisions. Use of sick leave to which an employee is entitled under this paragraph shall not be deemed an incident or occurrence under an absence control policy. Family and Medical Leave for such employees shall be governed by federal law and by C.G.S. §31-51kk. In addition, employees shall have the ability to take unpaid maternity, paternity, or other childrearing leave for up to four months beyond the expiration of any leave otherwise due under this section or under the FMLA, and as is current practice, employees may extend personal medical leave for up to 24 weeks after all other leaves have expired and with appropriate medical certification. Permanent part-time employees who do not meet the hours threshold of state and federal law shall continue to be eligible for unpaid family leave as per current practice.</p>
+</li>
+<li>
+<p><strong>F. Sheriff's Time Purchase by Judicial Marshals and former Judicial Marshals:</strong> The 4/28/15 Memorandum of Agreement affecting the purchase of qualified sheriff's time by current occupants of the Judicial Marshals series shall be modified as follows:</p>
+</li>
+<li>
+<p>a. Participation shall be open to all current Hazardous Duty plan participants who currently serve in the Judicial Marshals series or other hazardous duty positions, providing they are otherwise eligible to purchase service under that agreement.</p>
+</li>
+<li>
+<p>b. Up to 2 of the years purchased under that agreement may count toward retirement eligibility as well as retirement credit.</p>
+</li>
+<li>
+<p><strong>G. CDL Medical Examinations --</strong> The parties recognize that Commercial Drivers Licenses (CDLs) , which are required in some bargaining unit positions, now come with a requirement for so-called "CDL Medical Examinations" which are not covered under the State Employee Health Plan. The State recognizes the value of providing coverage for such examinations. In order to streamline the process, the State will contract with an appropriate statewide provider, such as Concentra Medical, which is currently contracted with the Judicial Branch to perform the CDL medical exam, to provide such examinations to employees in the executive branch. The particular provider for the executive branch will be determined through an appropriate RFP process. The State will pay for exams for eligible employees provided at the chosen provider's facilities.</p>
+</li>
+<li>
+<p><strong>H. Furlough Days -</strong> The parties to unit agreements which are or will be attached hereto have negotiated for three furlough days in FY 2018, provided that notwithstanding any furlough day language in any local bargaining unit agreement, units may substitute accrual reductions or other means that produce equivalent savings.</p>
+</li>
+</ul>
+<h3 class="sebac-heading sebac-h3">II. Job Security</h3>
+<ul class="sebac-list">
+<li><strong>A. Job Security for Office of Labor Relations -Covered Units.</strong> The following job security provisions shall apply to all OLR Covered units which agree or have agreed to contracts in accordance with the 2017 Agreement Framework including the provisions for wages and other changes which are summarized in Attachment F.</li>
+</ul>
+<ol class="sebac-list sebac-numbered-list">
+<li>From the July 1, 2017 and through June 30, 2021, there shall be no loss of employment for any bargaining unit employee hired prior to July 1, 2017, including loss of employment due to programmatic changes, subject to the following conditions:</li>
+</ol>
+<ul class="sebac-list">
+<li>
+<p>a. Protection from loss of employment is for permanent employees and does not apply to:</p>
+</li>
+<li>
+<p>i. employees in the initial working test period;</p>
+</li>
+<li>
+<p>ii. those who leave at the natural expiration of a fixed appointment term, including expiration of any employment with an end date;</p>
+</li>
+<li>
+<p>iii. expiration of a temporary, durational or special appointment; iv. non-renewal of a non-tenured employee (except in units where non-tenured have permanent status prior to achieving tenure);</p>
+</li>
+<li>
+<p>v. termination of grant or other outside funding specified for a particular position;</p>
+</li>
+<li>
+<p>vi. part-time employees who are not eligible for health insurance benefits.</p>
+</li>
+<li>
+<p>b. This protection from loss of employment does not prevent the State from restructuring and/or eliminating positions provided those affected bump or transfer to another comparable job in accordance</p>
+</li>
+</ul>
+<p>with the terms of the attached implementation agreement. An employee who is laid off under the rules of the implementation provisions below because of the refusal of an offered position will not be considered a layoff for purposes of this Agreement.</p>
+<ul class="sebac-list">
+<li>c. The State is not precluded from noticing layoff in order to accomplish any of the above, or for layoffs effective after 6/30/21.</li>
+</ul>
+<ol class="sebac-list sebac-numbered-list" start="2">
+<li>
+<p>The Office of Policy and Management and the Office of Labor Relations commit to continuing the effectiveness of the Placement &amp; Training Process during and beyond the biennium to facilitate the carrying out of its purposes.</p>
+</li>
+<li>
+<p>The State shall continue to utilize the funds previously established for carrying out the State's commitments under this agreement and to facilitate the Placement and Training process.</p>
+</li>
+</ol>
+<h4 class="sebac-heading sebac-h4">B. Implementation Provisions for SEBAC 2017 Job Security for OLR Covered Units</h4>
+<p>The process outlined in this section is a supplement to the October 18, 2005 Placement and Training Agreement and is designed to govern the procedure utilized in situations where there are employees covered by the Placement and Training Agreement who are impacted by a decision to close a state facility or make other programmatic changes which would have resulted in the layoff of state employees but for the Job Security Provisions of SEBAC 2017, and transfers necessary to deal with workload issues necessitating the transfer of state employees to different work units, locations or facilities. The provisions hereunder shall expire as of June 30, 2021, unless extended by mutual agreement of the parties. The State will continue to provide the longest possible advance notice as provided in Section 7d of the Placement and Training Agreement to the unions and employees impacted by such decisions. The process described below shall be known as the Job Security Implementation ("JSI") Process.</p>
+<ol class="sebac-list sebac-numbered-list">
+<li>There shall be a four-phase process as follows:</li>
+</ol>
+<ul class="sebac-list">
+<li>
+<p>a. <strong>Phase I.</strong> In the event of a significant reorganization, the State may contact affected bargaining units, and the Coalition, to discuss voluntary alternatives to placement to be offered to employees who would be affected by the reorganization. No such alternative will reduce the rights of any employee under this agreement should the employee not voluntarily elect the offered choice(s).</p>
+</li>
+<li>
+<p>b. <strong>Phase II.</strong> The State shall use its best efforts to attempt to combine the placement and transfers of individuals in the event of multiple closings and programmatic changes occurring within the same period of time to maximize the likelihood of success.</p>
+</li>
+<li>
+<p>i. Initially affected employees would enter the Placement and Training (P&amp;T) process.</p>
+</li>
+<li>
+<p>ii. May use normal P&amp;T rights.</p>
+</li>
+<li>
+<p>iii. In addition, the Secretary of OPM shall use best efforts to make comparable jobs available within acceptable geographic radius</p>
+</li>
+</ul>
+<p>(defined below). Such jobs will typically be in the affected employees' bargaining unit.</p>
+<ul class="sebac-list">
+<li>
+<p>iv. Comparable jobs within the same bargaining unit shall be initially offered to affected employees on the basis of layoff seniority as defined in their collective bargaining agreement and, if necessary, state service.</p>
+</li>
+<li>
+<p>v. Any affected employee not accepting a comparable job then goes to Phase III.</p>
+</li>
+<li>
+<p><strong>c. Phase III.</strong> The collective bargaining agreement (CBA) process begins. Initially affected employees and/or secondarily affected employees may then exercise their rights under the CBA. The CBA process ends when either (1) the affected employee(s) has a comparable job; or (2) the affected employee(s) choose to waive further contractual displacement rights and enter Phase III.</p>
+</li>
+<li>
+<p><strong>d. Phase IV.</strong> Finally any remaining affected employee(s) would enter the P&amp;T process.</p>
+</li>
+<li>
+<p>i. May use normal P&amp;T rights.</p>
+</li>
+<li>
+<p>ii. In addition, the Secretary of OPM uses best efforts to make comparable jobs available within acceptable geographic radius (defined below). Such job will typically be in the affected employees' bargaining unit.</p>
+</li>
+<li>
+<p>iii. Comparable jobs within the same bargaining unit shall be initially offered to affected employees on the basis of layoff seniority as defined in their collective bargaining agreement and, if necessary, state service.</p>
+</li>
+<li>
+<p>iv. If no comparable job available within the acceptable geographic radius, the finally affected employee(s) will be offered other jobs within the acceptable geographic radius on a temporary basis until comparable job available, and are red-circled in original pay-grade.</p>
+</li>
+<li>
+<p>v. Employee may be offered training through the P&amp;T Committee as a way of moving employee to a position comparable to the one lost.</p>
+</li>
+<li>
+<p>vi. No employee shall have a right to a promotion under this process.</p>
+</li>
+<li>
+<p>vii. Affected employee refusing an assignment within the acceptable geographic radius during Phase 3 of the process may be laid off, but will have all usual rights of laid off employees.</p>
+</li>
+</ul>
+<ol class="sebac-list sebac-numbered-list" start="2">
+<li>Relevant definitions which apply to this process only and shall not be utilized for any other purpose:</li>
+</ol>
+<ul class="sebac-list">
+<li>
+<p>a. "Comparable job" means one with similar duties and the same or substantially similar biweekly salary range. The requirement to offer a comparable job shall not be met if the target job requires a hazardous duty retirement covered employee to move to non-hazardous duty retirement employment, or vice versa.</p>
+</li>
+<li>
+<p>b. "Acceptable geographic radius" for Phase I means a one way commute equal to the greater of his/her present commute or thirty (30) miles from his/her</p>
+</li>
+</ul>
+<p>work location at the time of notice. During Phase III, acceptable geographic radius means a one-way commute equal to the greater of his/her present commute or thirty (30) miles from his/her home. In the event that there is no opportunity within the applicable thirty (30) mile measurement, the State will provide an opportunity within a fifty (50) mile radius based upon the applicable measurement. In the event an opportunity becomes available prior to July 1, 2023 within the applicable thirty (30) mile limitation, the impacted individual shall be offered such position before it is offered to an individual with lesser rights. In the event the individual declines such position within the applicable thirty (30) mile measurement, the State has no further obligation to offer another position to such individual based upon the geographic restriction.</p>
+<ul class="sebac-list">
+<li>c. Manner of measurement. The parties have agreed to utilize MapQuest, shortest distance for positions offered in Phase II and MapQuest, shortest time for positions offered in Phase IV.</li>
+</ul>
+<ol class="sebac-list sebac-numbered-list" start="3">
+<li><strong>Priority, Working Test Period Issues, and Related Issues</strong></li>
+</ol>
+<ul class="sebac-list">
+<li>
+<p>a. Employees needing positions through the process outlined in this Section B (as compared to the normal P&amp;T process) have priority over other claimants to position based on the SEBAC 2017 job security provisions. Provided, however, seniority under the CBA may be utilized for the purpose of shift selection in the target facility.</p>
+</li>
+<li>
+<p>b. Where a job is offered to comply with the rules of this Section, which would require the completion of a working test period, failure of the employee to successfully complete that working test period will return the employee to the process outlined in this Section B, unless the reasons for the failure would constitute just cause for dismissal from state service. The process outlined in this Section B terminates as of June 30, 2021, or when there is no employee remaining with rights to the process, whichever is later.</p>
+</li>
+</ul>
+<ol class="sebac-list sebac-numbered-list" start="4">
+<li><strong>Dispute Resolution</strong></li>
+</ol>
+<ul class="sebac-list">
+<li>
+<p>a. "Work now, grieve later" applies as usual to JSI related grievances.</p>
+</li>
+<li>
+<p>b. Placement &amp;Training Committee to convene for emergency advisory procedure if employee claims he or she is being inappropriately laid off in violation of the JSI procedure.</p>
+</li>
+<li>
+<p>c. Any arbitration necessary to resolve a claim that an employee is being denied a suitable comparable assignment under this agreement shall receive priority processing for purposes of assignment of an arbitrator, a hearing date, and resolution of the arbitration. Any dispute or arbitration under this agreement shall be under the SEBAC agreement process.</p>
+</li>
+</ul>
+<h5 class="sebac-heading sebac-h5">5. Transfer Implications</h5>
+<ul class="sebac-list">
+<li>
+<p>a. Where staffing disproportions other than through agency consolidations, the process outlined in this Section B will be used to eliminate the necessity of a transfer (directly or through layoff notice). If there is more than one employee in the impacted classification, the State shall ask the employees in layoff seniority order and, in the event there are no volunteers, the junior employee shall be transferred.</p>
+</li>
+<li>
+<p>b. In cases where involuntary transfers occur, affected employees shall have the right of first refusal to return to their prior geographic locations prior to an equivalent position being offered at the prior geographic location to a less senior person.</p>
+</li>
+</ul>
+<h4 class="sebac-heading sebac-h4">C. Job Security for Units Not Covered by OLR</h4>
+<p>Job security for other units has been or shall be negotiated on a unit-by-unit basis consistent with the 2017 Agreement Framework, including the provisions for wages and other matters which are summarized in Attachment F.</p>
+<h3 class="sebac-heading sebac-h3">III. Tentative Agreement, Subject to Ratification and Approval by the General Assembly</h3>
+<p>By their signatures below, the parties indicate that this tentative agreement has been approved by the Governor, and preliminarily recommended by SEBAC Leadership for ratification by the membership. This Agreement shall be deemed to include, as Attachment G, all bargaining unit agreements tentatively agreed to in accordance with Attachment F by their appropriate negotiating parties. Those agreements are subject to approval in accordance with their local bargaining unit processes and procedures, and shall become effective if and when this tentative agreement is ratified by SEBAC Leadership and approved by the General Assembly. Final ratification by SEBAC Leadership will occur in accordance with SEBAC rules following membership voting on this Tentative Agreement. This agreement is further subject to the approval of the General Assembly in accordance with the provisions of Connecticut General Statutes §5-278(b).</p>
+<h3 class="sebac-heading sebac-h3">IV. Duration</h3>
+<p>The provisions of the current SEBAC Agreement shall be extended until June 30, 2027.</p>
+<div class="sebac-signatures"><p><strong>Daniel E. Livingston</strong><br/>Chief Negotiator, SEBAC</p><p><strong>Lisa Grasso Egan</strong><br/>Undersecretary of Labor Relations, State of Connecticut</p></div>
+<p>Dated this 25th day of June, 2017.</p>
+<h3 class="sebac-heading sebac-h3">Attachment A - Health Insurance Design Specifications</h3>
+<h4 class="sebac-heading sebac-h4">I. Further Explanation of Pharmacy Changes</h4>
+<h5 class="sebac-heading sebac-h5">a. The Formulary Change</h5>
+<p>The state employees' health care plan will adopt a standard formulary that allows for prior authorizations of certain drugs to ensure appropriate use and in certain instances when lower cost clinically equivalent alternatives are available. Prior authorization denials can be appealed through the pharmacy benefit manager's standard appeal process. A plan member who receives an adverse second level appeal from the pharmacy benefit manager may further appeal to the Health Care Cost Containment Committee. The Health Care Cost Containment Committee will approve the payment of claims in which the prescribing physician attests that the non-formulary option is medically necessary for the patient.</p>
+<p>All third level appeals unrelated to the adoption of the standard formulary as described above will continue to utilize the external appeal process with the Connecticut Department of Insurance.</p>
+<h5 class="sebac-heading sebac-h5">b. The 4 Tier Co-Pay Structure</h5>
+<p>The $25, and $40 are preferred brand name, and non-preferred brand name, with no change in current practice, including but not limited to waiver practice. The $5 and $10 tiers are both generics, with the former designed to incent members to use equally clinically advantageous but more price effective generics as prescribed by their doctors. Additional generics will be added to the lower priced Tiers whenever doing so is consistent with good pharmaceutical practice and cost-effective for the Plan and its participants.</p>
+<h4 class="sebac-heading sebac-h4">II. Positive Incentive Based Design Changes</h4>
+<p>Preferred primary care and specialist care rankings, and the Smart Shopper program, are positive incentive based only programs -that is, the participant cost structure is unchanged from current practice with respect to non-preferred physicians or procedures taking place at sites not covered by Smart Shopper. As such, physicians and procedures will be reviewed on an ongoing basis so that they may be moved into or out of Smart Shopper or in and out of preferred status, as the quality and savings data indicates. In no case will any procedure be moved out of Smart Shopper, or any physician out of preferred status without advance notice available to guide participant choice.</p>
+<h4 class="sebac-heading sebac-h4">III. Site of Service</h4>
+<p>Site of service works off of, but modifies, the current network structure for outpatient labs and diagnostic imaging.</p>
+<ul class="sebac-list">
+<li>
+<p>a. The current out of network facilities remain out of network under Site of Service, all current access rules apply, and the sole change is the POS participants who choose to use such facilities will pay a 40% co-insurance rather than a 20% co-insurance. As is current practice, POE participants do not have coverage for out of network facilities.</p>
+</li>
+<li>
+<p>b. Current in-network facilities will now be restructured between preferred facilities which are covered 100% (no coinsurance), and non-preferred facilities which are covered 80% (20% co-insurance). Current state-wide access rules apply to the preferred facilities: All plans must maintain an adequate number and distribution of preferred facilities to ensure reasonable access to all plan members. . Non-preferred facilities are those within hospitals, or solely hospital owned, which charge facilities fees or otherwise inflated prices for services readily available at preferred facilities. Facilities will be reviewed over time to allow movement between non-preferred and preferred, but statewide access rules for preferred facilities must always be met, and plan participants must always have real-time prior access to a facility's preferred or non-preferred status.</p>
+</li>
+<li>
+<p>c. Out of network waiver processes, which allow treatment in out of network facilities to be treated as in network, will also apply in the event there is a medically necessary reason that a participant is unable to use a preferred facility for an outpatient lab test or diagnostic imaging.</p>
+</li>
+<li>
+<p>d. Current out-of-area protections apply to participants who are out of area so that Site of Service rules will not apply out of area unless there is a network in that area which fully meets plan access requirement.</p>
+</li>
+</ul>
+<h3 class="sebac-heading sebac-h3">Attachment B - Repayment Schedule for the Retiree Healthcare Trust Fund</h3>
+<p>The parties have agreed that for those choosing to lower their retiree healthcare contributions by 1.5% for one year (7/1/17 to 6/30/18) to offset the effects of a 1.5% pension contribution increase that year, the repayment will be 2% of salary paid as 1/2 % for four years beginning on 7/1/19. The parties have further agreed that this repayment schedule will be adjusted for employees who make full payment prior to 6/30/2022 to provide for a similar pro-rated return on investment for the Retiree Healthcare Fund. That schedule shall be prepared by the Office of the State Comptroller.</p>
+<h3 class="sebac-heading sebac-h3">Attachment C - Effect on ARP Contributions</h3>
+<ol class="sebac-list sebac-numbered-list">
+<li>
+<p>On the same effective dates as SERS Employee contributions increase, ARP Employer Contributions decrease by one half the amount of SERS employee contribution increases to a total of 1%.</p>
+</li>
+<li>
+<p>On those dates, except for ARP participants who execute an ARP an "opt out" form providing by the State Comptroller's office indicating his/her decision to remain at the current employee contribution, each ARP participant's employee contribution shall increase by the same amount as the Employer share decreases.</p>
+</li>
+<li>
+<p>As is current practice, the employee contribution for the Hybrid shall remain 3% higher than the employee contribution for the equivalent SERS Tier. For example, when under this agreement, the employee contribution for SERS Tier 2 goes to 2%, the employee contribution for the parallel Hybrid Tier 2 shall be 5%.</p>
+</li>
+<li>
+<p>Pursuant to IRS regulations, employees who bought into the Hybrid plan which is parallel to SERS Tier 2 have been making 3% contribution to SERS, and 2% Employee contributions to the ARP. In July of 2017, and July of 2019, when their SERS contributions increase by 1.5%, and .5% respectively, such employee's ARP contributions shall remain at 2%, unless such employee affirmatively opts out of continuing ARP contributions on a form to be provided by the office of the State Comptroller.</p>
+</li>
+</ol>
+<h3 class="sebac-heading sebac-h3">Attachment D - Examples of 18 Month COLA Review</h3>
+<ul class="sebac-list">
+<li>
+<p>Lowest CPI Circuit Breaker -- CPI-W for 18 months goes up annualized 5.5%. Using already existing COLA formula: COLA=5.5<em>60%=33%. Subtract 2.5%=.8%. Multiply by 1.5 (for 18 month period)=1.2% </em><em>circuit breaker COLA</em>* (paid in addition to normal COLA one time at 30 months after retirement)</p>
+</li>
+<li>
+<p>Highest CPI Circuit Breaker -- CPI-W for 18 months goes up annualized 11.2%. Using already existing COLA formula: COLA=6<em>60%(=3.6%), plus 5.2</em>75%(=3.9%)=7.5% (current maximum). Subtract 2.5%=5%. Multiply by 1.5 (for 18 months)=7.5% <strong>circuit breaker COLA</strong> (paid in addition to normal COLA one time at 30 months after retirement)</p>
+</li>
+</ul>
+<h3 class="sebac-heading sebac-h3">Attachment E - Pension, Health Care, and Retiree Healthcare Provisions Affecting New Employees First Hired On or After 7/1/2017</h3>
+<p>Except as specifically set forth in this Attachment, health care, retiree health care, and pension benefits for employees hired on or after 7/1/17 shall be identical to those hired on 6/30/17. The changes specific to such new employees shall be:</p>
+<h4 class="sebac-heading sebac-h4">I. Pension</h4>
+<ul class="sebac-list">
+<li>
+<p>a. The Employer contribution to the ARP shall be reduced to 6.5% of salary. Newly hired employees choosing the ARP shall have the option of an employee contribution of 6.5% -- which shall be the default option - or an employee contribution of 5% if he or she opts out of the 6.5% contribution on a form provided by the State Comptroller.</p>
+</li>
+<li>
+<p>b. SERS Types (Normal, Hazardous Duty, and Hybrid) shall pay 3% of base salary contribution more than Tier 3 employees in their respective programs.</p>
+</li>
+<li>
+<p>c. All SERS Types shall include the following provision for sharing the risk of adverse plan performance:</p>
+</li>
+</ul>
+<p>The employee contribution for each calendar year may exceed the base contribution by no more than 2% through actuarial risk sharing. The amount of additional contribution, if any, shall be 1/2 the amount, if any, by which the Employer normal cost was raised in the previous plan year due to adverse actuarial performance (as measured against the investment assumption of 6.9%) without consideration of asset smoothing or other similar actuarial methods that limit the recognition of market variation . Should the Plan change its actuarial assumption, the parties will discuss whether it is appropriate to alter this measure. Hybrid Works off Tier 4 same way as Tier 3 (3% extra employee contribution in return for the DC option upon leaving state service.</p>
+<ul class="sebac-list">
+<li><strong>d. The Structural Changes for Normal Retirement (including the Hybrid) shall be</strong></li>
+</ul>
+<ol class="sebac-list sebac-numbered-list">
+<li>
+<p>The multiplier for computing the pension for a normal or early retirement shall be 1.3% without a breakpoint.</p>
+</li>
+<li>
+<p>There shall be a 1% Employer Contribution to a plan qualified under I.R.C. §401(a), with a mandatory 1% Employee contribution. Additional employee contributions may be made to a 457 Plan. Vesting of the Employer contribution shall be {insert vesting schedule}</p>
+</li>
+<li>
+<p>The overtime contribution to final average pay will be computed based on the employee's total overtime hours averaged over the employee's last twenty-five (25) years of service multiplied by the employee's average hourly base rate during the five years used for computing Final Average Earnings.</p>
+</li>
+<li>
+<p>For purposes of computing Final Average Earnings, the amount over base pay which is added by overtime work shall not be more than 60%.</p>
+</li>
+<li>
+<p>Disability Retirement shall be handled as per Tier 3.</p>
+</li>
+</ol>
+<ul class="sebac-list">
+<li>e. <strong>The Structural changes for Hazardous Duty shall be</strong></li>
+</ul>
+<ol class="sebac-list sebac-numbered-list">
+<li>
+<p>The ability to retire at fewer than 25 years with a hazardous duty pension shall no longer apply.</p>
+</li>
+<li>
+<p>Items 2 through 5 above, affecting Normal Retirement, shall also affect Hazardous Duty Retirement</p>
+</li>
+</ol>
+<ul class="sebac-list">
+<li>
+<p><strong>II. Health Care --</strong> The employee premium shares shall be 3% higher than those in effect as of 7/1/17, except that the 3% increase shall not raise any premium share to beyond 16%. This shall have no impact on premium shares already at 16% or over.</p>
+</li>
+<li>
+<p><strong>III. Retiree Health Care</strong> -The 3% Retiree Health Care contribution for new employees shall be paid for 15 years.</p>
+</li>
+</ul>
+<h3 class="sebac-heading sebac-h3">Attachment F</h3>
+<p><strong>State of Connecticut and SEBAC -Framework Concerning Wages and Other Matters and Their Relationship to Job Security (hereinafter referred to as the "2017 Agreement Framework")</strong></p>
+<p>The State and SEBAC recognize that wages and other matters are negotiated on a bargaining unit basis by the union designated as the exclusive bargaining representative for that unit. However, the State and SEBAC have agreed that the following parameters shall apply to all units seeking the job security protections of the SEBAC 2017 Agreement.</p>
+<ul class="sebac-list">
+<li>
+<p>I. The following parameters shall apply to wage agreements through June 30, 2021:</p>
+</li>
+<li>
+<p><strong>a. Wage increases for FY 2016-17 and FY 2017-18 -</strong> Except as provided below, no state employee who is represented by a bargaining unit that is part of SEBAC will receive any increase in salary or payments for either of the next two fiscal years deriving from a General Wage, step increase, annual increment, payment for individuals who were at their top step as a bonus, for the above two fiscal years.</p>
+</li>
+</ul>
+<p>Individuals entitled to a promotion in accordance with the rules governing these subjects as outlined in the Connecticut General Statutes or their collective bargaining agreement shall receive increase in wages due to such promotion in accordance with past practice.</p>
+<ul class="sebac-list">
+<li>
+<p><strong>b. Payments for the FY 2018-19 Fiscal Year.</strong> There shall be a $2000 one-time payment to all employees, or top step lump sum plus $1000 if greater. All payments shall be pensionable in accordance with the Plan's normal rules. The one-time payments shall be paid in July of 2018. The top step lump paid shall be paid on the employee's normal increment date. The one-time payment amount shall be pro-rated for part-time unit employees.</p>
+</li>
+<li>
+<p><strong>c. Wage increases for 2019-2020 and FY 2020-21 -</strong> Provide a three and one-half percent (3.5%) increase plus step increases, annual increments or their equivalent in those units that have them as part of their collective bargaining agreement. Local parties are not prevented from using part of the GWI for restructuring payments to employees. Non-increment units will receive additional payments in accordance with the parties' usual practice.</p>
+</li>
+<li>
+<p>IV. <strong>Funds and other payments -</strong> All other funds (e.g., tuition reimbursement) and other wage payments e.g., shift differential, allowances, etc., shall remain in place and continue in the same amounts presently in the respective collective bargaining agreement, except to the extent otherwise called for in the collective bargaining agreements. As the FY 2016-17 year has or will shortly pass, those units which did not</p>
+</li>
+</ul>
+<p>receive funds for that year shall receive<sup>1/2</sup> the normal amount for that year, plus any additional amount needed to pay off obligations for that fiscal year without reducing the funds available in the subsequent fiscal year. Unexpended fund amounts shall roll over year to year. Any unexpended funds shall lapse or shall not lapse as of June 30, 2021, in accordance with whatever rules are set forth or practices determined in local agreements.</p>
+<ul class="sebac-list">
+<li>
+<p><strong>V. The Assistant Attorney Generals Bargaining Unit -</strong> This unit will negotiate and arbitrate the provisions of their collective bargaining agreement through June 30, 2021. They will be governed by the other portions of the SEBAC 2017 agreement as outlined herein.</p>
+</li>
+<li>
+<p><strong>VI. Longevity -</strong> The only change with respect to longevity is that the April 2018 longevity payment will be made in July 2018.</p>
+</li>
+<li>
+<p><strong>VII. Furlough Days --</strong> There shall be three furlough days in FY 17-18. These shall be handled for pension purposes under the Voluntary Schedule Reduction Program. The exact manner of taking days and reflecting the appropriate financial impact shall negotiated by each bargaining unit.</p>
+</li>
+<li>
+<p><strong>VIII. Additional Provisions --</strong> Bargaining units will be offered</p>
+</li>
+<li>
+<p>a. Continuation of language to prevent privatization leading to layoffs</p>
+</li>
+<li>
+<p>b. Options for telecommuting consistent with job duties where such is operationally feasible.</p>
+</li>
+</ul>
+<h3 class="sebac-heading sebac-h3">Attachment G - Unit Agreements</h3>
+<p>Bargaining unit agreements which have been negotiated and ratified in connection with the 2017 discussions between the State and SEBAC are will be attached hereto along with their required supporting documents.</p>
+</div>
+</details>
+<details class="article" id="memoranda" data-title="memoranda of agreement">
 <summary><span class="article-title">Memoranda of Agreement</span><span class="article-count"></span></summary>
 <div class="article-body"><p>All prior memoranda of agreement not incorporated into this agreement are null and void.</p>
 <h3 class="subhead">Memorandum of Agreement #1 Merit Pool</h3>
