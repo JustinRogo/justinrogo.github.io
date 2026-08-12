@@ -972,6 +972,13 @@
                 '4F': '../../../Maps/4F.png',
                 '5F': '../../../Maps/5F.png',
             };
+            const IMAGE_DATA_URLS = {
+                '1F': 'https://raw.githubusercontent.com/JustinRogo/justinrogo.github.io/refs/heads/main/Maps/1F.png',
+                '2F': 'https://raw.githubusercontent.com/JustinRogo/justinrogo.github.io/refs/heads/main/Maps/2F.png',
+                '3F': 'https://raw.githubusercontent.com/JustinRogo/justinrogo.github.io/refs/heads/main/Maps/3F.png',
+                '4F': 'https://raw.githubusercontent.com/JustinRogo/justinrogo.github.io/refs/heads/main/Maps/4F.png',
+                '5F': 'https://raw.githubusercontent.com/JustinRogo/justinrogo.github.io/refs/heads/main/Maps/5F.png',
+            };
 
             // --- Floors ---------------------------------------------------------------
             const DEFAULT_FLOOR_INDEX = 2;
@@ -1350,7 +1357,7 @@
                     note: (notesEl?.value || "").trim(),
                     floors: FLOORS.map(fl => ({
                         id: fl.id,
-                        image_data_url: fl.img.naturalWidth ? fl.img.src : null,
+                        image_data_url: fl.img.naturalWidth ? IMAGE_DATA_URLS[fl.id] : null,
                         image_size: fl.img.naturalWidth ? { w: fl.img.naturalWidth, h: fl.img.naturalHeight } : null,
                         points: fl.points
                     })),
