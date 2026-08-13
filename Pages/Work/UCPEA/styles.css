@@ -567,6 +567,43 @@ h1 em {
   padding-bottom: 52px;
 }
 
+.calendar-section {
+  padding-top: 72px;
+  padding-bottom: 72px;
+}
+
+.calendar-panel {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.calendar-panel__topline {
+  min-height: 72px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-soft);
+}
+
+.calendar-frame-wrap {
+  min-height: 720px;
+  padding: 16px;
+  background: #fff;
+}
+
+.calendar-frame {
+  display: block;
+  width: 100%;
+  height: 700px;
+  border: 0;
+  background: #fff;
+}
+
 .help-launcher {
   display: grid;
   grid-template-columns: minmax(300px, .8fr) minmax(440px, 1.2fr);
@@ -2214,6 +2251,19 @@ html[data-theme="dark"] .update-state {
   .help-result__actions,
   .deadline-result__actions {
     display: grid;
+  }
+
+  .calendar-panel__topline {
+    padding: 18px;
+  }
+
+  .calendar-frame-wrap {
+    min-height: 590px;
+    padding: 8px;
+  }
+
+  .calendar-frame {
+    height: 574px;
   }
 
   .deadline-shortcuts a,
