@@ -21,7 +21,7 @@
     <link rel="manifest" href="./manifest.webmanifest">
     <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
-    <title>Occupancy Heatmap | Dashboard</title>
+    <title>Law Library Heatmap</title>
     <script>
         (() => {
             const allowedThemes = new Set(['dark', 'light', 'oled']);
@@ -154,6 +154,23 @@
             align-items: center;
             gap: 0.75rem;
             flex-shrink: 0;
+        }
+
+        .tutorial-trigger {
+            min-height: 32px;
+            padding: 0.3rem 0.65rem;
+            border-radius: 99px;
+            background: var(--bg-input);
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .tutorial-trigger:hover:not(:disabled) {
+            color: var(--text-main);
+        }
+
+        .tutorial-trigger svg {
+            flex: 0 0 auto;
         }
 
         .sync-status {
@@ -466,6 +483,116 @@
             box-shadow: 0 -4px 10px rgba(0,0,0,0.2);
         }
 
+        /* --- Guided tutorial --- */
+        .tutorial-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .tutorial-overlay[hidden],
+        .tutorial-card [hidden] {
+            display: none !important;
+        }
+
+        .tutorial-backdrop {
+            position: absolute;
+            inset: 0;
+            pointer-events: auto;
+        }
+
+        .tutorial-spotlight {
+            position: fixed;
+            z-index: 1;
+            border: 3px solid #60a5fa;
+            border-radius: 14px;
+            box-shadow:
+                0 0 0 9999px rgba(2, 6, 23, 0.76),
+                0 0 0 6px rgba(96, 165, 250, 0.2),
+                0 12px 32px rgba(0, 0, 0, 0.35);
+            pointer-events: none;
+            transition: top 0.18s ease, left 0.18s ease, width 0.18s ease, height 0.18s ease;
+        }
+
+        .tutorial-card {
+            position: fixed;
+            z-index: 2;
+            width: min(370px, calc(100vw - 2rem));
+            max-height: calc(100dvh - 2rem);
+            overflow-y: auto;
+            padding: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: var(--bg-overlay);
+            color: var(--text-main);
+            box-shadow: 0 18px 48px rgba(0, 0, 0, 0.48);
+            pointer-events: auto;
+        }
+
+        .tutorial-card-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .tutorial-step-count {
+            color: var(--primary);
+            font-size: 0.76rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .tutorial-close {
+            min-width: 36px;
+            min-height: 36px;
+            padding: 0.35rem;
+            background: transparent;
+            font-size: 1.1rem;
+        }
+
+        .tutorial-card h2 {
+            margin: 0 0 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .tutorial-card p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 0.92rem;
+            line-height: 1.5;
+        }
+
+        .tutorial-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .tutorial-actions .tutorial-skip {
+            margin-right: auto;
+            padding-inline: 0.5rem;
+            border-color: transparent;
+            background: transparent;
+            color: var(--text-muted);
+        }
+
+        .tutorial-actions .tutorial-next {
+            min-width: 88px;
+            border-color: var(--primary-hover);
+            background: var(--primary);
+            color: #fff;
+            font-weight: 650;
+        }
+
+        .tutorial-actions .tutorial-next:hover:not(:disabled) {
+            background: var(--primary-hover);
+        }
+
         /* --- Settings Panel --- */
         .panel {
             position: fixed;
@@ -713,6 +840,17 @@
                 position: static; /* Don't pop up on mobile, keeps flow */
                 height: 60px;
             }
+
+            .tutorial-card {
+                width: calc(100vw - 1rem);
+                max-height: calc(100dvh - 1rem);
+            }
+        }
+
+        @media (max-width: 430px) {
+            .tutorial-trigger-label { display: none; }
+            .tutorial-trigger { min-width: 36px; padding-inline: 0.45rem; }
+            .sync-status { padding-inline: 0.5rem; }
         }
 
         /* Phone portrait: show every floor at once and prioritize notes. */
@@ -784,6 +922,10 @@
         </div>
 
         <div class="header-actions">
+            <button id="tutorialBtn" type="button" class="tutorial-trigger" aria-label="Tutorial" aria-haspopup="dialog" aria-controls="tutorialOverlay" aria-expanded="false" title="Open tutorial">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path stroke-linecap="round" d="M9.8 9a2.4 2.4 0 014.65.8c0 1.8-2.45 2.05-2.45 3.7M12 17h.01"/></svg>
+                <span class="tutorial-trigger-label">Tutorial</span>
+            </button>
             <div id="syncStatus" class="sync-status" data-state="ready" role="status" aria-live="polite">
                 <span class="sync-dot" aria-hidden="true"></span>
                 <span id="syncStatusText">Ready</span>
@@ -838,6 +980,24 @@
 
         <button id="submit" class="submitbtn">Submit</button>
     </footer>
+
+    <div id="tutorialOverlay" class="tutorial-overlay" hidden>
+        <div id="tutorialBackdrop" class="tutorial-backdrop" aria-hidden="true"></div>
+        <div id="tutorialSpotlight" class="tutorial-spotlight" aria-hidden="true"></div>
+        <section id="tutorialCard" class="tutorial-card" role="dialog" aria-modal="true" aria-labelledby="tutorialTitle" aria-describedby="tutorialText">
+            <div class="tutorial-card-head">
+                <span id="tutorialStepCount" class="tutorial-step-count">Step 1 of 5</span>
+                <button id="tutorialClose" type="button" class="tutorial-close" aria-label="Close tutorial">✕</button>
+            </div>
+            <h2 id="tutorialTitle">Choose a floor</h2>
+            <p id="tutorialText"></p>
+            <div class="tutorial-actions">
+                <button id="tutorialSkip" type="button" class="tutorial-skip">Skip tutorial</button>
+                <button id="tutorialBack" type="button">Back</button>
+                <button id="tutorialNext" type="button" class="tutorial-next">Next</button>
+            </div>
+        </section>
+    </div>
 
     <div id="controlsPanel" class="panel" hidden>
         <div class="control-row">
@@ -1013,6 +1173,18 @@
             const clearBtn = document.getElementById('clear');
             const resetAll = document.getElementById('resetAll');
             const submitBtn = document.getElementById('submit');
+            const tutorialBtn = document.getElementById('tutorialBtn');
+            const tutorialOverlay = document.getElementById('tutorialOverlay');
+            const tutorialBackdrop = document.getElementById('tutorialBackdrop');
+            const tutorialSpotlight = document.getElementById('tutorialSpotlight');
+            const tutorialCard = document.getElementById('tutorialCard');
+            const tutorialStepCount = document.getElementById('tutorialStepCount');
+            const tutorialTitle = document.getElementById('tutorialTitle');
+            const tutorialText = document.getElementById('tutorialText');
+            const tutorialCloseBtn = document.getElementById('tutorialClose');
+            const tutorialSkipBtn = document.getElementById('tutorialSkip');
+            const tutorialBackBtn = document.getElementById('tutorialBack');
+            const tutorialNextBtn = document.getElementById('tutorialNext');
             const syncStatusEl = document.getElementById('syncStatus');
             const syncStatusTextEl = document.getElementById('syncStatusText');
             const clearToastEl = document.getElementById('clearToast');
@@ -1103,6 +1275,158 @@
 
             countModeBtn.onclick = () => setMode('count');
             analyzeModeBtn.onclick = () => setMode('analyze');
+
+            // Guided walkthrough. The tutorial explains the workflow without
+            // changing counts, notes, or submission state.
+            const tutorialSteps = [
+                {
+                    target: () => tabs,
+                    title: 'Choose a floor',
+                    text: 'Select a floor tab before you begin. The badge on each tab shows the number of patrons logged on that floor.',
+                },
+                {
+                    target: () => wrap,
+                    title: 'Log each patron on the map',
+                    text: 'Tap or click once at each patron’s location. Use Undo if you place a point by mistake, then move to the next floor tab.',
+                },
+                {
+                    target: () => notesEl,
+                    title: 'Add an optional note',
+                    text: 'Use the notes field for anything the map cannot show, such as an event, a closed area, or an unusual crowd pattern. You can leave it blank.',
+                },
+                {
+                    target: () => tabs,
+                    title: 'Check all five floors',
+                    text: 'Visit every floor before submitting. If a floor has no patrons, check the map and leave its badge at 0; that still counts as completing the floor check.',
+                },
+                {
+                    target: () => submitBtn,
+                    title: 'Submit after all five floors',
+                    text: 'Once all five floor maps have been checked and any note has been added, select Submit. Wait for the status to change to Submitted before starting another count.',
+                },
+            ];
+            let tutorialIndex = 0;
+            let tutorialReturnFocus = null;
+
+            function positionTutorial() {
+                if (tutorialOverlay.hasAttribute('hidden')) return;
+                const target = tutorialSteps[tutorialIndex].target();
+                if (!target) return;
+
+                const viewportWidth = window.innerWidth;
+                const viewportHeight = window.innerHeight;
+                const edge = viewportWidth <= 768 ? 8 : 16;
+                const gap = 14;
+                const rect = target.getBoundingClientRect();
+                const spotPad = 6;
+                const spotLeft = Math.max(edge, rect.left - spotPad);
+                const spotTop = Math.max(edge, rect.top - spotPad);
+                const spotRight = Math.min(viewportWidth - edge, rect.right + spotPad);
+                const spotBottom = Math.min(viewportHeight - edge, rect.bottom + spotPad);
+
+                Object.assign(tutorialSpotlight.style, {
+                    left: `${spotLeft}px`,
+                    top: `${spotTop}px`,
+                    width: `${Math.max(0, spotRight - spotLeft)}px`,
+                    height: `${Math.max(0, spotBottom - spotTop)}px`,
+                });
+
+                const cardRect = tutorialCard.getBoundingClientRect();
+                let left = Math.min(Math.max(rect.left, edge), viewportWidth - cardRect.width - edge);
+                let top;
+                if (rect.bottom + gap + cardRect.height <= viewportHeight - edge) {
+                    top = rect.bottom + gap;
+                } else if (rect.top - gap - cardRect.height >= edge) {
+                    top = rect.top - gap - cardRect.height;
+                } else {
+                    left = Math.max(edge, Math.min((viewportWidth - cardRect.width) / 2, viewportWidth - cardRect.width - edge));
+                    top = Math.max(edge, Math.min((viewportHeight - cardRect.height) / 2, viewportHeight - cardRect.height - edge));
+                }
+                tutorialCard.style.left = `${left}px`;
+                tutorialCard.style.top = `${top}px`;
+            }
+
+            function renderTutorialStep() {
+                const step = tutorialSteps[tutorialIndex];
+                tutorialStepCount.textContent = `Step ${tutorialIndex + 1} of ${tutorialSteps.length}`;
+                tutorialTitle.textContent = step.title;
+                tutorialText.textContent = step.text;
+                tutorialBackBtn.disabled = tutorialIndex === 0;
+                tutorialSkipBtn.hidden = tutorialIndex === tutorialSteps.length - 1;
+                tutorialNextBtn.textContent = tutorialIndex === tutorialSteps.length - 1 ? 'Finish' : 'Next';
+                requestAnimationFrame(positionTutorial);
+            }
+
+            function openTutorial() {
+                tutorialReturnFocus = document.activeElement;
+                setMode('count');
+                document.getElementById('analyticsOverlay').setAttribute('hidden', '');
+                document.getElementById('controlsPanel').setAttribute('hidden', '');
+                document.getElementById('menuBtn').setAttribute('aria-expanded', 'false');
+                tutorialIndex = 0;
+                tutorialOverlay.removeAttribute('hidden');
+                tutorialBtn.setAttribute('aria-expanded', 'true');
+                renderTutorialStep();
+                tutorialNextBtn.focus();
+            }
+
+            function closeTutorial() {
+                if (tutorialOverlay.hasAttribute('hidden')) return;
+                tutorialOverlay.setAttribute('hidden', '');
+                tutorialBtn.setAttribute('aria-expanded', 'false');
+                if (tutorialReturnFocus instanceof HTMLElement) tutorialReturnFocus.focus();
+            }
+
+            tutorialBtn.addEventListener('click', openTutorial);
+            tutorialBackdrop.addEventListener('click', closeTutorial);
+            tutorialCloseBtn.addEventListener('click', closeTutorial);
+            tutorialSkipBtn.addEventListener('click', closeTutorial);
+            tutorialBackBtn.addEventListener('click', () => {
+                if (tutorialIndex > 0) {
+                    tutorialIndex -= 1;
+                    renderTutorialStep();
+                }
+            });
+            tutorialNextBtn.addEventListener('click', () => {
+                if (tutorialIndex === tutorialSteps.length - 1) {
+                    closeTutorial();
+                } else {
+                    tutorialIndex += 1;
+                    renderTutorialStep();
+                }
+            });
+
+            document.addEventListener('keydown', (event) => {
+                if (tutorialOverlay.hasAttribute('hidden')) return;
+                if (event.key === 'Escape') {
+                    event.preventDefault();
+                    closeTutorial();
+                    return;
+                }
+                if (event.key === 'ArrowRight') {
+                    event.preventDefault();
+                    tutorialNextBtn.click();
+                    return;
+                }
+                if (event.key === 'ArrowLeft' && tutorialIndex > 0) {
+                    event.preventDefault();
+                    tutorialBackBtn.click();
+                    return;
+                }
+                if (event.key === 'Tab') {
+                    const focusable = [...tutorialCard.querySelectorAll('button:not([disabled]):not([hidden])')];
+                    const first = focusable[0];
+                    const last = focusable[focusable.length - 1];
+                    if (event.shiftKey && document.activeElement === first) {
+                        event.preventDefault();
+                        last.focus();
+                    } else if (!event.shiftKey && document.activeElement === last) {
+                        event.preventDefault();
+                        first.focus();
+                    }
+                }
+            });
+            window.addEventListener('resize', positionTutorial);
 
             // Preload embedded images
             FLOORS.forEach(fl => {
