@@ -12,13 +12,39 @@
     </script>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Occupancy Heatmap | Dashboard</title>
+    <meta name="description" content="Record and review library occupancy across five floors, online or offline.">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Occupancy">
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+    <title>Law Library Heatmap</title>
+    <script>
+        (() => {
+            const allowedThemes = new Set(['dark', 'light', 'oled']);
+            let savedTheme = 'dark';
+            try { savedTheme = localStorage.getItem('occupancy-heatmap-theme') || savedTheme; } catch {}
+            const initialTheme = allowedThemes.has(savedTheme) ? savedTheme : 'dark';
+            document.documentElement.dataset.theme = initialTheme;
+            document.querySelector('meta[name="theme-color"]').content =
+                initialTheme === 'light' ? '#f1f5f9' : initialTheme === 'oled' ? '#000000' : '#0f172a';
+        })();
+    </script>
     <style>
         :root {
-            /* Modern Dark Palette */
+            color-scheme: dark;
             --bg-body: #0f172a;       /* Slate 900 */
             --bg-panel: rgba(30, 41, 59, 0.85); /* Slate 800 with alpha */
             --bg-element: #334155;    /* Slate 700 */
+            --bg-overlay: rgba(15, 23, 42, 0.94);
+            --bg-hover: #475569;
+            --bg-input: rgba(0, 0, 0, 0.2);
+            --bg-input-focus: rgba(0, 0, 0, 0.3);
+            --bg-subtle: rgba(255, 255, 255, 0.05);
+            --chart-grid: rgba(255, 255, 255, 0.08);
             --primary: #3b82f6;       /* Blue 500 */
             --primary-hover: #2563eb; /* Blue 600 */
             --danger: #ef4444;        /* Red 500 */
@@ -27,6 +53,46 @@
             --border: #1e293b;        /* Slate 800 */
             --radius: 12px;
             --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        :root[data-theme="light"] {
+            color-scheme: light;
+            --bg-body: #f1f5f9;
+            --bg-panel: rgba(255, 255, 255, 0.92);
+            --bg-element: #e2e8f0;
+            --bg-overlay: rgba(255, 255, 255, 0.96);
+            --bg-hover: #cbd5e1;
+            --bg-input: rgba(15, 23, 42, 0.06);
+            --bg-input-focus: rgba(15, 23, 42, 0.1);
+            --bg-subtle: rgba(15, 23, 42, 0.06);
+            --chart-grid: rgba(15, 23, 42, 0.12);
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --danger: #dc2626;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #cbd5e1;
+            --shadow: 0 4px 10px -2px rgba(15, 23, 42, 0.16);
+        }
+
+        :root[data-theme="oled"] {
+            color-scheme: dark;
+            --bg-body: #000;
+            --bg-panel: rgba(0, 0, 0, 0.96);
+            --bg-element: #171717;
+            --bg-overlay: rgba(0, 0, 0, 0.97);
+            --bg-hover: #262626;
+            --bg-input: #0a0a0a;
+            --bg-input-focus: #111;
+            --bg-subtle: rgba(255, 255, 255, 0.08);
+            --chart-grid: rgba(255, 255, 255, 0.12);
+            --primary: #60a5fa;
+            --primary-hover: #3b82f6;
+            --danger: #f87171;
+            --text-main: #fff;
+            --text-muted: #a3a3a3;
+            --border: #262626;
+            --shadow: none;
         }
 
         * { box-sizing: border-box; }
@@ -83,6 +149,103 @@
             white-space: nowrap;
         }
 
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .tutorial-trigger {
+            min-height: 32px;
+            padding: 0.3rem 0.65rem;
+            border-radius: 99px;
+            background: var(--bg-input);
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .tutorial-trigger:hover:not(:disabled) {
+            color: var(--text-main);
+        }
+
+        .tutorial-trigger svg {
+            flex: 0 0 auto;
+        }
+
+        .sync-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            min-height: 32px;
+            padding: 0.3rem 0.65rem;
+            border: 1px solid var(--border);
+            border-radius: 99px;
+            background: var(--bg-input);
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        .sync-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.12);
+        }
+
+        .sync-status[data-state="saved"] .sync-dot { background: var(--primary); }
+        .sync-status[data-state="sending"] .sync-dot { background: #f59e0b; animation: pulse 1s ease-in-out infinite; }
+        .sync-status[data-state="sent"] .sync-dot { background: #10b981; }
+        .sync-status[data-state="offline"] .sync-dot,
+        .sync-status[data-state="error"] .sync-dot { background: var(--danger); }
+
+        @keyframes pulse {
+            50% { opacity: 0.35; }
+        }
+
+        .mode-switch,
+        .theme-switch {
+            display: inline-flex;
+            padding: 3px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--bg-input);
+        }
+
+        .mode-switch button,
+        .theme-switch button {
+            min-height: 38px;
+            padding: 0.4rem 0.75rem;
+            border: 0;
+            background: transparent;
+            color: var(--text-muted);
+        }
+
+        .mode-switch button.active,
+        .theme-switch button.active {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: var(--shadow);
+        }
+
+        .panel .mode-switch,
+        .panel .theme-switch {
+            width: 100%;
+        }
+
+        .panel .mode-switch button,
+        .panel .theme-switch button {
+            flex: 1;
+            min-height: 44px;
+        }
+
+        body[data-mode="count"] .analyze-only,
+        body[data-mode="analyze"] .count-only {
+            display: none !important;
+        }
+
         /* --- Scrollable Tabs --- */
         .tabs-container {
             flex: 1;
@@ -117,7 +280,7 @@
         }
 
         .tab:hover {
-            background: rgba(255,255,255,0.05);
+            background: var(--bg-subtle);
             color: var(--text-main);
         }
 
@@ -129,7 +292,7 @@
         }
 
         .tab .badge {
-            background: rgba(0,0,0,0.3);
+            background: var(--bg-input-focus);
             font-size: 0.75rem;
             padding: 0.1rem 0.4rem;
             border-radius: 99px;
@@ -151,6 +314,15 @@
             cursor: crosshair;
         }
 
+        body[data-mode="analyze"] #wrap,
+        #wrap.is-panning {
+            cursor: grab;
+        }
+
+        #wrap.is-panning {
+            cursor: grabbing;
+        }
+
         #floor, #heat {
             position: absolute;
             top: 0; left: 0;
@@ -158,6 +330,58 @@
             display: block;
         }
         #heat { pointer-events: none; }
+
+        .map-controls {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.3rem;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--bg-overlay);
+            backdrop-filter: blur(8px);
+            box-shadow: var(--shadow);
+        }
+
+        .map-controls button {
+            min-width: 44px;
+            min-height: 44px;
+            padding: 0.45rem 0.65rem;
+        }
+
+        .zoom-readout {
+            min-width: 48px;
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            font-variant-numeric: tabular-nums;
+            text-align: center;
+        }
+
+        .undo-toast {
+            position: absolute;
+            left: 50%;
+            bottom: 0.75rem;
+            z-index: 12;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            min-width: min(360px, calc(100% - 2rem));
+            padding: 0.55rem 0.65rem 0.55rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg-overlay);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.42);
+            color: var(--text-main);
+        }
+
+        .undo-toast[hidden] { display: none; }
+        .undo-toast span { flex: 1; font-size: 0.88rem; }
+        .undo-toast button { min-width: 64px; }
 
         /* --- Footer / Controls --- */
         footer {
@@ -171,6 +395,7 @@
             align-items: center;
             z-index: 20;
         }
+        footer[hidden] { display: none; }
 
         .toolbar-group {
             display: flex;
@@ -192,10 +417,11 @@
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
+            min-height: 44px;
         }
 
         button:hover:not(:disabled) {
-            background: #475569;
+            background: var(--bg-hover);
         }
         button:active:not(:disabled) {
             transform: scale(0.97);
@@ -209,6 +435,7 @@
             padding: 0.6rem;
             font-size: 1.2rem;
             line-height: 1;
+            min-width: 44px;
         }
 
         /* Submit Button Special Styling */
@@ -233,7 +460,7 @@
         }
         
         #notes {
-            background: rgba(0,0,0,0.2);
+            background: var(--bg-input);
             border: 1px solid var(--border);
             color: var(--text-main);
             border-radius: 8px;
@@ -242,18 +469,128 @@
             font-size: 0.9rem;
             resize: none;
             width: 100%;
-            height: 42px; /* Compact by default */
+            height: 44px; /* Compact, with a tablet-sized touch target */
             transition: height 0.2s, border-color 0.2s;
         }
         #notes:focus {
             outline: none;
             border-color: var(--primary);
-            background: rgba(0,0,0,0.3);
+            background: var(--bg-input-focus);
             height: 80px; /* Expands on focus */
             position: absolute;
             bottom: 0;
             z-index: 30;
             box-shadow: 0 -4px 10px rgba(0,0,0,0.2);
+        }
+
+        /* --- Guided tutorial --- */
+        .tutorial-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .tutorial-overlay[hidden],
+        .tutorial-card [hidden] {
+            display: none !important;
+        }
+
+        .tutorial-backdrop {
+            position: absolute;
+            inset: 0;
+            pointer-events: auto;
+        }
+
+        .tutorial-spotlight {
+            position: fixed;
+            z-index: 1;
+            border: 3px solid #60a5fa;
+            border-radius: 14px;
+            box-shadow:
+                0 0 0 9999px rgba(2, 6, 23, 0.76),
+                0 0 0 6px rgba(96, 165, 250, 0.2),
+                0 12px 32px rgba(0, 0, 0, 0.35);
+            pointer-events: none;
+            transition: top 0.18s ease, left 0.18s ease, width 0.18s ease, height 0.18s ease;
+        }
+
+        .tutorial-card {
+            position: fixed;
+            z-index: 2;
+            width: min(370px, calc(100vw - 2rem));
+            max-height: calc(100dvh - 2rem);
+            overflow-y: auto;
+            padding: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: var(--bg-overlay);
+            color: var(--text-main);
+            box-shadow: 0 18px 48px rgba(0, 0, 0, 0.48);
+            pointer-events: auto;
+        }
+
+        .tutorial-card-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .tutorial-step-count {
+            color: var(--primary);
+            font-size: 0.76rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .tutorial-close {
+            min-width: 36px;
+            min-height: 36px;
+            padding: 0.35rem;
+            background: transparent;
+            font-size: 1.1rem;
+        }
+
+        .tutorial-card h2 {
+            margin: 0 0 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .tutorial-card p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 0.92rem;
+            line-height: 1.5;
+        }
+
+        .tutorial-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .tutorial-actions .tutorial-skip {
+            margin-right: auto;
+            padding-inline: 0.5rem;
+            border-color: transparent;
+            background: transparent;
+            color: var(--text-muted);
+        }
+
+        .tutorial-actions .tutorial-next {
+            min-width: 88px;
+            border-color: var(--primary-hover);
+            background: var(--primary);
+            color: #fff;
+            font-weight: 650;
+        }
+
+        .tutorial-actions .tutorial-next:hover:not(:disabled) {
+            background: var(--primary-hover);
         }
 
         /* --- Settings Panel --- */
@@ -282,10 +619,11 @@
         .panel input[type="time"] {
             background: var(--bg-body);
             border: 1px solid var(--border);
-            color: white;
-            padding: 4px;
+            color: var(--text-main);
+            padding: 0.5rem;
             border-radius: 4px;
             width: 100%;
+            min-height: 44px;
             font-family: inherit;
         }
 
@@ -303,6 +641,11 @@
             opacity: 0;
             pointer-events: none;
             visibility: hidden;
+        }
+
+        .panel button[hidden],
+        .panel input[hidden] {
+            display: none !important;
         }
 
         .panel h3 {
@@ -331,6 +674,7 @@
         input[type="range"] {
             -webkit-appearance: none;
             width: 100%;
+            height: 44px;
             background: transparent;
         }
         input[type="range"]::-webkit-slider-runnable-track {
@@ -341,11 +685,11 @@
         }
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            height: 16px;
-            width: 16px;
+            height: 24px;
+            width: 24px;
             border-radius: 50%;
             background: var(--primary);
-            margin-top: -5px;
+            margin-top: -9px;
             cursor: pointer;
             box-shadow: 0 0 5px rgba(0,0,0,0.3);
         }
@@ -360,7 +704,7 @@
             background: var(--bg-element);
             color: var(--text-main);
             border-radius: 4px;
-            padding: 0.2rem 0.5rem;
+            padding: 0.65rem 0.75rem;
             margin-right: 0.5rem;
             cursor: pointer;
         }
@@ -452,7 +796,7 @@
             gap: 2px;
             min-width: 540px;
         }
-        .dow-cell { aspect-ratio: 1; border-radius: 3px; background: rgba(255, 255, 255, 0.04); }
+        .dow-cell { aspect-ratio: 1; border-radius: 3px; background: var(--bg-subtle); }
         .dow-lbl {
             font-size: 0.7rem;
             color: var(--text-muted);
@@ -464,13 +808,24 @@
         .floor-row { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem; font-size: 0.85rem; }
         .floor-row:last-child { margin-bottom: 0; }
         .floor-row .fl-name { width: 64px; color: var(--text-muted); flex-shrink: 0; }
-        .floor-row .fl-bar-wrap { flex: 1; background: rgba(255, 255, 255, 0.05); border-radius: 99px; height: 14px; overflow: hidden; }
+        .floor-row .fl-bar-wrap { flex: 1; background: var(--bg-subtle); border-radius: 99px; height: 14px; overflow: hidden; }
         .floor-row .fl-bar { height: 100%; border-radius: 99px; }
         .floor-row .fl-val { width: 120px; text-align: right; font-variant-numeric: tabular-nums; flex-shrink: 0; }
 
         /* --- Mobile Tweaks --- */
         @media (max-width: 768px) {
 
+            header { gap: 0.5rem; padding-inline: 0.5rem; }
+            .header-left { gap: 0.5rem; }
+            .header-actions { gap: 0.4rem; }
+            .stat-badge { padding-inline: 0.5rem; }
+            .stat-label { display: none; }
+
+            .map-controls {
+                top: 0.5rem;
+                right: 0.5rem;
+            }
+            .map-controls .wide-control { display: none; }
             footer {
                 grid-template-columns: 1fr 1fr; /* Two columns */
                 grid-template-areas: 
@@ -485,11 +840,76 @@
                 position: static; /* Don't pop up on mobile, keeps flow */
                 height: 60px;
             }
+
+            .tutorial-card {
+                width: calc(100vw - 1rem);
+                max-height: calc(100dvh - 1rem);
+            }
+        }
+
+        @media (max-width: 430px) {
+            .tutorial-trigger-label { display: none; }
+            .tutorial-trigger { min-width: 36px; padding-inline: 0.45rem; }
+            .sync-status { padding-inline: 0.5rem; }
+        }
+
+        /* Phone portrait: show every floor at once and prioritize notes. */
+        @media (max-width: 768px) and (orientation: portrait) {
+            header {
+                display: grid;
+                grid-template-columns: auto 1fr;
+                grid-template-areas:
+                    "menu actions"
+                    "floors floors";
+                align-items: center;
+                gap: 0.5rem;
+                padding: 0.5rem;
+            }
+
+            .header-left { display: contents; }
+            #menuBtn { grid-area: menu; }
+
+            .header-actions {
+                grid-area: actions;
+                justify-self: end;
+            }
+
+            .tabs-container {
+                grid-area: floors;
+                width: 100%;
+                overflow: visible;
+                mask-image: none;
+                -webkit-mask-image: none;
+            }
+
+            .tabs {
+                flex-direction: column;
+                gap: 0.25rem;
+                padding: 0;
+            }
+
+            .tab {
+                width: 100%;
+                min-height: 44px;
+                justify-content: space-between;
+                padding-inline: 0.9rem;
+            }
+
+            footer {
+                grid-template-areas:
+                    "notes notes"
+                    "tools submit";
+            }
+
+            .notes-wrap {
+                margin-top: 0;
+                margin-bottom: 0.25rem;
+            }
         }
     </style>
 </head>
 
-<body>
+<body data-mode="count">
     <header>
         <div class="header-left">
             <button id="menuBtn" type="button" class="icon-only" aria-label="Menu" aria-expanded="false" aria-controls="controlsPanel">
@@ -501,14 +921,36 @@
             </div>
         </div>
 
-        <div class="stat-badge">
-            Total: <strong id="totalCount" style="color: var(--primary); margin-left:4px;">0</strong>
+        <div class="header-actions">
+            <button id="tutorialBtn" type="button" class="tutorial-trigger" aria-label="Tutorial" aria-haspopup="dialog" aria-controls="tutorialOverlay" aria-expanded="false" title="Open tutorial">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path stroke-linecap="round" d="M9.8 9a2.4 2.4 0 014.65.8c0 1.8-2.45 2.05-2.45 3.7M12 17h.01"/></svg>
+                <span class="tutorial-trigger-label">Tutorial</span>
+            </button>
+            <div id="syncStatus" class="sync-status" data-state="ready" role="status" aria-live="polite">
+                <span class="sync-dot" aria-hidden="true"></span>
+                <span id="syncStatusText">Ready</span>
+            </div>
+            <div class="stat-badge">
+                <span id="totalLabel" class="stat-label">Current count:</span>
+                <strong id="totalCount" style="color: var(--primary); margin-left:4px;">0</strong>
+            </div>
         </div>
     </header>
 
     <div id="wrap">
         <canvas id="floor"></canvas>
         <canvas id="heat"></canvas>
+        <div class="map-controls" aria-label="Map view controls">
+            <button id="zoomOut" type="button" class="icon-only" aria-label="Zoom out" title="Zoom out">−</button>
+            <span id="zoomReadout" class="zoom-readout" aria-live="polite">Fit</span>
+            <button id="zoomIn" type="button" class="icon-only" aria-label="Zoom in" title="Zoom in">+</button>
+            <button id="zoomFit" type="button" class="wide-control" title="Fit the whole floor plan">Fit floor</button>
+            <button id="zoomActual" type="button" class="wide-control" title="Show one image pixel per screen pixel">100%</button>
+        </div>
+        <div id="clearToast" class="undo-toast" role="status" aria-live="polite" hidden>
+            <span id="clearToastText">Floor cleared.</span>
+            <button id="restoreClear" type="button">Undo clear</button>
+        </div>
     </div>
 
     <div id="playbackBar" hidden>
@@ -520,7 +962,7 @@
         <button id="pbAll" class="active-mode" title="Show all sessions aggregated">Σ All</button>
     </div>
 
-    <footer>
+    <footer class="count-only">
         <div class="toolbar-group">
             <button id="undo" disabled title="Undo last point">
                 <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
@@ -536,14 +978,46 @@
             <textarea id="notes" placeholder="Add optional notes here..."></textarea>
         </div>
 
-        <button id="submit" class="submitbtn">
-            Submit
-            <span id="status" style="font-weight: 400; font-size: 0.8em; opacity: 0.8;"></span>
-        </button>
+        <button id="submit" class="submitbtn">Submit</button>
     </footer>
+
+    <div id="tutorialOverlay" class="tutorial-overlay" hidden>
+        <div id="tutorialBackdrop" class="tutorial-backdrop" aria-hidden="true"></div>
+        <div id="tutorialSpotlight" class="tutorial-spotlight" aria-hidden="true"></div>
+        <section id="tutorialCard" class="tutorial-card" role="dialog" aria-modal="true" aria-labelledby="tutorialTitle" aria-describedby="tutorialText">
+            <div class="tutorial-card-head">
+                <span id="tutorialStepCount" class="tutorial-step-count">Step 1 of 5</span>
+                <button id="tutorialClose" type="button" class="tutorial-close" aria-label="Close tutorial">✕</button>
+            </div>
+            <h2 id="tutorialTitle">Choose a floor</h2>
+            <p id="tutorialText"></p>
+            <div class="tutorial-actions">
+                <button id="tutorialSkip" type="button" class="tutorial-skip">Skip tutorial</button>
+                <button id="tutorialBack" type="button">Back</button>
+                <button id="tutorialNext" type="button" class="tutorial-next">Next</button>
+            </div>
+        </section>
+    </div>
 
     <div id="controlsPanel" class="panel" hidden>
         <div class="control-row">
+            <label>Workspace</label>
+            <div class="mode-switch" role="group" aria-label="Workspace mode">
+                <button id="countMode" type="button" class="active" aria-pressed="true">Count</button>
+                <button id="analyzeMode" type="button" aria-pressed="false">Analyze</button>
+            </div>
+        </div>
+
+        <div class="control-row">
+            <label>Appearance</label>
+            <div class="theme-switch" role="group" aria-label="Appearance theme">
+                <button id="themeDark" type="button" aria-pressed="false">Dark</button>
+                <button id="themeLight" type="button" aria-pressed="false">Light</button>
+                <button id="themeOled" type="button" aria-pressed="false">OLED</button>
+            </div>
+        </div>
+
+        <div class="control-row analyze-only">
             <button id="analyticsBtn" type="button" hidden style="width:100%; border-color:var(--primary); color:var(--primary);">📊 Open Trend Analytics</button>
         </div>
 
@@ -565,45 +1039,45 @@
             <input id="blur" type="range" min="0" max="30" value="8" oninput="document.getElementById('val-blur').innerText=this.value+'px'">
         </div>
 
-        <h3>Data Management</h3>
-        <div class="control-row">
+        <h3 class="count-only">Current Count</h3>
+        <div class="control-row count-only">
             <button id="resetAll" style="width:100%; border-color:var(--danger); color:var(--danger);">Reset All Floors</button>
         </div>
         
-        <h3>Load History</h3>
-        <div class="control-row">
+        <h3 class="analyze-only">Load History</h3>
+        <div class="control-row analyze-only">
             <button id="loadFolder" style="width:100%;">📂 Load OneDrive folder…</button>
             <button id="rescanFolder" style="width:100%;" hidden>🔄 Rescan “<span id="folderName"></span>”</button>
             <button id="clearSessions" style="width:100%;" hidden>Clear loaded sessions</button>
             <div id="loadStatus" style="font-size:0.8rem; color:var(--text-muted);"></div>
             <input id="loadFolderFallback" type="file" webkitdirectory multiple hidden>
         </div>
-        <div class="control-row">
+        <div class="control-row analyze-only">
             <label>Single JSON</label>
             <input id="loadJSON" type="file" accept="application/json">
         </div>
-        <div class="control-row">
+        <div class="control-row analyze-only">
             <label>Multiple JSONs</label>
             <input id="loadMany" type="file" accept="application/json" multiple>
         </div>
         
-        <h3>Filters</h3>
-        <div class="control-row">
+        <h3 class="analyze-only">Filters</h3>
+        <div class="control-row analyze-only">
             <label>Date Start</label>
             <input id="from" type="datetime-local">
         </div>
-        <div class="control-row">
+        <div class="control-row analyze-only">
             <label>Date End</label>
             <input id="to" type="datetime-local">
         </div>
-        <div class="control-row">
+        <div class="control-row analyze-only">
             <label>Time of Day (start – end)</label>
             <div style="display:flex; gap:0.5rem;">
                 <input id="todFrom" type="time" aria-label="Time of day start">
                 <input id="todTo" type="time" aria-label="Time of day end">
             </div>
         </div>
-        <div class="control-row">
+        <div class="control-row analyze-only">
             <label>Days of Week <span style="text-transform:none;">(none = all)</span></label>
             <div class="dow-filter" id="dowFilter">
                 <button type="button" data-dow="0">Su</button>
@@ -615,12 +1089,8 @@
                 <button type="button" data-dow="6">Sa</button>
             </div>
         </div>
-        <div class="control-row">
+        <div class="control-row analyze-only">
             <button id="clearFilters" style="width:100%;">Clear filters</button>
-        </div>
-        <div class="control-row" style="flex-direction:row; align-items:center;">
-             <input id="includeSessions" type="checkbox" checked style="width:auto;">
-             <label for="includeSessions" style="margin-left:0.5rem; margin-bottom:0;">Include loaded sessions</label>
         </div>
     </div>
 
@@ -656,6 +1126,13 @@
         (() => {
             // --- Embedded floor images (replace placeholders) ------------------------
             const EMBEDDED = {
+                '1F': '../../../Maps/1F.png',
+                '2F': '../../../Maps/2F.png',
+                '3F': '../../../Maps/3F.png',
+                '4F': '../../../Maps/4F.png',
+                '5F': '../../../Maps/5F.png',
+            };
+            const IMAGE_DATA_URLS = {
                 '1F': 'https://raw.githubusercontent.com/JustinRogo/justinrogo.github.io/refs/heads/main/Maps/1F.png',
                 '2F': 'https://raw.githubusercontent.com/JustinRogo/justinrogo.github.io/refs/heads/main/Maps/2F.png',
                 '3F': 'https://raw.githubusercontent.com/JustinRogo/justinrogo.github.io/refs/heads/main/Maps/3F.png',
@@ -664,14 +1141,24 @@
             };
 
             // --- Floors ---------------------------------------------------------------
+            const DEFAULT_FLOOR_INDEX = 2;
+            const THEMES = ['dark', 'light', 'oled'];
+            const THEME_KEY = 'occupancy-heatmap-theme';
             const FLOORS = [
-                { id: '1F', label: '1st Floor', img: new Image(), imgSrc: null, points: [] },
-                { id: '2F', label: '2nd Floor', img: new Image(), imgSrc: null, points: [] },
-                { id: '3F', label: '3rd Floor', img: new Image(), imgSrc: null, points: [] },
-                { id: '4F', label: '4th Floor', img: new Image(), imgSrc: null, points: [] },
-                { id: '5F', label: '5th Floor', img: new Image(), imgSrc: null, points: [] },
+                { id: '1F', label: '1st Floor', img: new Image(), imgSrc: null, points: [], view: { zoom: 1, panX: 0, panY: 0 } },
+                { id: '2F', label: '2nd Floor', img: new Image(), imgSrc: null, points: [], view: { zoom: 1, panX: 0, panY: 0 } },
+                { id: '3F', label: '3rd Floor', img: new Image(), imgSrc: null, points: [], view: { zoom: 1, panX: 0, panY: 0 } },
+                { id: '4F', label: '4th Floor', img: new Image(), imgSrc: null, points: [], view: { zoom: 1, panX: 0, panY: 0 } },
+                { id: '5F', label: '5th Floor', img: new Image(), imgSrc: null, points: [], view: { zoom: 1, panX: 0, panY: 0 } },
             ];
-            let current = 0;
+            let current = DEFAULT_FLOOR_INDEX;
+            let appMode = 'count';
+            let theme = THEMES.includes(document.documentElement.dataset.theme)
+                ? document.documentElement.dataset.theme
+                : 'dark';
+            let syncState = 'ready';
+            let syncResetTimer = null;
+            let clearUndo = null;
 
             // Sessions loaded for trend review
             const SESSIONS = []; 
@@ -686,7 +1173,23 @@
             const clearBtn = document.getElementById('clear');
             const resetAll = document.getElementById('resetAll');
             const submitBtn = document.getElementById('submit');
-            const statusEl = document.getElementById('status');
+            const tutorialBtn = document.getElementById('tutorialBtn');
+            const tutorialOverlay = document.getElementById('tutorialOverlay');
+            const tutorialBackdrop = document.getElementById('tutorialBackdrop');
+            const tutorialSpotlight = document.getElementById('tutorialSpotlight');
+            const tutorialCard = document.getElementById('tutorialCard');
+            const tutorialStepCount = document.getElementById('tutorialStepCount');
+            const tutorialTitle = document.getElementById('tutorialTitle');
+            const tutorialText = document.getElementById('tutorialText');
+            const tutorialCloseBtn = document.getElementById('tutorialClose');
+            const tutorialSkipBtn = document.getElementById('tutorialSkip');
+            const tutorialBackBtn = document.getElementById('tutorialBack');
+            const tutorialNextBtn = document.getElementById('tutorialNext');
+            const syncStatusEl = document.getElementById('syncStatus');
+            const syncStatusTextEl = document.getElementById('syncStatusText');
+            const clearToastEl = document.getElementById('clearToast');
+            const clearToastTextEl = document.getElementById('clearToastText');
+            const restoreClearBtn = document.getElementById('restoreClear');
             const radiusEl = document.getElementById('radius');
             const intenEl = document.getElementById('intensity');
             const opacEl = document.getElementById('opacity');
@@ -695,15 +1198,52 @@
             const loadMany = document.getElementById('loadMany');
             const fromEl = document.getElementById('from');
             const toEl = document.getElementById('to');
-            const includeSessionsEl = document.getElementById('includeSessions');
             const notesEl = document.getElementById('notes');
+            const countModeBtn = document.getElementById('countMode');
+            const analyzeModeBtn = document.getElementById('analyzeMode');
+            const themeDarkBtn = document.getElementById('themeDark');
+            const themeLightBtn = document.getElementById('themeLight');
+            const themeOledBtn = document.getElementById('themeOled');
+            const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+            const totalLabelEl = document.getElementById('totalLabel');
+            const zoomOutBtn = document.getElementById('zoomOut');
+            const zoomInBtn = document.getElementById('zoomIn');
+            const zoomFitBtn = document.getElementById('zoomFit');
+            const zoomActualBtn = document.getElementById('zoomActual');
+            const zoomReadoutEl = document.getElementById('zoomReadout');
+            const DRAFT_KEY = 'multi-floor-heatmap-embedded';
             const FLOW_URL = "https://default17f1a87e2a254eaab9df9d439034b0.80.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/8a4d2abd61de4fceb5cb6d2a4b2b31a8/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=EhX0b_ECMsXs08oSiwPJKO3H5KMRI3O0l3V1lLtdM6Q";
+
+            function setTheme(nextTheme, persist = true) {
+                if (!THEMES.includes(nextTheme)) return;
+                theme = nextTheme;
+                document.documentElement.dataset.theme = theme;
+                themeColorMeta?.setAttribute('content', theme === 'light' ? '#f1f5f9' : theme === 'oled' ? '#000000' : '#0f172a');
+                [
+                    [themeDarkBtn, 'dark'],
+                    [themeLightBtn, 'light'],
+                    [themeOledBtn, 'oled'],
+                ].forEach(([button, value]) => {
+                    const active = theme === value;
+                    button.classList.toggle('active', active);
+                    button.setAttribute('aria-pressed', String(active));
+                });
+                if (persist) {
+                    try { localStorage.setItem(THEME_KEY, theme); } catch {}
+                }
+                redraw();
+                if (!document.getElementById('analyticsOverlay').hasAttribute('hidden')) renderAnalytics();
+            }
+
+            themeDarkBtn.onclick = () => setTheme('dark');
+            themeLightBtn.onclick = () => setTheme('light');
+            themeOledBtn.onclick = () => setTheme('oled');
 
             // Tabs with counters
             const tabs = document.getElementById('tabs');
             FLOORS.forEach((fl, i) => {
                 const b = document.createElement('button');
-                b.className = 'tab' + (i === 0 ? ' active' : '');
+                b.className = 'tab' + (i === current ? ' active' : '');
                 // Using div to allow flex styling
                 b.innerHTML = `<span>${fl.label}</span> <span class="badge" id="count-${fl.id}">0</span>`;
                 b.onclick = () => { current = i; updateTabs(); fitCanvas(); redraw(); };
@@ -719,6 +1259,175 @@
                 });
             }
 
+            function setMode(mode) {
+                if (mode !== 'count' && mode !== 'analyze') return;
+                appMode = mode;
+                document.body.dataset.mode = mode;
+                countModeBtn.classList.toggle('active', mode === 'count');
+                analyzeModeBtn.classList.toggle('active', mode === 'analyze');
+                countModeBtn.setAttribute('aria-pressed', String(mode === 'count'));
+                analyzeModeBtn.setAttribute('aria-pressed', String(mode === 'analyze'));
+                if (mode === 'count') stopTimer();
+                if (mode === 'analyze') dismissClearUndo();
+                updatePlaybackUI();
+                redraw();
+            }
+
+            countModeBtn.onclick = () => setMode('count');
+            analyzeModeBtn.onclick = () => setMode('analyze');
+
+            // Guided walkthrough. The tutorial explains the workflow without
+            // changing counts, notes, or submission state.
+            const tutorialSteps = [
+                {
+                    target: () => tabs,
+                    title: 'Choose a floor',
+                    text: 'Select a floor tab before you begin. The badge on each tab shows the number of patrons logged on that floor.',
+                },
+                {
+                    target: () => wrap,
+                    title: 'Log each patron on the map',
+                    text: 'Tap or click once at each patron’s location. Use Undo if you place a point by mistake, then move to the next floor tab.',
+                },
+                {
+                    target: () => notesEl,
+                    title: 'Add an optional note',
+                    text: 'Use the notes field for anything the map cannot show, such as an event, a closed area, or an unusual crowd pattern. You can leave it blank.',
+                },
+                {
+                    target: () => tabs,
+                    title: 'Check all five floors',
+                    text: 'Visit every floor before submitting. If a floor has no patrons, check the map and leave its badge at 0; that still counts as completing the floor check.',
+                },
+                {
+                    target: () => submitBtn,
+                    title: 'Submit after all five floors',
+                    text: 'Once all five floor maps have been checked and any note has been added, select Submit. Wait for the status to change to Submitted before starting another count.',
+                },
+            ];
+            let tutorialIndex = 0;
+            let tutorialReturnFocus = null;
+
+            function positionTutorial() {
+                if (tutorialOverlay.hasAttribute('hidden')) return;
+                const target = tutorialSteps[tutorialIndex].target();
+                if (!target) return;
+
+                const viewportWidth = window.innerWidth;
+                const viewportHeight = window.innerHeight;
+                const edge = viewportWidth <= 768 ? 8 : 16;
+                const gap = 14;
+                const rect = target.getBoundingClientRect();
+                const spotPad = 6;
+                const spotLeft = Math.max(edge, rect.left - spotPad);
+                const spotTop = Math.max(edge, rect.top - spotPad);
+                const spotRight = Math.min(viewportWidth - edge, rect.right + spotPad);
+                const spotBottom = Math.min(viewportHeight - edge, rect.bottom + spotPad);
+
+                Object.assign(tutorialSpotlight.style, {
+                    left: `${spotLeft}px`,
+                    top: `${spotTop}px`,
+                    width: `${Math.max(0, spotRight - spotLeft)}px`,
+                    height: `${Math.max(0, spotBottom - spotTop)}px`,
+                });
+
+                const cardRect = tutorialCard.getBoundingClientRect();
+                let left = Math.min(Math.max(rect.left, edge), viewportWidth - cardRect.width - edge);
+                let top;
+                if (rect.bottom + gap + cardRect.height <= viewportHeight - edge) {
+                    top = rect.bottom + gap;
+                } else if (rect.top - gap - cardRect.height >= edge) {
+                    top = rect.top - gap - cardRect.height;
+                } else {
+                    left = Math.max(edge, Math.min((viewportWidth - cardRect.width) / 2, viewportWidth - cardRect.width - edge));
+                    top = Math.max(edge, Math.min((viewportHeight - cardRect.height) / 2, viewportHeight - cardRect.height - edge));
+                }
+                tutorialCard.style.left = `${left}px`;
+                tutorialCard.style.top = `${top}px`;
+            }
+
+            function renderTutorialStep() {
+                const step = tutorialSteps[tutorialIndex];
+                tutorialStepCount.textContent = `Step ${tutorialIndex + 1} of ${tutorialSteps.length}`;
+                tutorialTitle.textContent = step.title;
+                tutorialText.textContent = step.text;
+                tutorialBackBtn.disabled = tutorialIndex === 0;
+                tutorialSkipBtn.hidden = tutorialIndex === tutorialSteps.length - 1;
+                tutorialNextBtn.textContent = tutorialIndex === tutorialSteps.length - 1 ? 'Finish' : 'Next';
+                requestAnimationFrame(positionTutorial);
+            }
+
+            function openTutorial() {
+                tutorialReturnFocus = document.activeElement;
+                setMode('count');
+                document.getElementById('analyticsOverlay').setAttribute('hidden', '');
+                document.getElementById('controlsPanel').setAttribute('hidden', '');
+                document.getElementById('menuBtn').setAttribute('aria-expanded', 'false');
+                tutorialIndex = 0;
+                tutorialOverlay.removeAttribute('hidden');
+                tutorialBtn.setAttribute('aria-expanded', 'true');
+                renderTutorialStep();
+                tutorialNextBtn.focus();
+            }
+
+            function closeTutorial() {
+                if (tutorialOverlay.hasAttribute('hidden')) return;
+                tutorialOverlay.setAttribute('hidden', '');
+                tutorialBtn.setAttribute('aria-expanded', 'false');
+                if (tutorialReturnFocus instanceof HTMLElement) tutorialReturnFocus.focus();
+            }
+
+            tutorialBtn.addEventListener('click', openTutorial);
+            tutorialBackdrop.addEventListener('click', closeTutorial);
+            tutorialCloseBtn.addEventListener('click', closeTutorial);
+            tutorialSkipBtn.addEventListener('click', closeTutorial);
+            tutorialBackBtn.addEventListener('click', () => {
+                if (tutorialIndex > 0) {
+                    tutorialIndex -= 1;
+                    renderTutorialStep();
+                }
+            });
+            tutorialNextBtn.addEventListener('click', () => {
+                if (tutorialIndex === tutorialSteps.length - 1) {
+                    closeTutorial();
+                } else {
+                    tutorialIndex += 1;
+                    renderTutorialStep();
+                }
+            });
+
+            document.addEventListener('keydown', (event) => {
+                if (tutorialOverlay.hasAttribute('hidden')) return;
+                if (event.key === 'Escape') {
+                    event.preventDefault();
+                    closeTutorial();
+                    return;
+                }
+                if (event.key === 'ArrowRight') {
+                    event.preventDefault();
+                    tutorialNextBtn.click();
+                    return;
+                }
+                if (event.key === 'ArrowLeft' && tutorialIndex > 0) {
+                    event.preventDefault();
+                    tutorialBackBtn.click();
+                    return;
+                }
+                if (event.key === 'Tab') {
+                    const focusable = [...tutorialCard.querySelectorAll('button:not([disabled]):not([hidden])')];
+                    const first = focusable[0];
+                    const last = focusable[focusable.length - 1];
+                    if (event.shiftKey && document.activeElement === first) {
+                        event.preventDefault();
+                        last.focus();
+                    } else if (!event.shiftKey && document.activeElement === last) {
+                        event.preventDefault();
+                        first.focus();
+                    }
+                }
+            });
+            window.addEventListener('resize', positionTutorial);
+
             // Preload embedded images
             FLOORS.forEach(fl => {
                 if (EMBEDDED[fl.id]) {
@@ -731,14 +1440,39 @@
             // Resize handling
             window.addEventListener('resize', () => { fitCanvas(); redraw(); });
 
-            // Input: only inside fitted image rect
-            wrap.addEventListener('pointerdown', e => {
-                const fl = FLOORS[current];
-                if (!fl.img.naturalWidth) return;
-                const rect = floor.getBoundingClientRect();
-                const px = e.clientX - rect.left, py = e.clientY - rect.top;
+            // Map gestures: a stationary single-pointer release adds a point in
+            // Count mode. Dragging pans; two pointers pan and pinch in either mode.
+            const activePointers = new Map();
+            const TAP_SLOP = 8;
+            let pinchGesture = null;
 
-                const fit = imageFitRect(fl.img.naturalWidth, fl.img.naturalHeight, floor.width, floor.height);
+            function pointerPosition(e) {
+                const rect = floor.getBoundingClientRect();
+                return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+            }
+
+            function startPinch() {
+                const [a, b] = [...activePointers.values()];
+                if (!a || !b) return;
+                const center = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+                const distance = Math.hypot(b.x - a.x, b.y - a.y);
+                const view = FLOORS[current].view;
+                pinchGesture = {
+                    distance: Math.max(1, distance),
+                    zoom: view.zoom,
+                    localX: (center.x - floor.width / 2 - view.panX) / view.zoom,
+                    localY: (center.y - floor.height / 2 - view.panY) / view.zoom,
+                };
+                activePointers.forEach(p => { p.cancelTap = true; });
+            }
+
+            function addPointAt(clientX, clientY) {
+                const fl = FLOORS[current];
+                if (appMode !== 'count' || !fl.img.naturalWidth) return;
+                const rect = floor.getBoundingClientRect();
+                const px = clientX - rect.left, py = clientY - rect.top;
+
+                const fit = currentImageRect();
                 if (px < fit.x || px > fit.x + fit.w || py < fit.y || py > fit.y + fit.h) return;
 
                 const x = (px - fit.x) * (fl.img.naturalWidth / fit.w);
@@ -746,17 +1480,185 @@
 
                 fl.points.push({ x, y, t: Date.now() });
                 persist(); redraw();
+            }
+
+            wrap.addEventListener('pointerdown', e => {
+                if (e.target.closest('.map-controls, .undo-toast')) return;
+                if (e.pointerType === 'mouse' && e.button !== 0) return;
+                const pos = pointerPosition(e);
+                activePointers.set(e.pointerId, {
+                    ...pos,
+                    startX: pos.x,
+                    startY: pos.y,
+                    lastX: pos.x,
+                    lastY: pos.y,
+                    moved: false,
+                    cancelTap: false,
+                    clientX: e.clientX,
+                    clientY: e.clientY,
+                });
+                wrap.setPointerCapture(e.pointerId);
+                if (activePointers.size >= 2) startPinch();
             });
 
+            wrap.addEventListener('pointermove', e => {
+                const pointer = activePointers.get(e.pointerId);
+                if (!pointer) return;
+                const pos = pointerPosition(e);
+                const dx = pos.x - pointer.lastX;
+                const dy = pos.y - pointer.lastY;
+                pointer.x = pos.x;
+                pointer.y = pos.y;
+                pointer.clientX = e.clientX;
+                pointer.clientY = e.clientY;
+                pointer.lastX = pos.x;
+                pointer.lastY = pos.y;
+
+                if (Math.hypot(pos.x - pointer.startX, pos.y - pointer.startY) > TAP_SLOP) {
+                    pointer.moved = true;
+                }
+
+                if (activePointers.size >= 2) {
+                    if (!pinchGesture) startPinch();
+                    const [a, b] = [...activePointers.values()];
+                    const center = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+                    const distance = Math.max(1, Math.hypot(b.x - a.x, b.y - a.y));
+                    const view = FLOORS[current].view;
+                    view.zoom = clampZoom(pinchGesture.zoom * distance / pinchGesture.distance);
+                    view.panX = center.x - floor.width / 2 - pinchGesture.localX * view.zoom;
+                    view.panY = center.y - floor.height / 2 - pinchGesture.localY * view.zoom;
+                    clampView();
+                    wrap.classList.add('is-panning');
+                    redraw();
+                    e.preventDefault();
+                    return;
+                }
+
+                if (pointer.moved && FLOORS[current].view.zoom > 1) {
+                    const view = FLOORS[current].view;
+                    view.panX += dx;
+                    view.panY += dy;
+                    clampView();
+                    wrap.classList.add('is-panning');
+                    redraw();
+                    e.preventDefault();
+                }
+            });
+
+            function finishPointer(e, cancelled = false) {
+                const pointer = activePointers.get(e.pointerId);
+                if (!pointer) return;
+                const wasOnlyPointer = activePointers.size === 1;
+                activePointers.delete(e.pointerId);
+
+                if (!cancelled && wasOnlyPointer && !pointer.moved && !pointer.cancelTap) {
+                    addPointAt(pointer.clientX, pointer.clientY);
+                }
+
+                if (activePointers.size === 1) {
+                    const remaining = [...activePointers.values()][0];
+                    remaining.startX = remaining.lastX = remaining.x;
+                    remaining.startY = remaining.lastY = remaining.y;
+                    remaining.moved = false;
+                    remaining.cancelTap = true;
+                }
+                pinchGesture = null;
+                if (activePointers.size === 0) wrap.classList.remove('is-panning');
+            }
+
+            wrap.addEventListener('pointerup', e => finishPointer(e));
+            wrap.addEventListener('pointercancel', e => finishPointer(e, true));
+
+            wrap.addEventListener('wheel', e => {
+                if (e.target.closest('.map-controls')) return;
+                const pos = pointerPosition(e);
+                zoomAt(FLOORS[current].view.zoom * Math.exp(-e.deltaY * 0.0015), pos.x, pos.y);
+                e.preventDefault();
+            }, { passive: false });
+
+            function dismissClearUndo() {
+                if (clearUndo?.timer) clearTimeout(clearUndo.timer);
+                clearUndo = null;
+                clearToastEl.hidden = true;
+            }
+
+            function showClearUndo(floorIndex, points) {
+                dismissClearUndo();
+                const state = { floorIndex, points, timer: null };
+                clearUndo = state;
+                clearToastTextEl.textContent = `${FLOORS[floorIndex].label} cleared.`;
+                clearToastEl.hidden = false;
+                state.timer = setTimeout(() => {
+                    if (clearUndo === state) dismissClearUndo();
+                }, 7000);
+            }
+
             undoBtn.onclick = () => { FLOORS[current].points.pop(); persist(); redraw(); };
-            clearBtn.onclick = () => { FLOORS[current].points = []; persist(); redraw(); };
+            clearBtn.onclick = () => {
+                const points = FLOORS[current].points;
+                if (!points.length) return;
+                showClearUndo(current, points.map(point => ({ ...point })));
+                FLOORS[current].points = [];
+                persist();
+                redraw();
+            };
+
+            restoreClearBtn.onclick = () => {
+                if (!clearUndo) return;
+                const { floorIndex, points } = clearUndo;
+                FLOORS[floorIndex].points = [...points, ...FLOORS[floorIndex].points];
+                dismissClearUndo();
+                persist();
+                redraw();
+            };
 
             resetAll.onclick = () => {
                 if(confirm("Are you sure you want to clear all data from ALL floors?")) {
+                    dismissClearUndo();
                     FLOORS.forEach(fl => fl.points = []);
                     persist(); redraw();
                 }
             };
+
+            function hasDraft() {
+                return computeTotalCount() > 0 || Boolean(notesEl.value.trim());
+            }
+
+            function updateSyncStatus() {
+                let state = syncState;
+                let text = 'Ready';
+
+                if (!navigator.onLine && state !== 'sending') {
+                    state = 'offline';
+                    text = hasDraft() ? 'Offline · draft saved' : 'Offline';
+                } else if (state === 'sending') {
+                    text = 'Sending…';
+                } else if (state === 'sent') {
+                    text = 'Submitted';
+                } else if (state === 'error') {
+                    text = 'Send failed · draft saved';
+                } else if (hasDraft()) {
+                    state = 'saved';
+                    text = 'Draft saved';
+                } else {
+                    state = 'ready';
+                }
+
+                syncStatusEl.dataset.state = state;
+                syncStatusTextEl.textContent = text;
+            }
+
+            function setSyncState(state, resetAfter = 0) {
+                clearTimeout(syncResetTimer);
+                syncState = state;
+                updateSyncStatus();
+                if (resetAfter) {
+                    syncResetTimer = setTimeout(() => {
+                        syncState = 'ready';
+                        updateSyncStatus();
+                    }, resetAfter);
+                }
+            }
 
             async function sendToFlow(payload) {
                 const r = await fetch(FLOW_URL, {
@@ -769,42 +1671,42 @@
             }
 
             submitBtn.onclick = async () => {
+                if (!navigator.onLine) {
+                    updateSyncStatus();
+                    return;
+                }
+
                 const payload = {
                     submitted_at: new Date().toISOString(),
                     note: (notesEl?.value || "").trim(),
                     floors: FLOORS.map(fl => ({
                         id: fl.id,
-                        image_data_url: fl.img.naturalWidth ? fl.img.src : null,
+                        image_data_url: fl.img.naturalWidth ? IMAGE_DATA_URLS[fl.id] : null,
                         image_size: fl.img.naturalWidth ? { w: fl.img.naturalWidth, h: fl.img.naturalHeight } : null,
                         points: fl.points
                     })),
                     TotalCount: computeTotalCount()
                 };
 
-                const originalText = submitBtn.innerHTML;
                 submitBtn.disabled = true;
-                statusEl.textContent = " (Sending...)";
-                
+                setSyncState('sending');
+
                 try {
                     await sendToFlow(payload);
-                    statusEl.textContent = " (Done!)";
-                    
-                    // Visual feedback success
-                    submitBtn.style.background = "#10b981"; // Green
+                    dismissClearUndo();
+                    FLOORS.forEach(fl => fl.points = []);
+                    notesEl.value = "";
+                    persist();
+                    redraw();
+                    setSyncState('sent', 2500);
+
+                    submitBtn.style.background = "#10b981";
                     setTimeout(() => {
-                        submitBtn.style.background = ""; // Reset
-                        statusEl.textContent = "";
+                        submitBtn.style.background = "";
                         submitBtn.disabled = false;
                     }, 2000);
-
-                    // reset points only
-                    FLOORS.forEach(fl => fl.points = []);
-                    persist(); redraw();
-
-                    // clear note
-                    if (notesEl) notesEl.value = "";
                 } catch (e) {
-                    statusEl.textContent = " Error";
+                    setSyncState('error');
                     alert(`Flow error: ${e.message}`);
                     submitBtn.disabled = false;
                 }
@@ -813,20 +1715,8 @@
             // Load a single JSON
             loadJSON.onchange = e => {
                 const [f] = e.target.files || [];
-                if (!f) return;
-                f.text().then(txt => {
-                    try {
-                        const data = JSON.parse(txt);
-                        if (!data.floors) throw new Error("Bad format");
-                        data.floors.forEach((fl, i) => {
-                            if (!FLOORS[i]) return;
-                            FLOORS[i].points = Array.isArray(fl.points) ? fl.points : [];
-                            if (fl.image_data_url) { FLOORS[i].imgSrc = fl.image_data_url; FLOORS[i].img.src = fl.image_data_url; }
-                        });
-                        current = 0; updateTabs(); fitCanvas(); redraw();
-                        alert(`Loaded ${f.name}`);
-                    } catch (err) { alert("Invalid JSON file"); console.error(err); }
-                });
+                if (f) loadFiles([f]);
+                e.target.value = '';
             };
 
             // Load many JSONs (manual multi-select)
@@ -838,20 +1728,14 @@
             
             // Listeners for sliders that trigger redraw
             [radiusEl, intenEl, opacEl, blurEl].forEach(el => el.addEventListener('input', redraw));
-            [fromEl, toEl, includeSessionsEl].forEach(el => el.addEventListener('input', redraw));
+            [fromEl, toEl].forEach(el => el.addEventListener('input', redraw));
+            notesEl.addEventListener('input', persist);
+            window.addEventListener('online', updateSyncStatus);
+            window.addEventListener('offline', updateSyncStatus);
 
             // --- Helpers --------------------------------------------------------------
             function computeTotalCount() {
-                let total = 0;
-                FLOORS.forEach(fl => {
-                    let n = fl.points.length;
-                    for (const sess of filteredSessions()) {
-                        const sf = (sess.floors || []).find(f => f.id === fl.id);
-                        if (sf && Array.isArray(sf.points)) n += sf.points.length;
-                    }
-                    total += n;
-                });
-                return total;
+                return FLOORS.reduce((total, fl) => total + fl.points.length, 0);
             }
 
             function fitCanvas() {
@@ -861,6 +1745,8 @@
                 heat.width = floor.width; heat.height = floor.height;
                 fctx.imageSmoothingEnabled = true;
                 fctx.imageSmoothingQuality = 'high';
+                clampView();
+                updateZoomControls();
             }
 
             function imageFitRect(iw, ih, cw, ch) {
@@ -871,12 +1757,86 @@
                 return { x, y, w, h };
             }
 
-            function filteredSessions() {
+            const MIN_ZOOM = 1;
+            const MAX_ZOOM = 8;
+
+            function clampZoom(zoom) {
+                return Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, zoom));
+            }
+
+            function currentImageRect() {
+                const fl = FLOORS[current];
+                const base = imageFitRect(fl.img.naturalWidth, fl.img.naturalHeight, floor.width, floor.height);
+                const view = fl.view;
+                const w = base.w * view.zoom;
+                const h = base.h * view.zoom;
+                return {
+                    x: (floor.width - w) / 2 + view.panX,
+                    y: (floor.height - h) / 2 + view.panY,
+                    w,
+                    h,
+                };
+            }
+
+            function clampView() {
+                const fl = FLOORS[current];
+                const view = fl.view;
+                view.zoom = clampZoom(view.zoom);
+                if (!fl.img.naturalWidth) return;
+                const base = imageFitRect(fl.img.naturalWidth, fl.img.naturalHeight, floor.width, floor.height);
+                const maxX = Math.max(0, (base.w * view.zoom - floor.width) / 2);
+                const maxY = Math.max(0, (base.h * view.zoom - floor.height) / 2);
+                view.panX = Math.max(-maxX, Math.min(maxX, view.panX));
+                view.panY = Math.max(-maxY, Math.min(maxY, view.panY));
+            }
+
+            function zoomAt(nextZoom, screenX = floor.width / 2, screenY = floor.height / 2) {
+                const view = FLOORS[current].view;
+                const oldZoom = view.zoom;
+                nextZoom = clampZoom(nextZoom);
+                const localX = (screenX - floor.width / 2 - view.panX) / oldZoom;
+                const localY = (screenY - floor.height / 2 - view.panY) / oldZoom;
+                view.zoom = nextZoom;
+                view.panX = screenX - floor.width / 2 - localX * nextZoom;
+                view.panY = screenY - floor.height / 2 - localY * nextZoom;
+                clampView();
+                redraw();
+            }
+
+            function fitFloor() {
+                const view = FLOORS[current].view;
+                view.zoom = 1;
+                view.panX = 0;
+                view.panY = 0;
+                redraw();
+            }
+
+            function showActualSize() {
+                const fl = FLOORS[current];
+                if (!fl.img.naturalWidth) return;
+                const base = imageFitRect(fl.img.naturalWidth, fl.img.naturalHeight, floor.width, floor.height);
+                const baseScale = base.w / fl.img.naturalWidth;
+                zoomAt(baseScale ? 1 / baseScale : 1);
+            }
+
+            function updateZoomControls() {
+                const zoom = FLOORS[current].view.zoom;
+                zoomReadoutEl.textContent = Math.abs(zoom - 1) < 0.01 ? 'Fit' : `${Math.round(zoom * 100)}%`;
+                zoomOutBtn.disabled = zoom <= MIN_ZOOM + 0.001;
+                zoomInBtn.disabled = zoom >= MAX_ZOOM - 0.001;
+            }
+
+            zoomOutBtn.onclick = () => zoomAt(FLOORS[current].view.zoom / 1.25);
+            zoomInBtn.onclick = () => zoomAt(FLOORS[current].view.zoom * 1.25);
+            zoomFitBtn.onclick = fitFloor;
+            zoomActualBtn.onclick = showActualSize;
+
+            function displayedSessions() {
+                if (appMode !== 'analyze') return [];
                 if (playback.active) {
                     const list = analyticsSessions();
                     return list.length ? [list[Math.min(playback.index, list.length - 1)]] : [];
                 }
-                if (!includeSessionsEl.checked) return [];
                 return analyticsSessions();
             }
 
@@ -907,26 +1867,31 @@
             function redraw() {
                 const fl = FLOORS[current];
 
-                const aggPoints = [...fl.points];
-                for (const sess of filteredSessions()) {
+                const aggPoints = appMode === 'count' ? [...fl.points] : [];
+                for (const sess of displayedSessions()) {
                     const sf = (sess.floors || []).find(f => f.id === fl.id);
                     if (sf && Array.isArray(sf.points)) aggPoints.push(...sf.points);
                 }
 
-                undoBtn.disabled = fl.points.length === 0;
-                clearBtn.disabled = fl.points.length === 0;
+                undoBtn.disabled = appMode !== 'count' || fl.points.length === 0;
+                clearBtn.disabled = appMode !== 'count' || fl.points.length === 0;
 
                 fctx.clearRect(0, 0, floor.width, floor.height);
                 hctx.clearRect(0, 0, heat.width, heat.height);
 
                 if (!fl.img.naturalWidth) { updateCounts(); return; }
 
-                const fit = imageFitRect(fl.img.naturalWidth, fl.img.naturalHeight, floor.width, floor.height);
+                const fit = currentImageRect();
+                fctx.save();
+                fctx.filter = theme === 'oled' ? 'invert(1) hue-rotate(180deg) brightness(0.72) contrast(1.12)' : 'none';
                 fctx.drawImage(fl.img, 0, 0, fl.img.naturalWidth, fl.img.naturalHeight, fit.x, fit.y, fit.w, fit.h);
+                fctx.restore();
 
                 const down = 0.5;
-                const hw = Math.max(1, (fit.w * down) | 0);
-                const hh = Math.max(1, (fit.h * down) | 0);
+                // Keep the heat buffer viewport-sized so pinch gestures stay
+                // responsive even when the floor plan is deeply zoomed.
+                const hw = Math.max(1, (floor.width * down) | 0);
+                const hh = Math.max(1, (floor.height * down) | 0);
                 const acc = document.createElement('canvas'); acc.width = hw; acc.height = hh;
                 const actx = acc.getContext('2d', { willReadFrequently: true });
                 actx.clearRect(0, 0, hw, hh);
@@ -944,8 +1909,8 @@
                 const sx = fit.w / iw, sy = fit.h / ih;
 
                 for (const p of aggPoints) {
-                    const x = p.x * sx * k;
-                    const y = p.y * sy * k;
+                    const x = (fit.x + p.x * sx) * k;
+                    const y = (fit.y + p.y * sy) * k;
                     actx.globalAlpha = Math.min(1, I / 100);
                     actx.drawImage(sprScaled, x - sR, y - sR);
                 }
@@ -967,7 +1932,7 @@
                     actx.clearRect(0, 0, hw, hh); actx.drawImage(tmp, 0, 0);
                 }
 
-                hctx.drawImage(acc, 0, 0, hw, hh, fit.x, fit.y, fit.w, fit.h);
+                hctx.drawImage(acc, 0, 0, hw, hh, 0, 0, floor.width, floor.height);
 
                 // QA markers - improved visibility
                 fctx.fillStyle = '#0f172a'; // dark center
@@ -980,6 +1945,7 @@
                 }
 
                 updateCounts();
+                updateZoomControls();
             }
 
             function makeKernelSprite(R) {
@@ -1019,10 +1985,12 @@
             function updateCounts() {
                 let total = 0;
                 FLOORS.forEach(fl => {
-                    let n = fl.points.length;
-                    for (const sess of filteredSessions()) {
-                        const sf = (sess.floors || []).find(f => f.id === fl.id);
-                        if (sf && Array.isArray(sf.points)) n += sf.points.length;
+                    let n = appMode === 'count' ? fl.points.length : 0;
+                    if (appMode === 'analyze') {
+                        for (const sess of displayedSessions()) {
+                            const sf = (sess.floors || []).find(f => f.id === fl.id);
+                            if (sf && Array.isArray(sf.points)) n += sf.points.length;
+                        }
                     }
                     total += n;
                     const el = document.getElementById(`count-${fl.id}`);
@@ -1030,16 +1998,36 @@
                 });
                 const t = document.getElementById('totalCount');
                 if (t) t.textContent = total;
+                if (appMode === 'count') {
+                    totalLabelEl.textContent = 'Current count:';
+                } else if (!SESSIONS.length) {
+                    totalLabelEl.textContent = 'Loaded total:';
+                } else if (playback.active) {
+                    totalLabelEl.textContent = 'Session total:';
+                } else {
+                    totalLabelEl.textContent = 'Filtered total:';
+                }
             }
 
             function persist() {
                 const minimal = FLOORS.map(fl => ({ id: fl.id, points: fl.points }));
-                localStorage.setItem('multi-floor-heatmap-embedded', JSON.stringify(minimal));
+                localStorage.setItem(DRAFT_KEY, JSON.stringify({
+                    floors: minimal,
+                    note: notesEl.value,
+                    updated_at: new Date().toISOString(),
+                }));
+                if (syncState !== 'sending') {
+                    clearTimeout(syncResetTimer);
+                    syncState = 'ready';
+                }
+                updateSyncStatus();
             }
             function restore() {
                 try {
-                    const arr = JSON.parse(localStorage.getItem('multi-floor-heatmap-embedded') || "[]");
+                    const saved = JSON.parse(localStorage.getItem(DRAFT_KEY) || "[]");
+                    const arr = Array.isArray(saved) ? saved : (saved.floors || []);
                     arr.forEach((o, i) => { if (FLOORS[i]) FLOORS[i].points = o.points || []; });
+                    if (!Array.isArray(saved) && typeof saved.note === 'string') notesEl.value = saved.note;
                 } catch { }
             }
 
@@ -1244,7 +2232,7 @@
             }
             function updatePlaybackUI() {
                 const list = analyticsSessions();
-                playbackBar.hidden = SESSIONS.length === 0;
+                playbackBar.hidden = appMode !== 'analyze' || SESSIONS.length === 0;
                 pbSlider.max = Math.max(0, list.length - 1);
                 pbSlider.value = Math.min(playback.index, list.length - 1);
                 pbSlider.disabled = !list.length;
@@ -1290,6 +2278,7 @@
 
             // --- Analytics overlay -------------------------------------------
             analyticsBtn.onclick = () => {
+                setMode('analyze');
                 // close the settings menu underneath before opening the overlay
                 document.getElementById('controlsPanel').setAttribute('hidden', '');
                 document.getElementById('menuBtn').setAttribute('aria-expanded', 'false');
@@ -1353,8 +2342,9 @@
                 const y = v => T + (1 - v / ymax) * (H - T - B);
 
                 ctx.font = '11px sans-serif';
-                ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-                ctx.fillStyle = '#94a3b8';
+                const styles = getComputedStyle(document.documentElement);
+                ctx.strokeStyle = styles.getPropertyValue('--chart-grid').trim();
+                ctx.fillStyle = styles.getPropertyValue('--text-muted').trim();
                 ctx.textAlign = 'right';
                 for (let i = 0; i <= 4; i++) {
                     const v = ymax * i / 4, yy = y(v);
@@ -1484,9 +2474,11 @@
                 afterSessionsChanged();
             }
 
+            setTheme(theme, false);
             restore();
             fitCanvas();
             redraw();
+            updateSyncStatus();
         })();
 
         // --- Panel Toggle Logic ---
@@ -1512,6 +2504,14 @@
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && !controlsPanel.hasAttribute('hidden')) closePanel();
         });
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').catch((error) => {
+                    console.warn('Service worker registration failed:', error);
+                });
+            });
+        }
     </script>
 </body>
 </html>

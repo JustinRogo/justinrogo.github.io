@@ -28,7 +28,8 @@ The site includes:
 ├── style.css
 ├── main.js
 ├── data/
-│   └── cards_count.json
+│   ├── cards_count.json
+│   └── pages.json
 └── Pages/
     ├── For Fun/
     │   ├── Birds.html
@@ -40,7 +41,6 @@ The site includes:
         │   └── Timeline_LawLib.html
         ├── UCPEA/
         │   ├── index.html
-        │   ├── salary_calculator.html
         │   └── UCPEAContract.html
         └── cgs/
             ├── index.html
@@ -72,9 +72,9 @@ Key homepage areas include:
 
 ### Dynamic page tree
 
-The site automatically builds a page tree from HTML files inside the `Pages/` directory using the GitHub tree API. If the API is unavailable, `main.js` renders a fallback page list.
+The site builds its page tree from `data/pages.json`, which defines each page's title, category, short description, source path, and optional external destination. This keeps navigation content, ordering, and external links independent of the repository API.
 
-This makes it easier to add new project pages without manually updating the homepage every time.
+Folder index pages are automatically treated as parents of the other pages in the same folder. For example, the UCPEA member dashboard is the parent of the UCPEA contract and salary tools.
 
 ### UConn Law Library search widget
 
@@ -104,9 +104,9 @@ The site uses a custom CSS system with:
 
 ### CT General Statutes Explorer
 
-Path: `Pages/Work/cgs/`
+Live site: `https://uconn-law-library.github.io/CGS/#/`
 
-A static, installable web app for browsing and searching the Connecticut General Statutes, subject index, and infractions schedule.
+A static, installable web app for browsing and searching the Connecticut General Statutes, subject index, and infractions schedule. The former `Pages/Work/cgs/` entry point redirects to the project's new repository site.
 
 Features include:
 
@@ -137,17 +137,11 @@ Path: `Pages/Work/Library/Timeline_LawLib.html`
 
 An interactive timeline page for the UConn School of Law Library’s centennial history.
 
-### UCPEA Salary Increase Calculator
-
-Path: `Pages/Work/UCPEA/salary_calculator.html`
-
-A calculator for estimating salary changes based on scheduled wage increases, optional merit amount, and optional reclassification percentage.
-
 ### UCPEA Member Dashboard
 
 Path: `Pages/Work/UCPEA/index.html`
 
-A member-focused dashboard with current UCPEA updates, quick access to the searchable contract and salary calculator, and links to official benefits and support resources. A dependency-free feed adapter refreshes the latest public Union Wire posts during each deployment and scheduled site update.
+A member-focused dashboard with current UCPEA updates, a task-based help launcher, benefits deadline planning, an eligibility-aware salary and pay-band tool, quick access to the searchable contract, and links to official benefits and support resources. A dependency-free feed adapter refreshes the latest public Union Wire posts during each deployment and scheduled site update.
 
 ### UCPEA Contract Page
 
@@ -198,10 +192,10 @@ Typical edits:
 - Update homepage structure in `index.html`
 - Update visual styling in `style.css`
 - Update widgets, page tree behavior, tabs, search, weather, and events logic in `main.js`
-- Add new standalone pages under `Pages/`
+- Add new standalone pages under `Pages/` and list them in `data/pages.json`
 - Add or update generated/static data under `data/`
 
-When adding a new HTML page under `Pages/`, the homepage page tree should detect it automatically as long as the GitHub API call succeeds.
+When a folder contains an `index.html` entry in the manifest, the homepage automatically renders that page as the parent of the folder's other listed pages.
 
 ## Data and external services
 

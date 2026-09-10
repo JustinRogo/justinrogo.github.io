@@ -19,7 +19,7 @@ const PAGE_TREE_FALLBACK = [
       {
         title: 'CGS',
         children: [
-          { title: 'CT General Statutes Explorer', href: 'Pages/Work/cgs/index.html' },
+          { title: 'CT General Statutes Explorer', href: 'https://uconn-law-library.github.io/CGS/#/' },
         ],
       },
       {
@@ -34,7 +34,7 @@ const PAGE_TREE_FALLBACK = [
         title: 'UCPEA',
         children: [
           { title: 'UCPEA Member Dashboard', href: 'Pages/Work/UCPEA/index.html' },
-          { title: 'Salary Increase Calculator', href: 'Pages/Work/UCPEA/salary_calculator.html' },
+          { title: 'UCPEA Contract Comparison', href: 'Pages/Work/UCPEA/UCPEA_Contract_Comparison.html' },
           { title: 'UCPEA Collective Bargaining Agreement, 2025-2029', href: 'Pages/Work/UCPEA/UCPEAContract.html' },
         ],
       },
@@ -42,10 +42,7 @@ const PAGE_TREE_FALLBACK = [
   },
 ];
 const PAGE_TREE_ROOT = 'Pages/';
-const PAGE_TREE_API = 'https://api.github.com/repos/JustinRogo/justinrogo.github.io/git/trees/main?recursive=1';
-const PAGE_TREE_EXCLUDE = /\.bak\.html$/i;
-const PAGE_TREE_CACHE_KEY = 'pageTree.v2';
-const PAGE_TREE_CACHE_TTL = 6 * 60 * 60 * 1000; // 6 hours
+const PAGE_TREE_MANIFEST = 'data/pages.json';
 
 function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, char => ({
@@ -65,6 +62,25 @@ function escapeHtml(value) {
     return nodes.flatMap(node => (node.href ? [node] : collectPages(node.children || [])));
   }
 
+  function renderPage(page) {
+    const children = page.children || [];
+    return `<li${children.length ? ' class="page-tree__parent"' : ''}>
+      <a class="page-link${children.length ? ' page-link--parent' : ''}" href="${escapeHtml(page.href)}">
+        <span class="dot" aria-hidden="true"></span>
+        <span class="page-link__content">
+          <span class="page-link__heading">
+            <span class="page-link__title">${escapeHtml(page.title)}</span>
+            ${page.category ? `<span class="page-link__category">${escapeHtml(page.category)}</span>` : ''}
+          </span>
+          ${page.description ? `<span class="page-link__description">${escapeHtml(page.description)}</span>` : ''}
+        </span>
+      </a>
+      ${children.length ? `<ul class="page-branch__children">
+        ${children.map(renderPage).join('')}
+      </ul>` : ''}
+    </li>`;
+  }
+
   function renderNodes(nodes) {
     // Render folders recursively; collecting descendants is only for counts.
     function renderGroup(node, path, depth) {
@@ -74,18 +90,18 @@ function escapeHtml(value) {
       const heading = `h${Math.min(3 + depth, 6)}`;
       const children = [...node.children].sort((a, b) =>
         Number(Boolean(a.href)) - Number(Boolean(b.href)) || a.title.localeCompare(b.title));
+      const indexPage = children.find(child => child.href && /(?:^|\/)index\.html$/i.test(child.path || child.href));
+      const folders = children.filter(child => !child.href);
+      const pages = children.filter(child => child.href && child !== indexPage);
+      const links = indexPage ? [{ ...indexPage, children: pages }] : pages;
       return `<section class="page-branch${depth ? ' page-branch--nested' : ''}" aria-labelledby="${headingId}">
         <div class="page-branch__header">
           <${heading} id="${headingId}">${escapeHtml(node.title)}</${heading}>
           <span class="page-count">${count} ${count === 1 ? 'page' : 'pages'}</span>
         </div>
         <ul class="page-branch__items">
-          ${children.map((child, index) => child.href ? `<li>
-            <a class="page-link" href="${escapeHtml(child.href)}">
-              <span class="dot" aria-hidden="true"></span>
-              <span>${escapeHtml(child.title)}</span>
-            </a>
-          </li>` : `<li class="page-branch__folder">${renderGroup(child, `${path}-${index}`, depth + 1)}</li>`).join('')}
+          ${folders.map((child, index) => `<li class="page-branch__folder">${renderGroup(child, `${path}-${index}`, depth + 1)}</li>`).join('')}
+          ${links.map(renderPage).join('')}
         </ul>
       </section>`;
     }
@@ -105,8 +121,8 @@ function escapeHtml(value) {
       .join(' ');
   }
 
-  function insertPage(tree, path, title) {
-    const parts = path.split('/').slice(1);
+  function insertPage(tree, page) {
+    const parts = page.path.split('/').slice(1);
     const fileName = parts.pop();
     let cursor = tree;
 
@@ -119,7 +135,13 @@ function escapeHtml(value) {
       cursor = group.children;
     });
 
-    cursor.push({ title: title || titleFromPathPart(fileName), href: path });
+    cursor.push({
+      title: page.title || titleFromPathPart(fileName),
+      href: page.href || page.path,
+      path: page.path,
+      category: page.category,
+      description: page.description,
+    });
   }
 
   function sortTree(nodes) {
@@ -134,64 +156,35 @@ function escapeHtml(value) {
     return nodes;
   }
 
-  async function fetchPageTitle(path) {
-    try {
-      const response = await fetch(encodeURI(path));
-      if (!response.ok) throw new Error('Title fetch failed');
-      const doc = new DOMParser().parseFromString(await response.text(), 'text/html');
-      return doc.querySelector('title')?.textContent?.trim() || '';
-    } catch {
-      return '';
-    }
-  }
-
   async function loadPageTree() {
-    const response = await fetch(PAGE_TREE_API);
-    if (!response.ok) throw new Error('Page tree API failed');
+    const response = await fetch(PAGE_TREE_MANIFEST, { cache: 'no-cache' });
+    if (!response.ok) throw new Error('Page manifest failed to load');
     const data = await response.json();
-    const paths = (data.tree || [])
-      .filter(item => item.type === 'blob')
-      .map(item => item.path)
-      .filter(path => path.startsWith(PAGE_TREE_ROOT) && /\.html$/i.test(path) && !PAGE_TREE_EXCLUDE.test(path));
+    const pages = Array.isArray(data.pages) ? data.pages : [];
+    const validPages = pages.filter(page => (
+      page
+      && typeof page.path === 'string'
+      && page.path.startsWith(PAGE_TREE_ROOT)
+      && /\.html$/i.test(page.path)
+      && typeof page.title === 'string'
+      && page.title.trim()
+      && typeof page.category === 'string'
+      && page.category.trim()
+      && typeof page.description === 'string'
+      && page.description.trim()
+      && (page.href === undefined || typeof page.href === 'string')
+    ));
 
-    const pages = await Promise.all(paths.map(async path => ({
-      path,
-      title: await fetchPageTitle(path),
-    })));
+    if (!validPages.length) throw new Error('Page manifest contains no valid pages');
 
     const tree = [];
-    pages.forEach(page => insertPage(tree, page.path, page.title));
+    validPages.forEach(page => insertPage(tree, page));
     return sortTree(tree);
   }
 
-  function readCachedTree() {
-    try {
-      const raw = localStorage.getItem(PAGE_TREE_CACHE_KEY);
-      if (!raw) return null;
-      const { savedAt, tree } = JSON.parse(raw);
-      if (!Array.isArray(tree) || !tree.length || Date.now() - savedAt > PAGE_TREE_CACHE_TTL) return null;
-      return tree;
-    } catch {
-      return null;
-    }
-  }
-
-  function writeCachedTree(tree) {
-    try {
-      localStorage.setItem(PAGE_TREE_CACHE_KEY, JSON.stringify({ savedAt: Date.now(), tree }));
-    } catch { /* storage blocked or full */ }
-  }
-
-  // Local file previews cannot fetch HTML titles reliably. Keep their curated
-  // names and folder structure; hosted pages still discover new files normally.
+  // Local file previews cannot fetch the manifest; retain a curated tree.
   if (location.protocol === 'file:') {
     mount.innerHTML = renderNodes(PAGE_TREE_FALLBACK);
-    return;
-  }
-
-  const cached = readCachedTree();
-  if (cached) {
-    mount.innerHTML = renderNodes(cached);
     return;
   }
 
@@ -199,12 +192,7 @@ function escapeHtml(value) {
 
   loadPageTree()
     .then(tree => {
-      if (tree.length) {
-        writeCachedTree(tree);
-        mount.innerHTML = renderNodes(tree);
-      } else {
-        mount.innerHTML = renderNodes(PAGE_TREE_FALLBACK);
-      }
+      mount.innerHTML = renderNodes(tree);
     })
     .catch(() => {
       mount.innerHTML = renderNodes(PAGE_TREE_FALLBACK);
