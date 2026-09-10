@@ -18,8 +18,8 @@
   --bg: #030712;
   --bg-2: #070d1e;
   --bg-elev: rgba(13, 22, 46, 0.45);
-  --glass: rgba(13, 22, 46, 0.4);
-  --glass-strong: rgba(7, 13, 30, 0.85);
+  --glass: var(--glass-bg);
+  --glass-strong: var(--glass-bg-strong);
   --text: #cbd5e1;
   --text-strong: #ffffff;
   --muted: #94a3b8;
@@ -59,8 +59,8 @@ body.light {
   --bg: #f1f5f9;
   --bg-2: #e2e8f0;
   --bg-elev: #ffffff;
-  --glass: rgba(255, 255, 255, 0.95);
-  --glass-strong: #ffffff;
+  --glass: var(--glass-bg);
+  --glass-strong: var(--glass-bg-strong);
   --text: #1e293b;
   --text-strong: #020617;
   --muted: #475569;
@@ -120,7 +120,7 @@ a {
   z-index: 9999;
   pointer-events: none;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-  opacity: 0.035;
+  opacity: 0.018; /* Let background detail, not global grain, describe the glass. */
   mix-blend-mode: overlay;
 }
 
@@ -248,32 +248,12 @@ aside {
 /* ===================================================================
    Bento Cards & Glassmorphism
    =================================================================== */
+/* Card geometry is independent of its material; see refractive-glass below. */
 .card {
   position: relative;
   overflow: clip;
-  background: var(--glass);
-  border: 1px solid var(--line);
-  backdrop-filter: blur(20px) saturate(120%);
-  -webkit-backdrop-filter: blur(20px) saturate(120%);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  transition: transform var(--speed) cubic-bezier(0.2, 0.8, 0.2, 1),
-              box-shadow var(--speed) cubic-bezier(0.2, 0.8, 0.2, 1),
-              border-color var(--speed) ease;
-}
-
-.card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), transparent 45%);
-  z-index: 1;
-}
-
-.card > * {
-  position: relative;
-  z-index: 2;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--glass-radius);
 }
 
 /* ===================================================================
@@ -287,7 +267,6 @@ aside {
   align-items: flex-start;
   padding: clamp(24px, 5cqw, 36px);
   text-align: left;
-  background: linear-gradient(155deg, rgba(9, 18, 38, 0.7) 0%, rgba(5, 10, 24, 0.45) 100%);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -340,10 +319,7 @@ aside {
   gap: 8px;
   padding: 10px;
   width: 100%;
-  background: rgba(255, 255, 255, 0.02);
-  border-color: rgba(255, 255, 255, 0.04);
   border-radius: var(--radius-sm);
-  box-shadow: none;
 }
 
 .hero-strengths {
@@ -402,7 +378,6 @@ aside {
    =================================================================== */
 .btn {
   border: 1px solid var(--line-strong);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
   color: var(--text-strong);
   padding: 10px 16px;
   border-radius: var(--radius-sm);
@@ -415,22 +390,8 @@ aside {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: all var(--speed) cubic-bezier(0.2, 0.8, 0.2, 1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   width: auto;
   flex: 1 1 auto;
-}
-
-.btn:hover,
-.btn:focus-visible {
-  transform: translateY(-2px);
-  border-color: var(--cyan);
-  background: linear-gradient(135deg, rgba(0, 242, 254, 0.15), rgba(0, 102, 255, 0.05));
-  box-shadow: 0 4px 12px rgba(0, 242, 254, 0.15);
-}
-
-.btn:active {
-  transform: translateY(0) scale(0.98);
 }
 
 /* ===================================================================
@@ -444,15 +405,12 @@ aside {
   text-transform: uppercase;
   padding: 4px 10px;
   border-radius: var(--radius-pill);
-  background: rgba(0, 242, 254, 0.08);
   color: var(--cyan);
   border: 1px solid rgba(0, 242, 254, 0.2);
   width: fit-content;
 }
 
 body:not(.light) .chip {
-  background: rgba(255, 126, 95, 0.08);
-  border-color: rgba(255, 126, 95, 0.22);
   color: var(--orange);
 }
 
@@ -464,7 +422,6 @@ body:not(.light) .chip {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  background: linear-gradient(180deg, rgba(9, 18, 38, 0.6) 0%, rgba(5, 10, 24, 0.45) 100%);
 }
 
 .info-card .title {
@@ -565,7 +522,6 @@ body:not(.light) .chip {
   padding: 6px;
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
-  background: rgba(255, 255, 255, 0.02);
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -578,7 +534,6 @@ body:not(.light) .chip {
   flex: 1 1 auto;
   text-align: center;
   border: 1px solid transparent;
-  background: transparent;
   color: var(--muted);
   padding: 10px 14px;
   border-radius: calc(var(--radius-sm) - 4px);
@@ -586,20 +541,15 @@ body:not(.light) .chip {
   font-family: inherit;
   font-weight: 600;
   font-size: 0.88rem;
-  transition: all var(--speed);
   white-space: nowrap;
 }
 
 .tab:hover {
   color: var(--text-strong);
-  background: rgba(255, 255, 255, 0.04);
 }
 
 .tab[aria-selected="true"] {
   color: var(--text-strong);
-  border-color: var(--line-strong);
-  background: linear-gradient(135deg, rgba(0, 242, 254, 0.1) 0%, rgba(0, 102, 255, 0.05) 100%), rgba(255, 255, 255, 0.06);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 @container (max-width: 620px) {
@@ -766,7 +716,6 @@ body:not(.light) .chip {
 }
 
 .about-resume__panel {
-  background: rgba(255, 255, 255, .025);
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   padding: clamp(16px, 3cqw, 22px);
@@ -835,22 +784,12 @@ body:not(.light) .about-resume__panel .about-resume__label {
 }
 
 .about-resume__tools span {
-  background: rgba(0, 242, 254, .06);
   border: 1px solid rgba(0, 242, 254, .18);
   border-radius: var(--radius-pill);
   color: var(--text);
   font-size: .78rem;
   font-weight: 600;
   padding: 6px 10px;
-}
-
-body.light .about-resume__panel {
-  background: rgba(255, 255, 255, .65);
-}
-
-body.light .about-resume__tools span {
-  background: rgba(0, 102, 255, .06);
-  border-color: rgba(0, 102, 255, .16);
 }
 
 @container (max-width: 620px) {
@@ -1022,35 +961,15 @@ body:not(.light) .eyebrow {
   border-radius: var(--radius-sm);
   text-decoration: none;
   color: var(--text);
-  background: rgba(255, 255, 255, 0.01);
   border: 1px solid var(--line);
   font-weight: 600;
   font-size: 0.9rem;
-  transition: all var(--speed) cubic-bezier(0.2, 0.8, 0.2, 1);
   overflow: hidden;
-}
-
-.link::after {
-  content: '';
-  position: absolute;
-  inset: auto 12px 6px 12px;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--cyan), transparent);
-  opacity: 0;
-  transition: opacity var(--speed);
 }
 
 .link:hover,
 .link:focus-visible {
-  transform: translateY(-3px);
-  border-color: var(--cyan);
   color: var(--text-strong);
-  box-shadow: var(--ring);
-  background: rgba(255, 255, 255, 0.03);
-}
-
-.link:hover::after {
-  opacity: 1;
 }
 
 .dot {
@@ -1115,7 +1034,7 @@ body:not(.light) .eyebrow {
   width: 14px;
 }
 
-.page-branch__header h3 {
+.page-branch__header :is(h3, h4, h5, h6) {
   color: var(--text-strong);
   font-family: 'Fraunces', Georgia, serif;
   font-size: 1.15rem;
@@ -1131,6 +1050,25 @@ body:not(.light) .eyebrow {
   background: rgba(255, 255, 255, 0.04);
   padding: 2px 8px;
   border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+
+/* Retain real folder nesting, including Work > UCPEA > individual pages. */
+.page-branch--nested {
+  margin-block: 6px 12px;
+}
+
+.page-branch--nested .page-branch__header :is(h4, h5, h6) {
+  font-size: 1rem;
+}
+
+.page-branch__items > .page-branch__folder::before {
+  top: 18px;
+}
+
+.page-link > span:last-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .page-branch__items {
@@ -1164,15 +1102,10 @@ body:not(.light) .eyebrow {
   color: var(--text);
   text-decoration: none;
   border: 1px solid transparent;
-  background: rgba(255, 255, 255, 0.01);
-  transition: all var(--speed);
 }
 
 .page-link:hover {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: var(--cyan);
   color: var(--text-strong);
-  transform: translateX(4px);
 }
 
 /* ===================================================================
@@ -1409,102 +1342,79 @@ input, textarea {
   color: var(--text);
 }
 
-#csMount .item::after {
-  content: attr(data-domain);
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%) translateY(-6px);
-  background: var(--bg-2);
-  border: 1px solid var(--line-strong);
-  color: var(--text-strong);
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  opacity: 0;
-  pointer-events: none;
-  transition: all var(--speed);
-  white-space: nowrap;
-  box-shadow: var(--shadow-sm);
-  z-index: 50;
-}
-
-#csMount .item:hover::after,
-#csMount .item:focus-visible::after {
-  opacity: 1;
-  transform: translateX(-50%) translateY(-10px);
-}
-
-/* CliftonStrengths Modal Dialog */
-#csMount .modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(3, 7, 18, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  align-items: center;
-  justify-content: center;
-  z-index: 10000;
-}
-
-#csMount .modal-content {
-  background: var(--bg-elev);
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius);
-  padding: 28px;
-  max-width: 460px;
-  width: 90%;
-  box-shadow: var(--shadow);
+/* CliftonStrengths inline disclosure: a reading surface within the grid. */
+#csMount .strength-detail {
+  grid-column: 1 / -1;
+  min-width: 0;
+  scroll-margin-block: 16px;
   position: relative;
+  border: 1px solid var(--glass-border);
+  border-inline-start: 3px solid var(--strength-color);
+  border-radius: var(--radius-sm);
+  padding: 20px 58px 22px 20px;
   text-align: left;
 }
 
-#csMount .modal-content h3 {
-  margin: 0 0 10px 0;
+#csMount .strength-detail[hidden] { display: none; }
+
+#csMount .strength-detail[data-domain] {
+  border-inline-start-color: var(--strength-color);
+}
+
+#csMount [data-domain="thinking"] { --strength-color: var(--green); }
+#csMount [data-domain="executing"] { --strength-color: var(--purple); }
+#csMount [data-domain="relationship"] { --strength-color: var(--blue); }
+#csMount [data-domain="influencing"] { --strength-color: var(--orange); }
+
+#csMount .item[aria-expanded="true"] {
+  outline: 2px solid var(--strength-color);
+  outline-offset: -3px;
+}
+
+#csMount .item[aria-expanded="true"]:focus-visible {
+  outline-color: var(--cyan);
+}
+
+#csMount .strength-detail h4 {
+  margin: 4px 0 10px;
   font-family: 'Fraunces', Georgia, serif;
-  font-size: 1.6rem;
+  font-size: 1.45rem;
   color: var(--text-strong);
 }
 
-#csMount .modal-content p {
+#csMount .strength-detail__meta {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
+#csMount .strength-detail__description {
   color: var(--text);
-  line-height: 1.55;
+  line-height: 1.65;
   margin: 0;
   font-size: 0.95rem;
 }
 
-#csMount .close {
+#csMount .strength-detail__close {
   position: absolute;
-  top: 14px;
-  right: 18px;
+  top: 10px;
+  right: 10px;
+  width: 44px;
+  min-height: 44px;
+  padding: 0;
   font-size: 1.6rem;
-  color: var(--muted);
-  cursor: pointer;
-  transition: color var(--speed);
-  background: none;
-  border: none;
   line-height: 1;
-}
-
-#csMount .close:hover {
-  color: var(--text-strong);
 }
 
 /* ===================================================================
    UConn Library Search Widget (ULSW) Redesign Overrides
    =================================================================== */
 .ulsw .wrap {
-  border-color: var(--line) !important;
   border-radius: var(--radius) !important;
-  background: linear-gradient(155deg, rgba(9, 18, 38, 0.7) 0%, rgba(5, 10, 24, 0.45) 100%) !important;
-  box-shadow: var(--shadow) !important;
 }
 
 .ulsw .tabs {
-  background: rgba(255, 255, 255, 0.02) !important;
   border-bottom: 1px solid var(--line) !important;
   padding: 6px !important;
   gap: 4px !important;
@@ -1512,7 +1422,6 @@ input, textarea {
 
 .ulsw [role="tab"] {
   border: 1px solid transparent !important;
-  background: transparent !important;
   color: var(--muted) !important;
   font-family: inherit !important;
   font-size: 0.82rem !important;
@@ -1522,14 +1431,10 @@ input, textarea {
 
 .ulsw [role="tab"]:hover {
   color: var(--text-strong) !important;
-  background: rgba(255, 255, 255, 0.03) !important;
-  border-color: transparent !important;
 }
 
 .ulsw [role="tab"][aria-selected="true"] {
   color: var(--text-strong) !important;
-  border-color: var(--line-strong) !important;
-  background: rgba(255, 255, 255, 0.06) !important;
   transform: translateY(0) !important;
 }
 
@@ -1557,18 +1462,12 @@ input, textarea {
 
 .ulsw .btn {
   border: 1px solid var(--line-strong) !important;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)) !important;
   color: var(--text-strong) !important;
   border-radius: var(--radius-sm) !important;
   font-family: inherit !important;
   height: 42px !important;
   font-size: 0.88rem !important;
   padding: 0 16px !important;
-}
-
-.ulsw .btn:hover {
-  border-color: var(--cyan) !important;
-  background: linear-gradient(135deg, rgba(0, 242, 254, 0.15), rgba(0, 102, 255, 0.05)) !important;
 }
 
 .ulsw .links {
@@ -1691,20 +1590,8 @@ body.light .site-pet__label {
   border-radius: 16px;
   display: grid;
   place-items: center;
-  background: rgba(13, 22, 46, 0.8);
   border: 1px solid var(--line-strong);
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   text-decoration: none;
-  transition: all var(--speed) cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.fab:hover,
-.fab:focus-visible {
-  transform: translateY(-4px) scale(1.05);
-  border-color: var(--cyan);
-  box-shadow: 0 8px 24px rgba(0, 242, 254, 0.25);
 }
 
 .fab svg {
@@ -1720,12 +1607,7 @@ body.light .site-pet__label {
 
 .fab.donate {
   font-size: 1.25rem;
-  background: linear-gradient(135deg, var(--orange), var(--magenta));
   border: none;
-}
-
-.fab.donate:hover {
-  box-shadow: 0 8px 24px rgba(255, 95, 183, 0.3);
 }
 
 /* ===================================================================
@@ -1755,52 +1637,21 @@ body.light .site-pet__label {
 /* ===================================================================
    Light Mode Specific Component Overrides
    =================================================================== */
-body.light .glow-aurora {
-  display: none;
-}
-
-body.light .hero {
-  background: #ffffff;
-  border-color: rgba(15, 23, 42, 0.08);
-  box-shadow: 0 8px 30px -10px rgba(15, 23, 42, 0.08);
-}
 
 body.light .hero h1 {
   text-shadow: none;
 }
 
-body.light .hero .info-card {
-  background: #f8fafc;
-  border-color: rgba(15, 23, 42, 0.06);
-}
-
 body.light .btn {
-  background: #ffffff;
   color: var(--text-strong);
-  border-color: var(--line-strong);
 }
 
 body.light .btn:hover {
-  background: rgba(0, 102, 255, 0.05);
-  border-color: #0066ff;
   color: #0066ff;
-  box-shadow: 0 4px 12px rgba(0, 102, 255, 0.1);
-}
-
-body.light .info-card {
-  background: #ffffff;
-  border-color: rgba(15, 23, 42, 0.08);
-  box-shadow: 0 6px 20px -8px rgba(15, 23, 42, 0.05);
-}
-
-body.light [aria-label="UConn Law Events"].info-card {
-  background: #ffffff;
 }
 
 body.light .chip {
-  background: #eff6ff;
   color: #1d4ed8;
-  border-color: #dbeafe;
 }
 
 body.light .info-note {
@@ -1828,12 +1679,6 @@ body.light #eventsList a:focus-visible {
   color: #0066ff;
 }
 
-body.light #csMount .controls,
-body.light #csMount .toggle-buttons {
-  background: rgba(15, 23, 42, 0.03);
-  border-color: var(--line);
-}
-
 body.light #csMount .controls button,
 body.light #csMount .toggle-buttons button {
   color: #475569;
@@ -1842,35 +1687,19 @@ body.light #csMount .toggle-buttons button {
 body.light #csMount .controls button:hover,
 body.light #csMount .toggle-buttons button:hover {
   color: #0f172a;
-  background: rgba(15, 23, 42, 0.04);
 }
 
 body.light #csMount .controls button.active,
 body.light #csMount .toggle-buttons button.active {
-  background: #ffffff;
-  border-color: var(--line-strong);
   color: #0f172a;
-  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
 }
 
 body.light #csMount .item {
-  background: #ffffff;
-  border-color: var(--line);
   color: #1e293b;
-}
-
-body.light #csMount .item:hover {
-  background: #f8fafc;
-  border-color: #0066ff;
-  box-shadow: 0 8px 24px rgba(0, 102, 255, 0.08);
 }
 
 body.light #csMount .name {
   color: #475569;
-}
-
-body.light #csMount .item.top10 {
-  background: rgba(255, 255, 255, 0.8);
 }
 
 body.light #csMount .item.top10[data-domain="executing"] { border-color: var(--purple); }
@@ -1890,21 +1719,11 @@ body.light .link-tools input:focus {
 }
 
 body.light .link {
-  background: #ffffff;
-  border-color: var(--line);
   color: #1e293b;
 }
 
 body.light .link:hover {
-  background: #f8fafc;
-  border-color: #0066ff;
   color: #0f172a;
-  box-shadow: 0 8px 24px rgba(0, 102, 255, 0.08);
-}
-
-body.light .fab {
-  background: rgba(255, 255, 255, 0.85);
-  border-color: var(--line-strong);
 }
 
 body.light .fab svg {
@@ -1915,21 +1734,9 @@ body.light .fab:hover svg {
   fill: #0066ff;
 }
 
-body.light .fab:hover {
-  border-color: #0066ff;
-  box-shadow: 0 8px 24px rgba(0, 102, 255, 0.15);
-}
-
-/* ULSW (Library Catalog tab) — !important required to beat the base
-   .ulsw overrides above, which are themselves !important. */
-body.light .ulsw .wrap {
-  background: #ffffff !important;
-  border-color: rgba(15, 23, 42, 0.08) !important;
-  box-shadow: 0 6px 20px -8px rgba(15, 23, 42, 0.05) !important;
-}
+/* ULSW theme colors; shared material overrides are consolidated below. */
 
 body.light .ulsw .tabs {
-  background: rgba(15, 23, 42, 0.03) !important;
   border-bottom-color: var(--line) !important;
 }
 
@@ -1939,14 +1746,10 @@ body.light .ulsw [role="tab"] {
 
 body.light .ulsw [role="tab"]:hover {
   color: #0f172a !important;
-  background: rgba(15, 23, 42, 0.04) !important;
 }
 
 body.light .ulsw [role="tab"][aria-selected="true"] {
   color: #0f172a !important;
-  background: #ffffff !important;
-  border-color: var(--line-strong) !important;
-  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04) !important;
 }
 
 body.light .ulsw input[type="text"] {
@@ -1965,14 +1768,10 @@ body.light .ulsw input[type="text"]::placeholder {
 }
 
 body.light .ulsw .btn {
-  background: #ffffff !important;
   color: var(--text-strong) !important;
-  border-color: var(--line-strong) !important;
 }
 
 body.light .ulsw .btn:hover {
-  background: rgba(0, 102, 255, 0.05) !important;
-  border-color: #0066ff !important;
   color: #0066ff !important;
 }
 
@@ -2098,8 +1897,7 @@ body.light .ulsw .helper {
     border-radius: 16px;
     background: rgba(6, 13, 32, 0.94);
     box-shadow: var(--shadow);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    /* Individual contact buttons carry the glass; avoid a second blur slab. */
     pointer-events: auto;
     z-index: 1001;
   }
@@ -2411,6 +2209,313 @@ body.light .pocket-part-widget {
     grid-template-columns: 1fr;
   }
 }
+
+/* ===================================================================
+   REFRACTIVE-GLASS SYSTEM — material tokens and progressive enhancement
+   .surface = reading; .glass = clear; .glass--strong = prominent glass.
+   Existing dynamic widget selectors below are aliases, so JS is unchanged.
+   =================================================================== */
+:root {
+  /* Transparency: tune the alpha channels, leaving the brand hues intact. */
+  --glass-bg: rgba(13, 22, 46, 0.14);
+  --glass-bg-strong: rgba(13, 22, 46, 0.20);
+  --surface-bg: rgba(7, 13, 30, 0.72);
+  --surface-blur: 4px;
+  --glass-blur: 5px;
+  --glass-saturation: 112%;
+  /* Blend of the refracted layer, 0–1. SVG scale="3" sets the pixel amplitude.
+     A shared SVG primitive cannot inherit a different scale per CSS surface. */
+  --glass-distortion: 0.48;
+  --glass-distortion-strong: 0.72;
+  --glass-border: rgba(213, 228, 255, 0.15);
+  --glass-border-hover: rgba(232, 242, 255, 0.30);
+  --glass-highlight: rgba(255, 255, 255, 0.25);
+  --glass-highlight-strong: rgba(255, 255, 255, 0.38);
+  --glass-edge-shade: rgba(0, 4, 16, 0.22);
+  --glass-specular: rgba(255, 255, 255, 0.045);
+  --glass-shadow: 0 6px 18px -12px rgba(0, 3, 14, 0.40);
+  --glass-shadow-strong: 0 12px 28px -18px rgba(0, 3, 14, 0.52);
+  --glass-radius: var(--radius);
+  --glass-active-bg: rgba(96, 165, 250, 0.10);
+  --glass-floating-bg: rgba(7, 13, 30, 0.58);
+}
+
+body.light {
+  --glass-bg: rgba(255, 255, 255, 0.18);
+  --glass-bg-strong: rgba(255, 255, 255, 0.26);
+  --surface-bg: rgba(248, 250, 255, 0.76);
+  --glass-border: rgba(68, 91, 124, 0.18);
+  --glass-border-hover: rgba(58, 83, 117, 0.32);
+  --glass-highlight: rgba(255, 255, 255, 0.70);
+  --glass-highlight-strong: rgba(255, 255, 255, 0.88);
+  --glass-edge-shade: rgba(55, 75, 110, 0.12);
+  --glass-specular: rgba(255, 255, 255, 0.12);
+  --glass-shadow: 0 6px 18px -12px rgba(30, 50, 80, 0.18);
+  --glass-shadow-strong: 0 12px 28px -18px rgba(30, 50, 80, 0.26);
+  --glass-active-bg: rgba(31, 103, 168, 0.08);
+  --glass-floating-bg: rgba(248, 250, 255, 0.62);
+}
+
+.glass-filter-defs {
+  position: absolute;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Defaults for future standalone pieces; existing component geometry wins. */
+:where(.glass, .glass--strong) {
+  border: 1px solid var(--glass-border);
+  border-radius: var(--glass-radius);
+}
+
+/* Reading surfaces have a stable contrast floor and NO displacement. */
+.surface,
+#csMount .card,
+#csMount .content,
+#csMount .strength-detail {
+  background: var(--surface-bg);
+  border-color: var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: blur(var(--surface-blur)) saturate(105%);
+  backdrop-filter: blur(var(--surface-blur)) saturate(105%);
+}
+
+body.light .about-resume__panel.surface {
+  background: var(--surface-bg);
+}
+
+/* Keep About's existing divider, spacing, and unboxed text layout. */
+.hero-about.surface {
+  background: linear-gradient(90deg, transparent, var(--surface-bg) 12%,
+    var(--surface-bg) 88%, transparent);
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* No backdrop-filter, filter, opacity, or isolation on the glass host:
+   its children can still sample the page background, and fixed dialogs
+   aren't captured by an extra filter containing block. Both pseudo layers
+   sit behind all content inside this local stacking context. */
+:is(.glass, .glass--strong, .card:not(.surface), .btn, .tab, .link,
+    .page-link, .chip, .about-resume__tools span, .ulsw [role="tab"]) {
+  --_glass-bg: var(--glass-bg);
+  --_glass-blur: var(--glass-blur);
+  --_glass-highlight: var(--glass-highlight);
+  --_glass-distortion: var(--glass-distortion);
+  position: relative;
+  z-index: 0;
+  background: transparent;
+  border-color: var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  transition: border-color var(--speed) ease, box-shadow var(--speed) ease,
+    color var(--speed) ease;
+}
+
+:is(.glass, .glass--strong, .card:not(.surface), .btn, .tab, .link,
+    .page-link, .chip, .about-resume__tools span, .ulsw [role="tab"])::before,
+:is(.glass, .glass--strong, .card:not(.surface), .btn, .tab, .link,
+    .page-link, .chip, .about-resume__tools span, .ulsw [role="tab"])::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* Always-on material and blur fallback. NEVER put url() in this chain. */
+:is(.glass, .glass--strong, .card:not(.surface), .btn, .tab, .link,
+    .page-link, .chip, .about-resume__tools span, .ulsw [role="tab"])::before {
+  z-index: -2;
+  background: var(--_glass-bg);
+  -webkit-backdrop-filter: blur(var(--_glass-blur)) saturate(var(--glass-saturation));
+  backdrop-filter: blur(var(--_glass-blur)) saturate(var(--glass-saturation));
+  box-shadow: inset 0 1px 0 var(--_glass-highlight),
+    inset 1px 0 0 var(--glass-border),
+    inset 0 -1px 0 var(--glass-edge-shade),
+    inset -1px 0 0 var(--glass-edge-shade);
+}
+
+/* Optional refraction is a separate sibling of the fallback. A browser can
+   parse url() yet fail to render SVG backdrop filters; even then it cannot
+   invalidate the blur on ::before. The 1px inset leaves the bevel intact. */
+:is(.glass, .glass--strong, .card:not(.surface), .btn, .tab, .link,
+    .page-link, .chip, .about-resume__tools span, .ulsw [role="tab"])::after {
+  z-index: -1;
+  inset: 1px;
+  opacity: var(--_glass-distortion);
+  background: linear-gradient(125deg, var(--glass-specular), transparent 36%,
+    transparent 76%, var(--glass-specular));
+}
+
+@supports ((backdrop-filter: url("#refractive-glass")) or
+           (-webkit-backdrop-filter: url("#refractive-glass"))) {
+  :is(.glass, .glass--strong, .card:not(.surface), .btn, .tab, .link,
+      .page-link, .chip, .about-resume__tools span, .ulsw [role="tab"])::after {
+    -webkit-backdrop-filter: url("#refractive-glass") blur(0.3px) saturate(102%);
+    backdrop-filter: url("#refractive-glass") blur(0.3px) saturate(102%);
+  }
+}
+
+.glass.glass--strong {
+  --_glass-bg: var(--glass-bg-strong);
+  --_glass-highlight: var(--glass-highlight-strong);
+  --_glass-distortion: var(--glass-distortion-strong);
+  box-shadow: var(--glass-shadow-strong);
+}
+
+/* Nested pieces stay clear; avoid multiplying large-radius blur passes. */
+:is(.glass, .glass--strong) :is(.glass, .btn, .tab, .link, .chip, .page-link),
+.about-resume__tools span,
+.ulsw [role="tab"] {
+  --_glass-blur: 2px;
+}
+
+/* Keep controls readable when they float over a white iframe or dark text. */
+.fab.glass--strong,
+.contact-toggle.glass--strong {
+  --_glass-bg: var(--glass-floating-bg);
+  --_glass-blur: 5px;
+}
+
+.fab.donate {
+  border: 1px solid var(--glass-border);
+  --_glass-bg: linear-gradient(135deg, rgba(255, 126, 95, 0.32),
+    rgba(255, 95, 183, 0.20)), var(--glass-floating-bg);
+}
+
+/* Preserve chip colors while removing luminous colored outlines. */
+body:not(.light) .chip { color: var(--orange); }
+body.light .chip { color: #1d4ed8; }
+
+:is(.btn, .tab, .link, .page-link, .fab, .contact-toggle):is(:hover, :focus-visible) {
+  --_glass-highlight: var(--glass-highlight-strong);
+  --_glass-bg: var(--glass-active-bg);
+  border-color: var(--glass-border-hover);
+  color: var(--text-strong);
+  box-shadow: var(--glass-shadow);
+  transform: none;
+}
+
+:is(.fab, .contact-toggle):is(:hover, :focus-visible) {
+  --_glass-bg: var(--glass-floating-bg);
+  box-shadow: var(--glass-shadow-strong);
+}
+
+.btn:active { transform: none; }
+
+.tab[aria-selected="true"] {
+  --_glass-bg: var(--glass-active-bg);
+  --_glass-highlight: var(--glass-highlight-strong);
+  border-color: var(--glass-border-hover);
+  color: var(--text-strong);
+  /* A crisp inner edge identifies selection without an outer glow. */
+  box-shadow: inset 0 -2px 0 var(--cyan);
+}
+
+/* Inset focus is visible even inside clipped cards and scrolling tab bars. */
+:is(.btn, .tab, .link, .page-link, .fab, .contact-toggle):focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: -3px;
+}
+
+/* Dynamic components: use the same tokens without changing JS templates.
+   Their existing domain colors stay intact. */
+#csMount .card { background: var(--surface-bg); }
+
+#csMount .card::before,
+#csMount .card::after { content: none; }
+
+#csMount :is(.controls, .toggle-buttons, .summary, .item) {
+  background-color: var(--glass-bg);
+  box-shadow: inset 0 1px 0 var(--glass-highlight), var(--glass-shadow);
+}
+
+#csMount :is(.controls, .toggle-buttons) button {
+  background: var(--glass-bg);
+  box-shadow: inset 0 1px 0 var(--glass-highlight);
+}
+
+#csMount :is(.controls, .toggle-buttons) button:is(:hover, .active) {
+  background: var(--glass-active-bg);
+  box-shadow: inset 0 1px 0 var(--glass-highlight-strong);
+}
+
+#csMount .item:is(:hover, :focus-visible),
+body.light #csMount .item:is(:hover, :focus-visible) {
+  transform: none;
+  box-shadow: inset 0 1px 0 var(--glass-highlight-strong), var(--glass-shadow);
+}
+
+/* Embedded catalog ships its own inline !important overrides. Keep its
+   reading/form area stable, and let its small controls share the material. */
+body .ulsw .wrap {
+  background: var(--surface-bg) !important;
+  border-color: var(--glass-border) !important;
+  box-shadow: var(--glass-shadow) !important;
+}
+
+body .ulsw .tabs { background: var(--glass-bg) !important; }
+
+body .ulsw :is([role="tab"], .btn) {
+  background: transparent !important;
+  border-color: var(--glass-border) !important;
+  box-shadow: var(--glass-shadow) !important;
+}
+
+body .ulsw :is([role="tab"], .btn):is(:hover, :focus-visible, [aria-selected="true"]) {
+  --_glass-bg: var(--glass-active-bg);
+  --_glass-highlight: var(--glass-highlight-strong);
+  background: transparent !important;
+  border-color: var(--glass-border-hover) !important;
+  color: var(--text-strong) !important;
+}
+
+body .ulsw [role="tab"][aria-selected="true"] {
+  box-shadow: inset 0 -2px 0 var(--cyan) !important;
+}
+
+/* Text entry needs a stable background rather than displacement. */
+body :is(input, textarea),
+body .ulsw input[type="text"],
+body.light .link-tools input {
+  background: var(--surface-bg) !important;
+  color: var(--text-strong) !important;
+}
+
+@media (max-width: 600px) {
+  .quickbar-actions {
+    background: var(--glass-bg);
+    border-color: var(--glass-border);
+    box-shadow: inset 0 1px 0 var(--glass-highlight), var(--glass-shadow);
+  }
+}
+
+/* User accessibility preferences take precedence over the clear material. */
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  body {
+    --glass-bg: var(--bg-2);
+    --glass-bg-strong: var(--bg-2);
+    --glass-floating-bg: var(--bg-2);
+    --surface-bg: var(--bg-2);
+    --glass-distortion: 0;
+    --glass-distortion-strong: 0;
+    --glass-active-bg: var(--bg-elev);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  /* Keep the static material; skip the optional displacement pass. */
+  :is(.glass, .glass--strong, .card:not(.surface), .btn, .tab, .link,
+      .page-link, .chip, .about-resume__tools span, .ulsw [role="tab"])::after {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+/* ================= END REFRACTIVE-GLASS SYSTEM ===================== */
 
 /* ===================================================================
    Reduced Motion Accessibility Rules

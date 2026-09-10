@@ -44,7 +44,7 @@ const PAGE_TREE_FALLBACK = [
 const PAGE_TREE_ROOT = 'Pages/';
 const PAGE_TREE_API = 'https://api.github.com/repos/JustinRogo/justinrogo.github.io/git/trees/main?recursive=1';
 const PAGE_TREE_EXCLUDE = /\.bak\.html$/i;
-const PAGE_TREE_CACHE_KEY = 'pageTree.v1';
+const PAGE_TREE_CACHE_KEY = 'pageTree.v2';
 const PAGE_TREE_CACHE_TTL = 6 * 60 * 60 * 1000; // 6 hours
 
 function escapeHtml(value) {
@@ -66,27 +66,34 @@ function escapeHtml(value) {
   }
 
   function renderNodes(nodes) {
-    return nodes.map((node, index) => {
-      const pages = (node.href ? [node] : collectPages(node.children || []))
-        .sort((a, b) => a.title.localeCompare(b.title));
-      if (!pages.length) return '';
-
-      const headingId = `page-branch-${index}`;
-      return `<section class="page-branch" aria-labelledby="${headingId}">
+    // Render folders recursively; collecting descendants is only for counts.
+    function renderGroup(node, path, depth) {
+      const count = collectPages(node.children || []).length;
+      if (!count) return '';
+      const headingId = `page-branch-${path}`;
+      const heading = `h${Math.min(3 + depth, 6)}`;
+      const children = [...node.children].sort((a, b) =>
+        Number(Boolean(a.href)) - Number(Boolean(b.href)) || a.title.localeCompare(b.title));
+      return `<section class="page-branch${depth ? ' page-branch--nested' : ''}" aria-labelledby="${headingId}">
         <div class="page-branch__header">
-          <h3 id="${headingId}">${escapeHtml(node.href ? 'Other' : node.title)}</h3>
-          <span class="page-count">${pages.length} ${pages.length === 1 ? 'page' : 'pages'}</span>
+          <${heading} id="${headingId}">${escapeHtml(node.title)}</${heading}>
+          <span class="page-count">${count} ${count === 1 ? 'page' : 'pages'}</span>
         </div>
         <ul class="page-branch__items">
-          ${pages.map(page => `<li>
-            <a class="page-link" href="${escapeHtml(page.href)}">
+          ${children.map((child, index) => child.href ? `<li>
+            <a class="page-link" href="${escapeHtml(child.href)}">
               <span class="dot" aria-hidden="true"></span>
-              <span>${escapeHtml(page.title)}</span>
+              <span>${escapeHtml(child.title)}</span>
             </a>
-          </li>`).join('')}
+          </li>` : `<li class="page-branch__folder">${renderGroup(child, `${path}-${index}`, depth + 1)}</li>`).join('')}
         </ul>
       </section>`;
-    }).join('');
+    }
+
+    const groups = nodes.filter(node => !node.href);
+    const loosePages = nodes.filter(node => node.href);
+    if (loosePages.length) groups.push({ title: 'Other', children: loosePages });
+    return groups.map((node, index) => renderGroup(node, String(index), 0)).join('');
   }
 
   function titleFromPathPart(value) {
@@ -175,6 +182,13 @@ function escapeHtml(value) {
     } catch { /* storage blocked or full */ }
   }
 
+  // Local file previews cannot fetch HTML titles reliably. Keep their curated
+  // names and folder structure; hosted pages still discover new files normally.
+  if (location.protocol === 'file:') {
+    mount.innerHTML = renderNodes(PAGE_TREE_FALLBACK);
+    return;
+  }
+
   const cached = readCachedTree();
   if (cached) {
     mount.innerHTML = renderNodes(cached);
@@ -221,6 +235,7 @@ function escapeHtml(value) {
   let resizeTimer = 0;
   let themeColors = [];
   let lastRendered = 0;
+  let branchLimit = 0;
 
   function randomBetween(min, max) {
     return min + Math.random() * (max - min);
@@ -260,7 +275,7 @@ function escapeHtml(value) {
   }
 
   function addBranch(start, directionIndex, depth, delay, step, colorIndex) {
-    if (depth < 1 || branches.length > 140) return;
+    if (depth < 1 || branches.length >= branchLimit) return;
 
     const points = [{ x: start.x, y: start.y }];
     const segmentCount = Math.floor(randomBetween(2, depth > 4 ? 5 : 4));
@@ -323,11 +338,15 @@ function escapeHtml(value) {
   function createFractal() {
     branches = [];
     const area = width * height;
-    const rootCount = Math.max(3, Math.min(7, Math.round(area / 280000)));
+    // More starting paths, spread across all four edges. Keep mobile bounded
+    // and retain the existing 30fps limit and static reduced-motion drawing.
+    const rootCount = Math.max(6, Math.min(12, Math.round(area / 160000)));
+    const branchesPerRoot = 26;
     const step = Math.max(31, Math.min(52, width / 24));
 
     for (let index = 0; index < rootCount; index += 1) {
-      const edge = Math.floor(Math.random() * 4);
+      branchLimit = (index + 1) * branchesPerRoot;
+      const edge = index % 4;
       const margin = step * 1.5;
       let start;
       let direction;
@@ -578,14 +597,15 @@ function escapeHtml(value) {
         </div>
       </section>
 
-      <!-- Modal -->
-      <div id="modal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="modal-title" aria-describedby="modal-desc">
-        <div class="modal-content">
-          <button class="close" type="button" aria-label="Close CliftonStrengths description">&times;</button>
-          <h3 id="modal-title"></h3>
-          <p id="modal-desc"></p>
+      <!-- Inline disclosure: moved beneath the selected strength's grid row. -->
+      <section id="strength-detail" class="strength-detail surface" hidden aria-labelledby="strength-detail-title">
+        <button class="strength-detail__close btn" type="button" aria-label="Close strength description">&times;</button>
+        <div aria-live="polite" aria-atomic="true">
+          <p class="strength-detail__meta"></p>
+          <h4 id="strength-detail-title"></h4>
+          <p class="strength-detail__description"></p>
         </div>
-      </div>
+      </section>
     </div>`;
 
   mount.innerHTML = html;
@@ -599,9 +619,9 @@ function escapeHtml(value) {
     button.append(...item.childNodes);
     const themeName = button.querySelector('.name')?.textContent || 'CliftonStrengths theme';
     const rank = button.querySelector('.rank')?.textContent || '';
-    button.setAttribute('aria-label', `${themeName}, rank ${rank}. Open description`);
-    button.setAttribute('aria-haspopup', 'dialog');
-    button.setAttribute('aria-controls', 'modal');
+    button.setAttribute('aria-label', `${themeName}, rank ${rank}`);
+    button.setAttribute('aria-expanded', 'false');
+    button.setAttribute('aria-controls', 'strength-detail');
     item.replaceWith(button);
   });
 
@@ -633,10 +653,91 @@ function escapeHtml(value) {
     bar.setAttribute('aria-label', `Rank-weighted CliftonStrengths domain balance: ${labels.join(', ')}`);
   });
 
+  // Inline strength details: one reusable, non-modal disclosure. Focus stays
+  // on the selected button, so keyboard users can keep browsing the grid.
+  const detail = mount.querySelector('#strength-detail');
+  const detailTitle = detail.querySelector('#strength-detail-title');
+  const detailDescription = detail.querySelector('.strength-detail__description');
+  const detailMeta = detail.querySelector('.strength-detail__meta');
+  const domainNames = {
+    thinking: 'Strategic Thinking', executing: 'Executing',
+    relationship: 'Relationship Building', influencing: 'Influencing',
+  };
+  let detailTrigger = null;
+
+  function closeStrengthDetail(restoreFocus = false) {
+    const trigger = detailTrigger;
+    detailTrigger = null;
+    trigger?.setAttribute('aria-expanded', 'false');
+    if (restoreFocus) trigger?.focus({ preventScroll: true });
+    detail.hidden = true;
+  }
+
+  function positionStrengthDetail() {
+    if (!detailTrigger) return;
+    const focused = detail.contains(document.activeElement) ? document.activeElement : null;
+    // Measure the intact grid, then place the full-width detail after that row.
+    detail.hidden = true;
+    const list = detailTrigger.closest('.list');
+    const rowTop = detailTrigger.offsetTop;
+    const rowItems = [...list.querySelectorAll('.item')].filter(item =>
+      item.getClientRects().length && Math.abs(item.offsetTop - rowTop) < 2);
+    rowItems[rowItems.length - 1].after(detail);
+    detail.hidden = false;
+    focused?.focus({ preventScroll: true });
+  }
+
+  rankedItems.forEach(item => {
+    item.addEventListener('click', () => {
+      if (detailTrigger === item) {
+        closeStrengthDetail();
+        return;
+      }
+      closeStrengthDetail();
+      detailTrigger = item;
+      const name = item.querySelector('.name').textContent;
+      const rank = item.querySelector('.rank').textContent;
+      detail.dataset.domain = item.dataset.domain;
+      detailTitle.textContent = name;
+      detailMeta.textContent = `${domainNames[item.dataset.domain]} · Rank ${rank} of ${maxRank}`;
+      // The heading already supplies the name; avoid repeating it in the copy.
+      const description = item.dataset.desc || '';
+      detailDescription.textContent = description.startsWith(`${name}:`)
+        ? description.slice(name.length + 1).trim() : description;
+      item.setAttribute('aria-expanded', 'true');
+      positionStrengthDetail();
+      // Bring the short explanation into view while keeping its row nearby.
+      // No scroll animation is needed for this disclosure interaction.
+      detail.scrollIntoView({ block: 'nearest', behavior: 'instant' });
+    });
+  });
+
+  detail.querySelector('.strength-detail__close').addEventListener('click', () => closeStrengthDetail(true));
+  mount.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && detailTrigger) {
+      event.preventDefault();
+      closeStrengthDetail(true);
+    }
+  });
+
+  // Reflow the open detail when a responsive breakpoint changes the grid.
+  const listWidths = new WeakMap();
+  const detailResizeObserver = new ResizeObserver(entries => {
+    entries.forEach(({ target, contentRect }) => {
+      const previous = listWidths.get(target);
+      listWidths.set(target, contentRect.width);
+      if (contentRect.width > 0 && contentRect.width !== previous && target.contains(detailTrigger)) {
+        positionStrengthDetail();
+      }
+    });
+  });
+  mount.querySelectorAll('.list').forEach(list => detailResizeObserver.observe(list));
+
   // Strengths filter controls
   const controlBtns = mount.querySelectorAll('.controls button');
 
   function filterStrengths(limit) {
+    closeStrengthDetail();
     mount.querySelectorAll('.item').forEach(item => {
       const rank = parseInt(item.querySelector('.rank').textContent, 10);
       item.style.display = (limit === 'all' || rank <= limit) ? '' : 'none';
@@ -654,66 +755,6 @@ function escapeHtml(value) {
     });
     const allBtn = mount.querySelector('.controls button[data-limit="all"]');
     if (allBtn) { allBtn.classList.add('active'); filterStrengths('all'); }
-  }
-
-  // Modal
-  const modal = mount.querySelector('#modal');
-  const modalTitle = mount.querySelector('#modal-title');
-  const modalDesc = mount.querySelector('#modal-desc');
-
-  if (modal && modalTitle && modalDesc) {
-    const closeBtn = modal.querySelector('.close');
-    let modalTrigger = null;
-
-    function openModal(item) {
-      modalTrigger = item;
-      modalTitle.textContent = item.querySelector('.name').textContent;
-      modalDesc.textContent = item.dataset.desc;
-      modal.setAttribute('aria-hidden', 'false');
-      modal.style.display = 'flex';
-      closeBtn?.focus();
-    }
-
-    function closeModal() {
-      const trigger = modalTrigger;
-      modalTrigger = null;
-      trigger?.focus({ preventScroll: true });
-      modal.style.display = 'none';
-      modal.setAttribute('aria-hidden', 'true');
-    }
-
-    mount.querySelectorAll('.item').forEach(item => {
-      item.addEventListener('click', () => openModal(item));
-    });
-
-    if (closeBtn) closeBtn.addEventListener('click', closeModal);
-    modal.addEventListener('click', event => {
-      if (event.target === modal) closeModal();
-    });
-
-    modal.addEventListener('keydown', event => {
-      if (event.key === 'Escape') {
-        event.preventDefault();
-        closeModal();
-        return;
-      }
-
-      if (event.key !== 'Tab') return;
-      const focusable = [...modal.querySelectorAll(
-        'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-      )].filter(element => element.getClientRects().length);
-      if (!focusable.length) return;
-
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    });
   }
 
   // Content toggle (event delegation, replaces window.showContent)

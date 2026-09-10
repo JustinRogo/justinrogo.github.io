@@ -56,6 +56,22 @@
     })();
   </script>
 
+  <!-- Refractive-glass system: one static, shared backdrop displacement map.
+       Keep this SVG in the render tree (not display:none). CSS controls the
+       refraction mix; scale below controls the maximum displacement in px. -->
+  <svg class="glass-filter-defs" xmlns="http://www.w3.org/2000/svg"
+       width="0" height="0" aria-hidden="true" focusable="false">
+    <defs>
+      <filter id="refractive-glass" x="-5%" y="-5%" width="110%" height="110%"
+              color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.012 0.018"
+                      numOctaves="1" seed="8" stitchTiles="stitch" result="glass-noise" />
+        <feDisplacementMap in="SourceGraphic" in2="glass-noise" scale="3"
+                           xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+    </defs>
+  </svg>
+
   <!-- Premium Background Spectacle -->
   <div class="noise-overlay" aria-hidden="true"></div>
   <canvas class="fractal-background" id="fractalBackground" aria-hidden="true"></canvas>
@@ -65,7 +81,7 @@
 
   <div class="container">
     <!-- Hero / Profile -->
-    <header class="card hero" aria-label="Profile">
+    <header class="card glass glass--strong hero" aria-label="Profile">
         <div class="avatar" aria-hidden="true">
           <img
             alt="Justin Rogowski"
@@ -75,20 +91,20 @@
         <div class="hgroup">
           <h1>Justin Rogowski</h1>
           <p>Library Information Coordinator · University of Connecticut School of Law</p>
-          <div class="card info-card">
-            <button class="btn" id="shareBtn" title="Share this page">
+          <div class="card glass info-card">
+            <button class="glass btn" id="shareBtn" title="Share this page">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
                 <path d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.5 2.5 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5" />
               </svg>
               Share
             </button>
-            <button class="btn" id="theme" title="Toggle light/dark theme">
+            <button class="glass btn" id="theme" title="Toggle light/dark theme">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
                 <path d="M12 8a4 4 0 1 1-8 0 4 4 0 0 1 8 0M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708" />
               </svg>
               Toggle Theme
             </button>
-            <a class="btn"
+            <a class="glass btn"
                href="https://giving.uconn.edu/campaigns/60852/donations/new?designation=LawLibraryEndowmentFund"
                target="_blank" rel="noopener noreferrer">
               🧡 Donate to the Law Library
@@ -101,13 +117,13 @@
               <span class="purple" data-domain="executing" data-label="Executing" aria-hidden="true"></span>
               <span class="orange" data-domain="influencing" data-label="Influencing" aria-hidden="true"></span>
             </div>
-            <button class="btn hero-strengths__button" id="viewStrengthsBtn" type="button" aria-controls="tab-cs">
+            <button class="glass btn hero-strengths__button" id="viewStrengthsBtn" type="button" aria-controls="tab-cs">
               View my CliftonStrengths
             </button>
           </div>
         </div>
       <!-- About -->
-      <div class="hero-about">
+      <div class="hero-about surface">
         <p class="eyebrow">About</p>
         <h2 id="about-heading">A little about me</h2>
         <p class="about-intro__copy">I work where information, technology, data, and everyday operations meet. I’m drawn to complicated, repetitive, or mildly annoying problems that can be made clearer with a better process, a useful dashboard, a thoughtfully organized page, or a small tool that didn’t exist five minutes ago. Outside of work, I’m usually experimenting with code, starting another side project, or tending to an entirely reasonable number of houseplants.</p>
@@ -120,13 +136,13 @@
 
           <div class="about-more__content">
             <div class="about-more__grid">
-              <section class="about-resume__panel about-resume__panel--wide">
+              <section class="about-resume__panel about-resume__panel--wide surface">
                 <p class="about-resume__label">Professional focus</p>
                 <h3>Making complicated work easier to navigate</h3>
                 <p>I’ve worked in academic libraries for more than a decade and at UConn Law since 2016. My role as Library Information Coordinator spans technology, data, communications, administration, and knowledge management—along with the unexpected problems that resist tidy categories. I’m less interested in technology for its own sake than in what it can do: make information easier to find, remove unnecessary work, and leave behind systems people can actually use and maintain.</p>
               </section>
 
-              <section class="about-resume__panel">
+              <section class="about-resume__panel surface">
                 <p class="about-resume__label">Selected work</p>
                 <h3>Projects with practical impact</h3>
                 <ul class="about-resume__list">
@@ -138,7 +154,7 @@
                 </ul>
               </section>
 
-              <section class="about-resume__panel">
+              <section class="about-resume__panel surface">
                 <p class="about-resume__label">Leadership &amp; learning</p>
                 <h3>A broader view of how organizations work</h3>
                 <ul class="about-resume__list">
@@ -151,7 +167,7 @@
                 <p class="about-resume__affiliations">Member of the American Association of Law Libraries (AALL) and Law Libraries of New England (LLNE).</p>
               </section>
 
-              <section class="about-resume__panel about-resume__panel--wide">
+              <section class="about-resume__panel about-resume__panel--wide surface">
                 <p class="about-resume__label">Technology &amp; tools</p>
                 <h3>Tools I reach for</h3>
                 <div class="about-resume__tools" aria-label="Technology and tools">
@@ -173,25 +189,25 @@
     <aside>
 
       <!-- Trello + Time + Weather -->
-      <div class="card info-card">
-        <div class="chip">To Do</div>
+      <div class="card glass info-card">
+        <div class="chip glass">To Do</div>
         <div style="margin-top:.4rem">
           <strong id="trelloTotal">—</strong> total · <strong id="trelloDone">—</strong> completed
         </div>
 
-        <div class="chip">Now Working On</div>
+        <div class="chip glass">Now Working On</div>
         <p class="info-note" id="status" style="margin:.6rem 0 0">
           Tending plants · Power BI · Other duties as assigned
         </p>
 
-        <span class="chip">Time</span>
+        <span class="chip glass">Time</span>
         <div>
           <div class="title" id="time">—</div>
           <div class="info-note">Hartford, CT (ET)</div>
         </div>
 
         <div class="info-pair">
-          <span class="chip">Weather</span>
+          <span class="chip glass">Weather</span>
           <div>
             <div class="title" id="wx">Loading…</div>
             <div class="info-note" id="wxNote">—</div>
@@ -200,8 +216,8 @@
       </div>
 
       <!-- UConn Law Events -->
-      <div class="card info-card" role="region" aria-label="UConn Law Events">
-        <div class="chip">UConn Law Events</div>
+      <div class="card info-card surface" role="region" aria-label="UConn Law Events">
+        <div class="chip glass">UConn Law Events</div>
         <div class="info-note" id="eventsList" style="margin-top:.4rem">Loading upcoming events…</div>
       </div>
 
@@ -211,13 +227,13 @@
     <main>
 
       <!-- Tabs Deck -->
-      <section class="card tabs" aria-label="Widgets">
-        <div class="tablist" role="tablist" aria-label="Widget tabs">
-          <button class="tab" role="tab" aria-selected="false" aria-controls="tab-cal"  id="tbtn-cal"  tabindex="-1">My Calendar</button>
-          <button class="tab" role="tab" aria-selected="false" aria-controls="tab-book" id="tbtn-book" tabindex="-1">Book a Meeting</button>
-          <button class="tab" role="tab" aria-selected="false" aria-controls="tab-req"  id="tbtn-req"  tabindex="-1">Submit a Request</button>
-          <button class="tab" role="tab" aria-selected="false" aria-controls="tab-cs"   id="tbtn-cs"   tabindex="-1">My CliftonStrengths</button>
-          <button class="tab" role="tab" aria-selected="true"  aria-controls="tab-cat"  id="tbtn-cat">Library Catalog</button>
+      <section class="card glass tabs" aria-label="Widgets">
+        <div class="tablist glass glass--strong" role="tablist" aria-label="Widget tabs">
+          <button class="tab glass" role="tab" aria-selected="false" aria-controls="tab-cal"  id="tbtn-cal"  tabindex="-1">My Calendar</button>
+          <button class="tab glass" role="tab" aria-selected="false" aria-controls="tab-book" id="tbtn-book" tabindex="-1">Book a Meeting</button>
+          <button class="tab glass" role="tab" aria-selected="false" aria-controls="tab-req"  id="tbtn-req"  tabindex="-1">Submit a Request</button>
+          <button class="tab glass" role="tab" aria-selected="false" aria-controls="tab-cs"   id="tbtn-cs"   tabindex="-1">My CliftonStrengths</button>
+          <button class="tab glass" role="tab" aria-selected="true"  aria-controls="tab-cat"  id="tbtn-cat">Library Catalog</button>
         </div>
 
         <div id="tab-cal" class="tabpanel" role="tabpanel" aria-labelledby="tbtn-cal">
@@ -237,14 +253,14 @@
         </div>
 
         <div id="tab-req" class="tabpanel" role="tabpanel" aria-labelledby="tbtn-req">
-          <div class="card" style="padding:14px">
+          <div class="card surface" style="padding:14px">
             <div style="display:grid;grid-template-columns:2fr 1fr;gap:14px">
               <iframe
                 class="embed"
                 loading="lazy"
                 data-src="https://trello.com/b/2Yp5IKYz.html"
                 title="Public Trello Board"></iframe>
-              <div class="card" style="padding:16px">
+              <div class="card surface" style="padding:16px">
                 <h3 style="margin:0 0 8px 0">Submit a Request</h3>
                 <form action="https://formsubmit.co/justinrogowski1+vnowu7qczgm6cw6e96zn@boards.trello.com" method="POST">
                   <input type="hidden" name="_captcha" value="false" />
@@ -253,7 +269,7 @@
                   <label>Email<br><input name="email" type="email" required /></label><br /><br />
                   <label>Subject<br><input name="subject" required /></label><br /><br />
                   <label>Details<br><textarea name="details" rows="6" required></textarea></label><br />
-                  <button class="btn" style="width:100%" type="submit">Send Request</button>
+                  <button class="glass btn" style="width:100%" type="submit">Send Request</button>
                 </form>
               </div>
             </div>
@@ -270,41 +286,41 @@
       </section>
 
       <!-- Quick Links -->
-      <section class="card widget" aria-label="Quick Links">
+      <section class="card glass widget" aria-label="Quick Links">
         <h2>Quick Links</h2>
         <div class="link-tools">
           <input id="search" placeholder="Filter links…" aria-label="Filter quick links" />
         </div>
         <div class="link-grid" id="links">
-          <a class="link" href="https://library.law.uconn.edu/" target="_blank" rel="noopener noreferrer">
+          <a class="link glass" href="https://library.law.uconn.edu/" target="_blank" rel="noopener noreferrer">
             <span class="dot" aria-hidden="true"></span>UConn Law Library
           </a>
-          <a class="link" href="https://uconn.atlassian.net/wiki/x/IgHzNwY" target="_blank" rel="noopener noreferrer">
+          <a class="link glass" href="https://uconn.atlassian.net/wiki/x/IgHzNwY" target="_blank" rel="noopener noreferrer">
             <span class="dot" aria-hidden="true"></span>Confluence
           </a>
-          <a class="link" href="https://law.uconn.edu/student-life/student-services/#collapsepanel-3874-1-0-05" target="_blank" rel="noopener noreferrer">
+          <a class="link glass" href="https://law.uconn.edu/student-life/student-services/#collapsepanel-3874-1-0-05" target="_blank" rel="noopener noreferrer">
             <span class="dot" aria-hidden="true"></span>IT Help Desk
           </a>
-          <a class="link" href="https://libguides.law.uconn.edu/" target="_blank" rel="noopener noreferrer">
+          <a class="link glass" href="https://libguides.law.uconn.edu/" target="_blank" rel="noopener noreferrer">
             <span class="dot" aria-hidden="true"></span>Research Guides
           </a>
-          <a class="link" href="https://teams.microsoft.com/l/chat/0/0?users=justin.rogowski@uconn.edu" target="_blank" rel="noopener noreferrer">
+          <a class="link glass" href="https://teams.microsoft.com/l/chat/0/0?users=justin.rogowski@uconn.edu" target="_blank" rel="noopener noreferrer">
             <span class="dot" aria-hidden="true"></span>Start a Teams Chat
           </a>
-          <a class="link" href="tel:+18605705109">
+          <a class="link glass" href="tel:+18605705109">
             <span class="dot" aria-hidden="true"></span>Call Justin
           </a>
-          <a class="link" href="https://www.linkedin.com/in/justin-rogowski/" target="_blank" rel="noopener noreferrer">
+          <a class="link glass" href="https://www.linkedin.com/in/justin-rogowski/" target="_blank" rel="noopener noreferrer">
             <span class="dot" aria-hidden="true"></span>LinkedIn
           </a>
-          <a class="link" href="https://justinrogo.github.io/" target="_blank" rel="noopener noreferrer">
+          <a class="link glass" href="https://justinrogo.github.io/" target="_blank" rel="noopener noreferrer">
             <span class="dot" aria-hidden="true"></span>Home
           </a>
         </div>
       </section>
 
       <!-- The Pocket Part -->
-      <details class="card widget collapsible-widget pocket-part-widget">
+      <details class="card surface widget collapsible-widget pocket-part-widget">
         <summary class="collapsible-widget__summary">
           <h2 id="pocket-part-heading">
             <span class="pocket-part-widget__eyebrow">UConn Law Library Blog</span>
@@ -332,7 +348,7 @@
       </details>
 
       <!-- Page Tree -->
-      <details class="card widget collapsible-widget" id="page-directory">
+      <details class="card glass widget collapsible-widget" id="page-directory">
         <summary class="collapsible-widget__summary">
           <h2>Pages</h2>
           <span class="collapsible-widget__icon" aria-hidden="true"></span>
@@ -343,7 +359,7 @@
       </details>
 
       <!-- Recent GitHub Activity -->
-      <details class="card widget collapsible-widget commit-feed">
+      <details class="card surface widget collapsible-widget commit-feed">
         <summary class="collapsible-widget__summary">
           <h2 id="recent-commits-heading">
             <span class="eyebrow">GitHub activity</span>
@@ -374,16 +390,16 @@
 
   <!-- Quick contact -->
   <nav aria-label="Quick contact" class="quickbar">
-    <button class="contact-toggle" id="contactToggle" type="button" aria-expanded="false" aria-controls="quickbarActions">
+    <button class="contact-toggle glass glass--strong" id="contactToggle" type="button" aria-expanded="false" aria-controls="quickbarActions">
       Contact
     </button>
     <div class="quickbar-actions" id="quickbarActions">
-    <a aria-label="Call Justin" class="fab" href="tel:+18605705109" title="Call">
+    <a aria-label="Call Justin" class="fab glass glass--strong" href="tel:+18605705109" title="Call">
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V21a1 1 0 0 1-1 1C10.85 22 2 13.15 2 2a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.24.2 2.45.57 3.57a1 1 0 0 1-.25 1.02l-2.2 2.2z" />
       </svg>
     </a>
-    <a aria-label="Start Teams chat" class="fab"
+    <a aria-label="Start Teams chat" class="fab glass glass--strong"
        href="https://teams.microsoft.com/l/chat/0/0?users=justin.rogowski@uconn.edu"
        target="_blank" rel="noopener noreferrer" title="Teams">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
@@ -391,12 +407,12 @@
         <path d="M.682 3.349h6.822c.377 0 .682.305.682.682v6.822a.68.68 0 0 1-.682.682H.682A.68.68 0 0 1 0 10.853V4.03c0-.377.305-.682.682-.682Zm5.206 2.596v-.72h-3.59v.72h1.357V9.66h.87V5.945z" />
       </svg>
     </a>
-    <a aria-label="Email Justin" class="fab" href="mailto:justin.rogowski@uconn.edu" title="Email">
+    <a aria-label="Email Justin" class="fab glass glass--strong" href="mailto:justin.rogowski@uconn.edu" title="Email">
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z" />
       </svg>
     </a>
-    <a aria-label="Donate to the Law Library" class="fab donate"
+    <a aria-label="Donate to the Law Library" class="fab donate glass glass--strong"
        href="https://giving.uconn.edu/campaigns/60852/donations/new?designation=LawLibraryEndowmentFund"
        target="_blank" rel="noopener noreferrer" title="Donate">🧡</a>
     </div>
