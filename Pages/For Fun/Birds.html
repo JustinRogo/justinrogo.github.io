@@ -242,6 +242,7 @@
             setMag(n) { return this.normalize().mult(n); }
             heading() { return Math.atan2(this.y, this.x); }
             copy() { return new Vec2(this.x, this.y); }
+            set(x, y) { this.x = x; this.y = y; return this; }
             
             static sub(v1, v2) { return new Vec2(v1.x - v2.x, v1.y - v2.y); }
             static distSq(v1, v2) {
@@ -251,15 +252,95 @@
             }
         }
 
+        // Reuse buckets and query storage; only inspect cells within the sight radius.
+        class SpatialGrid {
+            constructor(cellSize) {
+                this.cellSize = cellSize;
+                this.cells = [];
+            }
+
+            resize(width, height) {
+                this.columns = Math.max(1, Math.ceil(width / this.cellSize));
+                this.rows = Math.max(1, Math.ceil(height / this.cellSize));
+                this.cells = Array.from({length: this.columns * this.rows}, () => []);
+            }
+
+            rebuild(items) {
+                for (const cell of this.cells) cell.length = 0;
+                for (const item of items) {
+                    if (item.dead) continue;
+                    const position = item.position || item;
+                    const col = Math.max(0, Math.min(this.columns - 1, Math.floor(position.x / this.cellSize)));
+                    const row = Math.max(0, Math.min(this.rows - 1, Math.floor(position.y / this.cellSize)));
+                    this.cells[row * this.columns + col].push(item);
+                }
+            }
+
+            query(x, y, radius, result) {
+                result.length = 0;
+                const minCol = Math.max(0, Math.min(this.columns - 1, Math.floor((x - radius) / this.cellSize)));
+                const maxCol = Math.max(0, Math.min(this.columns - 1, Math.floor((x + radius) / this.cellSize)));
+                const minRow = Math.max(0, Math.min(this.rows - 1, Math.floor((y - radius) / this.cellSize)));
+                const maxRow = Math.max(0, Math.min(this.rows - 1, Math.floor((y + radius) / this.cellSize)));
+                for (let row = minRow; row <= maxRow; row++) {
+                    for (let col = minCol; col <= maxCol; col++) {
+                        for (const item of this.cells[row * this.columns + col]) result.push(item);
+                    }
+                }
+            }
+        }
+
         // --- Simulation State ---
         const canvas = document.getElementById('simCanvas');
         const ctx = canvas.getContext('2d');
+        // Rasterize the expensive predator shadows once, then reuse them per frame.
+        const predatorGlows = {
+            hungry: createPredatorGlow('rgba(255, 0, 0, 1)'),
+            digesting: createPredatorGlow('rgba(16, 185, 129, 0.9)')
+        };
+
+        function createPredatorGlow(color) {
+            const sprite = document.createElement('canvas');
+            sprite.width = sprite.height = 80;
+            const glow = sprite.getContext('2d');
+            glow.translate(40, 40);
+            glow.beginPath();
+            glow.moveTo(0, -14);
+            glow.lineTo(-7, 14);
+            glow.lineTo(0, 7);
+            glow.lineTo(7, 14);
+            glow.closePath();
+            glow.fillStyle = 'hsl(0, 90%, 55%)';
+            glow.shadowBlur = 12;
+            glow.shadowColor = color;
+            glow.fill();
+            return sprite;
+        }
         
         let width, height;
         let boids = [];
         let obstacles = [];
         let isDrawing = false;
         let currentMode = 'draw';
+        const OBSTACLE_RADIUS = 5;
+        const OBSTACLE_SPACING = 8;
+        let strokeId = 0;
+        let strokeSample = 0;
+        let lastBrushPoint = null;
+        const boidGrid = new SpatialGrid(100);
+        const obstacleGrid = new SpatialGrid(50);
+        const nearbyBoids = [];
+        const nearbyObstacles = [];
+        const newborns = [];
+        let obstaclesDirty = true;
+        let obstacleAvoidRadius = 48;
+        const STEP_MS = 1000 / 60;
+        const MAX_STEPS = 3;
+        let lastFrameTime = null;
+        let accumulator = 0;
+        let lastCountTime = -Infinity;
+        let currentPreyCount = 0;
+        let currentPredCount = 0;
         
         let deathEffects = []; // Red flashes
         let birthEffects = []; // Green flashes
@@ -297,7 +378,8 @@
         class Boid {
             constructor(x, y, type = 'prey', parentDna = null) {
                 // Ensure starting positions are never exactly NaN
-                this.position = new Vec2(x || Math.random() * width, y || Math.random() * height);
+                this.position = new Vec2(Number.isFinite(x) ? x : Math.random() * width, Number.isFinite(y) ? y : Math.random() * height);
+                this.previousPosition = this.position.copy();
                 this.type = type;
                 this.dead = false;
                 
@@ -332,25 +414,28 @@
                 let angle = Math.random() * Math.PI * 2;
                 this.velocity = new Vec2(Math.cos(angle), Math.sin(angle)).mult(initialSpeed);
                 this.acceleration = new Vec2(0, 0);
+                this.forces = Array.from({length: 6}, () => new Vec2(0, 0));
             }
 
             edges() {
+                const x = this.position.x;
+                const y = this.position.y;
                 if (this.position.x > width + this.size) this.position.x = -this.size;
                 else if (this.position.x < -this.size) this.position.x = width + this.size;
                 
                 if (this.position.y > height + this.size) this.position.y = -this.size;
                 else if (this.position.y < -this.size) this.position.y = height + this.size;
+                // Do not interpolate a wrap across the entire canvas.
+                if (x !== this.position.x || y !== this.position.y) {
+                    this.previousPosition.set(this.position.x, this.position.y);
+                }
             }
 
-            flock(boids, obstacles) {
+            flock() {
                 if (this.dead) return;
 
-                let sep = new Vec2(0, 0);
-                let ali = new Vec2(0, 0);
-                let coh = new Vec2(0, 0);
-                let flee = new Vec2(0, 0);
-                let chase = new Vec2(0, 0);
-                let obsSteer = new Vec2(0, 0);
+                const [sep, ali, coh, flee, chase, obsSteer] = this.forces;
+                for (const force of this.forces) force.set(0, 0);
                 
                 let sepCount = 0, aliCount = 0, cohCount = 0, fleeCount = 0, chaseCount = 0, obsCount = 0;
 
@@ -364,7 +449,8 @@
                 if (this.type === 'predator' && this.satiation > 0) this.satiation--;
 
                 // Physics / Interactions
-                for (let other of boids) {
+                boidGrid.query(this.position.x, this.position.y, sightRadius, nearbyBoids);
+                for (let other of nearbyBoids) {
                     if (other === this || other.dead) continue;
                     
                     let dSq = Vec2.distSq(this.position, other.position);
@@ -393,16 +479,14 @@
                             cohCount++;
                             
                             if (dSq < separationRadiusSq) {
-                                let diff = Vec2.sub(this.position, other.position);
-                                diff.normalize().div(Math.sqrt(dSq)); 
-                                sep.add(diff);
+                                sep.x += (this.position.x - other.position.x) / dSq;
+                                sep.y += (this.position.y - other.position.y) / dSq;
                                 sepCount++;
                             }
                         } else {
                             if (this.type === 'prey' && other.type === 'predator') {
-                                let diff = Vec2.sub(this.position, other.position);
-                                diff.normalize().div(Math.sqrt(dSq)); 
-                                flee.add(diff);
+                                flee.x += (this.position.x - other.position.x) / dSq;
+                                flee.y += (this.position.y - other.position.y) / dSq;
                                 fleeCount++;
                             } 
                             else if (this.type === 'predator' && other.type === 'prey' && this.satiation <= 0) {
@@ -414,15 +498,16 @@
                 }
 
                 // Obstacles
-                for (let obs of obstacles) {
-                    let dSq = Vec2.distSq(this.position, new Vec2(obs.x, obs.y));
-                    if (dSq < 0.0001) dSq = 0.0001; // Safety
+                obstacleGrid.query(this.position.x, this.position.y, obstacleAvoidRadius, nearbyObstacles);
+                for (let obs of nearbyObstacles) {
+                    const dx = this.position.x - obs.x;
+                    const dy = this.position.y - obs.y;
+                    const dSq = Math.max(0.0001, dx * dx + dy * dy);
                     
                     let avoidRadius = obs.r + 40;
                     if (dSq < avoidRadius * avoidRadius) {
-                        let diff = Vec2.sub(this.position, new Vec2(obs.x, obs.y));
-                        diff.normalize().div(Math.sqrt(dSq));
-                        obsSteer.add(diff);
+                        obsSteer.x += dx / dSq;
+                        obsSteer.y += dy / dSq;
                         obsCount++;
                     }
                 }
@@ -430,19 +515,13 @@
                 // Calculate Forces (Checking > 0 to prevent NaN propagation on div)
                 if (aliCount > 0) ali.div(aliCount).normalize().mult(localMaxSpeed).sub(this.velocity).limit(maxForce);
                 if (cohCount > 0) {
-                    coh.div(cohCount);
-                    let desired = Vec2.sub(coh, this.position);
-                    desired.normalize().mult(localMaxSpeed);
-                    coh = desired.sub(this.velocity).limit(maxForce);
+                    coh.div(cohCount).sub(this.position).normalize().mult(localMaxSpeed).sub(this.velocity).limit(maxForce);
                 }
                 if (sepCount > 0) sep.div(sepCount).normalize().mult(localMaxSpeed).sub(this.velocity).limit(maxForce);
                 
                 if (fleeCount > 0) flee.div(fleeCount).normalize().mult(localMaxSpeed).sub(this.velocity).limit(maxForce * 2.5);
                 if (chaseCount > 0) {
-                    chase.div(chaseCount);
-                    let desired = Vec2.sub(chase, this.position);
-                    desired.normalize().mult(localMaxSpeed);
-                    chase = desired.sub(this.velocity).limit(maxForce * 1.5);
+                    chase.div(chaseCount).sub(this.position).normalize().mult(localMaxSpeed).sub(this.velocity).limit(maxForce * 1.5);
                 }
                 if (obsCount > 0) obsSteer.div(obsCount).normalize().mult(localMaxSpeed).sub(this.velocity).limit(maxForce * 3.0);
 
@@ -470,22 +549,27 @@
                     if (this.energy <= 0) this.dead = true;
                     
                     if (this.satiation > 0) {
-                        this.acceleration.add(new Vec2((Math.random()-0.5)*0.2, (Math.random()-0.5)*0.2));
+                        this.acceleration.x += (Math.random() - 0.5) * 0.2;
+                        this.acceleration.y += (Math.random() - 0.5) * 0.2;
                     }
                 }
 
+                this.previousPosition.set(this.position.x, this.position.y);
                 this.position.add(this.velocity);
                 this.velocity.add(this.acceleration);
                 this.velocity.limit(localMaxSpeed);
                 this.acceleration.mult(0);
             }
 
-            draw() {
+            draw(alpha) {
                 if (this.dead) return;
                 let theta = this.velocity.heading() + Math.PI / 2;
                 
                 ctx.save();
-                ctx.translate(this.position.x, this.position.y);
+                ctx.translate(
+                    this.previousPosition.x + (this.position.x - this.previousPosition.x) * alpha,
+                    this.previousPosition.y + (this.position.y - this.previousPosition.y) * alpha
+                );
                 ctx.rotate(theta);
                 
                 ctx.beginPath();
@@ -498,12 +582,10 @@
                 ctx.fillStyle = this.color;
                 
                 if(this.type === 'predator') {
-                    ctx.shadowBlur = 12;
-                    if (this.satiation > 0) {
-                        ctx.shadowColor = `rgba(16, 185, 129, 0.9)`; // Green digestion glow
-                    } else {
-                        ctx.shadowColor = `rgba(255, 0, 0, ${Math.min(1, this.energy/1000)})`; // Red hungry glow
-                    }
+                    const digesting = this.satiation > 0;
+                    ctx.globalAlpha = digesting ? 1 : Math.max(0, Math.min(1, this.energy / 1000));
+                    ctx.drawImage(digesting ? predatorGlows.digesting : predatorGlows.hungry, -40, -40);
+                    ctx.globalAlpha = 1;
                 }
                 
                 ctx.fill();
@@ -526,15 +608,20 @@
             height = window.innerHeight || document.documentElement.clientHeight || 600;
             canvas.width = width;
             canvas.height = height;
+            boidGrid.resize(width, height);
+            obstacleGrid.resize(width, height);
+            obstaclesDirty = true;
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(0, 0, width, height);
         }
 
         function updateCountsDisplay(preyCount, predCount) {
             if (preyCount !== lastPreyCount) {
-                document.getElementById('preyCount').innerText = preyCount;
+                document.getElementById('preyCount').textContent = preyCount;
                 lastPreyCount = preyCount;
             }
             if (predCount !== lastPredCount) {
-                document.getElementById('predCount').innerText = predCount;
+                document.getElementById('predCount').textContent = predCount;
                 lastPredCount = predCount;
             }
         }
@@ -553,7 +640,22 @@
             }
 
             if (currentMode === 'draw') {
-                obstacles.push({ x: x, y: y, r: 3 + Math.random() * 5 });
+                // Fill gaps between input events so fast drags create a continuous wall.
+                const start = lastBrushPoint || {x, y};
+                const distance = Math.hypot(x - start.x, y - start.y);
+                if (lastBrushPoint && distance < 2) return;
+                const steps = Math.max(1, Math.ceil(distance / OBSTACLE_SPACING));
+                for (let step = 1; step <= steps; step++) {
+                    obstacles.push({
+                        x: start.x + (x - start.x) * step / steps,
+                        y: start.y + (y - start.y) * step / steps,
+                        r: OBSTACLE_RADIUS,
+                        stroke: strokeId,
+                        sample: strokeSample++
+                    });
+                }
+                lastBrushPoint = isDrawing ? {x, y} : null;
+                obstaclesDirty = true;
             } else if (currentMode === 'erase') {
                 const eraserRadiusSq = 40 * 40;
                 obstacles = obstacles.filter(obs => {
@@ -561,20 +663,48 @@
                     const dy = obs.y - y;
                     return (dx * dx + dy * dy) > eraserRadiusSq;
                 });
+                obstaclesDirty = true;
             }
         }
 
-        function animate() {
-            ctx.fillStyle = 'rgba(15, 23, 42, 0.35)'; 
+        function startStroke(x, y) {
+            isDrawing = true;
+            lastBrushPoint = null;
+            strokeId++;
+            strokeSample = 0;
+            mouseX = x;
+            mouseY = y;
+            handleInteraction(x, y);
+        }
+
+        function endStroke() {
+            isDrawing = false;
+            lastBrushPoint = null;
+        }
+
+        function render(alpha, elapsed) {
+            // Keep the trail duration consistent on high-refresh displays.
+            ctx.fillStyle = `rgba(15, 23, 42, ${1 - Math.pow(0.65, elapsed / STEP_MS)})`;
             ctx.fillRect(0, 0, width, height);
 
-            // Draw Obstacles
-            ctx.fillStyle = '#64748b'; 
+            // Draw a smooth path through the collision samples.
+            ctx.strokeStyle = '#64748b';
+            ctx.lineWidth = OBSTACLE_RADIUS * 2;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.beginPath();
+            let previous = null;
             for (let obs of obstacles) {
-                ctx.beginPath();
-                ctx.arc(obs.x, obs.y, obs.r, 0, Math.PI * 2);
-                ctx.fill();
+                // Break at separate strokes and erased gaps, avoiding phantom bridges.
+                if (!previous || previous.stroke !== obs.stroke || previous.sample + 1 !== obs.sample) {
+                    ctx.moveTo(obs.x, obs.y);
+                    ctx.lineTo(obs.x + 0.001, obs.y); // Rounded dot for a single click/tap.
+                } else {
+                    ctx.lineTo(obs.x, obs.y);
+                }
+                previous = obs;
             }
+            ctx.stroke();
 
             // Draw Effects (Death = Red, Birth = Green)
             for (let i = deathEffects.length - 1; i >= 0; i--) {
@@ -584,8 +714,6 @@
                 ctx.strokeStyle = `rgba(239, 68, 68, ${e.life})`;
                 ctx.lineWidth = 2;
                 ctx.stroke();
-                e.life -= 0.1;
-                if (e.life <= 0) deathEffects.splice(i, 1);
             }
             for (let i = birthEffects.length - 1; i >= 0; i--) {
                 let e = birthEffects[i];
@@ -594,13 +722,34 @@
                 ctx.strokeStyle = `rgba(16, 185, 129, ${e.life})`; 
                 ctx.lineWidth = 2;
                 ctx.stroke();
-                e.life -= 0.05; 
-                if (e.life <= 0) birthEffects.splice(i, 1);
             }
 
-            let newBoids = [];
-            let currentPreyCount = 0;
-            let currentPredCount = 0;
+            for (const boid of boids) boid.draw(alpha);
+
+            if (isDrawing && currentMode === 'erase') {
+                ctx.beginPath();
+                ctx.arc(mouseX, mouseY, 40, 0, Math.PI * 2);
+                ctx.strokeStyle = 'rgba(255, 100, 100, 0.5)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+        }
+
+        function ageEffects(effects, decay) {
+            let count = 0;
+            for (const effect of effects) {
+                effect.life -= decay;
+                if (effect.life > 0) effects[count++] = effect;
+            }
+            effects.length = count;
+        }
+
+        function simulate() {
+            ageEffects(deathEffects, 0.1);
+            ageEffects(birthEffects, 0.05);
+            newborns.length = 0;
+            currentPreyCount = 0;
+            currentPredCount = 0;
             
             // Count alive boids
             for (let b of boids) {
@@ -613,24 +762,34 @@
             let growthFactor = Math.max(0, 1 - (currentPreyCount / params.maxPrey));
             let activeBreedSpeed = params.breedSpeed * growthFactor;
 
-            // Update & Draw Boids
+            boidGrid.rebuild(boids);
+            if (obstaclesDirty) {
+                obstacleGrid.rebuild(obstacles);
+                obstacleAvoidRadius = 0;
+                for (const obs of obstacles) obstacleAvoidRadius = Math.max(obstacleAvoidRadius, obs.r + 40);
+                obstaclesDirty = false;
+            }
+
+            // Compute every force before moving birds, keeping the spatial index valid.
+            for (const boid of boids) boid.flock();
+            let newbornPreyCount = 0;
             for (let boid of boids) {
                 if (boid.dead) continue;
                 
-                boid.edges();
-                boid.flock(boids, obstacles);
                 boid.update();
-                boid.draw();
+                boid.edges();
+                if (boid.dead) continue;
 
                 // Ecosystem: Guaranteed Reproduction Logic with spatial offset
                 if (boid.type === 'prey') {
                     boid.breedTimer += activeBreedSpeed;
-                    if (boid.breedTimer >= 1000 && (currentPreyCount + newBoids.length) < params.maxPrey) {
+                    if (boid.breedTimer >= 1000 && (currentPreyCount + newbornPreyCount) < params.maxPrey) {
                         boid.breedTimer = 0; // Reset maturity
                         // Add an offset so they don't occupy the exact same coordinate
                         let offsetX = (Math.random() - 0.5) * 10;
                         let offsetY = (Math.random() - 0.5) * 10;
-                        newBoids.push(new Boid(boid.position.x + offsetX, boid.position.y + offsetY, 'prey', boid.dna));
+                        newborns.push(new Boid(boid.position.x + offsetX, boid.position.y + offsetY, 'prey', boid.dna));
+                        newbornPreyCount++;
                         birthEffects.push({x: boid.position.x, y: boid.position.y, life: 1.0}); 
                     }
                 } else if (boid.type === 'predator') {
@@ -638,56 +797,80 @@
                         boid.energy = 1500; 
                         let offsetX = (Math.random() - 0.5) * 10;
                         let offsetY = (Math.random() - 0.5) * 10;
-                        newBoids.push(new Boid(boid.position.x + offsetX, boid.position.y + offsetY, 'predator'));
+                        newborns.push(new Boid(boid.position.x + offsetX, boid.position.y + offsetY, 'predator'));
                         birthEffects.push({x: boid.position.x, y: boid.position.y, life: 1.0});
                     }
                 }
             }
 
             // Cleanup dead, add newborns
-            boids = boids.filter(b => !b.dead);
-            if (newBoids.length > 0) {
-                boids.push(...newBoids);
+            let aliveCount = 0;
+            currentPreyCount = 0;
+            currentPredCount = 0;
+            for (const boid of boids) {
+                if (!boid.dead) boids[aliveCount++] = boid;
             }
-
-            // Update UI
-            updateCountsDisplay(currentPreyCount + newBoids.filter(b=>b.type==='prey').length, currentPredCount + newBoids.filter(b=>b.type==='predator').length);
-
-            if (isDrawing && currentMode === 'erase') {
-                ctx.beginPath();
-                ctx.arc(mouseX, mouseY, 40, 0, Math.PI * 2);
-                ctx.strokeStyle = 'rgba(255, 100, 100, 0.5)';
-                ctx.lineWidth = 2;
-                ctx.stroke();
+            boids.length = aliveCount;
+            for (const newborn of newborns) boids.push(newborn);
+            for (const boid of boids) {
+                if (boid.type === 'prey') currentPreyCount++;
+                else currentPredCount++;
             }
-
-            requestAnimationFrame(animate);
         }
+
+        function animate(timestamp) {
+            requestAnimationFrame(animate);
+            if (document.hidden) return;
+            const elapsed = lastFrameTime === null ? STEP_MS : Math.max(0, timestamp - lastFrameTime);
+            lastFrameTime = timestamp;
+            // Bound catch-up work after a stall so it cannot cause another long frame.
+            accumulator += Math.min(elapsed, STEP_MS * MAX_STEPS);
+            let steps = 0;
+            while (accumulator + 0.000001 >= STEP_MS && steps < MAX_STEPS) {
+                simulate();
+                accumulator = Math.max(0, accumulator - STEP_MS);
+                steps++;
+            }
+            render(accumulator / STEP_MS, Math.min(elapsed, STEP_MS * MAX_STEPS));
+            if (timestamp - lastCountTime >= 100) {
+                updateCountsDisplay(currentPreyCount, currentPredCount);
+                lastCountTime = timestamp;
+            }
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            lastFrameTime = null;
+            accumulator = 0;
+            endStroke();
+        });
 
         // --- Event Listeners ---
 
         let mouseX = 0;
         let mouseY = 0;
 
-        canvas.addEventListener('mousedown', (e) => { isDrawing = true; handleInteraction(e.clientX, e.clientY); });
+        canvas.addEventListener('mousedown', (e) => {
+            if (e.button === 0) startStroke(e.clientX, e.clientY);
+        });
         canvas.addEventListener('mousemove', (e) => { 
             mouseX = e.clientX; mouseY = e.clientY;
             if(isDrawing) handleInteraction(e.clientX, e.clientY); 
         });
-        canvas.addEventListener('mouseup', () => isDrawing = false);
-        canvas.addEventListener('mouseleave', () => isDrawing = false);
+        canvas.addEventListener('mouseup', endStroke);
+        canvas.addEventListener('mouseleave', endStroke);
+        window.addEventListener('blur', endStroke);
 
         canvas.addEventListener('touchstart', (e) => { 
-            isDrawing = true; 
-            mouseX = e.touches[0].clientX; mouseY = e.touches[0].clientY;
-            handleInteraction(mouseX, mouseY); 
+            e.preventDefault();
+            startStroke(e.touches[0].clientX, e.touches[0].clientY);
         }, {passive: false});
         canvas.addEventListener('touchmove', (e) => { 
             e.preventDefault(); 
             mouseX = e.touches[0].clientX; mouseY = e.touches[0].clientY;
             if(isDrawing) handleInteraction(mouseX, mouseY); 
         }, {passive: false});
-        canvas.addEventListener('touchend', () => isDrawing = false);
+        canvas.addEventListener('touchend', endStroke);
+        canvas.addEventListener('touchcancel', endStroke);
 
         // UI Binding
         const bindSlider = (id, paramKey, displayId, suffix = '') => {
@@ -716,10 +899,15 @@
 
         document.getElementById('addPreyBtn').addEventListener('click', () => addBoids(50, 'prey'));
         document.getElementById('addPredBtn').addEventListener('click', () => addBoids(1, 'predator'));
-        document.getElementById('clearObsBtn').addEventListener('click', () => { obstacles = []; });
+        document.getElementById('clearObsBtn').addEventListener('click', () => {
+            endStroke();
+            obstacles.length = 0;
+            obstaclesDirty = true;
+        });
 
         const toggleModeBtn = document.getElementById('toggleModeBtn');
         toggleModeBtn.addEventListener('click', () => {
+            endStroke();
             if (currentMode === 'draw') {
                 currentMode = 'erase';
                 toggleModeBtn.innerText = 'Brush: Erase Obstacles';
