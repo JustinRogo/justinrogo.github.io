@@ -160,13 +160,15 @@
             min-height: 32px;
             padding: 0.3rem 0.65rem;
             border-radius: 99px;
-            background: var(--bg-input);
-            color: var(--text-muted);
+            background: #15803d;
+            border-color: #166534;
+            color: #fff;
             font-size: 0.8rem;
         }
 
         .tutorial-trigger:hover:not(:disabled) {
-            color: var(--text-main);
+            background: #166534;
+            color: #fff;
         }
 
         .tutorial-trigger svg {
@@ -853,8 +855,8 @@
             .sync-status { padding-inline: 0.5rem; }
         }
 
-        /* Phone portrait: show every floor at once and prioritize notes. */
-        @media (max-width: 768px) and (orientation: portrait) {
+        /* Give all five floors a centered row before the header gets crowded. */
+        @media (max-width: 1200px) {
             header {
                 display: grid;
                 grid-template-columns: auto 1fr;
@@ -883,18 +885,35 @@
             }
 
             .tabs {
-                flex-direction: column;
+                justify-content: center;
+                flex-wrap: wrap;
                 gap: 0.25rem;
                 padding: 0;
             }
 
             .tab {
-                width: 100%;
                 min-height: 44px;
-                justify-content: space-between;
+                justify-content: center;
                 padding-inline: 0.9rem;
             }
+        }
 
+        @media (max-width: 600px) {
+            .tabs {
+                display: grid;
+                grid-template-columns: repeat(5, minmax(0, 1fr));
+            }
+
+            .tab {
+                flex-direction: column;
+                gap: 0.25rem;
+                padding: 0.5rem 0.1rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Phone portrait: prioritize notes. */
+        @media (max-width: 768px) and (orientation: portrait) {
             footer {
                 grid-template-areas:
                     "notes notes"
