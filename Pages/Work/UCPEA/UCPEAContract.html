@@ -13,11 +13,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>UCPEA Collective Bargaining Agreement, 2025-2029</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script>
 (() => {
   let theme;
   try {
-    theme = localStorage.getItem('ucpea-contract-theme');
+    theme = localStorage.getItem('ucpea-contract-theme') || localStorage.getItem('ucpea-dashboard-theme');
   } catch(error) {
     // Local storage may be unavailable when previewing from a local file.
   }
@@ -29,51 +32,51 @@
 </script>
 <style>
 :root {
-  --navy:#000E2F;
-  --gold:#FFB81C;
-  --accent:#013ECD;
-  --border:#d8dee9;
-  --bg:#f6f8fb;
-  --text:#182233;
-  --muted:#5b6678;
+  --navy:#002d62;
+  --gold:#9ebaf9;
+  --accent:#345f82;
+  --border:#d9e0e5;
+  --bg:#f7f8fa;
+  --text:#1a2b38;
+  --muted:#566b7b;
   --card:#ffffff;
   --mark:#fff3a3;
   --surface:#ffffff;
-  --surface-soft:#f0f4ff;
-  --toolbar-bg:rgba(246,248,251,.97);
-  --heading:#000E2F;
-  --toc-text:#22304a;
-  --subhead:#253858;
-  --divider:#edf1f7;
-  --target:#fff8d9;
-  --target-outline:rgba(255,184,28,.2);
-  --permalink-hover:#eef3ff;
+  --surface-soft:#eef2f5;
+  --toolbar-bg:rgba(247,248,250,.97);
+  --heading:#002d62;
+  --toc-text:#1a2b38;
+  --subhead:#345f82;
+  --divider:#e7edf2;
+  --target:#e5ecfb;
+  --target-outline:rgba(158,186,249,.35);
+  --permalink-hover:#e5ecfb;
   --success-bg:#e8f7ed;
   --success:#14733c;
-  --table-head:#f1f5fb;
+  --table-head:#eef2f5;
   color-scheme:light;
 }
 html[data-theme="dark"] {
-  --accent:#79a7ff;
-  --border:#35425a;
-  --bg:#0d1320;
-  --text:#e6ebf4;
-  --muted:#a9b4c7;
-  --card:#151d2a;
+  --accent:#9ebaf9;
+  --border:#293a52;
+  --bg:#07111f;
+  --text:#edf2fb;
+  --muted:#aebad0;
+  --card:#0f1d30;
   --mark:#6e5d00;
-  --surface:#151d2a;
-  --surface-soft:#202b40;
-  --toolbar-bg:rgba(13,19,32,.97);
+  --surface:#0f1d30;
+  --surface-soft:#16263b;
+  --toolbar-bg:rgba(7,17,31,.97);
   --heading:#f1f5ff;
-  --toc-text:#d8e0ef;
-  --subhead:#d5def0;
-  --divider:#29354b;
-  --target:#3a3217;
-  --target-outline:rgba(255,184,28,.28);
-  --permalink-hover:#263552;
+  --toc-text:#edf2fb;
+  --subhead:#cbd8ee;
+  --divider:#293a52;
+  --target:#243a5c;
+  --target-outline:rgba(158,186,249,.35);
+  --permalink-hover:#243a5c;
   --success-bg:#173a29;
   --success:#7fe1a7;
-  --table-head:#202b40;
+  --table-head:#16263b;
   color-scheme:dark;
 }
 * { box-sizing: border-box; }
@@ -327,13 +330,94 @@ mark.active-match { outline:2px solid var(--accent); outline-offset:2px; }
   .mobile-nav-dialog { max-height:82dvh; }
   .mobile-article-nav { max-height:calc(82dvh - 71px); }
 }
+
+/* Match the UCPEA dashboard and Contract History pages. */
+html { scroll-padding-top:170px; }
+body { text-rendering:optimizeLegibility; }
+button { font:inherit; }
+h1, h2, h3, h4, .article-title { font-family:Montserrat, Arial, Helvetica, sans-serif; }
+:focus-visible { outline:3px solid var(--gold); outline-offset:3px; }
+.skip-link { position:fixed; top:12px; left:12px; z-index:100; padding:10px 14px; border-radius:10px; background:var(--gold); color:var(--navy); font-weight:800; text-decoration:none; transform:translateY(-160%); }
+.skip-link:focus { transform:translateY(0); }
+.site-header { position:sticky; top:0; z-index:20; padding:0; border-bottom:1px solid rgba(255,255,255,.1); background:rgba(75,122,160,.96); backdrop-filter:blur(16px); }
+.header-inner { width:min(1320px,calc(100% - 48px)); min-height:76px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:24px; }
+.brand { display:inline-flex; align-items:center; gap:12px; color:#fff; text-decoration:none; }
+.brand-mark { display:grid; place-items:center; width:42px; height:42px; border:2px solid rgba(255,255,255,.82); border-radius:50% 50% 50% 12px; color:var(--gold); font:800 24px Georgia,serif; transform:rotate(-6deg); }
+.brand > span:last-child { display:grid; line-height:1.05; }
+.brand strong { font:800 18px Montserrat,Arial,Helvetica,sans-serif; letter-spacing:.08em; }
+.brand small { margin-top:4px; color:#dce6f2; font-size:11px; letter-spacing:.12em; text-transform:uppercase; }
+.dashboard-back { position:static; min-height:40px; margin:0; padding:8px 15px; border:1px solid rgba(255,255,255,.24); border-radius:999px; background:transparent; box-shadow:none; font-size:13px; white-space:nowrap; }
+.dashboard-back:hover { border-color:var(--gold); background:transparent; color:var(--gold); }
+.contract-hero { position:relative; overflow:hidden; background:radial-gradient(circle at 80% 18%,rgba(158,186,249,.3),transparent 26%),radial-gradient(circle at 15% 100%,rgba(75,122,160,.28),transparent 30%),var(--navy); color:#fff; }
+.contract-hero::after { content:""; position:absolute; top:20px; right:12%; width:230px; height:230px; border:1px solid rgba(255,255,255,.08); border-radius:50% 50% 18% 50%; transform:rotate(24deg); pointer-events:none; }
+.hero-inner { position:relative; z-index:1; width:min(1320px,calc(100% - 48px)); margin:0 auto; padding:62px 0 82px; }
+.hero-eyebrow { margin:0 0 15px; color:#cbd8ee; font-size:12px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; }
+.contract-hero h1 { max-width:960px; margin:0 0 18px; color:#fff; font-size:clamp(2.25rem,4.2vw,3.7rem); font-weight:800; line-height:1.06; letter-spacing:-.045em; }
+.contract-hero .subtitle { max-width:830px; color:#c5d2e8; font-size:clamp(1rem,1.6vw,1.2rem); line-height:1.55; }
+.toolbar { top:76px; z-index:10; margin:-28px auto 0; padding:0 24px; border:0; background:transparent; backdrop-filter:none; }
+.toolbar-inner { max-width:1320px; padding:16px 20px; border:1px solid var(--border); border-radius:28px; background:var(--surface); box-shadow:0 18px 48px rgba(7,27,61,.1); }
+.searchbox { min-height:46px; border-radius:999px; box-shadow:none; }
+.searchbox span { color:var(--muted); font-size:14px; font-weight:700; }
+.searchbox input { font-size:14px; }
+.searchbox:focus-within { border-color:var(--accent); box-shadow:0 0 0 3px rgba(158,186,249,.35); }
+.toolbar button { min-height:46px; border-radius:999px; background:var(--bg); box-shadow:none; color:var(--heading); font-size:14px; }
+.toolbar button:hover { background:var(--surface-soft); }
+.toolbar .icon-button { width:46px; height:46px; }
+.layout { width:min(1320px,calc(100% - 48px)); max-width:none; grid-template-columns:260px minmax(0,1fr); gap:28px; padding:28px 0 80px; align-items:start; }
+nav.toc { top:176px; max-height:calc(100vh - 192px); border-radius:28px; padding:18px; box-shadow:0 8px 24px rgba(7,27,61,.06); scrollbar-width:thin; }
+nav.toc h2 { margin:0 0 12px; color:var(--muted); font:800 12px Montserrat,Arial,Helvetica,sans-serif; letter-spacing:.14em; text-transform:uppercase; }
+nav.toc a { margin-bottom:3px; padding:10px 12px; border-radius:12px; font-size:14px; font-weight:600; line-height:1.4; }
+nav.toc a:hover { color:var(--accent); }
+nav.toc a.is-active, .mobile-article-nav a.is-active { background:var(--navy); color:#fff; box-shadow:0 8px 18px rgba(0,45,98,.15); }
+html[data-theme="dark"] nav.toc a.is-active, html[data-theme="dark"] .mobile-article-nav a.is-active { color:#fff; }
+.article { scroll-margin-top:176px; margin-bottom:16px; border-radius:28px; box-shadow:0 8px 24px rgba(7,27,61,.06); }
+.article summary { min-height:76px; padding:22px 26px; }
+.article-title { color:var(--heading); font-size:20px; letter-spacing:-.025em; }
+.article summary::after { width:34px; height:34px; background:var(--surface-soft); color:var(--accent); }
+.article-body { padding:6px 26px 28px; }
+.section-block { border-color:var(--divider); }
+.section-number, .label { color:var(--accent); }
+.permalink-target, .sebac-heading { scroll-margin-top:176px; }
+.no-results { border-radius:28px; }
+@media (max-width:880px) {
+  .layout { width:min(100% - 32px,1320px); grid-template-columns:1fr; padding:24px 0 96px; }
+  nav.toc { display:none; }
+}
+@media (max-width:560px) {
+  html { scroll-padding-top:200px; }
+  .header-inner, .hero-inner { width:calc(100% - 32px); }
+  .header-inner { min-height:68px; gap:12px; }
+  .brand-mark { width:36px; height:36px; font-size:20px; }
+  .brand strong { font-size:15px; }
+  .brand small { font-size:9px; }
+  .dashboard-back { min-height:36px; padding:7px 10px; font-size:11px; }
+  .hero-inner { padding:46px 0 68px; }
+  .contract-hero h1 { font-size:clamp(2rem,9vw,2.8rem); }
+  .toolbar { top:68px; margin-top:-24px; padding:0 12px; }
+  .toolbar-inner { gap:10px; padding:12px; border-radius:22px; }
+  .searchbox { grid-column:1 / -1; }
+  .toolbar button { min-height:42px; padding:8px 10px; font-size:13px; }
+  .toolbar .icon-button { width:42px; height:42px; }
+  .layout { width:calc(100% - 24px); padding-top:20px; }
+  .article { scroll-margin-top:200px; border-radius:18px; }
+  .article summary { min-height:62px; padding:16px; }
+  .article-title { font-size:17px; }
+  .article-body { padding:2px 14px 18px; }
+  .permalink-target, .sebac-heading { scroll-margin-top:200px; }
+}
 </style>
 </head>
 <body>
-<header class="site-header"><a class="dashboard-back" href="index.html" aria-label="Back to UCPEA Dashboard"><span aria-hidden="true">←</span> Dashboard</a><div class="wrap">
-<h1>UCPEA Collective Bargaining Agreement</h1>
-<p class="subtitle">Agreement between the University of Connecticut Board of Trustees and the University of Connecticut Professional Employees Association, Local 3695. Effective July 1, 2025 - June 30, 2029.</p>
+<a class="skip-link" href="#contract-content">Skip to contract</a>
+<header class="site-header"><div class="header-inner">
+<a class="brand" href="index.html" aria-label="UCPEA Member Dashboard home"><span class="brand-mark" aria-hidden="true">U</span><span><strong>UCPEA</strong><small>Member dashboard</small></span></a>
+<a class="dashboard-back" href="index.html"><span aria-hidden="true">←</span> UCPEA Dashboard</a>
 </div></header>
+<section class="contract-hero" aria-labelledby="contract-title"><div class="hero-inner">
+<p class="hero-eyebrow">2025–2029 agreement</p>
+<h1 id="contract-title">UCPEA Collective Bargaining Agreement</h1>
+<p class="subtitle">Agreement between the University of Connecticut Board of Trustees and the University of Connecticut Professional Employees Association, Local 3695. Effective July 1, 2025 – June 30, 2029.</p>
+</div></section>
 <div class="toolbar"><div class="toolbar-inner">
 <label class="searchbox" aria-label="Search contract language"><span aria-hidden="true">Search</span><input id="contract-search" type="search" placeholder="Search contract language, e.g., telecommuting, sick leave, salary"></label>
 <button id="expand-all" type="button">Expand all</button><button id="collapse-all" type="button">Collapse all</button>
@@ -344,7 +428,7 @@ mark.active-match { outline:2px solid var(--accent); outline-offset:2px; }
 <button id="next-match" type="button" aria-label="Next search match" title="Next match (Enter)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
 </div></div>
 </div></div>
-<main class="wrap layout">
+<main id="contract-content" class="wrap layout">
 <nav id="desktop-article-nav" class="toc" aria-label="Article navigation"><h2>Articles</h2><a href="#article-1">Article 1. Recognition</a><a href="#article-2">Article 2. Role Of Professional Staff</a><a href="#article-3">Article 3. Board Prerogatives</a><a href="#article-4">Article 4. Professional Freedom</a><a href="#article-5">Article 5. Nondiscrimination, Anti-Harassment, And Diversity, Equity &amp; Inclusion (DEI)</a><a href="#article-6">Article 6. Vacation Leave</a><a href="#article-7">Article 7. Notice Of Intent To Leave</a><a href="#article-8">Article 8. Holidays</a><a href="#article-9">Article 9. Personal Leave</a><a href="#article-10">Article 10. Civic And Legal Obligations</a><a href="#article-11">Article 11. Sick Leave</a><a href="#article-12">Article 12. Childbirth And Parental Benefits</a><a href="#article-13">Article 13. Educational Leave</a><a href="#article-14">Article 14. Maintenance Of Status While On Paid Leave</a><a href="#article-15">Article 15. Leaves Without Pay</a><a href="#article-16">Article 16. Work Schedules</a><a href="#article-17">Article 17. Student Health And Wellness</a><a href="#article-18">Article 18. Compensatory Time</a><a href="#article-19">Article 19. Employee Files</a><a href="#article-20">Article 20. Probationary Employees</a><a href="#article-21">Article 21. Evaluation</a><a href="#article-22">Article 22. Dismissal Or Other Disciplinary Action</a><a href="#article-23">Article 23. Grievance Procedure</a><a href="#article-24">Article 24. No Work Stoppage</a><a href="#article-25">Article 25. Career Ladders</a><a href="#article-26">Article 26. Vacancies And Job Posting</a><a href="#article-27">Article 27. Reduction Of Professional Staff</a><a href="#article-28">Article 28. Mergers And Acquisitions</a><a href="#article-29">Article 29. Meet And Discuss</a><a href="#article-30">Article 30. Parking</a><a href="#article-31">Article 31. Job Classification</a><a href="#article-32">Article 32. Salary</a><a href="#article-33">Article 33. Retirement, Medical Benefits And Disability Insurance</a><a href="#article-34">Article 34. Tuition Reimbursement And Professional Development</a><a href="#article-35">Article 35. Tuition Waivers</a><a href="#article-36">Article 36. Child Care</a><a href="#article-37">Article 37. Travel</a><a href="#article-38">Article 38. Health And Safety</a><a href="#article-39">Article 39. Consulting Policy</a><a href="#article-40">Article 40. Union Leave</a><a href="#article-41">Article 41. Representation Rights And Responsibilities</a><a href="#article-42">Article 42. UCPEA Security And Payroll Deductions</a><a href="#article-43">Article 43. Savings Clause</a><a href="#article-44">Article 44. Temporary And End-Date Employees</a><a href="#article-45">Article 45. Pay Equity</a><a href="#article-46">Article 46. Wireless Communication Device Stipends</a><a href="#article-47">Article 47. Phased Retirement Program</a><a href="#article-48">Article 48. Zipper Clause</a><a href="#article-49">Article 49. Duration</a><a href="#memoranda">Memoranda of Agreement</a><a class="toc-sebac" href="#sebac-section-i">SEBAC I. Pension and Health Care Agreement Modifications</a><a class="toc-sebac" href="#sebac-section-ii">SEBAC II. Job Security</a><a class="toc-sebac" href="#sebac-section-iii">SEBAC III. Ratification and General Assembly Approval</a><a class="toc-sebac" href="#sebac-section-iv">SEBAC IV. Duration</a><a class="toc-sebac" href="#sebac-attachment-a">SEBAC Attachment A. Health Insurance Design Specifications</a><a class="toc-sebac" href="#sebac-attachment-b">SEBAC Attachment B. Retiree Healthcare Trust Fund Repayment Schedule</a><a class="toc-sebac" href="#sebac-attachment-c">SEBAC Attachment C. Effect on ARP Contributions</a><a class="toc-sebac" href="#sebac-attachment-d">SEBAC Attachment D. Examples of 18 Month COLA Review</a><a class="toc-sebac" href="#sebac-attachment-e">SEBAC Attachment E. Provisions Affecting New Employees</a><a class="toc-sebac" href="#sebac-attachment-f">SEBAC Attachment F. 2017 Agreement Framework</a><a class="toc-sebac" href="#sebac-attachment-g">SEBAC Attachment G. Unit Agreements</a></nav>
 <section>
 <div id="no-results" class="no-results">No matching contract language found. Try a broader search term.</div>
