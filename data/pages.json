@@ -15,15 +15,15 @@
     },
     {
       "path": "Pages/For Fun/StrategicFramework2.html",
-      "title": "UConn Law Library & IT - Multi-Gen Strategic Framework 2026",
-      "category": "Planning Framework",
-      "description": "Explore a multigenerational strategic framework for library and IT work."
+      "title": "Multi-Gen Strategic Framework",
+      "category": "",
+      "description": "Chat, take this plan and make it brainrot."
     },
     {
       "path": "Pages/For Fun/Tarot/index.html",
-      "title": "Midnight Tarot",
-      "category": "Card App",
-      "description": "Draw and interpret tarot cards in a focused interactive experience."
+      "title": "Tarot Reading",
+      "category": "",
+      "description": "Do the fates care if the cards are digital?"
     },
     {
       "path": "Pages/Work/Library/Desk Planner/index.html",
@@ -33,9 +33,9 @@
     },
     {
       "path": "Pages/Work/Library/heatmap.html",
-      "title": "Occupancy Heatmap Dashboard",
+      "title": "Law Library Heatmap",
       "category": "Dashboard",
-      "description": "Explore library occupancy patterns and space-use activity."
+      "description": "Record library occupancy while walking through the Law Library."
     },
     {
       "path": "Pages/Work/Library/Timeline_LawLib.html",
@@ -52,7 +52,7 @@
     {
       "path": "Pages/Work/UCPEA/UCPEA_Contract_Comparison.html",
       "title": "UCPEA Contract Comparison: 2022–2025 and 2025–2029",
-      "category": "Contract Redline",
+      "category": "Reference",
       "description": "Compare changes between the 2022–2025 and 2025–2029 agreements."
     },
     {
