@@ -36,6 +36,7 @@ const PAGE_TREE_FALLBACK = [
           { title: 'UCPEA Member Dashboard', href: 'Pages/Work/UCPEA/index.html' },
           { title: 'UCPEA Contract Comparison', href: 'Pages/Work/UCPEA/UCPEA_Contract_Comparison.html' },
           { title: 'UCPEA Collective Bargaining Agreement, 2025-2029', href: 'Pages/Work/UCPEA/UCPEAContract.html' },
+          { title: 'UCPEA Contract History', href: 'Pages/Work/UCPEA/UCPEA_Contract_History.html' },
         ],
       },
     ],

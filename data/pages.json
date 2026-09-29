@@ -62,6 +62,12 @@
       "description": "Search and browse the 2025–2029 collective bargaining agreement."
     },
     {
+      "path": "Pages/Work/UCPEA/UCPEA_Contract_History.html",
+      "title": "UCPEA Contract History",
+      "category": "Contract Archive",
+      "description": "Explore UCPEA's history and summaries of every contract from 1977 to 2029."
+    },
+    {
       "path": "Pages/Work/cgs/index.html",
       "title": "CT General Statutes Explorer",
       "category": "Statutes Explorer",
