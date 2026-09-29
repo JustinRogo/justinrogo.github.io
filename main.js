@@ -945,18 +945,27 @@ fetch('https://justinrogo.github.io/data/cards_count.json')
 })();
 
 /* ===================================================================
-   Link Search / Filter
+   Request Form
    =================================================================== */
-(function initLinkSearch() {
-  const q = document.getElementById('search');
-  const grid = document.getElementById('links');
-  if (!q || !grid) return;
-  q.addEventListener('input', e => {
-    const v = e.target.value.toLowerCase();
-    [...grid.querySelectorAll('.link')].forEach(a => {
-      a.style.display = a.textContent.toLowerCase().includes(v) ? 'flex' : 'none';
-    });
+(function initRequestForm() {
+  const form = document.getElementById('requestForm');
+  if (!form) return;
+
+  // Use the requester's subject as the email subject (= Trello card title)
+  form.addEventListener('submit', () => {
+    const subject = form.elements.subject.value.trim();
+    if (subject) form.elements._subject.value = subject;
   });
+
+  // FormSubmit redirects back with ?sent=1 after a successful submission
+  const params = new URLSearchParams(location.search);
+  if (params.get('sent') !== '1') return;
+  document.getElementById('tbtn-req')?.click();
+  const sent = document.getElementById('requestSent');
+  if (sent) sent.hidden = false;
+  params.delete('sent');
+  const query = params.toString();
+  history.replaceState(null, '', location.pathname + (query ? `?${query}` : '') + location.hash);
 })();
 
 /* ===================================================================
@@ -1305,7 +1314,7 @@ fetch('https://justinrogo.github.io/data/cards_count.json')
       list.innerHTML = items.map(i =>
         `<div style="margin:.4rem 0">
           <a href="${escapeHtml(i.link || '#')}" target="_blank" rel="noopener noreferrer">${escapeHtml(i.title || 'Untitled event')}</a>
-          <div class="info-note">${i.date.toLocaleDateString()} · ${escapeHtml(i.desc.slice(0, 90))}${i.desc.length > 90 ? '…' : ''}</div>
+          <div class="info-note">${i.date.toLocaleDateString()}${i.desc ? ` · ${escapeHtml(i.desc.slice(0, 90))}${i.desc.length > 90 ? '…' : ''}` : ''}</div>
         </div>`
       ).join('');
     })
