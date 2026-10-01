@@ -161,6 +161,20 @@ Path: `Pages/For Fun/Game-of-Life.html`
 
 A stylized interactive version of Conway’s Game of Life with a cosmic visual theme.
 
+### WFC Studio
+
+Path: `Pages/For Fun/Wave-Function-Collapse.html`
+
+A dependency-free, tile-based Wave Function Collapse playground inspired by [Maxim Gumin’s original project](https://github.com/mxgmn/WaveFunctionCollapse). Generate circuits, islands, or ribbon loops; pause, step, guide a cell by clicking or with the keyboard, replay deterministic seeds, and download the canvas as a PNG. The URL records the world, grid detail, and seed for sharing. Reduced-motion preferences start the playground paused.
+
+The original JavaScript engine uses weighted Shannon entropy and adjacency propagation with closed boundaries for the built-in worlds. “Paint your own” adds a 24 × 24 pixel editor with eight starting color swatches, a picker for any drawing color, pencil, fill, erase, and undo. Picking a custom color keeps existing swatches and pixels intact; used custom colors also become swatches. Earlier 12 × 12 drawings load as 2 × 2 blocks per pixel, preserving their colors and shape while making room for finer edits. The overlapping model learns weighted 2 × 2 or 3 × 3 patches from that sample; optional rotations expand the learned patterns. Sample edges wrap when learning, and custom output has open boundaries. Every fully generated patch comes from the learned patterns.
+
+Paintings and learning settings are saved in local storage when available, and the custom world URL includes the drawing and palette for sharing. Generation and retries use a snapshot; repainting while a world runs leaves that world intact, and Replay repeats the original snapshot. Contradictions trigger deterministic retries, capped at 24. Tile selection and painting set up the next generation; speed and display overlays apply immediately. No source code or artwork from the reference repository is bundled. Supporting files live in `Pages/For Fun/Wave-Function-Collapse/`.
+
+Run the engine checks with `node --test tests/wfc.test.cjs`.
+
+The page's typography, control spacing, and interactions were refreshed using [Taste Skill's existing-project redesign guide](https://github.com/Leonxlnx/taste-skill/blob/main/skills/redesign-skill/SKILL.md). Fonts and icons are served locally with their licenses. See `Pages/For Fun/Wave-Function-Collapse/DESIGN.md` for the design audit and asset sources.
+
 ## Running locally
 
 Because the site uses JavaScript `fetch()` calls, embedded resources, and dynamic page loading, it should be served over HTTP rather than opened directly from the file system.

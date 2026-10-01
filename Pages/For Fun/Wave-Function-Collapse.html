@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101715">
+  <meta name="description" content="Generate circuits, islands, ribbons, or worlds from your own pixel paintings with Wave Function Collapse.">
+  <title>WFC Studio · For Fun</title>
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <link rel="preload" href="Wave-Function-Collapse/fonts/Geist.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="Wave-Function-Collapse/styles.css">
+  <script defer src="Wave-Function-Collapse/engine.js"></script>
+  <script defer src="Wave-Function-Collapse/painter.js"></script>
+  <script defer src="Wave-Function-Collapse/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#playground">Skip to playground</a>
+  <div class="page">
+    <nav class="topbar" aria-label="Page navigation">
+      <a href="../../index.html" class="back-link"><svg class="icon" aria-hidden="true"><use href="Wave-Function-Collapse/icons.svg#arrow-left"/></svg> Justin’s corner of the internet</a>
+      <span class="section-label">For Fun</span>
+    </nav>
+    <header class="hero">
+      <div><p class="eyebrow">Wave Function Collapse</p>
+        <h1>WFC <span>Studio.</span></h1>
+        <p class="intro">Pick a world or paint your own. Watch small rules turn into unexpected patterns.</p>
+      </div>
+    </header>
+    <main id="playground" class="studio">
+      <section id="paint-editor" class="paint-editor" aria-labelledby="paint-title" hidden>
+        <div class="paint-copy">
+          <h3 id="paint-title">Paint a sample</h3>
+          <p>Draw on the 24 × 24 grid. The generator uses patches from your drawing to make a larger image.</p>
+          <div id="paint-palette" class="paint-palette" role="group" aria-label="Paint colors"></div>
+          <div class="paint-color-row"><label for="paint-color">Pick any color <output id="paint-color-value" for="paint-color">#95af7d</output></label><input id="paint-color" type="color" value="#95af7d" aria-describedby="paint-color-help"></div>
+          <p id="paint-color-help" class="paint-color-help">Choose a color, then paint. Your swatches stay available.</p>
+          <div class="paint-tools" role="group" aria-label="Painting tools"><button data-tool="pencil" aria-pressed="true">Pencil</button><button data-tool="fill" aria-pressed="false">Fill</button><button data-tool="erase" aria-pressed="false">Erase</button></div>
+        </div>
+        <div class="paint-surface">
+          <canvas id="paint-canvas" width="576" height="576" tabindex="0" aria-label="24 by 24 sample painting grid" aria-describedby="paint-help"></canvas>
+          <p id="paint-help">Drag to paint. Arrow keys move; Space paints. Erase uses the first color.</p>
+        </div>
+        <div class="paint-settings">
+          <div class="paint-actions"><button id="paint-undo" disabled>Undo</button><button id="paint-clear">Clear</button><button id="paint-example">Example</button></div>
+          <div class="field"><label for="pattern-size">Patch size</label><select id="pattern-size"><option value="2">2 × 2 pixels · more variation</option><option value="3">3 × 3 pixels · closer to your drawing</option></select></div>
+          <div class="toggle-row"><label for="paint-rotations">Allow rotated patches</label><input id="paint-rotations" type="checkbox"></div>
+          <p id="paint-feedback" role="status" aria-live="polite"></p>
+          <p class="paint-tip">If generation gets stuck, try 2 × 2 patches or allow rotations. Opposite sample edges wrap around.</p>
+          <button id="paint-generate" class="generate">Generate a world <svg class="icon" aria-hidden="true"><use href="Wave-Function-Collapse/icons.svg#arrow-down-right"/></svg></button>
+        </div>
+      </section>
+      <section class="workspace" aria-label="Generated world">
+        <div class="workspace-bar"><div class="live-label"><span id="status-dot" aria-hidden="true"></span><span id="status" role="status" aria-live="polite">Ready to explore</span></div><span id="dimensions" class="mono"></span></div>
+        <div class="transport">
+          <div class="transport-buttons"><button id="play" class="primary"><svg class="icon" aria-hidden="true"><use href="Wave-Function-Collapse/icons.svg#player-pause"/></svg> Pause</button><button id="step" title="Collapse one cell">Step <svg class="icon" aria-hidden="true"><use href="Wave-Function-Collapse/icons.svg#arrow-right"/></svg></button><button id="replay" title="Start again with this seed"><svg class="icon" aria-hidden="true"><use href="Wave-Function-Collapse/icons.svg#rotate-clockwise"/></svg> Replay</button></div>
+          <button id="save" class="save-button">Save PNG <svg class="icon" aria-hidden="true"><use href="Wave-Function-Collapse/icons.svg#arrow-up-right"/></svg></button>
+        </div>
+        <div class="canvas-wrap">
+          <canvas id="world" width="1280" height="920" tabindex="0" aria-label="Wave Function Collapse canvas" aria-describedby="canvas-help">Your browser needs canvas support to show this world.</canvas>
+          <div class="canvas-tag"><span id="world-name">Circuit garden</span></div>
+        </div>
+        <div class="progress-track" role="progressbar" aria-label="Cells resolved" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress"><div id="progress-fill"></div></div>
+        <div class="stats"><div><strong id="resolved">0</strong><span>cells resolved</span></div><div><strong id="possibilities">0</strong><span>possibilities left</span></div><div><strong id="percent">0%</strong><span>world revealed</span></div></div>
+        <p id="canvas-help" class="canvas-help">Click an unresolved cell to fill it next. Use arrow keys to move and Enter to fill the selected cell.</p>
+        <p id="cell-info" class="cell-info" aria-live="polite">Hover over a cell to see how many tiles still fit.</p>
+      </section>
+      <aside class="controls" aria-label="World settings">
+        <div class="control-heading"><h2>Make it your own</h2></div>
+        <fieldset class="world-picker"><legend>Choose a world</legend>
+          <button class="preset selected" data-preset="circuits" aria-pressed="true"><canvas width="72" height="52" aria-hidden="true"></canvas><span><strong>Circuit garden</strong><small>Connected paths and junctions.</small></span><span class="preset-dot" aria-hidden="true"></span></button>
+          <button class="preset" data-preset="islands" aria-pressed="false"><canvas width="72" height="52" aria-hidden="true"></canvas><span><strong>Quiet islands</strong><small>Land, sea, and in-between.</small></span><span class="preset-dot" aria-hidden="true"></span></button>
+          <button class="preset" data-preset="ribbons" aria-pressed="false"><canvas width="72" height="52" aria-hidden="true"></canvas><span><strong>Ribbon maze</strong><small>Take the long way around.</small></span><span class="preset-dot" aria-hidden="true"></span></button>
+          <button class="preset" data-preset="custom" aria-pressed="false"><canvas id="paint-preview" width="72" height="52" aria-hidden="true"></canvas><span><strong>Paint your own</strong><small>Your drawing sets the rules.</small></span><span class="preset-dot" aria-hidden="true"></span></button>
+        </fieldset>
+        <fieldset class="tuning"><legend>Set the possibilities</legend>
+          <div class="field"><label for="size">Canvas size</label><select id="size"><option value="24">24 columns</option><option value="32" selected>32 columns</option><option value="48">48 columns</option></select></div>
+          <div class="field"><label for="seed">Seed <span>Same seed, same world.</span></label><div class="seed-row"><input id="seed" type="text" maxlength="64" value="little-wonders" spellcheck="false" autocomplete="off"><button id="shuffle" aria-label="Choose a random seed" title="Choose a random seed"><svg class="icon" aria-hidden="true"><use href="Wave-Function-Collapse/icons.svg#dice-5"/></svg></button></div></div>
+          <div class="field speed-field"><label for="speed">Reveal speed <output id="speed-label" for="speed">Medium</output></label><input id="speed" type="range" min="1" max="5" value="3"><div class="range-labels"><span>Slow</span><span>Fast</span></div></div>
+          <div class="toggle-row"><label for="show-options">Show possibilities</label><input id="show-options" type="checkbox" checked></div>
+          <div class="toggle-row"><label for="show-grid">Tile grid</label><input id="show-grid" type="checkbox"></div>
+        </fieldset>
+        <button id="generate" class="generate">Generate a world <svg class="icon" aria-hidden="true"><use href="Wave-Function-Collapse/icons.svg#arrow-right"/></svg></button>
+        <p class="settings-note">World, size, and seed apply when you generate. Speed, possibilities, and grid settings change immediately.</p>
+        <div class="tile-library"><h3>The building blocks <span id="tile-count"></span></h3><div id="tiles" aria-label="Tiles in the selected world"></div><p id="tile-note">Adjacent tile edges must match.</p></div>
+      </aside>
+    </main>
+    <section class="explanation" aria-labelledby="how-title">
+      <div class="explanation-intro"><h2 id="how-title">How it works</h2><a href="https://github.com/mxgmn/WaveFunctionCollapse" target="_blank" rel="noopener noreferrer">Explore the original project <svg class="icon" aria-hidden="true"><use href="Wave-Function-Collapse/icons.svg#arrow-up-right"/></svg></a></div>
+      <ol><li><span class="number">01</span><div><h3>Start with possible tiles</h3><p>Each cell starts with a set of possible tiles. Turn on Show possibilities to see the remaining options blended together.</p></div></li><li><span class="number">02</span><div><h3>Choose a tile</h3><p>At each step, WFC picks a tile for the cell with the least uncertainty. Tile weights affect the odds.</p></div></li><li><span class="number">03</span><div><h3>Check the neighbors</h3><p>Remove tiles that don’t fit the neighbors, then repeat. If a cell has no options left, start another attempt.</p></div></li></ol>
+    </section>
+    <footer><span>A browser experiment by Justin Rogowski</span><span>Inspired by <a href="https://github.com/mxgmn/WaveFunctionCollapse" target="_blank" rel="noopener noreferrer">Maxim Gumin’s WaveFunctionCollapse</a></span></footer>
+  </div>
+</body>
+</html>

@@ -26,6 +26,12 @@
       "description": "Do the fates care if the cards are digital?"
     },
     {
+      "path": "Pages/For Fun/Wave-Function-Collapse.html",
+      "title": "WFC Studio",
+      "category": "Generative Playground",
+      "description": "Generate circuits, islands, and ribbons, or paint a sample to create your own patterns."
+    },
+    {
       "path": "Pages/Work/Library/Desk Planner/index.html",
       "title": "Front Desk Planner",
       "category": "Planning Tool",
