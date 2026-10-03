@@ -2,6 +2,12 @@
   "version": 2,
   "pages": [
     {
+      "path": "Pages/For Fun/Spider/index.html",
+      "title": "Web Crawler",
+      "category": "Generative Experiment",
+      "description": "Watch neon spiders crawl Wikipedia and restyle everything they touch."
+    },
+    {
       "path": "Pages/For Fun/Birds.html",
       "title": "Evolutionary Flocking Ecosystem",
       "category": "Simulation",

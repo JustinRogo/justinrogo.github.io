@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#090b10">
+  <meta name="description" content="A neon spider crawls through Wikipedia and rewrites everything it touches. An interactive experiment by Justin Rogowski.">
+  <title>Web Crawler · Justin Rogowski</title>
+  <link rel="icon" href="../../../favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.3.0/dist/purify.min.js" defer></script>
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <main>
+    <nav class="topline" aria-label="Site"><a href="/">← JUSTIN ROGOWSKI</a><span>FOR FUN / EXPERIMENT 06</span></nav>
+    <header class="hero">
+      <div><p class="eyebrow"><span class="live-dot"></span> GENERATIVE WEB EXPERIMENT</p><h1>Web <span>Crawler</span><svg viewBox="0 0 80 80" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.2"><path d="M40 35 25 19 12 15M40 35 20 30 8 25M40 38 19 44 8 56M40 40 25 56 20 70M40 35 55 19 68 15M40 35 60 30 72 25M40 38 61 44 72 56M40 40 55 56 60 70"/><circle cx="40" cy="32" r="5"/><circle cx="40" cy="44" r="8"/></g></svg></h1><p class="intro">Eight legs. Endless links. A little digital vandalism.<br>Watch a spider make the web its own.</p></div>
+      <div class="specimen"><span>SPECIMEN No. 001</span><strong>Araneae.exe</strong><span>HABITAT: WIKIPEDIA</span></div>
+    </header>
+    <section class="controls" aria-label="Crawler controls">
+      <div class="control speed-control"><label for="speed">SPEED <output id="speed-value" for="speed">1.0×</output></label><input id="speed" type="range" min="0.25" max="3" step="0.25" value="1"></div>
+      <div class="control intensity-control"><label for="intensity">INTENSITY <output id="intensity-value" for="intensity">65%</output></label><input id="intensity" type="range" min="0" max="100" step="5" value="65" aria-valuetext="Balanced (65%)" title="Subtle to chaotic. Affects new mutations; Reset starts fresh."></div>
+      <div class="control"><label for="count">SPIDERS</label><select id="count"><option value="1">01</option><option value="2">02</option><option value="3">03</option><option value="4">04</option><option value="5">05</option></select></div>
+      <div class="action-controls"><button id="pause" type="button" disabled>Pause</button><button id="reset" type="button" disabled>↺ Reset</button></div>
+      <div class="toggles"><label class="toggle"><input id="dark" type="checkbox" checked><span class="switch" aria-hidden="true"></span>Dark page</label><label class="toggle"><input id="reel" type="checkbox"><span class="switch" aria-hidden="true"></span>9:16 reel</label></div>
+    </section>
+    <nav class="article-history" aria-label="Article history">
+      <button id="article-back" type="button" disabled>← Back</button>
+      <label for="article-trail">ARTICLE TRAIL</label>
+      <select id="article-trail" disabled><option>Finding the first thread…</option></select>
+      <span id="trail-count">0 visited</span>
+    </nav>
+    <section class="lab" aria-label="Crawler experiment">
+      <div class="frame" id="frame">
+        <div class="browser-bar"><span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span><span id="article-path">en.wikipedia.org / wiki / Spider</span><span class="source-label">LIVE HTML</span></div>
+        <div class="stage" id="stage">
+          <div id="viewport" tabindex="0" role="region" aria-label="Wikipedia article. Scroll or use arrow keys to explore."><div id="article-host"></div></div>
+          <canvas id="spider-canvas" aria-hidden="true"></canvas>
+          <div id="loading" class="notice" role="status"><span class="loader-mark" aria-hidden="true">✳</span><h2>Finding a web to crawl…</h2><p>Loading Wikipedia’s Spider article.</p></div>
+          <div id="error" class="notice" hidden><h2>This thread didn’t connect.</h2><p>Wikipedia may be taking a break. Try one of these articles.</p><div class="suggestions"><button type="button" data-article="Spider">Spider</button><button type="button" data-article="Spider_web">Spider web</button><button type="button" data-article="Jumping_spider">Jumping spider</button></div></div>
+          <div class="reel-watermark" aria-hidden="true">WEB CRAWLER <span>justinrogo.github.io</span></div>
+        </div>
+        <div class="telemetry"><span><span id="state-dot" class="live-dot"></span> <span id="state">CONNECTING</span></span><span><b id="mutations">000</b> MUTATIONS</span><span class="telemetry-end">8 LEGS / SPIDER</span></div>
+      </div>
+    </section>
+    <div class="below-stage"><p id="hint" role="status">Spiders occasionally follow Wikipedia links. Click a link to lead the way.</p><button id="home-article" type="button">Back to Spider ↗</button></div>
+    <footer><p>A web crawler, literally.<span>Text from <a id="source" href="https://en.wikipedia.org/wiki/Spider" target="_blank" rel="noopener noreferrer">Wikipedia</a> · <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a> · modified as it crawls.</span></p><div class="bookmark"><a id="bookmarklet" href="#" draggable="true">＋ Take the spider with you</a><span>Drag to your bookmarks bar. Click on a live page.</span></div></footer>
+    <noscript><p>This experiment needs JavaScript. You can still <a href="https://en.wikipedia.org/wiki/Spider">read about spiders on Wikipedia</a>.</p></noscript>
+  </main>
+</body>
+</html>
