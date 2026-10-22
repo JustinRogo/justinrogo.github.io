@@ -84,10 +84,9 @@ function escapeHtml(value) {
   }
 
   function renderNodes(nodes) {
-    // Render folders recursively; collecting descendants is only for counts.
+    // Keep multi-page folders nested and promote single-page folders to links.
     function renderGroup(node, path, depth) {
-      const count = collectPages(node.children || []).length;
-      if (!count) return '';
+      if (!collectPages(node.children || []).length) return '';
       const headingId = `page-branch-${path}`;
       const heading = `h${Math.min(3 + depth, 6)}`;
       const children = [...node.children].sort((a, b) =>
@@ -99,16 +98,21 @@ function escapeHtml(value) {
       return `<section class="page-branch${depth ? ' page-branch--nested' : ''}" aria-labelledby="${headingId}">
         <div class="page-branch__header">
           <${heading} id="${headingId}">${escapeHtml(node.title)}</${heading}>
-          <span class="page-count">${count} ${count === 1 ? 'page' : 'pages'}</span>
         </div>
         <ul class="page-branch__items">
-          ${folders.map((child, index) => `<li class="page-branch__folder">${renderGroup(child, `${path}-${index}`, depth + 1)}</li>`).join('')}
+          ${folders.map((child, index) => {
+            const descendants = collectPages(child.children || []);
+            if (!descendants.length) return '';
+            if (descendants.length === 1) return renderPage(descendants[0]);
+            return `<li class="page-branch__folder">${renderGroup(child, `${path}-${index}`, depth + 1)}</li>`;
+          }).join('')}
           ${links.map(renderPage).join('')}
         </ul>
       </section>`;
     }
 
-    const groups = nodes.filter(node => !node.href);
+    const groups = nodes.filter(node => !node.href)
+      .sort((a, b) => Number(b.title === 'Work') - Number(a.title === 'Work'));
     const loosePages = nodes.filter(node => node.href);
     if (loosePages.length) groups.push({ title: 'Other', children: loosePages });
     return groups.map((node, index) => renderGroup(node, String(index), 0)).join('');
