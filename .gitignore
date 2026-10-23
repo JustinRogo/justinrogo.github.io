@@ -6,3 +6,8 @@ Pages/Work/cgs/Index A-H.pdf
 Pages/Work/cgs/Index I-S.pdf
 Pages/Work/cgs/Index T-Z.pdf
 __pycache__/
+/.impeccable
+/node_modules/
+/dist/
+/.env.local
+/Pages/Updates/vendor/

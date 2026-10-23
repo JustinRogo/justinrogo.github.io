@@ -2,6 +2,13 @@
   "version": 2,
   "pages": [
     {
+      "path": "Pages/Updates/index.html",
+      "title": "Updates",
+      "category": "Posts & Discussion",
+      "description": "Read Justin's updates and join the conversation.",
+      "href": "https://justinrogo.vercel.app/updates"
+    },
+    {
       "path": "Pages/For Fun/Spider/index.html",
       "title": "Web Crawler",
       "category": "Generative Experiment",

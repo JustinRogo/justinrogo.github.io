@@ -1,0 +1,29 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "rewrites": [
+    { "source": "/updates/feed.xml", "destination": "/api/updates?action=feed" },
+    { "source": "/updates/embed", "destination": "/Pages/Updates/embed.html" },
+    { "source": "/updates", "destination": "/Pages/Updates/index.html" },
+    { "source": "/updates/", "destination": "/Pages/Updates/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/updates/embed",
+      "headers": [
+        { "key": "Content-Security-Policy", "value": "frame-ancestors 'self' https://uconn.atlassian.net" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+      ]
+    },
+    {
+      "source": "/Pages/Updates/embed.html",
+      "headers": [
+        { "key": "Content-Security-Policy", "value": "frame-ancestors 'self' https://uconn.atlassian.net" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" }
+      ]
+    }
+  ]
+}
