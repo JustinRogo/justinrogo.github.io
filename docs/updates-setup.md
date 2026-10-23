@@ -27,6 +27,8 @@ Use a publishable/anon key, never a secret/service-role key. All writes use the 
 
 `vercel.json` configures the build command (`npm run build`), static output (`dist`), the `/updates` routes, and the embed's iframe policy. If the imported project's dashboard has explicit build/output overrides, remove those overrides or align them with this configuration. The build copies the existing public site plus locally served, version-pinned editor/client libraries. Functions stay at the root `api/` directory for Vercel to deploy.
 
+Dependency installation and the build bundle the server's current HTML sanitizer into `lib/generated/sanitize-html.cjs`. This keeps its ESM parser compatible with Vercel's function loader and prepares it before function tracing. The generated file is private server output and is not copied into `dist`; Vercel traces it through the API's imports. `npm run dev` and `npm run test:updates` generate it automatically too.
+
 Deploy the changes, then sign in once at `https://justinrogo.vercel.app/updates`. In the Supabase SQL editor, grant publishing rights to **your account only**:
 
 ```sql

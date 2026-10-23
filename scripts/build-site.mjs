@@ -1,6 +1,7 @@
 import { cp, mkdir, copyFile, access, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { buildSanitizer } from './build-sanitizer.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export async function vendorUpdates() {
@@ -18,6 +19,7 @@ export async function vendorUpdates() {
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  await buildSanitizer();
   await vendorUpdates();
   const dist = path.join(root, 'dist');
   if (path.relative(root, dist) !== 'dist') throw new Error('Unexpected build output path.');

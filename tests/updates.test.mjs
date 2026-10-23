@@ -7,6 +7,24 @@ import handler from '../api/updates.mjs';
 const id = '10000000-0000-4000-8000-000000000001';
 const published = { id, title: 'An update <&> "quoted"', body: '<h2>News</h2><p>Good <strong>text</strong> &amp; links.</p>', excerpt: 'A <short> & useful preview', status: 'published', published_at: '2026-10-23T12:00:00Z', author_id: 'private-author-id' };
 
+test('the API starts when the runtime cannot require ES modules', () => {
+  // Vercel's function loader rejects CommonJS require(ESM), even though newer
+  // local Node versions allow it. Exercise startup before any request handler runs.
+  const result = execFileSync(process.execPath, [
+    '--no-experimental-require-module', '--input-type=module', '-e',
+    `delete process.env.SUPABASE_URL;
+     delete process.env.SUPABASE_PUBLISHABLE_KEY;
+     const { default: handler } = await import('./api/updates.mjs');
+     const response = {
+       setHeader() {},
+       status(code) { this.code = code; return this; },
+       json(body) { console.log(JSON.stringify({ status: this.code, ...body })); }
+     };
+     await handler({ url: '/api/updates?action=config', method: 'GET', headers: {} }, response);`
+  ], { encoding: 'utf8', cwd: new URL('..', import.meta.url) });
+  assert.deepEqual(JSON.parse(result), { status: 200, configured: false });
+});
+
 test('rich text survives, active content and unsafe image/link schemes do not', () => {
   const html = cleanBody('<h2>Heading</h2><ul><li>First</li></ul><p onclick="steal()">Hi<script>steal()</script><iframe src="https://bad.example"></iframe><a href="javascript:steal()">unsafe</a><a href="https://example.com">safe</a><img src="data:image/svg+xml,bad" onerror="steal()"><img src="https://example.com/a.png" alt="Picture"></p>');
   assert.match(html, /<h2>Heading<\/h2>/);
