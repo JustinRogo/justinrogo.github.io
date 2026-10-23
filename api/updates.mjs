@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { UUID, normalizePost, publicPost, makeFeed, isPublishableKey } from '../lib/updates.mjs';
+import { fetchLinkPreview } from '../lib/link-previews.mjs';
 
 const POST_FIELDS = 'id,title,body,excerpt,status,pinned,comments_enabled,published_at,created_at,updated_at';
 const COMMENT_FIELDS = 'id,post_id,user_id,author_name,body,status,created_at';
@@ -35,8 +36,8 @@ export default async function handler(req, res) {
     }
     if (!configured) throw fail(503, 'Updates are being prepared. Please check back soon.');
     const method = req.method;
-    const allowed = { posts: ['GET', 'POST', 'PATCH', 'DELETE'], comments: ['GET', 'POST', 'DELETE'], profile: ['GET'], drafts: ['GET'], moderation: ['GET', 'PATCH', 'DELETE'], feed: ['GET'] };
-    if (!allowed[action]) throw fail(404, 'This endpoint does not exist.');
+    const allowed = { posts: ['GET', 'POST', 'PATCH', 'DELETE'], comments: ['GET', 'POST', 'DELETE'], profile: ['GET'], drafts: ['GET'], moderation: ['GET', 'PATCH', 'DELETE'], feed: ['GET'], preview: ['POST'] };
+    if (!Object.hasOwn(allowed, action)) throw fail(404, 'This endpoint does not exist.');
     if (!allowed[action].includes(method)) {
       res.setHeader('Allow', allowed[action].join(', '));
       throw fail(405, 'This request method is not supported.');
@@ -62,6 +63,11 @@ export default async function handler(req, res) {
       body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
     }
     const id = req.query?.id || query.get('id');
+    if (action === 'preview') {
+      await requireAuthor();
+      try { return res.status(200).json(await fetchLinkPreview(body.url)); }
+      catch (error) { throw fail(400, error.message); }
+    }
     if (action === 'profile') {
       const user = await requireUser();
       const isAuthor = Boolean(dbResult(await client.rpc('updates_is_author')));

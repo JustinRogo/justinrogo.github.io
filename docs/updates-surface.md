@@ -4,6 +4,8 @@ Mode: Read for the feed and embedded view; Operate for publishing and moderation
 
 Confirmed direction: one author publishes formatted updates; others read and comment; Confluence Cloud embeds a compact view. Retain the established site identity. This is a narrowly specified channel layout, not a new visual world.
 
+Extension: the supplied Teams screenshot establishes compact thumbnail/title/domain link cards. Add optional previews beneath the post text, with a remove action and a choice of card or inline YouTube player. Keep the existing visual system and widget summary. Do not accept arbitrary third-party iframe HTML.
+
 ## Direction contract
 
 THESIS: A useful personal updates channel, with writing at the center and a short view of the same posts in Confluence.

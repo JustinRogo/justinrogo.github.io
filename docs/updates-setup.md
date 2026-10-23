@@ -54,6 +54,14 @@ The embed's HTTP Content-Security-Policy allows only this site's own origin and 
 
 Atlassian's instructions: https://support.atlassian.com/confluence-cloud/docs/insert-the-iframe-macro/
 
+## Link previews and YouTube videos
+
+In the editor, paste a link into your text and choose **Add preview** below the text editor, or enter the URL directly in **Website or YouTube link**. Up to four previews can be attached. YouTube watch, short-link, Shorts, live, and embed URLs are recognized; timestamp links retain their start position. Use **Play video inside the post** to switch between a card and a player. **Remove preview** leaves your text link intact.
+
+Only the author can request metadata. The server reads a public HTTPS page's Open Graph/title metadata, with size/time limits and public-address validation on every redirect. Sites that block preview requests get a simple text card. YouTube titles come from its public oEmbed endpoint; players use youtube-nocookie.com, have no autoplay, and retain a **Watch on YouTube** fallback for videos that disallow embedding. No YouTube API key is needed.
+
+Previews are stored as validated markers alongside the existing rich text body, so **no Supabase migration is needed**. Existing posts remain unchanged. The RSS feed carries a normal link fallback, and the small Confluence widget continues to show excerpts. Remote thumbnails and players load from their providers when displayed.
+
 ## RSS and permanent links
 
 - Main channel: `https://justinrogo.vercel.app/updates`

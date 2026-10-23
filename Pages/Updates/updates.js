@@ -1,7 +1,9 @@
+import { EMBED_ATTRIBUTES, webUrl, youtubeVideo, readEmbed, serializeEmbeds, renderEmbed, upgradeEmbeds } from './post-embeds.js';
+
 const $ = selector => document.querySelector(selector);
 const params = new URLSearchParams(location.search);
 const preview = params.get('preview') === '1';
-const state = { session: null, client: null, author: false, userId: null, view: 'published', posts: [], editing: null, dirty: false, offset: 0, configured: false, ready: false };
+const state = { session: null, client: null, author: false, userId: null, view: 'published', posts: [], editing: null, dirty: false, offset: 0, configured: false, ready: false, embeds: [], previewRequest: 0, previewLoading: false };
 let quill;
 let previewData;
 const previewComments = new Map();
@@ -38,14 +40,19 @@ async function api(action, { method = 'GET', body, query = {} } = {}) {
   if (!response.ok) throw new Error(data.error || 'The request could not be completed.');
   return data;
 }
-function safeBody(body) {
+function sanitizedBody(body) {
   const div = node('div', null, 'post-body');
   div.innerHTML = DOMPurify.sanitize(body, {
-    ALLOWED_TAGS: ['p', 'br', 'h2', 'h3', 'strong', 'b', 'em', 'i', 'u', 's', 'ul', 'ol', 'li', 'blockquote', 'pre', 'code', 'a', 'img'],
-    ALLOWED_ATTR: ['href', 'src', 'alt', 'target', 'rel']
+    ALLOWED_TAGS: ['p', 'br', 'h2', 'h3', 'strong', 'b', 'em', 'i', 'u', 's', 'ul', 'ol', 'li', 'blockquote', 'pre', 'code', 'a', 'img', 'figure'],
+    ALLOWED_ATTR: ['href', 'src', 'alt', 'target', 'rel', ...EMBED_ATTRIBUTES], ALLOW_DATA_ATTR:false
   });
   div.querySelectorAll('a').forEach(a => { a.target = '_blank'; a.rel = 'noopener noreferrer'; });
   div.querySelectorAll('img').forEach(img => { img.loading = 'lazy'; });
+  return div;
+}
+function safeBody(body) {
+  const div = sanitizedBody(body);
+  upgradeEmbeds(div);
   return div;
 }
 function empty(title, message, retry) {
@@ -249,13 +256,61 @@ function editor() {
   quill.root.setAttribute('aria-labelledby', 'editor-label');
   quill.root.setAttribute('role', 'textbox');
   quill.root.setAttribute('aria-multiline', 'true');
-  quill.on('text-change', (_, __, source) => { if (source === 'user') markDirty(); });
+  quill.on('text-change', (_, __, source) => { if (source === 'user') { markDirty(); offerPreview(); } });
   // Uploaded images use the controlled image picker. Drop/pasted data URLs are not stored in posts.
   quill.root.addEventListener('paste', event => { if ([...event.clipboardData.items].some(item => item.type.startsWith('image/'))) { event.preventDefault(); notice('Use the image button to upload an image.', true); } }, true);
   quill.root.addEventListener('drop', event => { if (event.dataTransfer.files.length) { event.preventDefault(); notice('Use the image button to upload an image.', true); } });
   return quill;
 }
 function markDirty() { state.dirty = true; $('#save-state').textContent = 'Unsaved changes'; }
+function offerPreview() {
+  if ($('#preview-url').value) return;
+  const urls = [...editor().root.querySelectorAll('a[href]')].map(link => link.href);
+  urls.push(...(editor().getText().match(/https:\/\/[^\s<>]+/g) || []));
+  const candidate = urls.find(url => webUrl(url) && !state.embeds.some(embed => embed.url === webUrl(url).href));
+  if (candidate) { $('#preview-url').value = candidate; $('#preview-status').textContent = 'Link detected. Choose Add preview to include a card or video.'; }
+}
+function renderComposerPreviews() {
+  const target = $('#post-previews'); target.replaceChildren();
+  state.embeds.forEach((embed, index) => {
+    const row = node('div', null, 'composer-preview');
+    row.append(renderEmbed(embed, { editor:true }));
+    const actions = node('div', null, 'preview-actions');
+    if (youtubeVideo(embed.url)) {
+      const label = node('label', null, 'check-label');
+      const check = node('input'); check.type = 'checkbox'; check.checked = embed.kind === 'youtube';
+      check.addEventListener('change', () => { embed.kind = check.checked ? 'youtube' : 'link'; markDirty(); });
+      label.append(check, document.createTextNode('Play video inside the post'));
+      actions.append(label);
+    } else actions.append(node('span', 'Link card', 'field-help'));
+    const remove = button('Remove preview', () => { state.embeds.splice(index, 1); markDirty(); renderComposerPreviews(); });
+    remove.setAttribute('aria-label', `Remove preview: ${embed.title}`);
+    actions.append(remove); row.append(actions); target.append(row);
+  });
+  $('#add-preview').disabled = state.previewLoading || state.embeds.length >= 4;
+}
+async function addPreview() {
+  const url = webUrl($('#preview-url').value.trim());
+  if (!url) { $('#preview-status').textContent = 'Enter a public HTTPS website or YouTube video link.'; return; }
+  if (state.embeds.length >= 4) { $('#preview-status').textContent = 'You can add up to four previews to a post.'; return; }
+  if (state.embeds.some(embed => embed.url === url.href)) { $('#preview-status').textContent = 'This link already has a preview.'; return; }
+  const request = ++state.previewRequest;
+  state.previewLoading = true; $('#add-preview').disabled = true;
+  $('#preview-status').textContent = 'Getting the preview…';
+  try {
+    let result;
+    if (preview) {
+      const video = youtubeVideo(url.href);
+      result = { preview: { kind: video ? 'youtube' : 'link', url:url.href, title:video ? 'YouTube video · preview example' : url.hostname, description:'Example preview. The published editor retrieves the website’s title, description, and thumbnail.', image:video ? `https://i.ytimg.com/vi/${video.id}/hqdefault.jpg` : '' } };
+    } else result = await api('preview', { method:'POST', body:{ url:url.href } });
+    if (request !== state.previewRequest) return;
+    state.embeds.push(result.preview);
+    $('#preview-url').value = '';
+    $('#preview-status').textContent = result.fallback ? 'Added a simple preview. This site did not provide full preview information.' : 'Preview added. You can remove it without removing your text link.';
+    markDirty(); renderComposerPreviews();
+  } catch (error) { if (request === state.previewRequest) $('#preview-status').textContent = error.message; }
+  finally { if (request === state.previewRequest) { state.previewLoading = false; $('#add-preview').disabled = state.embeds.length >= 4; } }
+}
 async function openComposer(post = null) {
   if (state.dirty && !await confirmAction('Discard your unsaved changes?', 'Save the current post first if you want to keep these changes.', 'Discard changes')) return;
   const q = editor();
@@ -265,7 +320,13 @@ async function openComposer(post = null) {
   $('#post-excerpt').value = post?.excerpt || '';
   $('#post-pinned').checked = post?.pinned || false;
   $('#post-comments').checked = post?.comments_enabled !== false;
-  q.clipboard.dangerouslyPasteHTML(DOMPurify.sanitize(post?.body || ''), 'silent');
+  state.previewRequest++; state.previewLoading = false;
+  const content = sanitizedBody(post?.body || '');
+  state.embeds = [...content.querySelectorAll('figure[data-update-embed]')].map(readEmbed).filter(Boolean);
+  content.querySelectorAll('figure[data-update-embed]').forEach(figure => figure.remove());
+  q.clipboard.dangerouslyPasteHTML(content.innerHTML, 'silent');
+  $('#preview-url').value = ''; $('#preview-status').textContent = '';
+  renderComposerPreviews();
   $('#publish-post').textContent = post?.status === 'published' ? 'Save published update' : 'Publish update';
   $('#save-draft').textContent = post?.status === 'published' ? 'Move to drafts' : 'Save draft';
   $('#save-state').textContent = 'Changes are saved when you choose an action.';
@@ -279,21 +340,23 @@ async function closeComposer() {
   if (state.dirty && !await confirmAction('Discard your unsaved changes?', 'Save this post first if you want to keep these changes.', 'Discard changes')) return;
   state.dirty = false;
   state.editing = null;
+  state.previewRequest++; state.previewLoading = false;
   $('#composer').hidden = true;
   $('#write-post').focus();
 }
 async function savePost(status) {
+  if (state.previewLoading) { $('#preview-status').textContent = 'Wait for the preview to finish before saving.'; return; }
   if (!$('#post-form').reportValidity()) return;
-  const body = { title: $('#post-title').value.trim(), body: DOMPurify.sanitize(editor().getSemanticHTML()), excerpt: $('#post-excerpt').value.trim(), pinned: $('#post-pinned').checked, comments_enabled: $('#post-comments').checked, status };
-  if (!body.title || (!editor().getText().trim() && !body.body.includes('<img'))) { notice('Enter a title and write something before saving.', true); return; }
-  const controls = [...$('#post-form').querySelectorAll('button,input,textarea')];
+  const body = { title: $('#post-title').value.trim(), body: DOMPurify.sanitize(editor().getSemanticHTML()), embeds:state.embeds, excerpt: $('#post-excerpt').value.trim(), pinned: $('#post-pinned').checked, comments_enabled: $('#post-comments').checked, status };
+  if (!body.title || (!editor().getText().trim() && !body.body.includes('<img') && !state.embeds.length)) { notice('Enter a title and write something or add a preview before saving.', true); return; }
+  const controls = [...$('#post-form').querySelectorAll('button,input,textarea,select')];
   controls.forEach(control => { control.disabled = true; });
   quill.enable(false);
   $('#save-state').textContent = 'Saving…';
   try {
     if (preview) {
       const old = previewData.find(p => p.id === state.editing);
-      const post = { ...body, id: state.editing || crypto.randomUUID(), body: DOMPurify.sanitize(body.body), excerpt: body.excerpt || editor().getText().trim().slice(0, 260), published_at: old?.published_at || (status === 'published' ? new Date().toISOString() : null), updated_at: new Date().toISOString() };
+      const post = { ...body, id: state.editing || crypto.randomUUID(), body: body.body + serializeEmbeds(state.embeds), excerpt: body.excerpt || editor().getText().trim().slice(0, 260) || state.embeds[0]?.title || '', published_at: old?.published_at || (status === 'published' ? new Date().toISOString() : null), updated_at: new Date().toISOString() };
       previewData = [post, ...previewData.filter(p => p.id !== post.id)];
       try { sessionStorage.setItem('updates-preview-posts', JSON.stringify(previewData)); } catch { /* Preview remains usable without storage. */ }
     } else await api('posts', { method: state.editing ? 'PATCH' : 'POST', query: state.editing ? { id: state.editing } : {}, body });
@@ -305,7 +368,7 @@ async function savePost(status) {
     syncControls(); await loadFeed();
     notice(preview ? 'Preview saved in this tab. Nothing was published.' : status === 'draft' ? 'Draft saved. Only you can see it.' : 'Your update is published. The widget and RSS feed will pick it up.');
   } catch (error) { notice(error.message, true); $('#save-state').textContent = 'Not saved. Your changes are still here.'; }
-  finally { controls.forEach(control => { control.disabled = false; }); quill.enable(true); }
+  finally { controls.forEach(control => { control.disabled = false; }); $('#add-preview').disabled = state.embeds.length >= 4; quill.enable(true); }
 }
 async function removePost(post) {
   if (!await confirmAction('Delete this post?', 'This also removes its comments. This cannot be undone.')) return;
@@ -335,6 +398,8 @@ $('#write-post').addEventListener('click', () => openComposer());
 $('#close-composer').addEventListener('click', closeComposer);
 $('#post-form').addEventListener('submit', event => { event.preventDefault(); savePost('published'); });
 $('#save-draft').addEventListener('click', () => savePost('draft'));
+$('#add-preview').addEventListener('click', addPreview);
+$('#preview-url').addEventListener('keydown', event => { if (event.key === 'Enter') { event.preventDefault(); addPreview(); } });
 $('#post-form').addEventListener('input', markDirty);
 $('#sign-in').addEventListener('click', () => $('#auth-dialog').showModal());
 $('#close-auth').addEventListener('click', () => $('#auth-dialog').close());

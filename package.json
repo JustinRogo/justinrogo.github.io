@@ -6,7 +6,7 @@
     "build": "node scripts/build-site.mjs",
     "dev": "node scripts/serve-updates.mjs",
     "pretest:updates": "node scripts/build-sanitizer.mjs",
-    "test:updates": "node --test tests/updates.test.mjs tests/updates-permissions.test.mjs"
+    "test:updates": "node --test tests/updates.test.mjs tests/updates-permissions.test.mjs tests/link-previews.test.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.118.0",

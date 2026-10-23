@@ -1,3 +1,5 @@
+import { serializeEmbeds } from './post-embeds.js';
+
 // Demonstration content is used only with ?preview=1; it never reaches the database or RSS.
 export const previewPosts = [
   {
@@ -19,3 +21,8 @@ export const previewPosts = [
     pinned: false, status: 'published', comments_enabled: true, published_at: '2026-10-18T13:00:00Z', updated_at: '2026-10-18T13:00:00Z'
   }
 ];
+
+previewPosts[0].body += serializeEmbeds([
+  { kind:'link', url:'https://justinrogo.vercel.app/', title:'Justin Rogowski', description:'Quick links, calendar, and projects.', image:'https://law.media.uconn.edu/wp-content/uploads/sites/3082/2021/07/rogowski-360x360-1.png' },
+  { kind:'youtube', url:'https://www.youtube.com/watch?v=M7lc1UVf-VE', title:'YouTube player example', description:'An example of an inline video. Playback depends on the video’s embedding settings.', image:'https://i.ytimg.com/vi/M7lc1UVf-VE/hqdefault.jpg' }
+]);

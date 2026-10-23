@@ -20,6 +20,8 @@ The existing repository is plain HTML, CSS, and JavaScript. It was imported into
 
 ## Capabilities and Constraints
 
+Updates supports optional link-preview cards and inline YouTube videos, following the user's Teams screenshot reference. Authors control whether previews are attached and whether a YouTube link is shown as a card or player. Existing posts and the database schema must continue working.
+
 Confirmed: rich text posts, comments, an RSS feed, and a compact iframe view for Confluence Cloud at https://uconn.atlassian.net. Updates must use a separate Supabase project from the Front Desk Planner.
 
 Implementation decisions: public published posts; author-only publishing; authenticated, moderated comments; drafts excluded from public endpoints and RSS. Credentials and database setup must be supplied through the documented deployment setup, never embedded in source.

@@ -56,6 +56,14 @@
               <div id="editor"></div>
               <input type="file" id="image-picker" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
               <p id="upload-status" class="field-help" role="status"></p>
+              <section class="embed-composer" aria-labelledby="embed-composer-title">
+                <h3 id="embed-composer-title">Link &amp; video previews</h3>
+                <p class="field-help" id="embed-help">Add a preview below your text. YouTube links can play inside the post.</p>
+                <label for="preview-url">Website or YouTube link</label>
+                <div class="preview-input-row"><input id="preview-url" type="url" placeholder="https://…" aria-describedby="embed-help" autocomplete="off"><button id="add-preview" type="button" class="outline-button">Add preview</button></div>
+                <p id="preview-status" class="field-help" role="status"></p>
+                <div id="post-previews" aria-label="Attached previews"></div>
+              </section>
               <details class="post-options"><summary>Post options</summary>
                 <label for="post-excerpt">Preview text <span class="optional">(optional)</span></label>
                 <textarea id="post-excerpt" maxlength="500" rows="2" placeholder="A short preview for Confluence and RSS. Otherwise, one is made from the post."></textarea>

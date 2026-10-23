@@ -115,7 +115,7 @@ test('unconfigured requests fail closed without making network calls', async () 
   assert.equal(result.headers['Cache-Control'], 'no-store');
 });
 test('anonymous publishing and moderation are denied before database access', async () => {
-  for (const [action, method] of [['posts', 'POST'], ['posts', 'PATCH'], ['posts', 'DELETE'], ['moderation', 'GET'], ['drafts', 'GET'], ['comments', 'POST']]) {
+  for (const [action, method] of [['posts', 'POST'], ['posts', 'PATCH'], ['posts', 'DELETE'], ['moderation', 'GET'], ['drafts', 'GET'], ['comments', 'POST'], ['preview', 'POST']]) {
     const result = await request(`/api/updates?action=${action}`, { method, body: {} });
     assert.equal(result.statusCode, 401, `${action} ${method}`);
   }
@@ -127,6 +127,8 @@ test('a signed-in reader still cannot publish or moderate', async () => {
   }
   const moderation = await request('/api/updates?action=moderation', { token: 'reader-token', fetcher: mockSupabase() });
   assert.equal(moderation.statusCode, 403);
+  const preview = await request('/api/updates?action=preview', { method:'POST', token:'reader-token', body:{ url:'https://example.com/' }, fetcher:mockSupabase() });
+  assert.equal(preview.statusCode, 403);
 });
 test('public feed requests explicitly filter drafts and return sanitized posts', async () => {
   const result = await request('/api/updates?action=posts', { fetcher: mockSupabase() });
