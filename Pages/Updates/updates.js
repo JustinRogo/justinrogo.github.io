@@ -80,7 +80,7 @@ async function loadFeed(append = false) {
   $('#load-more').hidden = true;
   if (!append) { state.offset = 0; state.posts = []; }
   try {
-    if (state.view === 'moderation') { document.title = 'Comment queue · Updates · Justin Rogowski'; await renderModeration(); return; }
+    if (state.view === 'moderation') { document.title = 'Comment queue · AI Corner · Justin Rogowski'; await renderModeration(); return; }
     const id = new URLSearchParams(location.search).get('post');
     let data;
     if (preview) {
@@ -108,7 +108,7 @@ async function loadFeed(append = false) {
     for (const post of state.posts) feed.append(renderPost(post, Boolean(id)));
     $('#load-more').hidden = !data.hasMore;
     state.offset = state.posts.length;
-    document.title = id && state.posts[0] ? `${state.posts[0].title} · Justin Rogowski` : state.view === 'drafts' ? 'Drafts · Updates · Justin Rogowski' : 'Updates · Justin Rogowski';
+    document.title = id && state.posts[0] ? `${state.posts[0].title} · Justin Rogowski` : state.view === 'drafts' ? 'Drafts · AI Corner · Justin Rogowski' : 'AI Corner · Justin Rogowski';
   } catch (error) {
     if (requestId !== feedRequest) return;
     $('#feed').replaceChildren(empty('Updates are unavailable', error.message, true));
