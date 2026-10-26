@@ -88,6 +88,12 @@ The homepage includes a custom search widget for:
 
 The widget builds search queries for UConn Law’s Primo discovery interface and LibGuides.
 
+### The Pocket Part blog
+
+The homepage reads the four newest blog posts from `data/pocket-part.json` on this site. Run `node scripts/update-pocket-part.mjs` to refresh that file directly from UConn's RSS feed; no third-party conversion service is needed.
+
+The GitHub Pages workflow refreshes the feed on deployment and on its existing twice-hourly schedule. It caches the latest successful snapshot between builds and keeps the saved posts when UConn is unavailable. The checked-in snapshot provides a fallback if the cache expires. The Vercel build also refreshes the feed, falling back to the checked-in snapshot on failure.
+
 ### Theme and visual design
 
 The site uses a custom CSS system with:

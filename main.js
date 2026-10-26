@@ -1332,8 +1332,7 @@ fetch('https://justinrogo.github.io/data/cards_count.json')
    The Pocket Part
    =================================================================== */
 (function initPocketPart() {
-  const FEED_URL = 'https://library.law.uconn.edu/category/blog/feed/';
-  const FEED_API = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(FEED_URL)}`;
+  const FEED_URL = 'data/pocket-part.json';
   const BLOG_URL = 'https://library.law.uconn.edu/the-pocket-part/';
   const POST_LIMIT = 4;
   const container = document.getElementById('pocket-part-content');
@@ -1475,14 +1474,14 @@ fetch('https://justinrogo.github.io/data/cards_count.json')
     container.append(recent);
   }
 
-  fetch(FEED_API)
+  fetch(FEED_URL, { cache: 'no-cache' })
     .then(response => {
       if (!response.ok) throw new Error(`Feed request failed: ${response.status}`);
       return response.json();
     })
     .then(data => {
-      if (data.status !== 'ok' || !Array.isArray(data.items)) {
-        throw new Error(data.message || 'The feed could not be parsed.');
+      if (data.schemaVersion !== 1 || !Array.isArray(data.items)) {
+        throw new Error('The saved feed could not be parsed.');
       }
 
       const posts = data.items.slice(0, POST_LIMIT).map(item => {

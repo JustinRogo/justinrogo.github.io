@@ -19,6 +19,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Restore last successful Pocket Part feed
+        uses: actions/cache/restore@v4
+        with:
+          path: data/pocket-part.json
+          key: pocket-part-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: pocket-part-
+
+      - name: Refresh Pocket Part feed
+        run: node scripts/update-pocket-part.mjs
+
+      - name: Save Pocket Part feed for future builds
+        uses: actions/cache/save@v4
+        with:
+          path: data/pocket-part.json
+          key: pocket-part-${{ github.run_id }}-${{ github.run_attempt }}
+
       - name: Refresh UCPEA Union Wire feed
         run: node "Pages/Work/UCPEA/update-union-wire.mjs"
 
