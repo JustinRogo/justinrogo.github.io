@@ -14,7 +14,6 @@ async function load() {
     if (preview) {
       posts = (await import('./preview.js')).previewPosts;
       document.querySelector('#preview-banner').hidden = false;
-      document.querySelector('.widget-heading a').href = '/updates?preview=1';
     } else {
       const response = await fetch('/api/updates?action=posts');
       const data = await response.json();
