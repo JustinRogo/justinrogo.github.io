@@ -14,7 +14,7 @@ OWN-WORLD: Inherit the homepage's navy, muted slate, warm orange accent, rounded
 
 STORY: Read recent posts, open a permanent link, and join its comments. The author signs in to write, save drafts, publish, and moderate.
 
-FIRST VIEWPORT: Compact navigation above a clear Updates heading; a wide chronological post column and a narrow author/subscription rail on desktop. Mobile places the rail after the feed. The iframe omits site navigation and shows three concise entries.
+FIRST VIEWPORT: Compact navigation above a clear Updates heading; chronological posts fill the available screen width inside responsive page gutters. Post metadata starts with the date, without a repeated author name. Subscription and embedding controls follow the feed at every viewport size, and the page footer contains only the main-site link. The iframe omits site navigation and shows three concise entries.
 
 FORM: Channel-style feed, explicitly established through the user's Teams comparison and single-author clarification. seed: none (precisely specified extension; no roll required). Signature interaction: opening a post reveals its discussion in place and updates its shareable URL.
 

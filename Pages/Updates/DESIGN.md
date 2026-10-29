@@ -99,7 +99,7 @@ The feed prioritizes readable writing and quiet dividers. Author operations use 
 
 **Key Characteristics:**
 
-- A wide reading column with a narrower supporting rail.
+- A full-width reading column with subscription and embedding controls below the feed.
 - Flat post rows; tonal panels for editing, notices, and dialogs.
 - Warm accent for primary actions and status emphasis; blue for reading links.
 - A compact widget that directs readers to the full post.
@@ -128,13 +128,13 @@ The extension uses the platform UI stack recorded above. The homepage separately
 
 The page title uses the responsive title token. Post titles use the responsive post-title token, becoming a fixed mobile size (1.5rem) below the narrow breakpoint. Section headings are compact (1.35rem); post subheadings have their own reading sizes (1.35rem and 1.1rem).
 
-Post copy uses the more open post-body leading and a maximum line length (72ch). Metadata is smaller and muted. Buttons have their own compact weight and leading. Widget body text starts smaller (14px); widget headings and excerpts are deliberately condensed (1rem and .86rem), while dates use tabular numerals.
+Post copy uses the more open post-body leading and fills the feed width, as requested for the full-width layout. Metadata is smaller and muted. Buttons have their own compact weight and leading. Widget body text starts smaller (14px); widget headings and excerpts are deliberately condensed (1rem and .86rem), while dates use tabular numerals.
 
 ## Layout
 
-The main wrapper is centered with a maximum width (1200px) and horizontal padding (48px). The header is a compact flex row with a minimum height (100px). The heading introduces the channel with vertical spacing (56px above, 40px below).
+The main wrapper fills the viewport width with horizontal padding (48px). The header is a compact flex row with a minimum height (100px). The heading introduces the channel with vertical spacing (56px above, 40px below).
 
-Desktop uses a flexible feed plus a fixed rail (224px) with a generous gap (60px). At widths up to 850px, wrapper padding becomes narrower (28px), the rail becomes smaller (190px), and the gap tightens (32px). At widths up to 640px, wrapper padding tightens again (20px), the header becomes shorter (80px), and the rail follows the feed in a single column. Heading actions stack below the title. Author actions wrap, tabs can scroll horizontally, and composer actions share the available width.
+The feed fills the available width, including post bodies. Subscription and embedding controls follow it with a generous gap (48px), arranged in two columns. At widths up to 850px, wrapper padding becomes narrower (28px) and the gap tightens (32px). At widths up to 640px, wrapper padding tightens again (20px), the header becomes shorter (80px), and the subscription controls stack in a single column. Heading actions stack below the title. Author actions wrap, tabs can scroll horizontally, and composer actions share the available width.
 
 Post rows use a top rule and generous vertical padding (28px above, 32px below); the mobile variant tightens both. Discussion has a separate top rule. The reading column can shrink without forcing horizontal overflow; long links and content wrap, while images retain their aspect ratio within the available width.
 
@@ -160,7 +160,7 @@ The shared action controls have a minimum height (42px). Primary hover brightens
 
 ### Feed and discussion
 
-Each post starts with author/date metadata, optional text status, a linked title, rich text, and a wrapping action row. Text status labels are unboxed, not chips. Opening a post updates the shareable URL and reveals its discussion in the reading column. Comments use separated rows, preserve entered line breaks, and show pending status in the accent color.
+Each post starts with date metadata, optional text status, a linked title, rich text, and a wrapping action row. The author name is omitted from post metadata and the page footer. Text status labels are unboxed, not chips. Opening a post updates the shareable URL and reveals its discussion in the reading column. Comments use separated rows, preserve entered line breaks, and show pending status in the accent color.
 
 ### Composer and fields
 
@@ -168,9 +168,9 @@ The composer is a tonal panel. Labels sit above full-width fields. Fields use a 
 
 Post options are collapsible. Save/publish actions align at the end of the desktop panel and stretch on mobile. Supporting save and upload messages occupy their own text space.
 
-### Navigation and supporting rail
+### Navigation and subscription footer
 
-The site name links home; the breadcrumb is hidden at the middle breakpoint. Author tabs indicate the current view through ink text and an accent underline. The rail combines the author mark, explanatory text, RSS, and a collapsed Confluence embedding disclosure. It becomes ordinary document flow beneath the feed on mobile.
+The site name links home; the breadcrumb is hidden at the middle breakpoint. Author tabs indicate the current view through ink text and an accent underline. Subscription controls sit beneath the feed on every screen size. They include RSS and a collapsed Confluence embedding disclosure, with signed-in account information below when present. The page footer links back to the main site.
 
 ### Notices and dialogs
 

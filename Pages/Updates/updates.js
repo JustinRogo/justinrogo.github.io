@@ -120,7 +120,6 @@ function renderPost(post, expanded) {
   const article = node('article', null, 'post');
   article.id = `post-${post.id}`;
   const meta = node('div', null, 'post-meta');
-  meta.append(node('strong', 'Justin Rogowski'));
   const time = node('time', date(post.published_at || post.updated_at));
   time.dateTime = post.published_at || post.updated_at;
   meta.append(time);
