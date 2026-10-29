@@ -11,12 +11,14 @@ const PAGE_TREE_FALLBACK = [
       { title: 'Game of Life - Ultimate Cosmos', href: 'Pages/For Fun/Game-of-Life.html' },
       { title: 'Midnight Tarot', href: 'Pages/For Fun/Tarot/index.html' },
       { title: 'Web Crawler', href: 'Pages/For Fun/Spider/index.html' },
+      { title: 'Wave Function Collapse', href: 'Pages/For Fun/Wave-Function-Collapse.html' },
       { title: 'UConn Law Library & IT - Multi-Gen Strategic Framework 2026', href: 'Pages/For Fun/StrategicFramework2.html' },
     ],
   },
   {
     title: 'Work',
     children: [
+      { title: 'AI Corner Blog', href: 'https://justinrogo.vercel.app/updates' },
       {
         title: 'CGS',
         children: [
@@ -27,7 +29,7 @@ const PAGE_TREE_FALLBACK = [
         title: 'Library',
         children: [
           { title: 'Front Desk Planner', href: 'Pages/Work/Library/Desk Planner/index.html' },
-          { title: 'Occupancy Heatmap Dashboard', href: 'Pages/Work/Library/heatmap.html' },
+          { title: 'Law Library Heatmap', href: 'Pages/Work/Library/heatmap.html' },
           { title: 'UConn School of Law Library Centennial Timeline', href: 'Pages/Work/Library/Timeline_LawLib.html' },
         ],
       },
@@ -85,21 +87,17 @@ function escapeHtml(value) {
 
   function renderNodes(nodes) {
     // Keep multi-page folders nested and promote single-page folders to links.
-    function renderGroup(node, path, depth) {
-      if (!collectPages(node.children || []).length) return '';
-      const headingId = `page-branch-${path}`;
-      const heading = `h${Math.min(3 + depth, 6)}`;
-      const children = [...node.children].sort((a, b) =>
+    function renderChildren(node, path, depth) {
+      const children = [...(node.children || [])].sort((a, b) =>
         Number(Boolean(a.href)) - Number(Boolean(b.href)) || a.title.localeCompare(b.title));
-      const indexPage = children.find(child => child.href && /(?:^|\/)index\.html$/i.test(child.path || child.href));
+      const indexPage = children.find(child => {
+        const directory = (child.path || child.href || '').match(/(?:^|\/)([^/]+)\/index\.html$/i)?.[1];
+        return child.href && directory === (node.pathPart || node.title);
+      });
       const folders = children.filter(child => !child.href);
       const pages = children.filter(child => child.href && child !== indexPage);
       const links = indexPage ? [{ ...indexPage, children: pages }] : pages;
-      return `<section class="page-branch${depth ? ' page-branch--nested' : ''}" aria-labelledby="${headingId}">
-        <div class="page-branch__header">
-          <${heading} id="${headingId}">${escapeHtml(node.title)}</${heading}>
-        </div>
-        <ul class="page-branch__items">
+      return `<ul class="page-branch__items">
           ${folders.map((child, index) => {
             const descendants = collectPages(child.children || []);
             if (!descendants.length) return '';
@@ -107,15 +105,43 @@ function escapeHtml(value) {
             return `<li class="page-branch__folder">${renderGroup(child, `${path}-${index}`, depth + 1)}</li>`;
           }).join('')}
           ${links.map(renderPage).join('')}
-        </ul>
+        </ul>`;
+    }
+
+    function renderGroup(node, path, depth) {
+      if (!collectPages(node.children || []).length) return '';
+      const headingId = `page-branch-${path}`;
+      const heading = `h${Math.min(3 + depth, 6)}`;
+      return `<section class="page-branch page-branch--nested" aria-labelledby="${headingId}">
+        <div class="page-branch__header"><${heading} id="${headingId}">${escapeHtml(node.title)}</${heading}></div>
+        ${renderChildren(node, path, depth)}
       </section>`;
     }
 
-    const groups = nodes.filter(node => !node.href)
-      .sort((a, b) => Number(b.title === 'Work') - Number(a.title === 'Work'));
-    const loosePages = nodes.filter(node => node.href);
-    if (loosePages.length) groups.push({ title: 'Other', children: loosePages });
-    return groups.map((node, index) => renderGroup(node, String(index), 0)).join('');
+    // Collections are navigation groupings; the existing file paths stay valid.
+    const work = { title: 'Work', description: 'Library tools, statutes & updates', children: [] };
+    const ucpea = { title: 'UCPEA', description: 'Union dashboard, contracts & resources', children: [] };
+    const fun = { title: 'For Fun', description: 'Creative experiments & simulations', children: [] };
+    for (const node of nodes) {
+      if (node.title === 'Work' && !node.href) {
+        for (const child of node.children || []) {
+          if (!child.href && child.title === 'UCPEA') ucpea.children.push(...(child.children || []));
+          else work.children.push(child);
+        }
+      } else if (node.title === 'For Fun' && !node.href) fun.children.push(...(node.children || []));
+      else if (node.title === 'Updates' && !node.href) work.children.push(...(node.children || []));
+      else work.children.push(node);
+    }
+    const groups = [work, ucpea, fun];
+    return groups.map((group, index) => {
+      return `<details class="page-collection">
+        <summary class="page-collection__summary">
+          <h3 class="page-collection__label"><span class="page-collection__title">${group.title}</span><span class="page-collection__description">${group.description}</span></h3>
+          <span class="page-collection__chevron" aria-hidden="true"></span>
+        </summary>
+        <div class="page-collection__body">${renderChildren(group, String(index), 0)}</div>
+      </details>`;
+    }).join('');
   }
 
   function titleFromPathPart(value) {

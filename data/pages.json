@@ -3,7 +3,7 @@
   "pages": [
     {
       "path": "Pages/Updates/index.html",
-      "title": "Updates",
+      "title": "AI Corner Blog",
       "category": "Posts & Discussion",
       "description": "Read Justin's updates and join the conversation.",
       "href": "https://justinrogo.vercel.app/updates"
@@ -40,7 +40,7 @@
     },
     {
       "path": "Pages/For Fun/Wave-Function-Collapse.html",
-      "title": "WFC Studio",
+      "title": "Wave Function Collapse",
       "category": "Generative Playground",
       "description": "Generate circuits, islands, and ribbons, or paint a sample to create your own patterns."
     },

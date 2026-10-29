@@ -1000,7 +1000,146 @@ body:not(.light) .eyebrow {
    =================================================================== */
 .page-tree {
   display: grid;
-  gap: clamp(22px, 4cqw, 32px);
+  gap: 0;
+}
+
+.page-directory {
+  --directory-accent: var(--orange);
+  padding: var(--gap);
+}
+
+body.light .page-directory {
+  --directory-accent: #a33b26;
+}
+
+.page-directory .page-link__category {
+  color: var(--directory-accent);
+}
+
+.page-directory__heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  padding-bottom: 22px;
+}
+
+.page-directory__heading h2 {
+  margin: 0;
+  font-size: clamp(1.55rem, 2.4vw, 1.9rem);
+  letter-spacing: -.025em;
+}
+
+.page-collection {
+  min-width: 0;
+  border-top: 1px solid var(--line-strong);
+}
+
+.page-collection__summary {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-height: 104px;
+  padding: 22px 4px 22px 32px;
+  list-style: none;
+  cursor: pointer;
+}
+
+.page-collection__summary::-webkit-details-marker {
+  display: none;
+}
+
+.page-collection__summary::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: calc(50% - 7px);
+  width: 14px;
+  height: 14px;
+  border: 3px solid var(--bg-2);
+  border-radius: 50%;
+  background: var(--orange);
+  box-shadow: 0 0 0 1px rgba(255, 126, 95, .4);
+}
+
+.page-collection[open] > .page-collection__summary::after {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: calc(50% + 7px);
+  bottom: 0;
+  width: 1px;
+  background: rgba(255, 126, 95, .55);
+}
+
+.page-collection__label {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  gap: 5px;
+  margin: 0;
+}
+
+.page-collection__title {
+  color: var(--text-strong);
+  font: 700 1.55rem/1.2 'Fraunces', Georgia, serif;
+}
+
+.page-collection__description {
+  color: var(--muted);
+  font: 400 .82rem/1.5 'Space Grotesk', sans-serif;
+}
+
+.page-collection__summary:hover .page-collection__title {
+  color: var(--directory-accent);
+}
+
+.page-collection__chevron {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  margin-right: 4px;
+  border-top: 1px solid var(--muted);
+  border-right: 1px solid var(--muted);
+  transform: rotate(45deg);
+  transition: transform var(--speed) ease;
+}
+
+.page-collection[open] > .page-collection__summary .page-collection__chevron {
+  transform: rotate(135deg);
+}
+
+.page-collection__body {
+  position: relative;
+  padding: 0 0 24px 28px;
+}
+
+.page-collection__body::before {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 0;
+  bottom: 42px;
+  width: 1px;
+  background: linear-gradient(180deg, rgba(255, 126, 95, .55), rgba(255, 126, 95, .16));
+}
+
+.page-collection__body > .page-branch__items {
+  margin-top: 0;
+}
+
+@media(max-width:600px) {
+  .page-collection__summary { gap: 12px; padding-left: 28px; }
+  .page-collection__title { font-size: 1.35rem; }
+  .page-collection__body { padding-left: 22px; }
+  .page-collection__body > .page-branch__items > li::before { left: -15px; width: 15px; }
+  .page-directory .page-branch { padding-left: 20px; }
+  .page-directory .page-branch__header::before { left: -20px; }
+  .page-directory .page-branch::before { left: 7px; }
+  .page-directory .page-branch__children { margin-left: 8px; padding-left: 12px; }
+  .page-directory .page-branch__children li::before { left: -12px; width: 12px; }
 }
 
 .page-branch {
@@ -1047,7 +1186,7 @@ body:not(.light) .eyebrow {
   margin: 0;
 }
 
-/* Retain real folder nesting, including Work > UCPEA > individual pages. */
+/* Retain folder nesting inside collections and the dashboard's child pages. */
 .page-branch--nested {
   margin-block: 6px 12px;
 }

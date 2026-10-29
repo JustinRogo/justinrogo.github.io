@@ -40,7 +40,7 @@
   <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Space+Grotesk:wght@400;600;700&display=swap" />
 
-  <link rel="stylesheet" href="style.css?v=20261022-page-order" />
+  <link rel="stylesheet" href="style.css?v=20261029-pages-projects" />
 </head>
 
 <body>
@@ -253,16 +253,13 @@
     <!-- ========== Main ========== -->
     <main>
 
-      <!-- Page Tree -->
-      <details class="card glass widget collapsible-widget" id="page-directory">
-        <summary class="collapsible-widget__summary">
-          <h2>Pages</h2>
-          <span class="collapsible-widget__icon" aria-hidden="true"></span>
-        </summary>
-        <div class="collapsible-widget__body">
-          <div class="page-tree" id="pageTree"></div>
-        </div>
-      </details>
+      <!-- Collections stay visible; each opens its familiar page tree. -->
+      <section class="card surface widget page-directory" id="page-directory" aria-labelledby="page-directory-heading">
+        <header class="page-directory__heading">
+          <h2 id="page-directory-heading">Pages &amp; Projects</h2>
+        </header>
+        <nav class="page-tree" id="pageTree" aria-label="Site collections"></nav>
+      </section>
 
       <!-- Tabs Deck -->
       <section class="card glass tabs" aria-label="Widgets">
@@ -453,7 +450,7 @@
     </div>
   </nav>
 
-  <script src="main.js?v=20261026-pocket-part" defer></script>
+  <script src="main.js?v=20261029-pages-projects" defer></script>
 </body>
 
 </html>
