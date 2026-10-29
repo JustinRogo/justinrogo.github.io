@@ -128,13 +128,15 @@ The extension uses the platform UI stack recorded above. The homepage separately
 
 The page title uses the responsive title token. Post titles use the responsive post-title token, becoming a fixed mobile size (1.5rem) below the narrow breakpoint. Section headings are compact (1.35rem); post subheadings have their own reading sizes (1.35rem and 1.1rem).
 
-Post copy uses the more open post-body leading and fills the feed width, as requested for the full-width layout. Metadata is smaller and muted. Buttons have their own compact weight and leading. Widget body text starts smaller (14px); widget headings and excerpts are deliberately condensed (1rem and .86rem), while dates use tabular numerals.
+Post copy uses the more open post-body leading. Text-only posts fill the feed width; posts with attachments reserve one quarter of the available grid width for media on wide screens. Metadata is smaller and muted. Buttons have their own compact weight and leading. Widget body text starts smaller (14px); widget headings and excerpts are deliberately condensed (1rem and .86rem), while dates use tabular numerals.
 
 ## Layout
 
 The main wrapper fills the viewport width with horizontal padding (48px). The header is a compact flex row with a minimum height (100px). The heading introduces the channel with vertical spacing (56px above, 40px below).
 
-The feed fills the available width, including post bodies. Subscription and embedding controls follow it with a generous gap (48px), arranged in two columns. At widths up to 850px, wrapper padding becomes narrower (28px) and the gap tightens (32px). At widths up to 640px, wrapper padding tightens again (20px), the header becomes shorter (80px), and the subscription controls stack in a single column. Heading actions stack below the title. Author actions wrap, tabs can scroll horizontally, and composer actions share the available width.
+The feed fills the available width. At viewport widths of 1100px and above, posts with text and attached videos or link cards use a 3:1 grid with a 32px gap, placing the media stack to the right of the body. Titles, metadata, actions, and discussion span the post width. Link-card thumbnails shrink to 72px in the media column, and video players keep a 16:9 aspect ratio. At narrower widths, media stacks below the text with a 24px gap; posts without attachments retain the full-width body. Media-only posts use at most 580px on wide screens.
+
+Subscription and embedding controls follow the feed with a generous gap (48px), arranged in two columns. At widths up to 850px, wrapper padding becomes narrower (28px) and the gap tightens (32px). At widths up to 640px, wrapper padding tightens again (20px), the header becomes shorter (80px), and the subscription controls stack in a single column. Heading actions stack below the title. Author actions wrap, tabs can scroll horizontally, and composer actions share the available width.
 
 Post rows use a top rule and generous vertical padding (28px above, 32px below); the mobile variant tightens both. Discussion has a separate top rule. The reading column can shrink without forcing horizontal overflow; long links and content wrap, while images retain their aspect ratio within the available width.
 
@@ -160,7 +162,7 @@ The shared action controls have a minimum height (42px). Primary hover brightens
 
 ### Feed and discussion
 
-Each post starts with date metadata, optional text status, a linked title, rich text, and a wrapping action row. The author name is omitted from post metadata and the page footer. Text status labels are unboxed, not chips. Opening a post updates the shareable URL and reveals its discussion in the reading column. Comments use separated rows, preserve entered line breaks, and show pending status in the accent color.
+Each post starts with date metadata, optional text status, a linked title, rich text, and a wrapping action row. The author name is omitted from post metadata and the page footer. Text status labels are unboxed, not chips. Opening a post updates the shareable URL and reveals its discussion in the reading column. Comments use separated rows and preserve entered line breaks. The form's **Post comment** action publishes immediately. Older pending comments still show pending status in the accent color and can be handled in the author's queue.
 
 ### Composer and fields
 

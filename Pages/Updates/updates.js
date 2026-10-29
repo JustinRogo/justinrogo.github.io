@@ -53,7 +53,18 @@ function sanitizedBody(body) {
 function safeBody(body) {
   const div = sanitizedBody(body);
   upgradeEmbeds(div);
-  return div;
+  const content = node('div', null, 'post-content');
+  const embeds = [...div.querySelectorAll('.post-embed')];
+  if (!embeds.length) return div;
+  const media = node('aside', null, 'post-media');
+  media.setAttribute('aria-label', 'Related videos and links');
+  media.append(...embeds);
+  if (div.textContent.trim() || div.querySelector('img')) {
+    content.classList.add('has-media');
+    content.append(div);
+  }
+  content.append(media);
+  return content;
 }
 function empty(title, message, retry) {
   const div = node('div', null, 'empty-state');
@@ -197,19 +208,19 @@ async function loadComments(post, target) {
     try { name.value = localStorage.getItem('updates-comment-name') || ''; } catch { /* Storage is optional. */ }
     const bodyLabel = node('label', 'Add a comment'); bodyLabel.htmlFor = bodyId;
     const text = node('textarea'); text.id = bodyId; text.rows = 3; text.maxLength = 4000; text.required = true;
-    const submit = node('button', 'Submit for approval', 'primary-button'); submit.type = 'submit';
-    const status = node('p', 'Comments appear publicly after approval.', 'field-help'); status.setAttribute('role', 'status');
+    const submit = node('button', 'Post comment', 'primary-button'); submit.type = 'submit';
+    const status = node('p', 'Comments appear publicly as soon as you post.', 'field-help'); status.setAttribute('role', 'status');
     form.append(nameLabel, name, bodyLabel, text, submit, status);
     form.addEventListener('submit', async event => {
       event.preventDefault(); submit.disabled = true;
       try {
         const body = { post_id: post.id, body: text.value.trim(), author_name: name.value.trim() };
         if (!body.body || !body.author_name) throw new Error('Enter your name and a comment.');
-        if (preview) previewComments.set(post.id, [...(previewComments.get(post.id) || []), { ...body, id: crypto.randomUUID(), user_id: 'preview', status: 'pending', created_at: new Date().toISOString() }]);
+        if (preview) previewComments.set(post.id, [...(previewComments.get(post.id) || []), { ...body, id: crypto.randomUUID(), user_id: 'preview', status: 'approved', created_at: new Date().toISOString() }]);
         else await api('comments', { method: 'POST', body });
         try { localStorage.setItem('updates-comment-name', body.author_name); } catch { /* Storage is optional. */ }
         await loadComments(post, target);
-        notice(preview ? 'Preview comment added locally. Nothing was published.' : 'Your comment was sent for approval.');
+        notice(preview ? 'Preview comment added locally. Nothing was published.' : 'Your comment is now posted.');
       } catch (error) { status.textContent = error.message; submit.disabled = false; }
     });
     target.append(form);
@@ -221,7 +232,7 @@ async function renderModeration() {
   const { comments } = preview ? { comments: [...previewComments.values()].flat().filter(c => c.status === 'pending') } : await api('moderation');
   const feed = $('#feed');
   feed.replaceChildren();
-  if (!comments.length) feed.append(empty('All caught up', 'New comments will wait here for your approval.'));
+  if (!comments.length) feed.append(empty('All caught up', 'No older comments are waiting for approval. New comments publish immediately.'));
   for (const comment of comments) {
     const article = node('article', null, 'moderation-item');
     article.append(node('h2', comment.author_name), node('p', date(comment.created_at), 'field-help'), node('p', comment.body));

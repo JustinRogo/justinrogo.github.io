@@ -53,7 +53,7 @@ create table public.updates_comments (
   user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
   author_name text not null check (char_length(author_name) between 1 and 80),
   body text not null check (char_length(body) between 1 and 4000),
-  status text not null default 'pending' check (status in ('pending', 'approved')),
+  status text not null default 'approved' check (status in ('pending', 'approved')),
   created_at timestamptz not null default now()
 );
 create index updates_comments_post on public.updates_comments (post_id, created_at);
@@ -66,9 +66,9 @@ create policy "Read visible comments" on public.updates_comments
       and (status = 'approved' or user_id = auth.uid())
     )
   );
-create policy "Signed in readers submit pending comments" on public.updates_comments
+create policy "Signed in readers publish comments" on public.updates_comments
   for insert to authenticated with check (
-    user_id = auth.uid() and status = 'pending'
+    user_id = auth.uid() and status = 'approved'
     and exists (select 1 from public.updates_posts p
       where p.id = post_id and p.status = 'published' and p.comments_enabled)
   );
@@ -87,6 +87,7 @@ begin
     raise exception 'Please wait 30 seconds before adding another comment.';
   end if;
   new.created_at := now();
+  new.status := 'approved';
   return new;
 end; $$;
 create trigger updates_comment_guard before insert on public.updates_comments

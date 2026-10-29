@@ -110,7 +110,7 @@ The site uses a custom CSS system with:
 
 ### Updates channel
 
-The Vercel-hosted `/updates` section adds rich text posts, author-only publishing, drafts, moderated reader comments, image uploads, and RSS. `/updates/embed` is a compact read-only iframe for `https://uconn.atlassian.net`. This feature requires a **separate Supabase project** and Vercel environment variables; setup is documented in [`docs/updates-setup.md`](docs/updates-setup.md).
+The Vercel-hosted `/updates` section adds rich text posts, author-only publishing, drafts, reader comments that publish immediately, image uploads, and RSS. `/updates/embed` is a compact read-only iframe for `https://uconn.atlassian.net`. This feature requires a **separate Supabase project** and Vercel environment variables; setup and the existing-project comment migration are documented in [`docs/updates-setup.md`](docs/updates-setup.md).
 
 Run `npm ci` and `npm run dev`, then visit `/updates?preview=1` for a labeled local author preview without database credentials. The existing static site still needs no build step for GitHub Pages; the Vercel build bundles this new section's dependencies and preserves the public site roots.
 

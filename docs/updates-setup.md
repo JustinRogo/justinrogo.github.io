@@ -1,6 +1,6 @@
 # Updates: Vercel + a separate Supabase project
 
-The implementation adds a public rich text channel, author-only publishing, authenticated moderated comments, public image uploads by the author, an RSS feed, and a small read-only iframe for **https://uconn.atlassian.net**.
+The implementation adds a public rich text channel, author-only publishing, authenticated comments that publish immediately, public image uploads by the author, an RSS feed, and a small read-only iframe for **https://uconn.atlassian.net**.
 
 It does not use the Front Desk Planner's Supabase project. No posts or user accounts are created by the repository code. The preview uses explicitly labeled example posts and never writes to Supabase.
 
@@ -12,6 +12,12 @@ It does not use the Front Desk Planner's Supabase project. No posts or user acco
 4. Enable email sign-in. Configure custom SMTP for sending sign-in links to real readers. Supabase's default mail service is restricted and is for testing, so a successful author test alone does not establish that other readers can receive links.
 
 Public posts and uploaded images are accessible outside Confluence too. Draft text stays private. Images uploaded while drafting go into the public bucket; do not upload confidential images. Closing comments preserves already approved comments.
+
+### Existing projects: enable immediate comments
+
+Before deploying the updated app, run `supabase/migrations/20261029_publish_comments_immediately.sql` in the existing Updates project's SQL editor. Do not rerun the initial schema. The migration changes the comment default, insert policy, and submission trigger so new comments are immediately public, including submissions from the previous app during deployment. Sign-in, the 30-second per-account throttle, closed-comment restrictions, and author/commenter deletion permissions remain in effect.
+
+Existing pending comments remain in **Comment queue** for the author to approve or delete. The migration can safely be run again. New projects using the current `supabase/updates.sql` already include these rules.
 
 ## 2. Configure Vercel
 
@@ -60,6 +66,8 @@ In the editor, paste a link into your text and choose **Add preview** below the 
 
 Only the author can request metadata. The server reads a public HTTPS page's Open Graph/title metadata, with size/time limits and public-address validation on every redirect. Sites that block preview requests get a simple text card. YouTube titles come from its public oEmbed endpoint; players use youtube-nocookie.com, have no autoplay, and retain a **Watch on YouTube** fallback for videos that disallow embedding. No YouTube API key is needed.
 
+At viewport widths of 1100 px and above, posts with text and attached previews use a 3:1 layout: text on the left and a compact stack of videos and link cards on the right, separated by a 32 px gap. Narrower screens stack previews below the text. Posts without previews retain the full reading width.
+
 Previews are stored as validated markers alongside the existing rich text body, so **no Supabase migration is needed**. Existing posts remain unchanged. The RSS feed carries a normal link fallback, and the small Confluence widget continues to show excerpts. Remote thumbnails and players load from their providers when displayed.
 
 ## RSS and permanent links
@@ -87,6 +95,6 @@ npm.cmd run test:updates
 npm.cmd run build
 ```
 
-Before using it with readers, verify with two real accounts: only the allowlisted author can publish/moderate; a reader can submit but not approve comments; signed-out visitors cannot read drafts or pending comments; images upload; the production RSS is valid; and the live widget appears in Confluence. Database policies and mail delivery require verification against the configured project.
+Before using it with readers, verify with two real accounts: only the allowlisted author can publish/moderate; a reader's new comment appears immediately to a signed-out visitor; readers cannot change comments or delete other readers' comments; the comment throttle and closed-comment restrictions still apply; signed-out visitors cannot read drafts or older pending comments; images upload; the production RSS is valid; and the live widget appears in Confluence. Database policies and mail delivery require verification against the configured project.
 
 GitHub Pages continues serving the existing site. It cannot run the new API; the navigation entry points to the Vercel channel. The existing GitHub Actions feed/Trello refreshes are independent of Vercel and are not replaced by this feature.

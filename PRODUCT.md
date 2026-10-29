@@ -24,7 +24,7 @@ Updates supports optional link-preview cards and inline YouTube videos, followin
 
 Confirmed: rich text posts, comments, an RSS feed, and a compact iframe view for Confluence Cloud at https://uconn.atlassian.net. Updates must use a separate Supabase project from the Front Desk Planner.
 
-Implementation decisions: public published posts; author-only publishing; authenticated, moderated comments; drafts excluded from public endpoints and RSS. Credentials and database setup must be supplied through the documented deployment setup, never embedded in source.
+Implementation decisions: public published posts; author-only publishing; authenticated comments that publish immediately, with a 30-second per-account throttle; drafts excluded from public endpoints and RSS. Older pending comments retain the author's approval queue. On wide screens, post text and attached media use a 75/25 split. Credentials and database setup must be supplied through the documented deployment setup, never embedded in source.
 
 ## Evidence on Hand
 

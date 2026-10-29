@@ -120,7 +120,7 @@ export default async function handler(req, res) {
       const name = String(body.author_name || '').trim();
       if (!text || text.length > 4000 || !name || name.length > 80) throw fail(400, 'Enter your name and a comment of up to 4,000 characters.');
       const comment = dbResult(await client.from('updates_comments').insert({
-        post_id: validId(body.post_id), user_id: user.id, author_name: name, body: text, status: 'pending'
+        post_id: validId(body.post_id), user_id: user.id, author_name: name, body: text, status: 'approved'
       }).select(COMMENT_FIELDS).single());
       return res.status(201).json({ comment });
     }

@@ -136,6 +136,24 @@ test('public feed requests explicitly filter drafts and return sanitized posts',
   assert.equal(result.body.posts.length, 1);
   assert.equal(result.body.posts[0].author_id, undefined);
 });
+
+test('comment submissions publish immediately using the authenticated identity', async () => {
+  const auth = mockSupabase();
+  const result = await request('/api/updates?action=comments', {
+    method: 'POST', token: 'reader-token',
+    body: { post_id: id, author_name: ' Reader ', body: ' A comment ', status: 'pending', user_id: 'spoofed-user' },
+    fetcher: async (input, options = {}) => {
+      const url = new URL(typeof input === 'string' ? input : input.url);
+      if (url.pathname !== '/rest/v1/updates_comments') return auth(input, options);
+      assert.equal(options.method, 'POST');
+      const saved = JSON.parse(options.body);
+      assert.deepEqual(saved, { post_id: id, user_id: id, author_name: 'Reader', body: 'A comment', status: 'approved' });
+      return Response.json({ ...saved, id: 'new-comment', created_at: '2026-10-29T12:00:00Z' }, { status: 201 });
+    }
+  });
+  assert.equal(result.statusCode, 201);
+  assert.equal(result.body.comment.status, 'approved');
+});
 test('invalid post links and unsupported methods return clear errors', async () => {
   const invalid = await request('/api/updates?action=posts&id=not-a-uuid');
   assert.equal(invalid.statusCode, 400);
