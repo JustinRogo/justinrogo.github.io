@@ -106,6 +106,8 @@ The site uses a custom CSS system with:
 - Accessible tab interactions
 - Mobile-friendly quick contact buttons
 
+The homepage adapts [React Bits Spotlight Card](https://reactbits.dev/components/spotlight-card) into pointer lighting on the Pages & Projects collection rows. Its moving widget-tab selection is inspired by [Gooey Nav](https://reactbits.dev/components/gooey-nav), with a simple sliding highlight in place of particles. Both use the existing CSS and vanilla JavaScript, with no new runtime dependencies. Pointer lighting is limited to mouse input and stops under reduced motion; keyboard users receive a static highlight and focus outline. The tab indicator follows the mobile grid and disables movement under reduced motion. Attribution and the upstream license are in [`assets/react-bits-LICENSE.txt`](assets/react-bits-LICENSE.txt).
+
 ## Notable project pages
 
 ### Updates channel

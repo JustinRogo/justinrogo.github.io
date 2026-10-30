@@ -136,6 +136,7 @@ function escapeHtml(value) {
     return groups.map((group, index) => {
       return `<details class="page-collection">
         <summary class="page-collection__summary">
+          <span class="page-collection__spotlight" aria-hidden="true"></span>
           <h3 class="page-collection__label"><span class="page-collection__title">${group.title}</span><span class="page-collection__description">${group.description}</span></h3>
           <span class="page-collection__chevron" aria-hidden="true"></span>
         </summary>
@@ -229,6 +230,56 @@ function escapeHtml(value) {
     .catch(() => {
       mount.innerHTML = renderNodes(PAGE_TREE_FALLBACK);
     });
+})();
+
+/* ===================================================================
+   Collection spotlight — adapted from React Bits Spotlight Card.
+   https://reactbits.dev/components/spotlight-card
+   Copyright (c) 2026 David Haz. See assets/react-bits-LICENSE.txt.
+   Delegation also covers the asynchronously loaded and fallback trees.
+   =================================================================== */
+(function initCollectionSpotlight() {
+  const tree = document.getElementById('pageTree');
+  if (!tree) return;
+  const finePointer = matchMedia('(hover: hover) and (pointer: fine)');
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  let frame = 0;
+  let current = null;
+  let pointer = null;
+
+  function clear() {
+    cancelAnimationFrame(frame);
+    frame = 0;
+    current?.classList.remove('is-spotlit');
+    current = null;
+    pointer = null;
+  }
+
+  tree.addEventListener('pointermove', event => {
+    if (!finePointer.matches || reducedMotion.matches || event.pointerType !== 'mouse') return;
+    const summary = event.target.closest('.page-collection__summary');
+    if (!summary) { clear(); return; }
+    if (current !== summary) {
+      clear();
+      current = summary;
+    }
+    pointer = { x: event.clientX, y: event.clientY };
+    if (frame) return;
+    frame = requestAnimationFrame(() => {
+      frame = 0;
+      const rect = current.getBoundingClientRect();
+      current.style.setProperty('--spotlight-x', `${pointer.x - rect.left}px`);
+      current.style.setProperty('--spotlight-y', `${pointer.y - rect.top}px`);
+      current.classList.add('is-spotlit');
+    });
+  }, { passive: true });
+
+  tree.addEventListener('pointerleave', clear);
+  tree.addEventListener('pointercancel', clear);
+  window.addEventListener('scroll', clear, { passive: true });
+  window.addEventListener('blur', clear);
+  finePointer.addEventListener('change', clear);
+  reducedMotion.addEventListener('change', clear);
 })();
 
 /* ===================================================================
@@ -926,8 +977,60 @@ fetch('https://justinrogo.github.io/data/cards_count.json')
    Tabs + Lazy Iframe Load
    =================================================================== */
 (function initTabs() {
-  const tabs = [...document.querySelectorAll('.tab')];
-  const panels = [...document.querySelectorAll('.tabpanel')];
+  const tablist = document.querySelector('.tablist');
+  if (!tablist) return;
+  const tabs = [...tablist.querySelectorAll('.tab')];
+  const panels = [...tablist.closest('.tabs').querySelectorAll('.tabpanel')];
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+
+  // A quiet take on React Bits' moving navigation selection. Keep the
+  // original selected-tab styling as the fallback until geometry is ready.
+  const indicator = document.createElement('span');
+  indicator.className = 'tab-indicator';
+  indicator.setAttribute('aria-hidden', 'true');
+  tablist.prepend(indicator);
+
+  function positionIndicator(animate = false) {
+    const active = tabs.find(tab => tab.getAttribute('aria-selected') === 'true');
+    if (!active || !active.offsetWidth) return;
+    const previous = indicator.getBoundingClientRect();
+    const ready = tablist.classList.contains('has-indicator');
+    indicator.getAnimations().forEach(animation => animation.cancel());
+    const x = active.offsetLeft;
+    const y = active.offsetTop;
+    const width = active.offsetWidth;
+    const height = active.offsetHeight;
+    const transform = `translate(${x}px, ${y}px)`;
+    indicator.style.width = `${width}px`;
+    indicator.style.height = `${height}px`;
+    indicator.style.transform = transform;
+    tablist.classList.add('has-indicator');
+
+    if (animate && ready && !reducedMotion.matches) {
+      const box = tablist.getBoundingClientRect();
+      const fromX = previous.left - box.left - tablist.clientLeft + tablist.scrollLeft;
+      const fromY = previous.top - box.top - tablist.clientTop + tablist.scrollTop;
+      indicator.animate([
+        { transform: `translate(${fromX}px, ${fromY}px) scale(${previous.width / width}, ${previous.height / height})` },
+        { transform },
+      ], { duration: 300, easing: 'cubic-bezier(0.16, 1, 0.3, 1)' });
+    }
+  }
+
+  let resizeFrame = 0;
+  function schedulePosition() {
+    cancelAnimationFrame(resizeFrame);
+    resizeFrame = requestAnimationFrame(() => positionIndicator());
+  }
+  if (typeof ResizeObserver !== 'undefined') {
+    const observer = new ResizeObserver(() => positionIndicator());
+    [tablist, ...tabs].forEach(element => observer.observe(element));
+  } else {
+    window.addEventListener('resize', schedulePosition);
+  }
+  document.fonts?.ready.then(schedulePosition);
+  reducedMotion.addEventListener('change', schedulePosition);
+  positionIndicator();
 
   function showPanel(id, btn) {
     panels.forEach(p => {
@@ -943,6 +1046,7 @@ fetch('https://justinrogo.github.io/data/cards_count.json')
       b.setAttribute('aria-selected', on ? 'true' : 'false');
       b.tabIndex = on ? 0 : -1;
     });
+    positionIndicator(true);
     btn.focus();
   }
 

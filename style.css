@@ -593,7 +593,7 @@ body:not(.light) .chip {
     width: 100%;
   }
 
-  .tab:last-child:nth-child(odd) {
+  .tab:last-of-type:nth-of-type(odd) {
     grid-column: 1 / -1;
   }
 }
@@ -1051,6 +1051,38 @@ body.light .page-directory {
   display: none;
 }
 
+/* React Bits Spotlight Card, adapted for the existing collection rows.
+   Copyright (c) 2026 David Haz. See assets/react-bits-LICENSE.txt. */
+.page-collection__spotlight {
+  position: absolute;
+  inset: 1px 0;
+  border-radius: 8px;
+  pointer-events: none;
+  background: radial-gradient(260px circle at var(--spotlight-x, 50%) var(--spotlight-y, 50%),
+    rgba(255, 126, 95, .14), transparent 75%);
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+body.light .page-collection__spotlight {
+  background: radial-gradient(260px circle at var(--spotlight-x, 50%) var(--spotlight-y, 50%),
+    rgba(163, 59, 38, .09), transparent 75%);
+}
+
+.page-collection__summary:is(.is-spotlit, :focus-visible) > .page-collection__spotlight {
+  opacity: 1;
+}
+
+.page-collection__summary:focus-visible {
+  outline: 2px solid var(--directory-accent);
+  outline-offset: -2px;
+  border-radius: 8px;
+}
+
+.page-collection__summary:focus-visible .page-collection__title {
+  color: var(--directory-accent);
+}
+
 .page-collection__summary::before {
   content: '';
   position: absolute;
@@ -1075,6 +1107,7 @@ body.light .page-directory {
 }
 
 .page-collection__label {
+  position: relative;
   display: grid;
   flex: 1;
   min-width: 0;
@@ -1097,6 +1130,7 @@ body.light .page-directory {
 }
 
 .page-collection__chevron {
+  position: relative;
   flex: 0 0 auto;
   width: 8px;
   height: 8px;
@@ -2742,6 +2776,35 @@ body .ulsw input[type="text"] {
   }
 }
 /* ================= END REFRACTIVE-GLASS SYSTEM ===================== */
+
+/* Moving tab selection, inspired by React Bits navigation components.
+   Geometry follows the active button in both the row and mobile grid. */
+.tab-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  pointer-events: none;
+  transform-origin: top left;
+  border: 1px solid var(--glass-border-hover);
+  border-radius: calc(var(--radius-sm) - 4px);
+  background: var(--glass-active-bg);
+  box-shadow: inset 0 -2px 0 var(--cyan), inset 0 1px 0 var(--glass-highlight-strong);
+}
+
+.tablist.has-indicator > .tab {
+  z-index: 1;
+}
+
+.tablist.has-indicator > .tab[aria-selected="true"] {
+  --_glass-bg: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.tablist.has-indicator > .tab[aria-selected="true"]::before {
+  box-shadow: none;
+}
 
 /* ===================================================================
    Reduced Motion Accessibility Rules
