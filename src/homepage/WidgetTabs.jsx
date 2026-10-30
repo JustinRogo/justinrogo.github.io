@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { mountCliftonStrengths, mountULSW } from './legacy-widgets.js';
 import { useTabIndicator } from './effects.js';
+import { GlassMaterial } from './GlassMaterial.jsx';
 
 const TABS = [
   { id: 'cal', label: 'My Calendar', title: "Today's Schedule", src: 'https://outlook.office365.com/calendar/published/3ca52ff81f8a440699723f09efe5d298@uconn.edu/66bd7da89640440591f449ae5ce4fcc514733372329545515702/calendar.html' },
@@ -89,6 +90,7 @@ export function WidgetTabs() {
   }
 
   return <section ref={sectionRef} className="card glass tabs" aria-label="Widgets">
+    <GlassMaterial />
     <div ref={tablistRef} className="tablist glass glass--strong" role="tablist" aria-label="Widget tabs">
       <span ref={indicatorRef} className="tab-indicator" aria-hidden="true" />
       {TABS.map((tab, index) => <button key={tab.id} ref={element => { buttonsRef.current[tab.id] = element; }} type="button"

@@ -256,7 +256,7 @@ test('an unavailable embedded service does not prevent tab navigation or the req
 });
 
 test('production includes static assets and preserves standalone paths and Updates aliases', async ({ request }) => {
-  for (const file of ['/assets/homepage.js', '/assets/homepage.js.LEGAL.txt', '/assets/react-LICENSE.txt', '/assets/react-dom-LICENSE.txt', '/assets/scheduler-LICENSE.txt', '/assets/react-bits-LICENSE.txt', '/main.js', '/style.css']) {
+  for (const file of ['/assets/homepage.js', '/assets/homepage.css', '/assets/homepage.js.LEGAL.txt', '/assets/react-LICENSE.txt', '/assets/react-dom-LICENSE.txt', '/assets/scheduler-LICENSE.txt', '/assets/react-bits-LICENSE.txt', '/main.js', '/style.css']) {
     expect((await request.get(file)).ok(), file).toBe(true);
   }
   for (const entry of manifest.pages) {
@@ -282,4 +282,150 @@ test('built file previews load React and the curated directory without fetching 
   await page.locator('.page-collection summary').last().click();
   await expect(page.getByRole('link', { name: 'Midnight Tarot' })).toBeVisible();
   expect(manifestRequests).toBe(0);
+});
+
+test('Glass Surface enhances six shells without filtering content or duplicating SVG IDs', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await open(page);
+  await expect(page.locator('.homepage-glass')).toHaveCount(6);
+  await expect(page.locator('.glass-surface--svg')).toHaveCount(6);
+  await expect(page.locator('.glass-material[aria-hidden="true"][inert]')).toHaveCount(6);
+  expect(await page.locator('.homepage-glass').evaluateAll(elements => elements.every(element =>
+    getComputedStyle(element).backdropFilter === 'none' && getComputedStyle(element).filter === 'none'))).toBe(true);
+  expect(await page.evaluate(() => {
+    const ids = [...document.querySelectorAll('[id]')].map(element => element.id);
+    return ids.filter((id, index) => ids.indexOf(id) !== index);
+  })).toEqual([]);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(page.locator('.glass-surface--fallback')).toHaveCount(6);
+  await expect(page.locator('.glass-surface--svg')).toHaveCount(0);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await expect(page.locator('.glass-surface--svg')).toHaveCount(6);
+  await expect.poll(() => page.locator('#page-directory .glass-material .glass-surface').evaluate(element => {
+    const href = element.querySelector('feImage').getAttribute('href');
+    const map = decodeURIComponent(href.split(',')[1]);
+    const width = Number(map.match(/<svg width="([\d.]+)"/)[1]);
+    return Math.abs(width - element.getBoundingClientRect().width);
+  })).toBeLessThan(1);
+});
+
+test('Glass Surface responds to reduced motion and increased contrast without animations', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await open(page);
+  await expect(page.locator('.glass-surface--svg')).toHaveCount(6);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await expect(page.locator('.glass-surface--fallback')).toHaveCount(6);
+  expect(await page.locator('.glass-material').evaluateAll(elements => elements.every(element =>
+    element.getAnimations({ subtree: true }).length === 0))).toBe(true);
+  await page.emulateMedia({ reducedMotion: 'no-preference', contrast: 'more' });
+  await expect(page.locator('.glass-surface--fallback')).toHaveCount(6);
+  expect(await page.locator('.glass-material > .glass-surface').evaluateAll(elements => elements.every(element => {
+    const style = getComputedStyle(element);
+    return style.backdropFilter === 'none' && /^rgb\(/.test(style.backgroundColor);
+  }))).toBe(true);
+});
+
+test('Glass Surface selects the frosted fallback when upstream disables SVG filters', async ({ browser }) => {
+  // Exercise the upstream feature branch, rather than claiming a Firefox run.
+  const context = await browser.newContext({
+    viewport: { width: 1440, height: 1000 },
+    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0',
+  });
+  const page = await context.newPage();
+  await page.route('https://**/*', route => route.fulfill({ body: '' }));
+  await open(page);
+  await expect(page.locator('.glass-surface--fallback')).toHaveCount(6);
+  await expect(page.locator('.glass-surface--svg')).toHaveCount(0);
+  await page.locator('#viewStrengthsBtn').click();
+  await expect(page.locator('#tab-cs')).toBeVisible();
+  await context.close();
+});
+
+test('Antigravity renders the requested 1050 tetrahedrons and survives resizing', async ({ page }) => {
+  await page.addInitScript(() => {
+    window.backgroundFrames = 0;
+    const draw = WebGL2RenderingContext.prototype.drawArraysInstanced;
+    WebGL2RenderingContext.prototype.drawArraysInstanced = function (...args) {
+      if (this.canvas.matches('.antigravity__canvas')) {
+        window.backgroundFrames++;
+        window.backgroundCount = args[3];
+      }
+      return draw.apply(this, args);
+    };
+  });
+  await open(page);
+  await expect(page.locator('.site-background__layers')).toHaveAttribute('data-background-state', 'active');
+  await expect.poll(() => page.evaluate(() => window.backgroundFrames)).toBeGreaterThan(1);
+  expect(await page.evaluate(() => window.backgroundCount)).toBe(1050);
+  const uniforms = await page.locator('.antigravity__canvas').evaluate(canvas => {
+    const gl = canvas.getContext('webgl2');
+    const program = gl.getParameter(gl.CURRENT_PROGRAM);
+    return Object.fromEntries(['uShape', 'uAmbient', 'uDepth', 'uPulse', 'uVariance', 'uColorMode'].map(name =>
+      [name, gl.getUniform(program, gl.getUniformLocation(program, name))]));
+  });
+  expect(uniforms.uShape).toBe(3); // Upstream tetrahedron shader branch.
+  expect(uniforms.uAmbient).toBeCloseTo(0.38);
+  expect(uniforms.uDepth).toBeCloseTo(2.5);
+  expect(uniforms.uPulse).toBeCloseTo(5.7);
+  expect(uniforms.uVariance).toBeCloseTo(0.6);
+  expect(uniforms.uColorMode).toBe(1); // Radial palette.
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect.poll(() => page.locator('.antigravity__canvas').evaluate(canvas => canvas.clientWidth)).toBe(390);
+  expect(await page.locator('.antigravity__canvas').evaluate(canvas => canvas.width * canvas.height)).toBeLessThan(2404000);
+  expect(await page.locator('#site-background').evaluate(element => getComputedStyle(element).pointerEvents)).toBe('none');
+  await expect(page.locator('#fractalBackground, .glow-aurora')).toHaveCount(0);
+});
+
+test('Antigravity uses a still particle field for reduced motion and responds to preference changes', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await open(page);
+  await expect(page.locator('.site-background__layers')).toHaveAttribute('data-background-state', 'static');
+  await expect(page.locator('.antigravity__canvas')).toHaveCount(0);
+  const image = await page.locator('.background-static').evaluate(canvas => canvas.toDataURL());
+  await page.waitForTimeout(200);
+  expect(await page.locator('.background-static').evaluate(canvas => canvas.toDataURL())).toBe(image);
+  expect(await page.locator('.background-static').evaluate(canvas => {
+    const pixels = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data;
+    return pixels.some((channel, index) => index % 4 === 3 && channel > 0);
+  })).toBe(true);
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await expect(page.locator('.site-background__layers')).toHaveAttribute('data-background-state', 'active');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await expect(page.locator('.antigravity__canvas')).toHaveCount(0);
+});
+
+test('Antigravity falls back without WebGL while the homepage stays usable', async ({ page }) => {
+  await page.addInitScript(() => {
+    const getContext = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (type, ...args) {
+      return type === 'webgl2' ? null : getContext.call(this, type, ...args);
+    };
+  });
+  await open(page);
+  await expect(page.locator('.site-background__layers')).toHaveAttribute('data-background-state', 'fallback');
+  await expect(page.locator('.background-static')).toBeVisible();
+  await page.locator('#viewStrengthsBtn').click();
+  await expect(page.locator('#tab-cs')).toBeVisible();
+  await page.locator('#tbtn-req').click();
+  await expect(page.locator('#requestForm')).toBeVisible();
+});
+
+test('Antigravity recovers from WebGL context loss without losing widget state', async ({ page }) => {
+  await open(page);
+  const background = page.locator('.site-background__layers');
+  await expect(background).toHaveAttribute('data-background-state', 'active');
+  await page.locator('.antigravity__canvas').evaluate(canvas => {
+    const extension = canvas.getContext('webgl2').getExtension('WEBGL_lose_context');
+    window.restoreBackground = () => extension.restoreContext();
+    extension.loseContext();
+  });
+  await expect(background).toHaveAttribute('data-background-state', 'fallback');
+  await page.locator('#tbtn-req').click();
+  await page.locator('#requestForm [name="subject"]').fill('Retained during recovery');
+  await page.waitForTimeout(200);
+  await page.evaluate(() => window.restoreBackground());
+  await expect(background).toHaveAttribute('data-background-state', 'active');
+  await expect(page.locator('#requestForm [name="subject"]')).toHaveValue('Retained during recovery');
+  await expect(page.locator('.antigravity__canvas')).toHaveCount(1);
 });

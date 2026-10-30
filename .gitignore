@@ -14,6 +14,8 @@ __pycache__/
 /lib/generated/
 /assets/homepage.js
 /assets/homepage.js.LEGAL.txt
+/assets/homepage.css
+/assets/homepage.css.LEGAL.txt
 /assets/react-LICENSE.txt
 /assets/react-dom-LICENSE.txt
 /assets/scheduler-LICENSE.txt

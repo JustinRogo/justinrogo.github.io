@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { loadPageTree, PAGE_TREE_FALLBACK } from './page-tree.js';
 import { useCollectionSpotlight } from './effects.js';
+import { GlassMaterial } from './GlassMaterial.jsx';
 
 const collectPages = nodes => nodes.flatMap(node => node.href ? [node] : collectPages(node.children || []));
 
@@ -85,6 +86,7 @@ export function ProjectDirectory() {
     return () => { disposed = true; clearTimeout(timeout); controller.abort(); };
   }, []);
   return <section className="card surface widget page-directory" id="page-directory" aria-labelledby="page-directory-heading">
+    <GlassMaterial />
     <header className="page-directory__heading"><h2 id="page-directory-heading">Pages &amp; Projects</h2></header>
     <nav className="page-tree" id="pageTree" ref={treeRef} aria-label="Site collections" aria-busy={!tree}>
       {!tree ? <span className="info-note" role="status">Loading pages...</span> : collections(tree).map((group, index) =>

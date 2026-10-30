@@ -1,0 +1,26 @@
+/* Antigravity is a fixed decorative backdrop; page content owns all input. */
+.site-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+body.light .site-background { opacity: 0.65; }
+
+.site-background__layers,
+.site-background .antigravity,
+.background-static {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.site-background__layers[data-background-state="active"] .background-static { visibility: hidden; }
+
+@media (prefers-contrast: more), (forced-colors: active) {
+  .site-background { display: none; }
+}

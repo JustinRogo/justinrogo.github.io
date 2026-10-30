@@ -1,0 +1,71 @@
+/* Theme/layout integration for the vendored React Bits Glass Surface.
+   Only six large homepage shells use this material; nested reading surfaces
+   and controls retain the existing, quieter material and focus treatments. */
+.card.homepage-glass {
+  --liquid-tint: rgba(10, 18, 38, 0.40);
+  position: relative;
+  z-index: 0;
+  background: transparent;
+  border-color: rgba(208, 225, 255, 0.22);
+  box-shadow: 0 12px 32px -18px rgba(0, 3, 14, 0.58);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+body.light .card.homepage-glass {
+  --liquid-tint: rgba(255, 255, 255, 0.34);
+  border-color: rgba(113, 135, 166, 0.26);
+  box-shadow: 0 12px 32px -18px rgba(30, 50, 80, 0.25);
+}
+
+/* Replace the previous two material passes only after React has mounted. */
+.card.homepage-glass::before,
+.card.homepage-glass::after {
+  content: none;
+}
+
+.glass-material {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+  user-select: none;
+  color-scheme: dark;
+}
+
+body.light .glass-material { color-scheme: light; }
+
+/* The slots must not become extra grid/flex items in the legacy cards. */
+[data-glass-material] { display: contents; }
+
+.glass-material > .glass-surface {
+  position: absolute;
+  inset: 0;
+  background: var(--liquid-tint);
+}
+
+.glass-material .glass-surface__content { display: none; }
+
+/* An opaque material remains readable when transparency is unavailable or
+   the visitor explicitly requests greater contrast. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .card.homepage-glass { --liquid-tint: var(--bg-2); }
+}
+
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more), (forced-colors: active) {
+  .card.homepage-glass,
+  body.light .card.homepage-glass { --liquid-tint: var(--bg-2); }
+  .glass-material > .glass-surface {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow: none;
+  }
+  .glass-material .glass-surface__sheen,
+  .glass-material .glass-surface__rim { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glass-material * { transition: none; }
+}
