@@ -2,7 +2,7 @@ React Bits
 https://github.com/DavidHDev/react-bits
 Spotlight Card interaction adapted for this website.
 Glass Surface component vendored from revision e12c22192ac7b4b452c5e2feb9b586d74765d696.
-Antigravity background vendored from the same revision.
+Shape Waves background vendored from the same revision.
 
 MIT + Commons Clause License Condition v1.0
 

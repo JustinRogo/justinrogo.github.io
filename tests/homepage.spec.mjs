@@ -342,66 +342,57 @@ test('Glass Surface selects the frosted fallback when upstream disables SVG filt
   await context.close();
 });
 
-test('Antigravity renders the requested 1050 tetrahedrons and survives resizing', async ({ page }) => {
+test('Shape Waves animates, reacts to the pointer, and survives resizing', async ({ page }) => {
   await page.addInitScript(() => {
     window.backgroundFrames = 0;
-    const draw = WebGL2RenderingContext.prototype.drawArraysInstanced;
-    WebGL2RenderingContext.prototype.drawArraysInstanced = function (...args) {
-      if (this.canvas.matches('.antigravity__canvas')) {
-        window.backgroundFrames++;
-        window.backgroundCount = args[3];
-      }
-      return draw.apply(this, args);
+    const submit = GPUQueue.prototype.submit;
+    GPUQueue.prototype.submit = function (...args) {
+      window.backgroundFrames++;
+      return submit.apply(this, args);
     };
   });
   await open(page);
   await expect(page.locator('.site-background__layers')).toHaveAttribute('data-background-state', 'active');
   await expect.poll(() => page.evaluate(() => window.backgroundFrames)).toBeGreaterThan(1);
-  expect(await page.evaluate(() => window.backgroundCount)).toBe(1050);
-  const uniforms = await page.locator('.antigravity__canvas').evaluate(canvas => {
-    const gl = canvas.getContext('webgl2');
-    const program = gl.getParameter(gl.CURRENT_PROGRAM);
-    return Object.fromEntries(['uShape', 'uAmbient', 'uDepth', 'uPulse', 'uVariance', 'uColorMode'].map(name =>
-      [name, gl.getUniform(program, gl.getUniformLocation(program, name))]));
-  });
-  expect(uniforms.uShape).toBe(3); // Upstream tetrahedron shader branch.
-  expect(uniforms.uAmbient).toBeCloseTo(0.38);
-  expect(uniforms.uDepth).toBeCloseTo(2.5);
-  expect(uniforms.uPulse).toBeCloseTo(5.7);
-  expect(uniforms.uVariance).toBeCloseTo(0.6);
-  expect(uniforms.uColorMode).toBe(1); // Radial palette.
+  await expect(page.locator('.shape-waves')).toHaveCSS('background-color', 'rgb(0, 23, 58)');
+  // Let the upstream intro finish, then compare actual pixels across pointer movement.
+  await page.waitForTimeout(1800);
+  const before = await page.locator('#site-background').screenshot();
+  await page.mouse.move(60, 120);
+  await page.mouse.move(160, 160, { steps: 8 });
+  const after = await page.locator('#site-background').screenshot();
+  expect(before.equals(after)).toBe(false);
   await page.setViewportSize({ width: 390, height: 844 });
-  await expect.poll(() => page.locator('.antigravity__canvas').evaluate(canvas => canvas.clientWidth)).toBe(390);
-  expect(await page.locator('.antigravity__canvas').evaluate(canvas => canvas.width * canvas.height)).toBeLessThan(2404000);
+  await expect.poll(() => page.locator('.shape-waves__canvas').evaluate(canvas => canvas.clientWidth)).toBe(390);
+  expect(await page.locator('.shape-waves__canvas').evaluate(canvas => canvas.width * canvas.height)).toBeLessThan(2404000);
   expect(await page.locator('#site-background').evaluate(element => getComputedStyle(element).pointerEvents)).toBe('none');
-  await expect(page.locator('#fractalBackground, .glow-aurora')).toHaveCount(0);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.getByRole('button', { name: 'Toggle Theme' }).click();
+  await expect(page.locator('.site-background__layers')).toHaveAttribute('data-background-state', 'active');
+  await page.locator('#viewStrengthsBtn').click();
+  await expect(page.locator('#tab-cs')).toBeVisible();
 });
 
-test('Antigravity uses a still particle field for reduced motion and responds to preference changes', async ({ page }) => {
+test('Shape Waves uses still shapes for reduced motion and responds to preference changes', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await open(page);
   await expect(page.locator('.site-background__layers')).toHaveAttribute('data-background-state', 'static');
-  await expect(page.locator('.antigravity__canvas')).toHaveCount(0);
+  await expect(page.locator('.shape-waves__canvas')).toHaveCount(0);
   const image = await page.locator('.background-static').evaluate(canvas => canvas.toDataURL());
   await page.waitForTimeout(200);
   expect(await page.locator('.background-static').evaluate(canvas => canvas.toDataURL())).toBe(image);
   expect(await page.locator('.background-static').evaluate(canvas => {
     const pixels = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data;
-    return pixels.some((channel, index) => index % 4 === 3 && channel > 0);
+    return pixels.some((channel, index) => index % 4 === 0 && channel > 0);
   })).toBe(true);
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await expect(page.locator('.site-background__layers')).toHaveAttribute('data-background-state', 'active');
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await expect(page.locator('.antigravity__canvas')).toHaveCount(0);
+  await expect(page.locator('.shape-waves__canvas')).toHaveCount(0);
 });
 
-test('Antigravity falls back without WebGL while the homepage stays usable', async ({ page }) => {
-  await page.addInitScript(() => {
-    const getContext = HTMLCanvasElement.prototype.getContext;
-    HTMLCanvasElement.prototype.getContext = function (type, ...args) {
-      return type === 'webgl2' ? null : getContext.call(this, type, ...args);
-    };
-  });
+test('Shape Waves falls back without WebGPU while the homepage stays usable', async ({ page }) => {
+  await page.addInitScript(() => Object.defineProperty(navigator, 'gpu', { value: undefined }));
   await open(page);
   await expect(page.locator('.site-background__layers')).toHaveAttribute('data-background-state', 'fallback');
   await expect(page.locator('.background-static')).toBeVisible();
@@ -411,21 +402,22 @@ test('Antigravity falls back without WebGL while the homepage stays usable', asy
   await expect(page.locator('#requestForm')).toBeVisible();
 });
 
-test('Antigravity recovers from WebGL context loss without losing widget state', async ({ page }) => {
+test('Shape Waves falls back after GPU device loss without losing widget state', async ({ page }) => {
+  await page.addInitScript(() => {
+    const requestDevice = GPUAdapter.prototype.requestDevice;
+    GPUAdapter.prototype.requestDevice = async function (...args) {
+      const device = await requestDevice.apply(this, args);
+      window.loseBackgroundDevice = () => device.destroy();
+      return device;
+    };
+  });
   await open(page);
   const background = page.locator('.site-background__layers');
   await expect(background).toHaveAttribute('data-background-state', 'active');
-  await page.locator('.antigravity__canvas').evaluate(canvas => {
-    const extension = canvas.getContext('webgl2').getExtension('WEBGL_lose_context');
-    window.restoreBackground = () => extension.restoreContext();
-    extension.loseContext();
-  });
-  await expect(background).toHaveAttribute('data-background-state', 'fallback');
   await page.locator('#tbtn-req').click();
-  await page.locator('#requestForm [name="subject"]').fill('Retained during recovery');
-  await page.waitForTimeout(200);
-  await page.evaluate(() => window.restoreBackground());
-  await expect(background).toHaveAttribute('data-background-state', 'active');
-  await expect(page.locator('#requestForm [name="subject"]')).toHaveValue('Retained during recovery');
-  await expect(page.locator('.antigravity__canvas')).toHaveCount(1);
+  await page.locator('#requestForm [name="subject"]').fill('Retained after device loss');
+  await page.evaluate(() => window.loseBackgroundDevice());
+  await expect(background).toHaveAttribute('data-background-state', 'fallback');
+  await expect(page.locator('.background-static')).toBeVisible();
+  await expect(page.locator('#requestForm [name="subject"]')).toHaveValue('Retained after device loss');
 });

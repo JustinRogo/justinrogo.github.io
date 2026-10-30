@@ -19,7 +19,8 @@
     "quill": "2.0.2",
     "react": "19.3.1",
     "react-dom": "19.3.1",
-    "sanitize-html": "2.18.1"
+    "sanitize-html": "2.18.1",
+    "vgpu": "0.3.1"
   },
   "engines": {
     "node": ">=22"

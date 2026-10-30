@@ -20,8 +20,8 @@ export async function buildHomepage({ watch = false } = {}) {
     legalComments: 'linked',
   };
   // Include dependency licenses alongside the static bundle on both hosts.
-  for (const name of ['react', 'react-dom', 'scheduler']) {
-    await copyFile(path.join(root, 'node_modules', name, 'LICENSE'), path.join(root, 'assets', `${name}-LICENSE.txt`));
+  for (const name of ['react', 'react-dom', 'scheduler', 'vgpu', '@vgpu/core', '@vgpu/wgsl', '@vgpu/wgsl-std']) {
+    await copyFile(path.join(root, 'node_modules', name, 'LICENSE'), path.join(root, 'assets', `${name.replace('@', '').replace('/', '-')}-LICENSE.txt`));
   }
   if (watch) {
     const watcher = await context(options);

@@ -1,18 +1,17 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import Antigravity from './vendor/Antigravity.jsx';
+import ShapeWaves from './vendor/ShapeWaves.jsx';
 import './site-background.css';
 
-// Stardust preset with the explicit overrides from the shared React Bits URL.
-export const ANTIGRAVITY_SETTINGS = Object.freeze({
-  colors: ['#275dff', '#f97316'],
-  particleShape: 'tetrahedron', particleSize: 1.25, rotationSpeed: 0.3,
-  depthFactor: 2.5, ambient: 0.38, particleVariance: 0.6,
-  magnetRadius: 3, ringRadius: 5, count: 1050, waveAmplitude: 3.8,
-  lerpSpeed: 0.07, colorSpeed: 0.17, colorMode: 'radial',
-  fieldStrength: 7.5, waveSpeed: 0.9, pulseSpeed: 5.7, waveCount: 3,
+// Explicit values from the shared React Bits Shape Waves URL.
+export const SHAPE_WAVES_SETTINGS = Object.freeze({
+  text: '', textSize: 0.24, shapes: 'mixed',
+  hoverColor: '#f97316', color: '#913d00', backgroundColor: '#00173a',
+  direction: 175, glow: 1.75, flow: 2.3, fade: 0.3, brightness: 0.48,
+  splashStrength: 0.75, splashRadius: 28, dotSize: 0.58, cellSize: 8,
+  scale: 1.6, contrast: 3, speed: 0.7,
 });
 
-function StaticParticles({ light }) {
+function StaticShapes() {
   const ref = useRef(null);
   useLayoutEffect(() => {
     const canvas = ref.current;
@@ -20,25 +19,51 @@ function StaticParticles({ light }) {
     if (!context) return;
     function draw() {
       const { width, height } = canvas.getBoundingClientRect();
-      const ratio = Math.min(devicePixelRatio || 1, 1.5);
+      const ratio = Math.min(devicePixelRatio || 1, 1.5,
+        Math.sqrt(2400000 / Math.max(1, width * height)));
       canvas.width = Math.max(1, Math.round(width * ratio));
       canvas.height = Math.max(1, Math.round(height * ratio));
       context.setTransform(ratio, 0, 0, ratio, 0, 0);
-      let seed = 1337;
-      const random = () => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 4294967296; };
-      for (let index = 0; index < ANTIGRAVITY_SETTINGS.count; index++) {
-        const x = random() * width;
-        const y = random() * height;
-        const radius = Math.hypot(x - width / 2, y - height / 2) / Math.max(width, height);
-        const size = Math.max(1.2, height / 360) * (0.5 + random() * 1.5);
-        context.fillStyle = ANTIGRAVITY_SETTINGS.colors[radius > 0.3 ? 1 : 0];
-        context.globalAlpha = (light ? 0.28 : 0.4) * (0.3 + random() * 0.7);
-        context.beginPath();
-        context.moveTo(x, y - size);
-        context.lineTo(x + size * 0.866, y + size / 2);
-        context.lineTo(x - size * 0.866, y + size / 2);
-        context.closePath();
-        context.fill();
+      const { cellSize, dotSize, color, backgroundColor, fade, scale, contrast, brightness } = SHAPE_WAVES_SETTINGS;
+      context.fillStyle = backgroundColor;
+      context.fillRect(0, 0, width, height);
+      context.fillStyle = color;
+      const cols = Math.max(1, Math.round(width / cellSize));
+      const cell = width / cols;
+      const rows = Math.max(1, Math.floor(height / cell));
+      const originY = (height - rows * cell) / 2;
+      const smoothstep = (a, b, value) => {
+        const t = Math.max(0, Math.min(1, (value - a) / (b - a)));
+        return t * t * (3 - 2 * t);
+      };
+      // A deterministic still approximation of the shader's coherent shape bands.
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+          const x = (col + 0.5) * cell;
+          const y = originY + (row + 0.5) * cell;
+          const px = x / (32 * cell * scale);
+          const py = y / (32 * cell * scale);
+          const noise = (Math.sin(px * 4.3 + Math.sin(py * 3.1)) +
+            Math.cos(py * 5.7 - Math.sin(px * 2.8))) / 2;
+          const tone = Math.max(0, Math.min(0.999999,
+            (noise * 0.5 + (brightness - 0.5) * 0.4) * 2.8 * contrast + 0.5));
+          const shape = 2 - Math.floor(tone * 3);
+          const qx = Math.abs(x / width * 2 - 1);
+          const qy = Math.abs(y / height * 2 - 1);
+          const radius = Math.pow(qx ** 2.5 + qy ** 2.5, 1 / 2.5) / Math.pow(2, 1 / 2.5);
+          context.globalAlpha = 1 - smoothstep(Math.max(0, 1 - fade * 2.2), 1, radius);
+          const size = cell * 0.5 * dotSize;
+          context.beginPath();
+          if (shape === 0) context.rect(x - size, y - size, size * 2, size * 2);
+          else if (shape === 1) context.arc(x, y, size, 0, Math.PI * 2);
+          else {
+            context.moveTo(x, y - size);
+            context.lineTo(x + size, y + size);
+            context.lineTo(x - size, y + size);
+            context.closePath();
+          }
+          context.fill();
+        }
       }
       context.globalAlpha = 1;
     }
@@ -46,12 +71,11 @@ function StaticParticles({ light }) {
     const observer = new ResizeObserver(draw);
     observer.observe(canvas);
     return () => observer.disconnect();
-  }, [light]);
+  }, []);
   return <canvas ref={ref} className="background-static" aria-hidden="true" />;
 }
 
 export function SiteBackground() {
-  const [light, setLight] = useState(() => document.body.classList.contains('light'));
   const [animated, setAnimated] = useState(() => !matchMedia('(prefers-reduced-motion: reduce), (prefers-contrast: more), (forced-colors: active)').matches);
   const [interactive, setInteractive] = useState(() => matchMedia('(hover: hover) and (pointer: fine)').matches);
   const [status, setStatus] = useState('fallback');
@@ -60,18 +84,19 @@ export function SiteBackground() {
     const quiet = matchMedia('(prefers-reduced-motion: reduce), (prefers-contrast: more), (forced-colors: active)');
     const finePointer = matchMedia('(hover: hover) and (pointer: fine)');
     const controller = new AbortController();
-    const sync = () => { setAnimated(!quiet.matches); setInteractive(finePointer.matches); };
+    const sync = () => {
+      setAnimated(!quiet.matches);
+      setInteractive(finePointer.matches);
+      if (quiet.matches) setStatus('fallback');
+    };
     quiet.addEventListener('change', sync, { signal: controller.signal });
     finePointer.addEventListener('change', sync, { signal: controller.signal });
-    const observer = new MutationObserver(() => setLight(document.body.classList.contains('light')));
-    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
-    sync();
-    return () => { controller.abort(); observer.disconnect(); };
+    return () => controller.abort();
   }, []);
 
   return <div className="site-background__layers" data-background-state={animated ? status : 'static'}>
-    <StaticParticles light={light} />
-    {animated && <Antigravity {...ANTIGRAVITY_SETTINGS} lightMode={light}
-      interactive={interactive} autoAnimate maxDevicePixelRatio={1.5} onStatus={setStatus} />}
+    <StaticShapes />
+    {animated && <ShapeWaves {...SHAPE_WAVES_SETTINGS}
+      interactive={interactive} onStatus={setStatus} />}
   </div>;
 }

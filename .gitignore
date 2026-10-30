@@ -19,5 +19,9 @@ __pycache__/
 /assets/react-LICENSE.txt
 /assets/react-dom-LICENSE.txt
 /assets/scheduler-LICENSE.txt
+/assets/vgpu-LICENSE.txt
+/assets/vgpu-core-LICENSE.txt
+/assets/vgpu-wgsl-LICENSE.txt
+/assets/vgpu-wgsl-std-LICENSE.txt
 /test-results/
 /playwright-report/

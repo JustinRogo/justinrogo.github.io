@@ -112,13 +112,15 @@ The profile, two sidebar cards, Pages & Projects, widget deck and Quick Links us
 
 `GlassMaterial.jsx` places the component in a decorative, inert layer behind each card's content. This keeps text, iframes, forms, native disclosures and existing event handlers separate from the refraction effect. Existing HTML cards expose empty `data-glass-material` slots; React owns only these slots. Theme integration is in `glass-material.css`, separate from the upstream stylesheet. SVG refraction is enabled on desktop with a fine pointer; mobile, reduced motion and upstream browser compatibility checks select the frosted fallback. Higher contrast, reduced transparency and forced colors use an opaque material. The glass material adds no WebGL loop, dependency or external runtime.
 
-### Antigravity background
+### Shape Waves background
 
-`SiteBackground.jsx` owns the fixed `#site-background` island. It uses the official React Bits [Antigravity](https://reactbits.dev/backgrounds/antigravity) component from the same pinned revision as Glass Surface, with the shared Stardust configuration: `#275dff` and `#f97316`, 1,050 tetrahedrons, radial colors, size 1.25, rotation 0.3, depth 2.5, ambient 0.38, variance 0.6, magnet radius 3, ring radius 5, wave amplitude 3.8, lerp speed 0.07, color speed 0.17, field strength 7.5, wave speed 0.9 and pulse speed 5.7. These settings live in the exported `ANTIGRAVITY_SETTINGS` constant; the remaining preset defaults are retained.
+`SiteBackground.jsx` owns the fixed `#site-background` island. It uses the official React Bits [Shape Waves](https://reactbits.dev/backgrounds/shape-waves) component, vendored at revision `e12c22192ac7b4b452c5e2feb9b586d74765d696`. The exported `SHAPE_WAVES_SETTINGS` constant preserves the shared URL: empty text, text size 0.24, mixed shapes, background `#00173a`, shape color `#913d00`, hover `#f97316`, direction 175, glow 1.75, flow 2.3, fade 0.3, brightness 0.48, splash strength 0.75, splash radius 28, dot size 0.58, cell size 8, scale 1.6, contrast 3 and speed 0.7.
 
-Antigravity uses native WebGL2 and instanced drawing without another library. The renderer retains its 2.4-million-pixel budget, with device pixel ratio capped at 1.5. It pauses offscreen/in hidden tabs, and the wrapper observes theme and accessibility preferences. Fine pointers can interact through the page; touch uses autonomous motion without intercepting scrolling or controls. Reduced motion uses a deterministic still 2D particle field with no animation loop or WebGL context. That still field also appears when WebGL is unavailable or lost, and the renderer recovers when the context returns. Higher contrast and forced colors hide the decorative background.
+Shape Waves uses WebGPU through the pinned `vgpu@0.3.1` dependency, bundled locally with the homepage. Local source changes report readiness/failure, cap device pixel ratio at 1.5 with a 2.4-million-pixel budget, and suspend rendering in hidden tabs or offscreen. Fine pointers trigger the upstream ripple interaction through the page without intercepting links, forms or scrolling. Touch retains the autonomous wave motion. The dark theme displays the supplied colors directly; the light theme softens the backdrop through CSS opacity.
 
-The upstream Antigravity source has only a local renderer-status callback added for readiness, failure and context-loss handling. `main.js` no longer initializes the fractal canvas; its old canvas, auroras and animation CSS have been removed. `site-background.css` controls layering and theme opacity. No client-side route or server is required.
+Reduced motion uses a deterministic, still 2D approximation of the shape bands with the same palette, grid and edge fade, without a GPU context or animation loop. This pattern also appears if WebGPU is unavailable, initialization fails or the GPU device is lost. A reload retries WebGPU after device loss. Higher contrast and forced colors hide the decorative background. Upstream attribution remains in `assets/react-bits-LICENSE.txt`; the build copies the bundled GPU dependencies' MIT licenses alongside the static assets.
+
+`site-background.css` controls layering and light-theme opacity. No client-side route or server is required.
 
 ### Homepage React components and ownership
 
@@ -129,7 +131,7 @@ The homepage has two independent roots, `#project-directory-root` and `#widget-t
 - `effects.js` owns spotlight listeners and moving-indicator geometry. Its observers, animation frames and media-query listeners are cleaned up. Indicator motion is cancelled and measured again during rapid switching, font loading and resizing.
 - `legacy-widgets.js` exports the existing CliftonStrengths and library catalog initializers. `LegacyWidget` gives each initializer an empty host; React never reconciles that host's descendants. Initializers run once per mount and return cleanup, including the strengths resize observer and delegated listeners. The strengths initializer also updates the existing profile domain bar.
 
-`main.js` continues to own theme/share controls, clock/weather, feeds, profile disclosures, contact menu and companion. It contains no directory, main-tab, request-form, nested-widget or background initializer. `style.css` remains the shared layout and base-material source; Glass Surface and Antigravity styles are bundled separately.
+`main.js` continues to own theme/share controls, clock/weather, feeds, profile disclosures, contact menu and companion. It contains no directory, main-tab, request-form, nested-widget or background initializer. `style.css` remains the shared layout and base-material source; Glass Surface and Shape Waves styles are bundled separately.
 
 ### Development and builds
 
