@@ -40,8 +40,8 @@
   <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Space+Grotesk:wght@400;600;700&display=swap" />
 
-  <link rel="stylesheet" href="style.css?v=20261030-background-choices" />
-  <link rel="stylesheet" href="assets/homepage.css?v=20261030-background-choices" />
+  <link rel="stylesheet" href="style.css?v=20261030-mobile-settings" />
+  <link rel="stylesheet" href="assets/homepage.css?v=20261030-mobile-settings" />
 </head>
 
 <body>
@@ -358,7 +358,17 @@
           </div>
         </div>
       </details>
-      <footer>Built with ✨ by Justin · <span id="year"></span></footer>
+      <footer>
+        <span class="footer-credit">Built with ✨ by Justin · <span id="year"></span></span>
+        <button class="mobile-background-toggle" id="mobileBackgroundToggle" type="button"
+                aria-label="Change page background" aria-haspopup="dialog"
+                aria-expanded="false" aria-controls="rogoSettings" title="Background settings">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+            <path d="M9.5 2h5l.5 2.5 2 1.2 2.4-.8 2.5 4.2-1.9 1.7v2.4l1.9 1.7-2.5 4.2-2.4-.8-2 1.2-.5 2.5h-5L9 19.5l-2-1.2-2.4.8-2.5-4.2L4 13.2v-2.4L2.1 9.1l2.5-4.2 2.4.8 2-1.2z" />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
+        </button>
+      </footer>
     </main>
   </div>
 
@@ -458,8 +468,8 @@
     </div>
   </nav>
 
-  <script src="main.js?v=20261030-background-choices" defer></script>
-  <script src="assets/homepage.js?v=20261030-background-choices" defer></script>
+  <script src="main.js?v=20261030-mobile-settings" defer></script>
+  <script src="assets/homepage.js?v=20261030-mobile-settings" defer></script>
 </body>
 
 </html>

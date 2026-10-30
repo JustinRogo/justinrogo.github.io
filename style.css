@@ -1301,6 +1301,13 @@ footer {
   border-top: 1px solid var(--line);
 }
 
+footer:has(.mobile-background-toggle) { opacity: 1; }
+.footer-credit { opacity: 0.7; }
+.mobile-background-toggle { display: none; }
+.mobile-background-toggle svg { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.mobile-background-toggle:hover { background: var(--bg-elev); }
+.mobile-background-toggle:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+
 /* ===================================================================
    Accessibility (Focus Styles)
    =================================================================== */
@@ -1823,12 +1830,22 @@ body.light .rogo-settings__option:hover .rogo-settings__name { color: #a23d10; }
 body.light .rogo-settings__option input { accent-color: #a23d10; }
 
 @media (max-width: 1099px) {
-  .site-pet { width: 72px; left: 12px; }
-  .site-pet__canvas { width: 72px; height: 78px; }
-  .site-pet__label { margin-top: -4px; font-size: 0.65rem; opacity: 1; transform: none; }
-  .site-pet:hover, .site-pet:focus-visible { transform: none; }
-  .rogo-settings { --rogo-bubble-bottom: calc(122px + env(safe-area-inset-bottom, 0px)); }
-  .rogo-settings::after { left: 24px; }
+  .site-pet { display: none !important; }
+  .mobile-background-toggle {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    margin: 12px auto 0;
+    padding: 0;
+    border: 1px solid var(--line-strong);
+    border-radius: 10px;
+    background: var(--bg-2);
+    color: var(--text-strong);
+    cursor: pointer;
+  }
+  .rogo-settings { --rogo-bubble-bottom: calc(104px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); }
+  .rogo-settings::after { left: calc(50% - 7px); }
 }
 
 @media (prefers-reduced-motion: reduce) {

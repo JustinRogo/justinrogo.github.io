@@ -169,9 +169,12 @@ fetch('https://justinrogo.github.io/data/cards_count.json')
    =================================================================== */
 (function initBackgroundPicker() {
   const pet = document.getElementById('sitePet');
+  const mobileToggle = document.getElementById('mobileBackgroundToggle');
   const bubble = document.getElementById('rogoSettings');
   const close = document.getElementById('closeRogoSettings');
-  if (!pet || !bubble || !close) return;
+  if (!pet || !mobileToggle || !bubble || !close) return;
+  const triggers = [pet, mobileToggle];
+  const desktopQuery = matchMedia('(min-width: 1100px)');
   const options = [...bubble.querySelectorAll('input[name="page-background"]')];
   const note = document.getElementById('backgroundPreferenceNote');
 
@@ -185,16 +188,16 @@ fetch('https://justinrogo.github.io/data/cards_count.json')
 
   function setOpen(open, restoreFocus = false) {
     bubble.hidden = !open;
-    pet.setAttribute('aria-expanded', String(open));
+    triggers.forEach(trigger => trigger.setAttribute('aria-expanded', String(open)));
     if (open) {
       const selected = options.find(option => option.checked);
       selected?.focus({ preventScroll: true });
       selected?.closest('label').scrollIntoView({ block: 'nearest' });
     }
-    else if (restoreFocus) pet.focus({ preventScroll: true });
+    else if (restoreFocus) (desktopQuery.matches ? pet : mobileToggle).focus({ preventScroll: true });
   }
 
-  pet.addEventListener('click', () => setOpen(bubble.hidden));
+  triggers.forEach(trigger => trigger.addEventListener('click', () => setOpen(bubble.hidden)));
   close.addEventListener('click', () => setOpen(false, true));
   bubble.addEventListener('change', event => {
     if (!options.includes(event.target)) return;
@@ -213,10 +216,10 @@ fetch('https://justinrogo.github.io/data/cards_count.json')
     }
   });
   document.addEventListener('pointerdown', event => {
-    if (!bubble.hidden && !bubble.contains(event.target) && !pet.contains(event.target)) setOpen(false);
+    if (!bubble.hidden && !bubble.contains(event.target) && !triggers.some(trigger => trigger.contains(event.target))) setOpen(false);
   });
   document.addEventListener('focusin', event => {
-    if (!bubble.hidden && !bubble.contains(event.target) && !pet.contains(event.target)) setOpen(false);
+    if (!bubble.hidden && !bubble.contains(event.target) && !triggers.some(trigger => trigger.contains(event.target))) setOpen(false);
   });
   window.addEventListener('storage', event => {
     if (event.key === 'site-background' || event.key === null) applyBackground(event.newValue);
@@ -299,6 +302,7 @@ fetch('https://justinrogo.github.io/data/cards_count.json')
   }
 
   function start() {
+    if (!desktopQuery.matches) { stop(); return; }
     window.clearTimeout(timer);
     pet.hidden = false;
     mode = 'idle';
@@ -344,12 +348,16 @@ fetch('https://justinrogo.github.io/data/cards_count.json')
   }
 
   pet.addEventListener('click', requestWave);
-  desktopQuery.addEventListener('change', () => { if (loaded) start(); });
+  function syncVisibility() {
+    if (desktopQuery.matches) load();
+    else stop();
+  }
+  desktopQuery.addEventListener('change', syncVisibility);
   reducedMotionQuery.addEventListener('change', () => {
     if (loaded) start();
   });
   document.addEventListener('visibilitychange', () => { if (loaded) start(); });
-  load();
+  syncVisibility();
 })();
 
 /* ===================================================================

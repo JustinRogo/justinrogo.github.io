@@ -488,15 +488,23 @@ test('Rogo supports keyboard selection, Escape, close and outside dismissal', as
 });
 
 for (const width of [320, 390]) {
-  test(`Rogo's speech bubble fits at ${width}px and touch can change backgrounds`, async ({ browser }, testInfo) => {
-    const context = await browser.newContext({ viewport: { width, height: 640 }, hasTouch: true, isMobile: true, reducedMotion: 'reduce' });
+  test(`mobile footer gear at ${width}px opens the background picker without loading Rogo`, async ({ browser }, testInfo) => {
+    const context = await browser.newContext({ viewport: { width, height: 640 }, hasTouch: true, isMobile: true, reducedMotion: 'reduce', colorScheme: width === 320 ? 'dark' : 'light' });
     const page = await context.newPage();
+    let spriteRequests = 0;
+    page.on('request', request => { if (request.url().endsWith('/assets/rogo-corner.webp')) spriteRequests++; });
     await page.route('https://**/*', route => route.fulfill({ body: '' }));
     try {
       await open(page);
-      await page.getByRole('button', { name: 'Rogo: change page background' }).tap();
+      await expect(page.locator('#sitePet')).toBeHidden();
+      const gear = page.getByRole('button', { name: 'Change page background', exact: true });
+      await expect(page.locator('footer').getByRole('button', { name: 'Change page background', exact: true })).toBeVisible();
+      await gear.scrollIntoViewIfNeeded();
+      await page.screenshot({ path: testInfo.outputPath('mobile-footer-gear.png') });
+      await gear.tap();
       const bubble = page.getByRole('dialog', { name: 'Pick a background.' });
       await expect(bubble).toBeVisible();
+      await expect(gear).toHaveAttribute('aria-expanded', 'true');
       await expect(bubble.getByRole('radio')).toHaveCount(5);
       const bounds = await bubble.boundingBox();
       expect(bounds.x).toBeGreaterThanOrEqual(0);
@@ -518,10 +526,44 @@ for (const width of [320, 390]) {
       await expect(page.locator('.glow-aurora')).toHaveCount(3);
       await bubble.getByRole('radio', { name: 'Shape Waves', exact: true }).tap();
       await expect(page.locator('.site-background__layers')).toHaveAttribute('data-background-state', 'static');
+      await bubble.getByRole('button', { name: 'Close background picker' }).tap();
+      await expect(bubble).toBeHidden();
+      await expect(gear).toBeFocused();
+      await expect(gear).toHaveAttribute('aria-expanded', 'false');
+      await page.keyboard.press('Space');
+      await expect(bubble).toBeVisible();
+      await page.keyboard.press('Escape');
+      await expect(gear).toBeFocused();
+      expect(spriteRequests).toBe(0);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     } finally { await context.close(); }
   });
 }
+
+test('background picker switches between desktop Rogo and the mobile footer gear', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await open(page);
+  const pet = page.getByRole('button', { name: 'Rogo: change page background' });
+  const gear = page.locator('#mobileBackgroundToggle');
+  const bubble = page.getByRole('dialog', { name: 'Pick a background.' });
+  await expect(pet).toBeVisible();
+  await expect(gear).toBeHidden();
+  await pet.click();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(pet).toBeHidden();
+  await expect(gear).toBeVisible();
+  await expect(bubble).toBeVisible();
+  await bubble.getByRole('button', { name: 'Close background picker' }).click();
+  await expect(gear).toBeFocused();
+  await gear.click();
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await expect(pet).toBeVisible();
+  await expect(gear).toBeHidden();
+  await page.keyboard.press('Escape');
+  await expect(bubble).toBeHidden();
+  await expect(pet).toBeFocused();
+  await expect(pet).toHaveAttribute('aria-expanded', 'false');
+});
 
 test('Rogo keeps background selection working when browser storage is blocked', async ({ page }) => {
   const errors = [];
