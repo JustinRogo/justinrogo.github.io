@@ -421,3 +421,123 @@ test('Shape Waves falls back after GPU device loss without losing widget state',
   await expect(page.locator('.background-static')).toBeVisible();
   await expect(page.locator('#requestForm [name="subject"]')).toHaveValue('Retained after device loss');
 });
+
+test('Rogo switches to solid backgrounds, saves the choice and restores Shape Waves without losing input', async ({ page }, testInfo) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.addInitScript(() => localStorage.setItem('theme', 'dark'));
+  await open(page);
+  const pet = page.getByRole('button', { name: 'Rogo: change page background' });
+  const bubble = page.getByRole('dialog', { name: 'Pick a background.' });
+  await page.locator('#tbtn-req').click();
+  await page.locator('#requestForm [name="subject"]').fill('Keep this request');
+  await pet.click();
+  await expect(bubble).toBeVisible();
+  await expect(bubble.getByRole('radio', { name: 'Shape Waves', exact: true })).toBeChecked();
+  await bubble.getByRole('radio', { name: 'None', exact: true }).check();
+  await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(0, 0, 0)');
+  await expect(page.locator('html')).toHaveCSS('background-color', 'rgb(0, 0, 0)');
+  await expect(page.locator('#site-background canvas')).toHaveCount(0);
+  await expect(page.locator('.noise-overlay')).toBeHidden();
+  await expect(bubble).toBeVisible();
+  await page.screenshot({ path: testInfo.outputPath('rogo-picker-dark.png') });
+  await expect(page.locator('#requestForm [name="subject"]')).toHaveValue('Keep this request');
+  expect(await page.evaluate(() => localStorage.getItem('site-background'))).toBe('none');
+  await bubble.getByRole('radio', { name: 'Shape Waves', exact: true }).check();
+  await expect(page.locator('.site-background__layers')).toHaveAttribute('data-background-state', 'active');
+  await expect(page.locator('#requestForm [name="subject"]')).toHaveValue('Keep this request');
+  await bubble.getByRole('radio', { name: 'None', exact: true }).check();
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await expect(page.locator('body')).toHaveAttribute('data-background', 'none');
+  await expect(page.locator('#site-background canvas')).toHaveCount(0);
+  await page.locator('#theme').click();
+  await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+  await expect(page.locator('html')).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+  await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', '#ffffff');
+  await pet.click();
+  await page.screenshot({ path: testInfo.outputPath('rogo-picker-light.png') });
+});
+
+test('Rogo supports keyboard selection, Escape, close and outside dismissal', async ({ page }) => {
+  await open(page);
+  const pet = page.getByRole('button', { name: 'Rogo: change page background' });
+  const bubble = page.getByRole('dialog', { name: 'Pick a background.' });
+  await expect(pet).toBeVisible();
+  await pet.focus();
+  await page.keyboard.press('Enter');
+  await expect(pet).toHaveAttribute('aria-expanded', 'true');
+  await expect(bubble.getByRole('radio', { name: 'Shape Waves', exact: true })).toBeFocused();
+  await page.keyboard.press('ArrowDown');
+  await expect(bubble.getByRole('radio', { name: 'None', exact: true })).toBeChecked();
+  await page.keyboard.press('Escape');
+  await expect(bubble).toBeHidden();
+  await expect(pet).toBeFocused();
+  await expect(pet).toHaveAttribute('aria-expanded', 'false');
+  await pet.click();
+  await expect(bubble.getByRole('radio', { name: 'None', exact: true })).toBeFocused();
+  await bubble.getByRole('button', { name: 'Close background picker' }).click();
+  await expect(pet).toBeFocused();
+  await pet.click();
+  await page.locator('h1').click();
+  await expect(bubble).toBeHidden();
+  await pet.click();
+  await page.locator('#theme').focus();
+  await expect(bubble).toBeHidden();
+});
+
+for (const width of [320, 390]) {
+  test(`Rogo's speech bubble fits at ${width}px and touch can change backgrounds`, async ({ browser }, testInfo) => {
+    const context = await browser.newContext({ viewport: { width, height: 640 }, hasTouch: true, isMobile: true, reducedMotion: 'reduce' });
+    const page = await context.newPage();
+    await page.route('https://**/*', route => route.fulfill({ body: '' }));
+    try {
+      await open(page);
+      await page.getByRole('button', { name: 'Rogo: change page background' }).tap();
+      const bubble = page.getByRole('dialog', { name: 'Pick a background.' });
+      await expect(bubble).toBeVisible();
+      const bounds = await bubble.boundingBox();
+      expect(bounds.x).toBeGreaterThanOrEqual(0);
+      expect(bounds.y).toBeGreaterThanOrEqual(0);
+      expect(bounds.x + bounds.width).toBeLessThanOrEqual(width);
+      await bubble.getByRole('radio', { name: 'None', exact: true }).tap();
+      await expect(page.locator('#site-background canvas')).toHaveCount(0);
+      await page.screenshot({ path: testInfo.outputPath('rogo-picker.png') });
+      await bubble.getByRole('radio', { name: 'Shape Waves', exact: true }).tap();
+      await expect(page.locator('.site-background__layers')).toHaveAttribute('data-background-state', 'static');
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    } finally { await context.close(); }
+  });
+}
+
+test('Rogo keeps background selection working when browser storage is blocked', async ({ page }) => {
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.addInitScript(() => {
+    Storage.prototype.getItem = Storage.prototype.setItem = () => { throw new DOMException('Storage blocked', 'SecurityError'); };
+  });
+  await open(page);
+  await page.getByRole('button', { name: 'Rogo: change page background' }).click();
+  await page.getByRole('radio', { name: 'None', exact: true }).check();
+  await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(0, 0, 0)');
+  await expect(page.locator('#site-background canvas')).toHaveCount(0);
+  await expect(page.locator('#backgroundPreferenceNote')).toHaveText('Applied for this visit.');
+  await page.getByRole('radio', { name: 'Shape Waves', exact: true }).check();
+  await expect(page.locator('.site-background__layers')).toHaveAttribute('data-background-state', 'active');
+  expect(errors).toEqual([]);
+});
+
+test('Rogo synchronizes background choices across tabs and handles cleared or invalid preferences', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('site-background', 'unknown-background'));
+  await open(page);
+  await expect(page.locator('body')).toHaveAttribute('data-background', 'shape-waves');
+  const otherPage = await page.context().newPage();
+  await otherPage.route('https://**/*', route => route.fulfill({ body: '' }));
+  try {
+    await otherPage.goto('/', { waitUntil: 'domcontentloaded' });
+    await otherPage.evaluate(() => localStorage.setItem('site-background', 'none'));
+    await expect(page.locator('body')).toHaveAttribute('data-background', 'none');
+    await expect(page.locator('#site-background canvas')).toHaveCount(0);
+    await otherPage.evaluate(() => localStorage.clear());
+    await expect(page.locator('body')).toHaveAttribute('data-background', 'shape-waves');
+  } finally { await otherPage.close(); }
+  await expect(page.locator('.site-background__layers')).toHaveAttribute('data-background-state', 'active');
+});

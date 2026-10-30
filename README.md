@@ -122,6 +122,8 @@ Reduced motion uses a deterministic, still 2D approximation of the shape bands w
 
 `site-background.css` controls layering and light-theme opacity. No client-side route or server is required.
 
+Click or tap Rogo to open a speech bubble with Shape Waves and None choices. None removes the background canvases and texture overlay, displaying solid black in dark mode and solid white in light mode. The choice is saved under `site-background` in local storage, applied before first paint, and synchronized across tabs. If storage is blocked, changes still apply for the current visit. The picker supports native radio-keyboard controls, Escape, an explicit close button and outside-click dismissal. Rogo stays still on mobile and under reduced motion; desktop retains his idle and wave animations.
+
 ### Homepage React components and ownership
 
 The homepage has two independent roots, `#project-directory-root` and `#widget-tabs-root`, mounted by [`src/homepage/index.jsx`](src/homepage/index.jsx). No router is used; all existing page paths and external links remain normal links.

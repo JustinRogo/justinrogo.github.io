@@ -76,6 +76,7 @@ function StaticShapes() {
 }
 
 export function SiteBackground() {
+  const [enabled, setEnabled] = useState(() => document.body.dataset.background !== 'none');
   const [animated, setAnimated] = useState(() => !matchMedia('(prefers-reduced-motion: reduce), (prefers-contrast: more), (forced-colors: active)').matches);
   const [interactive, setInteractive] = useState(() => matchMedia('(hover: hover) and (pointer: fine)').matches);
   const [status, setStatus] = useState('fallback');
@@ -91,9 +92,18 @@ export function SiteBackground() {
     };
     quiet.addEventListener('change', sync, { signal: controller.signal });
     finePointer.addEventListener('change', sync, { signal: controller.signal });
-    return () => controller.abort();
+    const syncBackground = () => {
+      const nextEnabled = document.body.dataset.background !== 'none';
+      if (!nextEnabled) setStatus('fallback');
+      setEnabled(nextEnabled);
+    };
+    const observer = new MutationObserver(syncBackground);
+    observer.observe(document.body, { attributes: true, attributeFilter: ['data-background'] });
+    syncBackground();
+    return () => { controller.abort(); observer.disconnect(); };
   }, []);
 
+  if (!enabled) return null;
   return <div className="site-background__layers" data-background-state={animated ? status : 'static'}>
     <StaticShapes />
     {animated && <ShapeWaves {...SHAPE_WAVES_SETTINGS}

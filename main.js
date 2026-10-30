@@ -36,9 +36,12 @@ fetch('https://justinrogo.github.io/data/cards_count.json')
   const meta = document.querySelector('meta[name="theme-color"]');
 
   function syncThemeColor() {
-    if (meta) meta.content = body.classList.contains('light') ? '#f1f5f9' : '#060d20';
+    if (!meta) return;
+    const plain = body.dataset.background === 'none';
+    meta.content = body.classList.contains('light') ? (plain ? '#ffffff' : '#f1f5f9') : (plain ? '#000000' : '#060d20');
   }
   syncThemeColor();
+  document.addEventListener('backgroundchange', syncThemeColor);
 
   if (btn) {
     btn.addEventListener('click', () => {
@@ -162,7 +165,62 @@ fetch('https://justinrogo.github.io/data/cards_count.json')
 })();
 
 /* ===================================================================
-   Animated Desktop Companion
+   Rogo's Background Picker
+   =================================================================== */
+(function initBackgroundPicker() {
+  const pet = document.getElementById('sitePet');
+  const bubble = document.getElementById('rogoSettings');
+  const close = document.getElementById('closeRogoSettings');
+  if (!pet || !bubble || !close) return;
+  const options = [...bubble.querySelectorAll('input[name="page-background"]')];
+  const note = document.getElementById('backgroundPreferenceNote');
+
+  function applyBackground(value) {
+    const selection = value === 'none' ? 'none' : 'shape-waves';
+    document.body.dataset.background = selection;
+    options.forEach(option => { option.checked = option.value === selection; });
+    document.dispatchEvent(new Event('backgroundchange'));
+  }
+
+  function setOpen(open, restoreFocus = false) {
+    bubble.hidden = !open;
+    pet.setAttribute('aria-expanded', String(open));
+    if (open) options.find(option => option.checked)?.focus({ preventScroll: true });
+    else if (restoreFocus) pet.focus({ preventScroll: true });
+  }
+
+  pet.addEventListener('click', () => setOpen(bubble.hidden));
+  close.addEventListener('click', () => setOpen(false, true));
+  bubble.addEventListener('change', event => {
+    if (!options.includes(event.target)) return;
+    applyBackground(event.target.value);
+    try {
+      localStorage.setItem('site-background', document.body.dataset.background);
+      if (note) note.textContent = 'Your choice stays in this browser.';
+    } catch {
+      if (note) note.textContent = 'Applied for this visit.';
+    }
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && !bubble.hidden) {
+      event.preventDefault();
+      setOpen(false, true);
+    }
+  });
+  document.addEventListener('pointerdown', event => {
+    if (!bubble.hidden && !bubble.contains(event.target) && !pet.contains(event.target)) setOpen(false);
+  });
+  document.addEventListener('focusin', event => {
+    if (!bubble.hidden && !bubble.contains(event.target) && !pet.contains(event.target)) setOpen(false);
+  });
+  window.addEventListener('storage', event => {
+    if (event.key === 'site-background' || event.key === null) applyBackground(event.newValue);
+  });
+  applyBackground(document.body.dataset.background);
+})();
+
+/* ===================================================================
+   Animated Site Companion
    =================================================================== */
 (function initSitePet() {
   const pet = document.getElementById('sitePet');
@@ -210,7 +268,7 @@ fetch('https://justinrogo.github.io/data/cards_count.json')
   }
 
   function tick() {
-    if (!desktopQuery.matches || reducedMotionQuery.matches || !loaded) return;
+    if (!desktopQuery.matches || reducedMotionQuery.matches || document.hidden || !loaded) return;
 
     const sequence = sequences[mode];
     draw(sequence.row, frame);
@@ -243,7 +301,7 @@ fetch('https://justinrogo.github.io/data/cards_count.json')
     waveLoops = 0;
     scheduleWave();
 
-    if (reducedMotionQuery.matches) draw(sequences.idle.row, 0);
+    if (reducedMotionQuery.matches || !desktopQuery.matches || document.hidden) draw(sequences.idle.row, 0);
     else tick();
   }
 
@@ -280,17 +338,13 @@ fetch('https://justinrogo.github.io/data/cards_count.json')
     sprite.src = 'assets/rogo-corner.webp';
   }
 
-  function syncVisibility() {
-    if (desktopQuery.matches) load();
-    else stop();
-  }
-
   pet.addEventListener('click', requestWave);
-  desktopQuery.addEventListener('change', syncVisibility);
+  desktopQuery.addEventListener('change', () => { if (loaded) start(); });
   reducedMotionQuery.addEventListener('change', () => {
-    if (desktopQuery.matches && loaded) start();
+    if (loaded) start();
   });
-  syncVisibility();
+  document.addEventListener('visibilitychange', () => { if (loaded) start(); });
+  load();
 })();
 
 /* ===================================================================

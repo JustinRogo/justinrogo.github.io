@@ -76,6 +76,14 @@ body.light ::selection {
   color: #ffffff;
 }
 
+/* A plain background is truly solid, including the page's texture overlay. */
+body[data-background="none"] { --bg: #000000; }
+body.light[data-background="none"] { --bg: #ffffff; }
+html:has(body[data-background="none"]) { background: #000000; }
+html:has(body.light[data-background="none"]) { background: #ffffff; }
+body[data-background="none"] .site-background,
+body[data-background="none"] .noise-overlay { display: none; }
+
 /* ===================================================================
    Reset & Base Styles
    =================================================================== */
@@ -1717,7 +1725,8 @@ input, textarea {
 }
 
 .site-pet:hover .site-pet__label,
-.site-pet:focus-visible .site-pet__label {
+.site-pet:focus-visible .site-pet__label,
+.site-pet[aria-expanded="true"] .site-pet__label {
   opacity: 1;
   transform: translateY(0);
 }
@@ -1727,10 +1736,105 @@ body.light .site-pet__label {
   color: #0f1a2e;
 }
 
+.rogo-settings {
+  --rogo-bubble-bg: #0d182d;
+  --rogo-bubble-bottom: calc(170px + env(safe-area-inset-bottom, 0px));
+  position: fixed;
+  left: clamp(16px, 1.5vw, 24px);
+  bottom: var(--rogo-bubble-bottom);
+  z-index: 1100;
+  width: min(320px, calc(100vw - 32px));
+  border: 1px solid var(--line-strong);
+  border-radius: 16px;
+  background: var(--rogo-bubble-bg);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
+  color: var(--text-strong);
+}
+
+.rogo-settings[hidden] { display: none; }
+.rogo-settings::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 40px;
+  width: 14px;
+  height: 14px;
+  border-right: 1px solid var(--line-strong);
+  border-bottom: 1px solid var(--line-strong);
+  background: var(--rogo-bubble-bg);
+  transform: rotate(45deg);
+}
+
+.rogo-settings__content {
+  max-height: calc(100dvh - var(--rogo-bubble-bottom) - 16px);
+  overflow-y: auto;
+  padding: 18px;
+}
+
+.rogo-settings__heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.rogo-settings__heading h2 { margin: 0; font-size: 1.2rem; line-height: 1.3; }
+.rogo-settings__close {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  margin: -10px -10px -10px 0;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+.rogo-settings__close svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.rogo-settings__close:hover { background: var(--line); color: var(--text-strong); }
+.rogo-settings__intro { margin: 8px 0 16px; font-size: 0.875rem; color: var(--text); }
+.rogo-settings__options { margin: 0; padding: 0; border: 0; min-width: 0; }
+.rogo-settings .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.rogo-settings__option {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) 20px;
+  gap: 12px;
+  align-items: center;
+  min-height: 76px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line-strong);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.rogo-settings__option:hover .rogo-settings__name { color: var(--orange); }
+.rogo-settings__preview { display: block; width: 40px; height: 40px; border-radius: 6px; }
+.rogo-settings__preview--none { background: #000000; border: 1px solid var(--line-strong); }
+.rogo-settings__name { display: block; font-size: 0.9rem; font-weight: 700; }
+.rogo-settings__description { display: block; margin-top: 3px; font-size: 0.75rem; line-height: 1.5; color: var(--text); }
+.rogo-settings__option input { width: 18px; height: 18px; margin: 0; accent-color: var(--orange); cursor: pointer; }
+.rogo-settings__close:focus-visible,
+.rogo-settings__option:has(input:focus-visible) { outline: 2px solid var(--cyan); outline-offset: 3px; border-radius: 6px; }
+.rogo-settings__note { margin: 12px 0 0; color: var(--muted); font-size: 0.75rem; }
+body.light .rogo-settings { --rogo-bubble-bg: #ffffff; }
+body.light .rogo-settings__preview--none { background: #ffffff; }
+body.light .rogo-settings__option:hover .rogo-settings__name { color: #a23d10; }
+body.light .rogo-settings__option input { accent-color: #a23d10; }
+
 @media (max-width: 1099px) {
-  .site-pet {
-    display: none !important;
-  }
+  .site-pet { width: 72px; left: 12px; }
+  .site-pet__canvas { width: 72px; height: 78px; }
+  .site-pet__label { margin-top: -4px; font-size: 0.65rem; opacity: 1; transform: none; }
+  .site-pet:hover, .site-pet:focus-visible { transform: none; }
+  .rogo-settings { --rogo-bubble-bottom: calc(122px + env(safe-area-inset-bottom, 0px)); }
+  .rogo-settings::after { left: 24px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-pet, .site-pet__label { transition: none; }
+  .site-pet:hover, .site-pet:focus-visible { transform: none; }
+}
+
+@media (forced-colors: active) {
+  .rogo-settings, body.light .rogo-settings { --rogo-bubble-bg: Canvas; color: CanvasText; border-color: CanvasText; }
+  .rogo-settings__option input { forced-color-adjust: auto; }
 }
 
 /* ===================================================================
