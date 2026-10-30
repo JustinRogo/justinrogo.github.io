@@ -467,6 +467,9 @@ test('Rogo supports keyboard selection, Escape, close and outside dismissal', as
   await expect(pet).toHaveAttribute('aria-expanded', 'true');
   await expect(bubble.getByRole('radio', { name: 'Shape Waves', exact: true })).toBeFocused();
   await page.keyboard.press('ArrowDown');
+  await expect(bubble.getByRole('radio', { name: 'Antigravity', exact: true })).toBeChecked();
+  await page.keyboard.press('ArrowUp');
+  await page.keyboard.press('ArrowUp');
   await expect(bubble.getByRole('radio', { name: 'None', exact: true })).toBeChecked();
   await page.keyboard.press('Escape');
   await expect(bubble).toBeHidden();
@@ -477,7 +480,7 @@ test('Rogo supports keyboard selection, Escape, close and outside dismissal', as
   await bubble.getByRole('button', { name: 'Close background picker' }).click();
   await expect(pet).toBeFocused();
   await pet.click();
-  await page.locator('h1').click();
+  await page.getByRole('heading', { name: 'Pages & Projects', exact: true }).click();
   await expect(bubble).toBeHidden();
   await pet.click();
   await page.locator('#theme').focus();
@@ -494,13 +497,25 @@ for (const width of [320, 390]) {
       await page.getByRole('button', { name: 'Rogo: change page background' }).tap();
       const bubble = page.getByRole('dialog', { name: 'Pick a background.' });
       await expect(bubble).toBeVisible();
+      await expect(bubble.getByRole('radio')).toHaveCount(5);
       const bounds = await bubble.boundingBox();
       expect(bounds.x).toBeGreaterThanOrEqual(0);
       expect(bounds.y).toBeGreaterThanOrEqual(0);
       expect(bounds.x + bounds.width).toBeLessThanOrEqual(width);
       await bubble.getByRole('radio', { name: 'None', exact: true }).tap();
       await expect(page.locator('#site-background canvas')).toHaveCount(0);
+      expect(await bubble.getByRole('radio', { name: 'None', exact: true }).evaluate(input => {
+        const option = input.closest('label').getBoundingClientRect();
+        const note = document.getElementById('backgroundPreferenceNote').getBoundingClientRect();
+        const list = document.querySelector('.rogo-settings__choices').getBoundingClientRect();
+        // Scroll positions round to device pixels while layout uses fractional CSS pixels.
+        return option.bottom <= note.top && option.top >= list.top - 1 && option.bottom <= list.bottom + 1;
+      })).toBe(true);
       await page.screenshot({ path: testInfo.outputPath('rogo-picker.png') });
+      await bubble.getByRole('radio', { name: 'Fractal', exact: true }).tap();
+      await expect(page.locator('.fractal-background')).toBeVisible();
+      await bubble.getByRole('radio', { name: 'Aurora', exact: true }).tap();
+      await expect(page.locator('.glow-aurora')).toHaveCount(3);
       await bubble.getByRole('radio', { name: 'Shape Waves', exact: true }).tap();
       await expect(page.locator('.site-background__layers')).toHaveAttribute('data-background-state', 'static');
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -540,4 +555,126 @@ test('Rogo synchronizes background choices across tabs and handles cleared or in
     await expect(page.locator('body')).toHaveAttribute('data-background', 'shape-waves');
   } finally { await otherPage.close(); }
   await expect(page.locator('.site-background__layers')).toHaveAttribute('data-background-state', 'active');
+});
+
+test('restored backgrounds switch renderers without leaving animation loops behind', async ({ page }) => {
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.addInitScript(() => {
+    window.legacyFrames = { particles: 0, fractal: 0 };
+    const draw = WebGL2RenderingContext.prototype.drawArraysInstanced;
+    WebGL2RenderingContext.prototype.drawArraysInstanced = function (...args) {
+      if (this.canvas.matches('.antigravity__canvas')) {
+        window.legacyFrames.particles++;
+        window.legacyParticleCount = args[3];
+      }
+      return draw.apply(this, args);
+    };
+    const clear = CanvasRenderingContext2D.prototype.clearRect;
+    CanvasRenderingContext2D.prototype.clearRect = function (...args) {
+      if (this.canvas.matches('.fractal-background')) window.legacyFrames.fractal++;
+      return clear.apply(this, args);
+    };
+  });
+  await open(page);
+  await page.getByRole('button', { name: 'Rogo: change page background' }).click();
+  const choose = name => page.getByRole('radio', { name, exact: true }).check();
+  await choose('Antigravity');
+  await expect.poll(() => page.evaluate(() => window.legacyFrames.particles)).toBeGreaterThan(1);
+  expect(await page.evaluate(() => window.legacyParticleCount)).toBe(1050);
+  await expect(page.locator('.shape-waves')).toHaveCount(0);
+  await choose('Aurora');
+  await expect(page.locator('#site-background canvas')).toHaveCount(0);
+  await expect(page.locator('.glow-aurora')).toHaveCount(3);
+  const particles = await page.evaluate(() => window.legacyFrames.particles);
+  await page.waitForTimeout(200);
+  expect(await page.evaluate(() => window.legacyFrames.particles)).toBe(particles);
+  await choose('Fractal');
+  await expect.poll(() => page.evaluate(() => window.legacyFrames.fractal)).toBeGreaterThan(2);
+  await choose('None');
+  await expect(page.locator('#site-background canvas, #site-background .glow-aurora')).toHaveCount(0);
+  const fractal = await page.evaluate(() => window.legacyFrames.fractal);
+  await page.waitForTimeout(200);
+  expect(await page.evaluate(() => window.legacyFrames.fractal)).toBe(fractal);
+  await choose('Shape Waves');
+  await expect(page.locator('.site-background__layers')).toHaveAttribute('data-background-state', 'active');
+  await expect(page.locator('.antigravity, .fractal-background, .glow-aurora')).toHaveCount(0);
+  expect(errors).toEqual([]);
+});
+
+for (const [id, name, renderer] of [
+  ['antigravity', 'Antigravity', '.antigravity__canvas'],
+  ['fractal', 'Fractal', '.fractal-background'],
+  ['aurora', 'Aurora', '.site-background__aurora'],
+]) {
+  test(`restored ${name} survives reload and supports both themes`, async ({ page }, testInfo) => {
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await page.addInitScript(value => {
+      localStorage.setItem('site-background', value);
+      localStorage.setItem('theme', 'dark');
+    }, id);
+    await open(page);
+    await expect(page.locator('body')).toHaveAttribute('data-background', id);
+    await expect(page.locator(renderer)).toBeVisible();
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await expect(page.locator(renderer)).toBeVisible();
+    await page.getByRole('button', { name: 'Rogo: change page background' }).click();
+    await expect(page.getByRole('radio', { name, exact: true })).toBeChecked();
+    if (id === 'fractal') {
+      await expect.poll(() => page.locator(renderer).evaluate(canvas => {
+        const pixels = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data;
+        return pixels.some((value, index) => index % 4 === 3 && value > 0);
+      })).toBe(true);
+    }
+    // Let the restored renderer's entrance settle before visual review.
+    await page.waitForTimeout(1200);
+    await page.screenshot({ path: testInfo.outputPath(`${id}-dark.png`) });
+    await page.getByRole('button', { name: 'Close background picker' }).click();
+    await page.locator('#theme').click();
+    await expect(page.locator('body')).toHaveClass(/light/);
+    await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(241, 245, 249)');
+    await expect(page.locator(renderer)).toBeVisible();
+    await page.getByRole('button', { name: 'Rogo: change page background' }).click();
+    await page.screenshot({ path: testInfo.outputPath(`${id}-light.png`) });
+  });
+}
+
+test('restored backgrounds provide still alternatives for reduced motion', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await open(page);
+  await page.getByRole('button', { name: 'Rogo: change page background' }).click();
+  for (const name of ['Antigravity', 'Fractal', 'Aurora']) {
+    await page.getByRole('radio', { name, exact: true }).check();
+    await expect(page.locator('.site-background__layers')).toHaveAttribute('data-background-state', 'static');
+    await expect(page.locator('.antigravity__canvas, .shape-waves__canvas')).toHaveCount(0);
+    expect(await page.locator('#site-background').evaluate(element => element.getAnimations({ subtree: true }).length)).toBe(0);
+    const canvas = page.locator('#site-background canvas');
+    if (await canvas.count()) {
+      const image = await canvas.evaluate(element => element.toDataURL());
+      await page.waitForTimeout(150);
+      expect(await canvas.evaluate(element => element.toDataURL())).toBe(image);
+    }
+  }
+  await page.getByRole('radio', { name: 'Antigravity', exact: true }).check();
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await expect(page.locator('.antigravity__canvas')).toBeVisible();
+  await page.emulateMedia({ contrast: 'more' });
+  await expect(page.locator('#site-background')).toBeHidden();
+  await expect(page.locator('.antigravity__canvas')).toHaveCount(0);
+});
+
+test('restored Antigravity falls back when WebGL is unavailable', async ({ page }) => {
+  await page.addInitScript(() => {
+    const getContext = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (type, ...args) {
+      return type === 'webgl2' ? null : getContext.call(this, type, ...args);
+    };
+  });
+  await open(page);
+  await page.getByRole('button', { name: 'Rogo: change page background' }).click();
+  await page.getByRole('radio', { name: 'Antigravity', exact: true }).check();
+  await expect(page.locator('.site-background__layers')).toHaveAttribute('data-background-state', 'fallback');
+  await expect(page.locator('.background-static')).toBeVisible();
+  await page.getByRole('radio', { name: 'Fractal', exact: true }).check();
+  await expect(page.locator('.fractal-background')).toBeVisible();
 });

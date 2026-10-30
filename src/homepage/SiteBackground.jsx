@@ -1,6 +1,9 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import ShapeWaves from './vendor/ShapeWaves.jsx';
+import { AntigravityBackground } from './AntigravityBackground.jsx';
+import { FractalBackground } from './FractalBackground.jsx';
 import './site-background.css';
+import './legacy-backgrounds.css';
 
 // Explicit values from the shared React Bits Shape Waves URL.
 export const SHAPE_WAVES_SETTINGS = Object.freeze({
@@ -75,11 +78,29 @@ function StaticShapes() {
   return <canvas ref={ref} className="background-static" aria-hidden="true" />;
 }
 
+function ShapeWavesBackground({ animated, interactive }) {
+  const [status, setStatus] = useState('fallback');
+  return <div className="site-background__layers" data-background-state={animated ? status : 'static'}>
+    <StaticShapes />
+    {animated && <ShapeWaves {...SHAPE_WAVES_SETTINGS}
+      interactive={interactive} onStatus={setStatus} />}
+  </div>;
+}
+
+function AuroraBackground({ animated, visible }) {
+  return <div className="site-background__aurora" data-animated={animated} data-visible={visible} aria-hidden="true">
+    <div className="glow-aurora glow-aurora-1" />
+    <div className="glow-aurora glow-aurora-2" />
+    <div className="glow-aurora glow-aurora-3" />
+  </div>;
+}
+
 export function SiteBackground() {
-  const [enabled, setEnabled] = useState(() => document.body.dataset.background !== 'none');
+  const [background, setBackground] = useState(() => document.body.dataset.background || 'shape-waves');
+  const [light, setLight] = useState(() => document.body.classList.contains('light'));
+  const [visible, setVisible] = useState(() => !document.hidden);
   const [animated, setAnimated] = useState(() => !matchMedia('(prefers-reduced-motion: reduce), (prefers-contrast: more), (forced-colors: active)').matches);
   const [interactive, setInteractive] = useState(() => matchMedia('(hover: hover) and (pointer: fine)').matches);
-  const [status, setStatus] = useState('fallback');
 
   useEffect(() => {
     const quiet = matchMedia('(prefers-reduced-motion: reduce), (prefers-contrast: more), (forced-colors: active)');
@@ -88,25 +109,27 @@ export function SiteBackground() {
     const sync = () => {
       setAnimated(!quiet.matches);
       setInteractive(finePointer.matches);
-      if (quiet.matches) setStatus('fallback');
     };
     quiet.addEventListener('change', sync, { signal: controller.signal });
     finePointer.addEventListener('change', sync, { signal: controller.signal });
     const syncBackground = () => {
-      const nextEnabled = document.body.dataset.background !== 'none';
-      if (!nextEnabled) setStatus('fallback');
-      setEnabled(nextEnabled);
+      setBackground(document.body.dataset.background || 'shape-waves');
+      setLight(document.body.classList.contains('light'));
     };
     const observer = new MutationObserver(syncBackground);
-    observer.observe(document.body, { attributes: true, attributeFilter: ['data-background'] });
+    observer.observe(document.body, { attributes: true, attributeFilter: ['data-background', 'class'] });
+    document.addEventListener('visibilitychange', () => setVisible(!document.hidden), { signal: controller.signal });
     syncBackground();
     return () => { controller.abort(); observer.disconnect(); };
   }, []);
 
-  if (!enabled) return null;
-  return <div className="site-background__layers" data-background-state={animated ? status : 'static'}>
-    <StaticShapes />
-    {animated && <ShapeWaves {...SHAPE_WAVES_SETTINGS}
-      interactive={interactive} onStatus={setStatus} />}
+  // Mount only the selected renderer; switching releases its timers and GPU resources.
+  const motionKey = animated ? 'animated' : 'still';
+  if (background === 'none') return null;
+  if (background === 'antigravity') return <AntigravityBackground key={motionKey} light={light} animated={animated} interactive={interactive} />;
+  if (background === 'shape-waves') return <ShapeWavesBackground key={motionKey} animated={animated} interactive={interactive} />;
+  return <div className="site-background__layers" data-background-state={animated ? 'active' : 'static'}>
+    <AuroraBackground animated={animated} visible={visible} />
+    {background === 'fractal' && <FractalBackground animated={animated} light={light} />}
   </div>;
 }

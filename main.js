@@ -176,16 +176,21 @@ fetch('https://justinrogo.github.io/data/cards_count.json')
   const note = document.getElementById('backgroundPreferenceNote');
 
   function applyBackground(value) {
-    const selection = value === 'none' ? 'none' : 'shape-waves';
+    const selection = options.some(option => option.value === value) ? value : 'shape-waves';
     document.body.dataset.background = selection;
     options.forEach(option => { option.checked = option.value === selection; });
+    if (!bubble.hidden) options.find(option => option.checked)?.closest('label').scrollIntoView({ block: 'nearest' });
     document.dispatchEvent(new Event('backgroundchange'));
   }
 
   function setOpen(open, restoreFocus = false) {
     bubble.hidden = !open;
     pet.setAttribute('aria-expanded', String(open));
-    if (open) options.find(option => option.checked)?.focus({ preventScroll: true });
+    if (open) {
+      const selected = options.find(option => option.checked);
+      selected?.focus({ preventScroll: true });
+      selected?.closest('label').scrollIntoView({ block: 'nearest' });
+    }
     else if (restoreFocus) pet.focus({ preventScroll: true });
   }
 

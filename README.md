@@ -112,7 +112,7 @@ The profile, two sidebar cards, Pages & Projects, widget deck and Quick Links us
 
 `GlassMaterial.jsx` places the component in a decorative, inert layer behind each card's content. This keeps text, iframes, forms, native disclosures and existing event handlers separate from the refraction effect. Existing HTML cards expose empty `data-glass-material` slots; React owns only these slots. Theme integration is in `glass-material.css`, separate from the upstream stylesheet. SVG refraction is enabled on desktop with a fine pointer; mobile, reduced motion and upstream browser compatibility checks select the frosted fallback. Higher contrast, reduced transparency and forced colors use an opaque material. The glass material adds no WebGL loop, dependency or external runtime.
 
-### Shape Waves background
+### Homepage backgrounds
 
 `SiteBackground.jsx` owns the fixed `#site-background` island. It uses the official React Bits [Shape Waves](https://reactbits.dev/backgrounds/shape-waves) component, vendored at revision `e12c22192ac7b4b452c5e2feb9b586d74765d696`. The exported `SHAPE_WAVES_SETTINGS` constant preserves the shared URL: empty text, text size 0.24, mixed shapes, background `#00173a`, shape color `#913d00`, hover `#f97316`, direction 175, glow 1.75, flow 2.3, fade 0.3, brightness 0.48, splash strength 0.75, splash radius 28, dot size 0.58, cell size 8, scale 1.6, contrast 3 and speed 0.7.
 
@@ -122,7 +122,9 @@ Reduced motion uses a deterministic, still 2D approximation of the shape bands w
 
 `site-background.css` controls layering and light-theme opacity. No client-side route or server is required.
 
-Click or tap Rogo to open a speech bubble with Shape Waves and None choices. None removes the background canvases and texture overlay, displaying solid black in dark mode and solid white in light mode. The choice is saved under `site-background` in local storage, applied before first paint, and synchronized across tabs. If storage is blocked, changes still apply for the current visit. The picker supports native radio-keyboard controls, Escape, an explicit close button and outside-click dismissal. Rogo stays still on mobile and under reduced motion; desktop retains his idle and wave animations.
+Click or tap Rogo to open a speech bubble with Shape Waves, Antigravity, Fractal, Aurora and None choices. None removes the background canvases and texture overlay, displaying solid black in dark mode and solid white in light mode. The choice is saved under `site-background` in local storage, applied before first paint, and synchronized across tabs. If storage is blocked, changes still apply for the current visit. The picker supports native radio-keyboard controls, Escape, an explicit close button and outside-click dismissal. Rogo stays still on mobile and under reduced motion; desktop retains his idle and wave animations.
+
+The three restored choices reuse earlier implementations from Git history. Antigravity retains the 1,050 blue/orange tetrahedrons and original Stardust settings from `8f3254c`, plus its static particle fallback and WebGL context recovery. Fractal restores the branching-line algorithm from `1d5b197`, its 30fps limit and 30-second grow/fade cycle, with the original aurora layers behind it. Aurora offers those three drifting blue/violet/orange glows on their own. The fractal and particle canvases retain a 2.4-million-pixel budget with DPR capped at 1.5; reduced motion renders still versions, hidden tabs suspend motion, and changing choices releases the prior renderer's listeners, timers and GPU resources. The picker scrolls its options on short screens while keeping its heading and close button visible.
 
 ### Homepage React components and ownership
 
@@ -133,7 +135,7 @@ The homepage has two independent roots, `#project-directory-root` and `#widget-t
 - `effects.js` owns spotlight listeners and moving-indicator geometry. Its observers, animation frames and media-query listeners are cleaned up. Indicator motion is cancelled and measured again during rapid switching, font loading and resizing.
 - `legacy-widgets.js` exports the existing CliftonStrengths and library catalog initializers. `LegacyWidget` gives each initializer an empty host; React never reconciles that host's descendants. Initializers run once per mount and return cleanup, including the strengths resize observer and delegated listeners. The strengths initializer also updates the existing profile domain bar.
 
-`main.js` continues to own theme/share controls, clock/weather, feeds, profile disclosures, contact menu and companion. It contains no directory, main-tab, request-form, nested-widget or background initializer. `style.css` remains the shared layout and base-material source; Glass Surface and Shape Waves styles are bundled separately.
+`main.js` continues to own theme/share controls, clock/weather, feeds, profile disclosures, contact menu and companion. It contains no directory, main-tab, request-form, nested-widget or background renderer. `style.css` remains the shared layout and base-material source; Glass Surface and Shape Waves styles are bundled separately.
 
 ### Development and builds
 

@@ -1,17 +1,21 @@
-/* Shape Waves is a fixed decorative backdrop; page content owns all input. */
+/* Selected backgrounds are fixed decorative backdrops; page content owns input. */
 .site-background {
   position: fixed;
   inset: 0;
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
-  background: #00173a;
 }
 
-body.light .site-background { opacity: 0.12; }
+body[data-background="shape-waves"] .site-background { background: #00173a; }
+body.light[data-background="shape-waves"] .site-background { opacity: 0.12; }
+body[data-background="antigravity"] .site-background { opacity: 0.8; }
+body.light[data-background="antigravity"] .site-background { opacity: 0.65; }
 
 .site-background__layers,
 .site-background .shape-waves,
+.site-background .antigravity,
+.site-background__aurora,
 .background-static {
   position: absolute;
   inset: 0;

@@ -40,8 +40,8 @@
   <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Space+Grotesk:wght@400;600;700&display=swap" />
 
-  <link rel="stylesheet" href="style.css?v=20261030-rogo-background" />
-  <link rel="stylesheet" href="assets/homepage.css?v=20261030-rogo-background" />
+  <link rel="stylesheet" href="style.css?v=20261030-background-choices" />
+  <link rel="stylesheet" href="assets/homepage.css?v=20261030-background-choices" />
 </head>
 
 <body>
@@ -58,7 +58,8 @@
     (function () {
       var background = 'shape-waves';
       try {
-        if (localStorage.getItem('site-background') === 'none') background = 'none';
+        var saved = localStorage.getItem('site-background');
+        if (['shape-waves', 'antigravity', 'fractal', 'aurora', 'none'].includes(saved)) background = saved;
       } catch (e) { /* storage blocked — keep Shape Waves */ }
       document.body.dataset.background = background;
     })();
@@ -91,7 +92,7 @@
     </defs>
   </svg>
 
-  <!-- React-owned Shape Waves background, behind all interactive content. -->
+  <!-- React-owned selected background, behind all interactive content. -->
   <div class="noise-overlay" aria-hidden="true"></div>
   <div id="site-background" class="site-background" aria-hidden="true"></div>
 
@@ -372,22 +373,50 @@
         </button>
       </div>
       <p class="rogo-settings__intro">Make yourself at home.</p>
-      <fieldset class="rogo-settings__options">
-        <legend class="sr-only">Page background</legend>
-        <label class="rogo-settings__option">
-          <svg class="rogo-settings__preview" viewBox="0 0 40 40" aria-hidden="true">
-            <rect width="40" height="40" rx="6" fill="#00173a" />
-            <g fill="#b85513"><path d="m8 7 3 6H5zm12 0 3 6h-6zm12 0 3 6h-6z" /><circle cx="8" cy="21" r="3" /><circle cx="20" cy="21" r="3" /><circle cx="32" cy="21" r="3" /><path d="M5 29h6v6H5zm12 0h6v6h-6zm12 0h6v6h-6z" /></g>
-          </svg>
-          <span><span class="rogo-settings__name">Shape Waves</span><span class="rogo-settings__description" id="shapeWavesDescription">A little motion, a little color.</span></span>
-          <input type="radio" name="page-background" value="shape-waves" aria-label="Shape Waves" aria-describedby="shapeWavesDescription" checked />
-        </label>
-        <label class="rogo-settings__option">
-          <span class="rogo-settings__preview rogo-settings__preview--none" aria-hidden="true"></span>
-          <span><span class="rogo-settings__name">None</span><span class="rogo-settings__description" id="noBackgroundDescription">Solid black or white to match your theme.</span></span>
-          <input type="radio" name="page-background" value="none" aria-label="None" aria-describedby="noBackgroundDescription" />
-        </label>
-      </fieldset>
+      <div class="rogo-settings__choices">
+        <fieldset class="rogo-settings__options">
+          <legend class="sr-only">Page background</legend>
+          <label class="rogo-settings__option">
+            <svg class="rogo-settings__preview" viewBox="0 0 40 40" aria-hidden="true">
+              <rect width="40" height="40" rx="6" fill="#00173a" />
+              <g fill="#b85513"><path d="m8 7 3 6H5zm12 0 3 6h-6zm12 0 3 6h-6z" /><circle cx="8" cy="21" r="3" /><circle cx="20" cy="21" r="3" /><circle cx="32" cy="21" r="3" /><path d="M5 29h6v6H5zm12 0h6v6h-6zm12 0h6v6h-6z" /></g>
+            </svg>
+            <span><span class="rogo-settings__name">Shape Waves</span><span class="rogo-settings__description" id="shapeWavesDescription">A little motion, a little color.</span></span>
+            <input type="radio" name="page-background" value="shape-waves" aria-label="Shape Waves" aria-describedby="shapeWavesDescription" checked />
+          </label>
+          <label class="rogo-settings__option">
+            <svg class="rogo-settings__preview" viewBox="0 0 40 40" aria-hidden="true">
+              <rect width="40" height="40" rx="6" fill="#070d1e" />
+              <path d="m10 8 5 10H5zm18 3 4 8h-8zM18 22l6 12H12z" fill="#275dff" />
+              <path d="m30 25 4 8h-8zM7 28l3 6H4z" fill="#f97316" />
+            </svg>
+            <span><span class="rogo-settings__name">Antigravity</span><span class="rogo-settings__description" id="antigravityDescription">Floating blue and orange particles.</span></span>
+            <input type="radio" name="page-background" value="antigravity" aria-label="Antigravity" aria-describedby="antigravityDescription" />
+          </label>
+          <label class="rogo-settings__option">
+            <svg class="rogo-settings__preview" viewBox="0 0 40 40" aria-hidden="true">
+              <rect width="40" height="40" rx="6" fill="#070d1e" />
+              <path d="m1 7 9 5v12l11 6h10m-21-6 9-5V9m2 21v9M19 19l10 6 10-6" fill="none" stroke="#00cde0" stroke-width="1.5" />
+            </svg>
+            <span><span class="rogo-settings__name">Fractal</span><span class="rogo-settings__description" id="fractalDescription">Colorful branches that grow and fade.</span></span>
+            <input type="radio" name="page-background" value="fractal" aria-label="Fractal" aria-describedby="fractalDescription" />
+          </label>
+          <label class="rogo-settings__option">
+            <svg class="rogo-settings__preview" viewBox="0 0 40 40" aria-hidden="true">
+              <defs><radialGradient id="auroraPreviewBlue"><stop stop-color="#0066ff" /><stop offset="1" stop-color="#070d1e" /></radialGradient><radialGradient id="auroraPreviewViolet"><stop stop-color="#7c3aed" /><stop offset="1" stop-color="#070d1e" /></radialGradient></defs>
+              <rect width="40" height="40" rx="6" fill="#070d1e" />
+              <circle cx="11" cy="12" r="11" fill="url(#auroraPreviewBlue)" /><circle cx="27" cy="26" r="12" fill="url(#auroraPreviewViolet)" />
+            </svg>
+            <span><span class="rogo-settings__name">Aurora</span><span class="rogo-settings__description" id="auroraDescription">Soft, slowly drifting color glows.</span></span>
+            <input type="radio" name="page-background" value="aurora" aria-label="Aurora" aria-describedby="auroraDescription" />
+          </label>
+          <label class="rogo-settings__option">
+            <span class="rogo-settings__preview rogo-settings__preview--none" aria-hidden="true"></span>
+            <span><span class="rogo-settings__name">None</span><span class="rogo-settings__description" id="noBackgroundDescription">Solid black or white to match your theme.</span></span>
+            <input type="radio" name="page-background" value="none" aria-label="None" aria-describedby="noBackgroundDescription" />
+          </label>
+        </fieldset>
+      </div>
       <p class="rogo-settings__note" id="backgroundPreferenceNote">Your choice stays in this browser.</p>
     </div>
   </section>
@@ -429,8 +458,8 @@
     </div>
   </nav>
 
-  <script src="main.js?v=20261030-rogo-background" defer></script>
-  <script src="assets/homepage.js?v=20261030-rogo-background" defer></script>
+  <script src="main.js?v=20261030-background-choices" defer></script>
+  <script src="assets/homepage.js?v=20261030-background-choices" defer></script>
 </body>
 
 </html>
