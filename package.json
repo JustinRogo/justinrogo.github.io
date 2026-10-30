@@ -4,7 +4,11 @@
   "scripts": {
     "postinstall": "node scripts/build-sanitizer.mjs",
     "build": "node scripts/build-site.mjs",
+    "build:homepage": "node scripts/build-homepage.mjs",
     "dev": "node scripts/serve-updates.mjs",
+    "test:homepage": "playwright test --config tests/homepage.config.mjs",
+    "pretest:homepage": "node scripts/build-site.mjs --skip-feed",
+    "preview": "node scripts/preview-site.mjs",
     "pretest:updates": "node scripts/build-sanitizer.mjs",
     "test:updates": "node --test tests/updates.test.mjs tests/updates-permissions.test.mjs tests/link-previews.test.mjs"
   },
@@ -13,6 +17,8 @@
     "dompurify": "3.4.17",
     "entities": "4.5.0",
     "quill": "2.0.2",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
     "sanitize-html": "2.18.1"
   },
   "engines": {
@@ -20,6 +26,7 @@
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.11",
+    "@playwright/test": "1.64.1",
     "esbuild": "0.28.2"
   }
 }

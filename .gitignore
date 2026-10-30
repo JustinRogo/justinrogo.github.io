@@ -12,3 +12,10 @@ __pycache__/
 /.env.local
 /Pages/Updates/vendor/
 /lib/generated/
+/assets/homepage.js
+/assets/homepage.js.LEGAL.txt
+/assets/react-LICENSE.txt
+/assets/react-dom-LICENSE.txt
+/assets/scheduler-LICENSE.txt
+/test-results/
+/playwright-report/

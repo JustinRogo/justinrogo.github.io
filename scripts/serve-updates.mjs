@@ -4,12 +4,14 @@ import { readFile, stat } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { vendorUpdates } from './build-site.mjs';
 import { buildSanitizer } from './build-sanitizer.mjs';
+import { buildHomepage } from './build-homepage.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 try { process.loadEnvFile(path.join(root, '.env.local')); } catch (error) { if (error.code !== 'ENOENT') throw error; }
 await buildSanitizer();
 const { default: handler } = await import('../api/updates.mjs');
 await vendorUpdates();
+const homepageWatcher = await buildHomepage({ watch: true });
 const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.png': 'image/png', '.jpg': 'image/jpeg', '.gif': 'image/gif', '.woff2': 'font/woff2', '.webmanifest': 'application/manifest+json', '.pdf': 'application/pdf' };
 const port = Number(process.env.PORT || 4388);
 const server = http.createServer(async (req, res) => {
@@ -61,4 +63,10 @@ const server = http.createServer(async (req, res) => {
     res.end(error.code === 'ENOENT' ? 'Not found' : 'Could not serve this request');
   }
 });
-server.listen(port, '127.0.0.1', () => console.log(`Local: http://127.0.0.1:${port}/updates?preview=1`));
+server.listen(port, '127.0.0.1', () => console.log(`Local: http://127.0.0.1:${port}/ (Updates preview: /updates?preview=1)`));
+async function shutdown() {
+  await homepageWatcher.dispose();
+  server.close();
+}
+process.once('SIGINT', shutdown);
+process.once('SIGTERM', shutdown);

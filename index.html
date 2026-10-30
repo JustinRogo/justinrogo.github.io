@@ -40,7 +40,7 @@
   <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Space+Grotesk:wght@400;600;700&display=swap" />
 
-  <link rel="stylesheet" href="style.css?v=20261030-react-bits" />
+  <link rel="stylesheet" href="style.css?v=20261030-react" />
 </head>
 
 <body>
@@ -253,77 +253,17 @@
     <!-- ========== Main ========== -->
     <main>
 
-      <!-- Collections stay visible; each opens its familiar page tree. -->
-      <section class="card surface widget page-directory" id="page-directory" aria-labelledby="page-directory-heading">
-        <header class="page-directory__heading">
-          <h2 id="page-directory-heading">Pages &amp; Projects</h2>
-        </header>
-        <nav class="page-tree" id="pageTree" aria-label="Site collections"></nav>
-      </section>
-
-      <!-- Tabs Deck -->
-      <section class="card glass tabs" aria-label="Widgets">
-        <div class="tablist glass glass--strong" role="tablist" aria-label="Widget tabs">
-          <button class="tab glass" role="tab" aria-selected="false" aria-controls="tab-cal"  id="tbtn-cal"  tabindex="-1">My Calendar</button>
-          <button class="tab glass" role="tab" aria-selected="false" aria-controls="tab-book" id="tbtn-book" tabindex="-1">Book a Meeting</button>
-          <button class="tab glass" role="tab" aria-selected="false" aria-controls="tab-req"  id="tbtn-req"  tabindex="-1">Submit a Request</button>
-          <button class="tab glass" role="tab" aria-selected="false" aria-controls="tab-cs"   id="tbtn-cs"   tabindex="-1">My CliftonStrengths</button>
-          <button class="tab glass" role="tab" aria-selected="true"  aria-controls="tab-cat"  id="tbtn-cat">Library Catalog</button>
-        </div>
-
-        <div id="tab-cal" class="tabpanel" role="tabpanel" aria-labelledby="tbtn-cal">
-          <iframe
-            class="embed"
-            loading="lazy"
-            data-src="https://outlook.office365.com/calendar/published/3ca52ff81f8a440699723f09efe5d298@uconn.edu/66bd7da89640440591f449ae5ce4fcc514733372329545515702/calendar.html"
-            title="Today's Schedule"></iframe>
-        </div>
-
-        <div id="tab-book" class="tabpanel" role="tabpanel" aria-labelledby="tbtn-book">
-          <iframe
-            class="embed"
-            loading="lazy"
-            data-src="https://outlook.office.com/bookwithme/user/3ca52ff81f8a440699723f09efe5d298%40uconn.edu?anonymous&amp;ismsaljsauthenabled=true"
-            title="Book Meeting"></iframe>
-        </div>
-
-        <div id="tab-req" class="tabpanel" role="tabpanel" aria-labelledby="tbtn-req">
-          <div class="card surface" style="padding:14px">
-            <div class="request-layout">
-              <iframe
-                class="embed"
-                loading="lazy"
-                data-src="https://trello.com/b/2Yp5IKYz.html"
-                title="Public Trello Board"></iframe>
-              <div class="card surface request-form-card">
-                <h3>Submit a Request</h3>
-                <p class="request-form__sent" id="requestSent" role="status" hidden>Thanks! Your request was sent.</p>
-                <form action="https://formsubmit.co/justinrogowski1+vnowu7qczgm6cw6e96zn@boards.trello.com" method="POST" id="requestForm">
-                  <input type="hidden" name="_captcha" value="false" />
-                  <input type="hidden" name="_next" value="https://justinrogo.github.io/?sent=1" />
-                  <!-- Trello uses the email subject as the card title; filled from the Subject field on submit -->
-                  <input type="hidden" name="_subject" value="Website request" />
-                  <!-- Honeypot: FormSubmit discards submissions that fill this in -->
-                  <input type="text" name="_honey" class="request-form__honey" tabindex="-1" autocomplete="off" aria-hidden="true" />
-                  <label>Name<input name="name" autocomplete="name" required /></label>
-                  <label>Email<input name="email" type="email" autocomplete="email" required /></label>
-                  <label>Subject<input name="subject" required /></label>
-                  <label>Details<textarea name="details" rows="6" required></textarea></label>
-                  <button class="glass btn request-form__submit" type="submit">Send Request</button>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div id="tab-cs" class="tabpanel" role="tabpanel" aria-labelledby="tbtn-cs">
-          <div id="csMount" class="widget">Loading CliftonStrengths…</div>
-        </div>
-
-        <div id="tab-cat" class="tabpanel active" role="tabpanel" aria-labelledby="tbtn-cat">
-          <div id="ulsw-root"></div>
-        </div>
-      </section>
+      <!-- React owns only these two islands; the rest remains in main.js. -->
+      <div id="project-directory-root">
+        <section class="card surface widget page-directory" aria-labelledby="page-directory-heading">
+          <header class="page-directory__heading"><h2 id="page-directory-heading">Pages &amp; Projects</h2></header>
+          <p class="info-note" role="status">Loading pages...</p>
+          <noscript><p>Enable JavaScript to browse the project directory and widgets.</p></noscript>
+        </section>
+      </div>
+      <div id="widget-tabs-root">
+        <section class="card glass tabs" aria-label="Widgets"><p class="info-note" role="status">Loading widgets…</p></section>
+      </div>
 
       <!-- Quick Links -->
       <section class="card glass widget" aria-label="Quick Links">
@@ -450,7 +390,8 @@
     </div>
   </nav>
 
-  <script src="main.js?v=20261030-react-bits" defer></script>
+  <script src="main.js?v=20261030-react" defer></script>
+  <script src="assets/homepage.js?v=20261030-react" defer></script>
 </body>
 
 </html>

@@ -22,6 +22,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+          cache: npm
+
+      - name: Install build dependencies
+        run: npm ci
 
       - name: Restore last successful Pocket Part feed
         uses: actions/cache/restore@v4
@@ -43,10 +47,7 @@ jobs:
         run: node "Pages/Work/UCPEA/update-union-wire.mjs"
 
       - name: Prepare static site
-        run: |
-          mkdir -p dist
-          cp -R data Maps Pages favicon.svg index.html main.js style.css dist/
-          find dist -type f -name '*.bak.html' -delete
+        run: npm run build -- --skip-feed
 
       - uses: actions/configure-pages@v5
 

@@ -1,0 +1,285 @@
+import { test, expect } from '@playwright/test';
+import { readFile, stat } from 'node:fs/promises';
+
+const manifest = JSON.parse(await readFile(new URL('../data/pages.json', import.meta.url), 'utf8'));
+const mainTabs = page => page.getByRole('tablist', { name: 'Widget tabs', exact: true });
+
+test.beforeEach(async ({ page }) => {
+  // Exercise the local application without depending on external widget uptime.
+  await page.route('https://**/*', route => {
+    const type = route.request().resourceType();
+    return route.fulfill({
+      status: 200,
+      contentType: type === 'script' ? 'text/javascript' : type === 'stylesheet' ? 'text/css' : 'text/html',
+      body: type === 'document' ? '<!doctype html><title>External widget fixture</title><p>External widget fixture</p>' : '',
+    });
+  });
+});
+
+async function open(page, url = '/') {
+  await page.goto(url, { waitUntil: 'domcontentloaded' });
+  await expect(mainTabs(page).getByRole('tab')).toHaveCount(5);
+  await expect(page.locator('.page-collection')).toHaveCount(3);
+}
+
+async function assertIndicator(page) {
+  await expect.poll(() => page.evaluate(() => {
+    const list = document.querySelector('#widget-tabs-root .tablist');
+    const active = list.querySelector('[aria-selected="true"]').getBoundingClientRect();
+    const indicator = list.querySelector('.tab-indicator').getBoundingClientRect();
+    return Math.max(...['x', 'y', 'width', 'height'].map(key => Math.abs(active[key] - indicator[key])));
+  })).toBeLessThan(1.5);
+}
+
+test('manifest content, native disclosures and parent/child links keep their destinations', async ({ page }) => {
+  await open(page);
+  for (const summary of await page.locator('.page-collection summary').all()) {
+    await summary.focus();
+    await page.keyboard.press('Enter');
+    await expect(summary.locator('..')).toHaveAttribute('open', '');
+  }
+  for (const entry of manifest.pages) {
+    const link = page.locator('#pageTree a').filter({ hasText: entry.title }).first();
+    await expect(link).toHaveAttribute('href', entry.href || entry.path);
+    await expect(link).toBeVisible();
+  }
+  await expect(page.locator('.page-tree__parent > a')).toHaveCount(1);
+  await expect(page.locator('.page-tree__parent > .page-branch__children > li')).toHaveCount(3);
+  await page.locator('.page-collection summary').first().press('Space');
+  await expect(page.locator('.page-collection').first()).not.toHaveAttribute('open', '');
+});
+
+for (const failure of ['http', 'invalid-json', 'empty', 'invalid-records', 'network']) {
+  test(`manifest ${failure} failure uses the curated fallback`, async ({ page }) => {
+    await page.route('**/data/pages.json', route => failure === 'network' ? route.abort() : route.fulfill({
+      status: failure === 'http' ? 503 : 200,
+      contentType: 'application/json',
+      body: failure === 'invalid-json' ? '{' : JSON.stringify({ pages: failure === 'invalid-records' ? [{ path: 'bad' }, null] : [] }),
+    }));
+    await open(page);
+    await page.locator('.page-collection summary').last().click();
+    await expect(page.getByRole('link', { name: 'Midnight Tarot' })).toHaveAttribute('href', 'Pages/For Fun/Tarot/index.html');
+    await expect(page.locator('#pageTree')).toHaveAttribute('aria-busy', 'false');
+  });
+}
+
+test('manifest loading remains accessible and a stalled fetch times out to fallback', async ({ page }) => {
+  let release;
+  const pending = new Promise(resolve => { release = resolve; });
+  await page.route('**/data/pages.json', async route => {
+    await pending;
+    await route.fulfill({ json: manifest }).catch(() => {});
+  });
+  try {
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('#pageTree')).toHaveAttribute('aria-busy', 'true');
+    await expect(page.locator('#pageTree').getByRole('status')).toHaveText('Loading pages...');
+    // Install clock after React starts, then advance only the manifest timeout.
+    await page.clock.install();
+    await page.clock.fastForward(11000);
+    await expect(page.locator('.page-collection')).toHaveCount(3, { timeout: 15000 });
+  } finally { release(); }
+});
+
+test('main tabs support roving focus, arrows, Home/End and persistent lazy frames', async ({ page }) => {
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await open(page);
+  const tabs = mainTabs(page).getByRole('tab');
+  await expect(tabs.last()).toHaveAttribute('aria-selected', 'true');
+  await expect(page.locator('#widget-tabs-root iframe[src]')).toHaveCount(0);
+  await tabs.last().focus();
+  await page.keyboard.press('ArrowRight');
+  await expect(tabs.first()).toBeFocused();
+  await expect(page.locator('#tab-cal iframe')).toHaveAttribute('src', /outlook\.office365\.com/);
+  await page.keyboard.press('ArrowLeft');
+  await expect(tabs.last()).toBeFocused();
+  await page.keyboard.press('Home');
+  await expect(tabs.first()).toBeFocused();
+  await page.keyboard.press('ArrowRight');
+  await expect(tabs.nth(1)).toBeFocused();
+  await page.keyboard.press('End');
+  await expect(tabs.last()).toBeFocused();
+  await expect(page.locator('#widget-tabs-root iframe[src]')).toHaveCount(2);
+  await expect(page.locator('#widget-tabs-root > section > .tabpanel:not([hidden])')).toHaveCount(1);
+  await expect(mainTabs(page).locator('[tabindex="0"]')).toHaveCount(1);
+  // A frame's browsing context must survive repeated panel switches.
+  await page.locator('#tab-cal iframe').evaluate(frame => { frame.dataset.identity = 'retained'; });
+  await tabs.first().click();
+  await expect(page.locator('#tab-cal iframe')).toHaveAttribute('data-identity', 'retained');
+  await assertIndicator(page);
+  expect(errors).toEqual([]);
+});
+
+test('request form retains input, native validation, Trello subject and redirect state', async ({ page }) => {
+  await open(page, '/?sent=1&keep=yes#profile');
+  await expect(page.locator('#tbtn-req')).toHaveAttribute('aria-selected', 'true');
+  await expect(page.locator('#requestSent')).toBeVisible();
+  await expect(page).toHaveURL(/\?keep=yes#profile$/);
+  const form = page.locator('#requestForm');
+  expect(await form.evaluate(element => element.checkValidity())).toBe(false);
+  await form.getByLabel('Name', { exact: true }).fill('Local Test');
+  await form.getByLabel('Email', { exact: true }).fill('test@example.com');
+  await form.getByLabel('Subject', { exact: true }).fill('  Local request title  ');
+  await form.getByLabel('Details', { exact: true }).fill('Local browser test only');
+  await page.locator('#tbtn-cat').click();
+  await page.locator('#tbtn-req').click();
+  await expect(form.getByLabel('Subject', { exact: true })).toHaveValue('  Local request title  ');
+  // Prevent transmission; inspect the normal submit handler's result locally.
+  await form.evaluate(element => element.addEventListener('submit', event => event.preventDefault(), { once: true }));
+  await form.getByRole('button', { name: 'Send Request' }).click();
+  await expect(form.locator('[name="_subject"]')).toHaveValue('Local request title');
+  await expect(form).toHaveAttribute('method', 'POST');
+  await expect(form).toHaveAttribute('action', /formsubmit\.co\/justinrogowski1/);
+  await expect(form.locator('[name="_next"]')).toHaveValue('https://justinrogo.github.io/?sent=1');
+});
+
+test('profile control, strength disclosures, filters and nested catalog tabs still work', async ({ page }) => {
+  await open(page);
+  await page.locator('#viewStrengthsBtn').click();
+  await expect(page.locator('#tbtn-cs')).toBeFocused();
+  await expect(page.locator('#tab-cs')).toBeVisible();
+  await page.locator('#CS [data-limit="5"]').click();
+  await expect(page.locator('#CS .item:visible')).toHaveCount(5);
+  const ideation = page.getByRole('button', { name: 'Ideation, rank 1', exact: true });
+  await ideation.click();
+  await expect(ideation).toHaveAttribute('aria-expanded', 'true');
+  await expect(page.locator('#strength-detail')).toBeVisible();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(page.locator('#strength-detail-title')).toHaveText('Ideation');
+  await ideation.press('Escape');
+  await expect(page.locator('#strength-detail')).toBeHidden();
+  await page.locator('#tbtn-cat').click();
+  await page.locator('#ulsw-tabbtn-books').focus();
+  await page.keyboard.press('ArrowRight');
+  await expect(page.locator('#ulsw-tabbtn-journals')).toBeFocused();
+  await expect(page.locator('#tbtn-cat')).toHaveAttribute('aria-selected', 'true');
+  await page.locator('#ulsw-tab-journals [data-query-input]').fill('Library, science');
+  // Stop the legacy form's native navigation and inspect query construction.
+  await page.locator('#ulsw-tab-journals form').evaluate(form => {
+    form.submit = () => { form.dataset.submitted = 'true'; };
+  });
+  await page.locator('#ulsw-tab-journals [data-submit]').click();
+  await expect(page.locator('#ulsw-tab-journals [data-query-target]')).toHaveValue('any,contains,Library  science');
+  await page.locator('#tbtn-cs').click();
+  await expect(page.locator('#CS .item:visible')).toHaveCount(5);
+  await page.locator('#tbtn-cat').click();
+  await expect(page.locator('#ulsw-tab-journals [data-query-input]')).toHaveValue('Library, science');
+});
+
+for (const theme of ['light', 'dark']) {
+  for (const width of [1440, 768, 390, 320]) {
+    test(`${theme} theme at ${width}px retains layout and indicator after switching and resizing`, async ({ page }, testInfo) => {
+      await page.setViewportSize({ width, height: 1000 });
+      await page.addInitScript(value => localStorage.setItem('theme', value), theme);
+      await open(page);
+      const collection = page.locator('.page-collection summary').first();
+      await collection.click();
+      await expect(page.locator('.page-collection').first()).toHaveAttribute('open', '');
+      await page.locator('#tbtn-req').click();
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      await assertIndicator(page);
+      await page.locator('#tbtn-cat').click();
+      await assertIndicator(page);
+      await page.locator('#page-directory').screenshot({ path: testInfo.outputPath('directory.png') });
+      await page.locator('#widget-tabs-root').screenshot({ path: testInfo.outputPath('widgets.png') });
+      await page.locator('#theme').click();
+      await expect(page.locator('body')).toHaveClass(theme === 'light' ? /^(?!.*\blight\b).*$/ : /light/);
+      await page.setViewportSize({ width: width === 1440 ? 390 : 1440, height: 1000 });
+      await assertIndicator(page);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    });
+  }
+}
+
+test('rapid switching, scrolling and resizing settle on the selected tab', async ({ page }) => {
+  await open(page);
+  await page.evaluate(async () => {
+    const buttons = [...document.querySelectorAll('#widget-tabs-root .tablist .tab')];
+    for (let index = 0; index < 35; index++) {
+      buttons[index % buttons.length].click();
+      await new Promise(requestAnimationFrame);
+    }
+  });
+  await page.setViewportSize({ width: 375, height: 812 });
+  await assertIndicator(page);
+  await expect(page.locator('#tbtn-cat')).toHaveAttribute('aria-selected', 'true');
+  await page.setViewportSize({ width: 1536, height: 864 });
+  await page.locator('#tbtn-book').click();
+  await assertIndicator(page);
+});
+
+test('spotlight respects mouse, touch and live reduced-motion preferences', async ({ page }) => {
+  await open(page);
+  const summary = page.locator('.page-collection summary').first();
+  await summary.hover();
+  await expect(summary).toHaveClass(/is-spotlit/);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await expect(summary).not.toHaveClass(/is-spotlit/);
+  await page.mouse.move(0, 0);
+  await summary.hover();
+  await expect(summary).not.toHaveClass(/is-spotlit/);
+  await page.locator('#tbtn-cal').click();
+  await assertIndicator(page);
+  expect(await page.locator('.tab-indicator').evaluate(element => element.getAnimations().length)).toBe(0);
+  expect(await page.locator('#tab-cal').evaluate(element => getComputedStyle(element).animationName)).toBe('none');
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await summary.dispatchEvent('pointermove', { pointerType: 'touch', clientX: 20, clientY: 20 });
+  await expect(summary).not.toHaveClass(/is-spotlit/);
+});
+
+test('touch operates disclosures and tabs without a hover dependency', async ({ browser }) => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  const page = await context.newPage();
+  await page.route('https://**/*', route => route.fulfill({ body: '' }));
+  await open(page);
+  await page.locator('.page-collection summary').first().tap();
+  await expect(page.locator('.page-collection').first()).toHaveAttribute('open', '');
+  await page.locator('#tbtn-cs').tap();
+  await expect(page.locator('#tab-cs')).toBeVisible();
+  await page.getByRole('button', { name: 'Ideation, rank 1', exact: true }).tap();
+  await expect(page.locator('#strength-detail')).toBeVisible();
+  await expect(page.locator('.is-spotlit')).toHaveCount(0);
+  await context.close();
+});
+
+test('an unavailable embedded service does not prevent tab navigation or the request form', async ({ page }) => {
+  await page.route('https://outlook.**/*', route => route.abort());
+  await page.route('https://trello.com/**', route => route.abort());
+  await open(page);
+  await page.locator('#tbtn-cal').click();
+  await expect(page.locator('#tab-cal iframe')).toHaveAttribute('src', /outlook/);
+  await page.locator('#tbtn-req').click();
+  await expect(page.locator('#requestForm')).toBeVisible();
+  await page.locator('#tbtn-cat').click();
+  await expect(page.locator('#ulsw-tab-books')).toBeVisible();
+});
+
+test('production includes static assets and preserves standalone paths and Updates aliases', async ({ request }) => {
+  for (const file of ['/assets/homepage.js', '/assets/homepage.js.LEGAL.txt', '/assets/react-LICENSE.txt', '/assets/react-dom-LICENSE.txt', '/assets/scheduler-LICENSE.txt', '/assets/react-bits-LICENSE.txt', '/main.js', '/style.css']) {
+    expect((await request.get(file)).ok(), file).toBe(true);
+  }
+  for (const entry of manifest.pages) {
+    expect((await request.get('/' + entry.path)).ok(), entry.path).toBe(true);
+  }
+  expect((await request.get('/updates')).ok()).toBe(true);
+  expect((await request.get('/updates/embed')).ok()).toBe(true);
+  for (const file of ['quill.js', 'quill.snow.css', 'purify.js', 'supabase.js']) {
+    expect((await request.get('/Pages/Updates/vendor/' + file)).ok()).toBe(true);
+  }
+  expect((await request.get('/api/updates')).status()).toBe(404);
+  for (const path of ['src', 'node_modules', 'api', 'scripts', '.env.local', 'supabase']) {
+    await expect(stat(new URL('../dist/' + path, import.meta.url))).rejects.toThrow();
+  }
+});
+
+test('built file previews load React and the curated directory without fetching a manifest', async ({ page }) => {
+  let manifestRequests = 0;
+  page.on('request', request => { if (request.url().endsWith('/data/pages.json')) manifestRequests++; });
+  await page.goto(new URL('../dist/index.html', import.meta.url).href, { waitUntil: 'domcontentloaded' });
+  await expect(mainTabs(page).getByRole('tab')).toHaveCount(5);
+  await expect(page.locator('.page-collection')).toHaveCount(3);
+  await page.locator('.page-collection summary').last().click();
+  await expect(page.getByRole('link', { name: 'Midnight Tarot' })).toBeVisible();
+  expect(manifestRequests).toBe(0);
+});

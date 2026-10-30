@@ -3,6 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildSanitizer } from './build-sanitizer.mjs';
 import { refreshPocketPart } from './update-pocket-part.mjs';
+import { buildHomepage } from './build-homepage.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export async function vendorUpdates() {
@@ -20,7 +21,9 @@ export async function vendorUpdates() {
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  await refreshPocketPart();
+  // Local/reproducible builds can retain the existing feed without modifying it.
+  if (!process.argv.includes('--skip-feed')) await refreshPocketPart();
+  await buildHomepage();
   await buildSanitizer();
   await vendorUpdates();
   const dist = path.join(root, 'dist');

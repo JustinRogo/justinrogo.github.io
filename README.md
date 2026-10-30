@@ -6,7 +6,7 @@ Live site: https://justinrogo.github.io/
 
 ## Overview
 
-This repository powers a static GitHub Pages website built with HTML, CSS, and vanilla JavaScript. The homepage brings together professional quick links, scheduling tools, UConn Law Library resources, project pages, personal productivity widgets, and experimental web apps.
+This repository powers a static website built with HTML, CSS, vanilla JavaScript, and two React islands on the homepage. The homepage brings together professional quick links, scheduling tools, UConn Law Library resources, project pages, personal productivity widgets, and experimental web apps.
 
 The site includes:
 
@@ -106,7 +106,42 @@ The site uses a custom CSS system with:
 - Accessible tab interactions
 - Mobile-friendly quick contact buttons
 
-The homepage adapts [React Bits Spotlight Card](https://reactbits.dev/components/spotlight-card) into pointer lighting on the Pages & Projects collection rows. Its moving widget-tab selection is inspired by [Gooey Nav](https://reactbits.dev/components/gooey-nav), with a simple sliding highlight in place of particles. Both use the existing CSS and vanilla JavaScript, with no new runtime dependencies. Pointer lighting is limited to mouse input and stops under reduced motion; keyboard users receive a static highlight and focus outline. The tab indicator follows the mobile grid and disables movement under reduced motion. Attribution and the upstream license are in [`assets/react-bits-LICENSE.txt`](assets/react-bits-LICENSE.txt).
+The homepage adapts [React Bits Spotlight Card](https://reactbits.dev/components/spotlight-card) into pointer lighting on the Pages & Projects collection rows. Its moving widget-tab selection is inspired by [Gooey Nav](https://reactbits.dev/components/gooey-nav), with a simple sliding highlight in place of particles. React hooks now manage both effects using the existing CSS. Pointer lighting is limited to mouse input and stops under reduced motion; keyboard users receive a static highlight and focus outline. The tab indicator follows the mobile grid and disables movement under reduced motion. Attribution and the upstream license remain in [`assets/react-bits-LICENSE.txt`](assets/react-bits-LICENSE.txt).
+
+### Homepage React components and ownership
+
+The homepage has two independent roots, `#project-directory-root` and `#widget-tabs-root`, mounted by [`src/homepage/index.jsx`](src/homepage/index.jsx). No router is used; all existing page paths and external links remain normal links.
+
+- `ProjectDirectory.jsx` renders the three native `<details>` collections and recursive page links. `page-tree.js` loads and validates `data/pages.json`, preserves folder/index grouping and carries the curated fallback formerly in `main.js`. File previews, failed/invalid manifests and requests stalled for ten seconds use that fallback.
+- `WidgetTabs.jsx` owns the five main tabs, roving keyboard focus, panel visibility, request form, success redirect and lazy iframe URLs. Visited panels stay mounted, preserving iframe sessions, form values and nested widget state. The profile's existing `#viewStrengthsBtn` is connected through one effect with cleanup.
+- `effects.js` owns spotlight listeners and moving-indicator geometry. Its observers, animation frames and media-query listeners are cleaned up. Indicator motion is cancelled and measured again during rapid switching, font loading and resizing.
+- `legacy-widgets.js` exports the existing CliftonStrengths and library catalog initializers. `LegacyWidget` gives each initializer an empty host; React never reconciles that host's descendants. Initializers run once per mount and return cleanup, including the strengths resize observer and delegated listeners. The strengths initializer also updates the existing profile domain bar.
+
+`main.js` continues to own the background, theme/share controls, clock/weather, feeds, profile disclosures, contact menu and companion. It contains no directory, main-tab, request-form or nested-widget initializers. `style.css` remains the shared visual source without a design change.
+
+### Development and builds
+
+Use Node.js 22 or newer:
+
+```sh
+npm ci
+npm run dev
+```
+
+Open `http://127.0.0.1:4388/`. The existing Updates development server also compiles and watches React sources with esbuild; refresh the browser after editing. `/updates?preview=1` remains available without database credentials. Plain HTML/CSS/legacy JS edits are served directly. Build before opening `index.html` via `file://` so `assets/homepage.js` exists.
+
+```sh
+npm run build:homepage          # Compile just the production homepage bundle
+npm run build                  # Full dist/ build; refreshes Pocket Part
+npm run build -- --skip-feed    # Reproducible build using the existing feed
+npm run preview                # Serve dist/ statically on port 4391
+npm run test:homepage          # Build with --skip-feed and run browser checks
+npm run test:updates           # Backend, sanitization and database-policy tests
+```
+
+The browser suite uses installed Microsoft Edge on Windows; elsewhere run `npx playwright install chromium` first. `HOMEPAGE_BROWSER_CHANNEL` can select another installed Chromium channel. It checks the production artifact across desktop/tablet/mobile widths and both themes, keyboard/touch, native disclosures, lazy frames, form state, manifest failure/loading, reduced motion, rapid switching, resizing, preserved page URLs and Updates assets. Screenshots and failure traces go to ignored `test-results/`. Third-party responses are stubbed and form submissions intercepted; external service availability and real submissions require separate live checks.
+
+The existing esbuild dependency compiles JSX and bundles React/React DOM into a local IIFE, with no CDN or client router. Generated `assets/homepage.js`, its license notices and dependency license files are ignored in Git and rebuilt by development and production commands. GitHub Pages installs dependencies with `npm ci`, keeps its scheduled feed refreshes, and runs the same static build as Vercel. All public assets are copied into `dist/`; source, environment files and backend code are excluded. GitHub Pages needs only those static files. Vercel continues to use `api/updates.mjs` and the existing `/updates` rewrites in `vercel.json`.
 
 ## Notable project pages
 
@@ -114,7 +149,7 @@ The homepage adapts [React Bits Spotlight Card](https://reactbits.dev/components
 
 The Vercel-hosted `/updates` section adds rich text posts, author-only publishing, drafts, reader comments that publish immediately, image uploads, and RSS. `/updates/embed` is a compact read-only iframe for `https://uconn.atlassian.net`. This feature requires a **separate Supabase project** and Vercel environment variables; setup and the existing-project comment migration are documented in [`docs/updates-setup.md`](docs/updates-setup.md).
 
-Run `npm ci` and `npm run dev`, then visit `/updates?preview=1` for a labeled local author preview without database credentials. The existing static site still needs no build step for GitHub Pages; the Vercel build bundles this new section's dependencies and preserves the public site roots.
+Run `npm ci` and `npm run dev`, then visit `/updates?preview=1` for a labeled local author preview without database credentials. Both deployment hosts run the shared build, which bundles homepage React and Updates dependencies and preserves the public site roots.
 
 ### CT General Statutes Explorer
 
