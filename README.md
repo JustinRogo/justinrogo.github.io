@@ -116,6 +116,12 @@ The profile, two sidebar cards, Pages & Projects, widget deck and Quick Links us
 
 Reduced motion, increased contrast, forced colors, and hidden tabs unmount the decorative motion components. The name settles to plain text and does not replay when those preferences are restored. The original heading text and Teams link remain available without JavaScript. Theme and integration styles are in `profile-motion.css`.
 
+### CliftonStrengths
+
+The strengths tab starts with Ideation, Strategic, Input, Arranger, and Restorative. Top 10 and All 34 remain available; domain groups without visible themes are hidden. The ranked themes precede the existing “at my best” and “overextended” reflections, and all original descriptions remain available through native button disclosures. The domain legend labels the existing rank-weighted balance across all 34 themes, independently of the selected filter.
+
+`strengths-motion.js` adapts the existing React Bits Spotlight Card lighting for the strength buttons, using each domain's color. Mouse movement follows the pointer; keyboard focus gets a centered static highlight. Filter changes use the existing GSAP dependency for 240ms position/size transitions and incoming-card fades, with no automatic entrance sequence or new dependency. Rapid changes capture the current interpolated positions. Reduced motion, increased contrast, forced colors, resizing, hidden tabs and hidden panels settle any active filter animation and clear pointer lighting. Touch retains native selection feedback. `strengths.css` contains these scoped styles, and the legacy initializer owns cleanup.
+
 ### Homepage backgrounds
 
 `SiteBackground.jsx` owns the fixed `#site-background` island. It uses the official React Bits [Shape Waves](https://reactbits.dev/backgrounds/shape-waves) component, vendored at revision `e12c22192ac7b4b452c5e2feb9b586d74765d696`. The exported `SHAPE_WAVES_SETTINGS` constant preserves the shared URL: empty text, text size 0.24, mixed shapes, background `#00173a`, shape color `#913d00`, hover `#f97316`, direction 175, glow 1.75, flow 2.3, fade 0.3, brightness 0.48, splash strength 0.75, splash radius 28, dot size 0.58, cell size 8, scale 1.6, contrast 3 and speed 0.7.

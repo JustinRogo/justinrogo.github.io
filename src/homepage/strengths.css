@@ -1,0 +1,71 @@
+/* The ranked themes lead; reflections remain a separate reading section. */
+#csMount #CS { gap: 24px; }
+#csMount .strength-domains { display: grid; gap: 24px; min-width: 0; }
+#csMount .section[hidden], #csMount .item[hidden], #csMount .content[hidden] { display: none; }
+#csMount .section h3 { margin: 0 0 12px; text-transform: none; letter-spacing: 0; }
+#csMount .summary .bar { margin-bottom: 12px; }
+
+#csMount .strength-legend {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 20px;
+  padding: 0;
+  margin: 0;
+  color: var(--text);
+  font-size: 0.8rem;
+}
+
+#csMount .strength-legend li { display: flex; align-items: baseline; gap: 7px; min-width: 0; }
+#csMount .strength-legend li::before {
+  content: '';
+  flex: 0 0 7px;
+  width: 7px;
+  height: 7px;
+  align-self: center;
+  background: var(--strength-color);
+  border-radius: 50%;
+}
+#csMount .strength-legend__percentage { margin-inline-start: auto; font-variant-numeric: tabular-nums; }
+#csMount .strength-domain-note { margin: 10px 0 18px; color: var(--text); font-size: 0.78rem; line-height: 1.5; }
+#csMount .strength-instruction { margin: 14px 0 0; color: var(--text); font-size: 0.85rem; }
+#csMount #strength-filter-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+#csMount .controls { flex-direction: row; }
+#csMount .controls button { min-width: 0; padding: 10px 6px; font-size: 0.85rem; transition: background-color 150ms, color 150ms; }
+
+#csMount .item { overflow: hidden; transition: border-color 150ms, background-color 150ms; }
+#csMount .item .rank, #csMount .item .name { position: relative; z-index: 1; }
+#csMount .strength-spotlight {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(180px circle at var(--spotlight-x, 50%) var(--spotlight-y, 50%),
+    color-mix(in srgb, var(--strength-color) 24%, transparent), transparent 75%);
+  opacity: 0;
+  transition: opacity 150ms;
+}
+#csMount .item:is(.is-spotlit, :focus-visible) .strength-spotlight { opacity: 1; }
+#csMount .item:is(:hover, :focus-visible) { border-color: var(--strength-color); }
+
+#csMount .strengths-reflection { padding: 0; border: 0; background: transparent; box-shadow: none; }
+#csMount .toggle-buttons button { transition: background-color 150ms, color 150ms; }
+#csMount .content p { max-width: 70ch; }
+
+@media (max-width: 600px) {
+  #csMount .summary { padding: 16px; }
+  #csMount .strength-legend { grid-template-columns: minmax(0, 1fr); }
+  #csMount .controls button { font-size: 0.8rem; }
+}
+
+@media (prefers-reduced-motion: reduce), (prefers-contrast: more), (forced-colors: active) {
+  #csMount .strength-spotlight { display: none; }
+}

@@ -1,6 +1,6 @@
 React Bits
 https://github.com/DavidHDev/react-bits
-Spotlight Card interaction adapted for this website.
+Spotlight Card interactions adapted for project collections and CliftonStrengths themes.
 Glass Surface component vendored from revision e12c22192ac7b4b452c5e2feb9b586d74765d696.
 Shape Waves background vendored from the same revision.
 Antigravity background restored from the same revision.

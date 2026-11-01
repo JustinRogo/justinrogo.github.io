@@ -1,5 +1,15 @@
 # Homepage React migration validation
 
+## CliftonStrengths follow-up — October 31, 2026
+
+The strengths tab defaults to the Top 5, hides empty domain groups, and places the original reflections after the ranked themes. The domain bar now has a visible legend and explains that the displayed balance is rank-weighted across all 34 themes. Filters and reflection controls expose their selected state with `aria-pressed`; the filter announces the visible theme count. The original 34 descriptions were compared with the previous commit and are unchanged.
+
+The existing Spotlight Card adaptation now provides domain-colored pointer lighting on the native strength buttons, with static keyboard feedback and no moving spotlight for touch or reduced motion. The existing GSAP dependency animates filter changes for 240ms. Active transitions settle on preference changes, resizing, panel/tab hiding, and opening a description. Listeners, observers, animation frames and tweens are released by the widget's cleanup.
+
+Fresh desktop (1440px) and mobile (390px) previews in both themes were visually inspected, including open descriptions. Normal remote fonts loaded; no application JavaScript errors or horizontal overflow appeared. The full homepage suite passes **51 tests**. Additional regression checks exercise Top 5/Top 10/All 34, empty groups, legend consistency, original descriptions, reflection controls, keyboard/touch feedback, rapid filter interruption, live reduced-motion changes, resize and panel state retention. The production build uses `--skip-feed`.
+
+No dependency or GPU renderer was added. JavaScript and CSS together grow by about 2.2 KB gzipped. The design detector reports the same 24 existing page-style advisories and none in the new strengths files. Checks are local Microsoft Edge/Chromium checks; no deployment is included.
+
 ## Profile Glare Hover and Split Text follow-up — October 31, 2026
 
 The homepage uses pinned React Bits Glare Hover on the native Teams contact link and Split Text inside the existing name heading. Both are vendored at `e12c22192ac7b4b452c5e2feb9b586d74765d696`, with locally bundled `gsap@3.15.0` and `@gsap/react@2.1.2`. The source notices and GSAP license references are included in the production artifact.

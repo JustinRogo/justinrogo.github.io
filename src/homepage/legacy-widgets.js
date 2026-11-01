@@ -1,5 +1,8 @@
 // Imperative widget islands. React owns only their empty host elements.
 // Each initializer returns cleanup; panel switching never remounts these hosts.
+import { mountStrengthsMotion } from './strengths-motion.js';
+import './strengths.css';
+
 export function mountCliftonStrengths(mount) {
   if (!mount) return;
 
@@ -13,11 +16,20 @@ export function mountCliftonStrengths(mount) {
           <div class="purple" data-domain="executing" data-label="Executing" aria-hidden="true"></div>
           <div class="orange" data-domain="influencing" data-label="Influencing" aria-hidden="true"></div>
         </div>
-        <div class="controls">
-          <button data-limit="5">Top 5</button>
-          <button data-limit="10">Top 10</button>
-          <button data-limit="all">Show All</button>
+        <ul class="strength-legend" aria-label="Strength domains">
+          <li data-domain="thinking"><span>Strategic Thinking</span><span class="strength-legend__percentage"></span></li>
+          <li data-domain="relationship"><span>Relationship Building</span><span class="strength-legend__percentage"></span></li>
+          <li data-domain="executing"><span>Executing</span><span class="strength-legend__percentage"></span></li>
+          <li data-domain="influencing"><span>Influencing</span><span class="strength-legend__percentage"></span></li>
+        </ul>
+        <p class="strength-domain-note">Rank-weighted overview of all 34 themes.</p>
+        <div class="controls" role="group" aria-label="Number of strengths to show">
+          <button type="button" data-limit="5" aria-pressed="true" aria-controls="strength-domains">Top 5</button>
+          <button type="button" data-limit="10" aria-pressed="false" aria-controls="strength-domains">Top 10</button>
+          <button type="button" data-limit="all" aria-pressed="false" aria-controls="strength-domains">All 34</button>
         </div>
+        <p class="strength-instruction">Select a theme to read its description.</p>
+        <span id="strength-filter-status" class="sr-only" role="status"></span>
       </div>
       <br />
       <div class="card">
@@ -120,6 +132,16 @@ export function mountCliftonStrengths(mount) {
 
   mount.innerHTML = html;
 
+  const root = mount.querySelector('#CS');
+  const sections = [...root.querySelectorAll('.section')];
+  const domains = document.createElement('div');
+  domains.id = 'strength-domains';
+  domains.className = 'strength-domains';
+  domains.append(...sections);
+  root.querySelector('.summary').after(domains);
+  root.querySelector('.card').classList.add('strengths-reflection');
+  root.querySelectorAll(':scope > br').forEach(spacer => spacer.remove());
+
   // Promote each generated theme card to a native button before the browser
   // paints it, so the card has built-in keyboard and assistive-tech behavior.
   mount.querySelectorAll('.item').forEach(item => {
@@ -127,6 +149,10 @@ export function mountCliftonStrengths(mount) {
     [...item.attributes].forEach(attribute => button.setAttribute(attribute.name, attribute.value));
     button.type = 'button';
     button.append(...item.childNodes);
+    const spotlight = document.createElement('span');
+    spotlight.className = 'strength-spotlight';
+    spotlight.setAttribute('aria-hidden', 'true');
+    button.prepend(spotlight);
     const themeName = button.querySelector('.name')?.textContent || 'CliftonStrengths theme';
     const rank = button.querySelector('.rank')?.textContent || '';
     button.setAttribute('aria-label', `${themeName}, rank ${rank}`);
@@ -150,6 +176,11 @@ export function mountCliftonStrengths(mount) {
     return scores;
   }, {});
   const totalDomainScore = Object.values(domainScores).reduce((total, score) => total + score, 0);
+
+  root.querySelectorAll('.strength-legend [data-domain]').forEach(legend => {
+    const percentage = totalDomainScore ? Math.round(domainScores[legend.dataset.domain] / totalDomainScore * 1000) / 10 : 0;
+    legend.querySelector('.strength-legend__percentage').textContent = `${percentage}%`;
+  });
 
   [domainBar, heroDomainBar].filter(Boolean).forEach(bar => {
     if (!totalDomainScore) return;
@@ -199,6 +230,7 @@ export function mountCliftonStrengths(mount) {
 
   rankedItems.forEach(item => {
     item.addEventListener('click', () => {
+      motion.settle();
       if (detailTrigger === item) {
         closeStrengthDetail();
         return;
@@ -245,13 +277,27 @@ export function mountCliftonStrengths(mount) {
 
   // Strengths filter controls
   const controlBtns = mount.querySelectorAll('.controls button');
+  const motion = mountStrengthsMotion(root);
+  let activeLimit = null;
 
-  function filterStrengths(limit) {
+  function filterStrengths(limit, animate = true) {
+    if (limit === activeLimit) return;
     closeStrengthDetail();
-    mount.querySelectorAll('.item').forEach(item => {
+    const previous = animate ? motion.capture() : null;
+    rankedItems.forEach(item => {
       const rank = parseInt(item.querySelector('.rank').textContent, 10);
-      item.style.display = (limit === 'all' || rank <= limit) ? '' : 'none';
+      item.hidden = limit !== 'all' && rank > limit;
     });
+    sections.forEach(section => { section.hidden = !section.querySelector('.item:not([hidden])'); });
+    controlBtns.forEach(button => {
+      const active = button.dataset.limit === String(limit);
+      button.classList.toggle('active', active);
+      button.setAttribute('aria-pressed', String(active));
+    });
+    const count = rankedItems.filter(item => !item.hidden).length;
+    mount.querySelector('#strength-filter-status').textContent = `Showing ${count} of ${maxRank} themes.`;
+    activeLimit = limit;
+    if (previous) motion.transition(previous);
   }
 
   if (controlBtns.length) {
@@ -259,28 +305,34 @@ export function mountCliftonStrengths(mount) {
       btn.addEventListener('click', () => {
         const limit = btn.dataset.limit === 'all' ? 'all' : parseInt(btn.dataset.limit, 10);
         filterStrengths(limit);
-        controlBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
       });
     });
-    const allBtn = mount.querySelector('.controls button[data-limit="all"]');
-    if (allBtn) { allBtn.classList.add('active'); filterStrengths('all'); }
+    filterStrengths(5, false);
   }
+
+  mount.querySelectorAll('.toggle-buttons button').forEach(button => {
+    button.type = 'button';
+    button.setAttribute('aria-pressed', String(button.classList.contains('active')));
+    button.setAttribute('aria-controls', button.dataset.showContent);
+  });
+  mount.querySelectorAll('.content').forEach(panel => { panel.hidden = !panel.classList.contains('active'); });
 
   // Content toggle (event delegation, replaces window.showContent)
   mount.addEventListener('click', e => {
     const btn = e.target.closest('[data-show-content]');
     if (!btn) return;
     const id = btn.dataset.showContent;
-    mount.querySelectorAll('.content').forEach(div => div.classList.remove('active'));
-    mount.querySelectorAll('.toggle-buttons button').forEach(b => b.classList.remove('active'));
+    mount.querySelectorAll('.content').forEach(div => { div.classList.remove('active'); div.hidden = true; });
+    mount.querySelectorAll('.toggle-buttons button').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
     const panel = mount.querySelector('#' + id);
-    if (panel) panel.classList.add('active');
+    if (panel) { panel.classList.add('active'); panel.hidden = false; }
     btn.classList.add('active');
+    btn.setAttribute('aria-pressed', 'true');
   }, { signal: controller.signal });
   return () => {
     controller.abort();
     detailResizeObserver.disconnect();
+    motion.dispose();
     mount.replaceChildren();
   };
 }

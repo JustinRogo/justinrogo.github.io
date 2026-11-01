@@ -167,6 +167,106 @@ test('profile control, strength disclosures, filters and nested catalog tabs sti
   await expect(page.locator('#ulsw-tab-journals [data-query-input]')).toHaveValue('Library, science');
 });
 
+for (const [theme, width] of [['dark', 1440], ['light', 320]]) {
+  test(`strengths lead with Top 5 and retain the full profile in ${theme} at ${width}px`, async ({ page }, testInfo) => {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.addInitScript(value => localStorage.setItem('theme', value), theme);
+    await open(page);
+    await page.locator('#tbtn-cs').click();
+    const root = page.locator('#CS');
+    await expect(root.locator('.controls [data-limit="5"]')).toHaveAttribute('aria-pressed', 'true');
+    await expect(root.locator('.item:visible .name')).toHaveText(['Ideation', 'Strategic', 'Input', 'Arranger', 'Restorative']);
+    await expect(root.locator('.section:visible')).toHaveCount(2);
+    await expect(root.getByRole('list', { name: 'Strength domains' }).getByRole('listitem')).toHaveCount(4);
+    expect(await root.evaluate(element => Boolean(element.querySelector('.strength-domains')
+      .compareDocumentPosition(element.querySelector('.strengths-reflection')) & Node.DOCUMENT_POSITION_FOLLOWING))).toBe(true);
+    const overview = await root.locator('.bar').getAttribute('aria-label');
+    await root.locator('[data-limit="10"]').click();
+    await expect(root.locator('.item:visible')).toHaveCount(10);
+    await expect(root.locator('.section:visible')).toHaveCount(3);
+    await root.locator('[data-limit="all"]').click();
+    await expect(root.locator('.item:visible')).toHaveCount(34);
+    await expect(root.locator('.section:visible')).toHaveCount(4);
+    await expect(root.locator('.bar')).toHaveAttribute('aria-label', overview);
+    await root.locator('[data-limit="5"]').click();
+    await page.getByRole('button', { name: 'Ideation, rank 1', exact: true }).click();
+    await expect(root.locator('#strength-detail')).toContainText('finding connections between ideas');
+    await root.locator('.strength-detail__close').click();
+    await expect(page.getByRole('button', { name: 'Ideation, rank 1', exact: true })).toBeFocused();
+    await root.getByRole('button', { name: "When I'm overextended" }).click();
+    await expect(root.locator('#overextended')).toBeVisible();
+    await expect(root.locator('#best')).toBeHidden();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await root.screenshot({ path: testInfo.outputPath('strengths.png') });
+  });
+}
+
+test('strengths filters settle after interruption, resize, reduced motion, and tab switching', async ({ page }) => {
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await open(page);
+  await page.locator('#tbtn-cs').click();
+  await page.locator('#CS [data-limit="all"]').click();
+  await page.getByRole('button', { name: 'Harmony, rank 33', exact: true }).click();
+  await page.locator('#CS [data-limit="5"]').click();
+  await expect(page.locator('#strength-detail')).toBeHidden();
+  await page.locator('#CS').evaluate(async root => {
+    for (const limit of ['all', '5', '10', 'all', '10']) {
+      root.querySelector(`[data-limit="${limit}"]`).click();
+      await new Promise(requestAnimationFrame);
+    }
+  });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await expect(page.locator('#CS .item:visible')).toHaveCount(10);
+  const settled = () => page.locator('#CS .item').evaluateAll(items => items.every(item =>
+    getComputedStyle(item).transform === 'none' && Number(getComputedStyle(item).opacity) === 1));
+  await expect.poll(settled).toBe(true);
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.locator('#CS [data-limit="all"]').click();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect.poll(settled).toBe(true);
+  await page.locator('#CS [data-limit="5"]').click();
+  await page.locator('#tbtn-cat').click();
+  await expect.poll(settled).toBe(true);
+  await page.locator('#tbtn-cs').click();
+  await expect(page.locator('#CS .item:visible')).toHaveCount(5);
+  await expect(page.locator('#CS [data-limit="5"]')).toHaveAttribute('aria-pressed', 'true');
+  expect(errors).toEqual([]);
+});
+
+test('strength spotlights support mouse and keyboard while honoring live motion preferences and touch', async ({ page }) => {
+  await open(page);
+  await page.locator('#tbtn-cs').click();
+  const ideation = page.getByRole('button', { name: 'Ideation, rank 1', exact: true });
+  // Settle the scroll before pointing: scrolling intentionally clears lighting.
+  await ideation.scrollIntoViewIfNeeded();
+  await page.evaluate(() => new Promise(requestAnimationFrame));
+  await page.mouse.move(0, 0);
+  await ideation.hover();
+  await expect(ideation).toHaveClass(/is-spotlit/);
+  await page.mouse.move(0, 0);
+  await page.locator('#CS [data-limit="all"]').focus();
+  await page.keyboard.press('Tab');
+  await expect(ideation).toBeFocused();
+  await expect.poll(() => ideation.locator('.strength-spotlight').evaluate(element => getComputedStyle(element).opacity)).toBe('1');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await expect(ideation).not.toHaveClass(/is-spotlit/);
+  await expect(ideation.locator('.strength-spotlight')).toBeHidden();
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  // Media changes also restore the page's smooth scrolling and glass material.
+  // Let those layout updates commit before testing fresh pointer input.
+  await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  await ideation.dispatchEvent('pointermove', { pointerType: 'touch', clientX: 20, clientY: 20 });
+  await expect(ideation).not.toHaveClass(/is-spotlit/);
+  await ideation.scrollIntoViewIfNeeded();
+  await page.evaluate(() => new Promise(requestAnimationFrame));
+  await page.mouse.move(0, 0);
+  await ideation.hover();
+  await expect(ideation).toHaveClass(/is-spotlit/);
+  await page.locator('#tbtn-cat').click();
+  await expect(page.locator('#CS .is-spotlit')).toHaveCount(0);
+});
+
 for (const theme of ['light', 'dark']) {
   for (const width of [1440, 768, 390, 320]) {
     test(`${theme} theme at ${width}px retains layout and indicator after switching and resizing`, async ({ page }, testInfo) => {
