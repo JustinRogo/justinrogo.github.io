@@ -173,6 +173,9 @@ for (const theme of ['light', 'dark']) {
       await page.setViewportSize({ width, height: 1000 });
       await page.addInitScript(value => localStorage.setItem('theme', value), theme);
       await open(page);
+      await expect(page.getByRole('heading', { level: 1, name: 'Justin Rogowski', exact: true })).toBeVisible();
+      await expect.poll(() => page.locator('.profile-name .split-char').evaluateAll(characters =>
+        characters.every(character => Number(getComputedStyle(character).opacity) === 1))).toBe(true);
       const collection = page.locator('.page-collection summary').first();
       await collection.click();
       await expect(page.locator('.page-collection').first()).toHaveAttribute('open', '');
@@ -256,7 +259,7 @@ test('an unavailable embedded service does not prevent tab navigation or the req
 });
 
 test('production includes static assets and preserves standalone paths and Updates aliases', async ({ request }) => {
-  for (const file of ['/assets/homepage.js', '/assets/homepage.css', '/assets/homepage.js.LEGAL.txt', '/assets/react-LICENSE.txt', '/assets/react-dom-LICENSE.txt', '/assets/scheduler-LICENSE.txt', '/assets/react-bits-LICENSE.txt', '/main.js', '/style.css']) {
+  for (const file of ['/assets/homepage.js', '/assets/homepage.css', '/assets/homepage.js.LEGAL.txt', '/assets/react-LICENSE.txt', '/assets/react-dom-LICENSE.txt', '/assets/scheduler-LICENSE.txt', '/assets/react-bits-LICENSE.txt', '/assets/gsap-LICENSE.txt', '/assets/gsap-react-LICENSE.txt', '/main.js', '/style.css']) {
     expect((await request.get(file)).ok(), file).toBe(true);
   }
   for (const entry of manifest.pages) {
@@ -271,6 +274,71 @@ test('production includes static assets and preserves standalone paths and Updat
   for (const path of ['src', 'node_modules', 'api', 'scripts', '.env.local', 'supabase']) {
     await expect(stat(new URL('../dist/' + path, import.meta.url))).rejects.toThrow();
   }
+});
+
+test('profile entrance keeps one heading, finishes, and settles when reduced motion changes live', async ({ page }) => {
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await open(page);
+  const heading = page.getByRole('heading', { level: 1, name: 'Justin Rogowski', exact: true });
+  await expect(heading).toHaveCount(1);
+  await expect(page.locator('.profile-name .split-char')).toHaveCount(14);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await expect(page.locator('.profile-name .split-char')).toHaveCount(0);
+  await expect(heading).toBeVisible();
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.setViewportSize({ width: 320, height: 844 });
+  await expect(page.locator('.profile-name .split-char')).toHaveCount(0);
+  await page.getByText('More about me', { exact: true }).click();
+  await expect(heading).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  expect(errors).toEqual([]);
+});
+
+test('Teams glare responds to mouse and keyboard without intercepting the link, and stops under reduced motion', async ({ page }) => {
+  await open(page);
+  const link = page.getByRole('link', { name: 'Start a Teams Chat', exact: true });
+  const band = link.locator('.glare-hover__band');
+  await expect(band).toHaveCount(1);
+  const resting = await band.getAttribute('style');
+  await link.hover();
+  await expect.poll(() => band.getAttribute('style')).not.toBe(resting);
+  expect(await link.evaluate(element => {
+    const box = element.getBoundingClientRect();
+    return document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2)?.closest('a') === element;
+  })).toBe(true);
+  await page.mouse.move(0, 0);
+  await expect.poll(() => band.evaluate(element => element.getBoundingClientRect().x)).toBeGreaterThan(-10000);
+  // Focus by keyboard so :focus-visible takes the same path as a real visitor.
+  await page.locator('#theme').focus();
+  await page.keyboard.press('Shift+Tab');
+  await page.keyboard.press('Shift+Tab');
+  await page.keyboard.press('Shift+Tab');
+  await page.keyboard.press('Shift+Tab');
+  await page.keyboard.press('Shift+Tab');
+  await expect(link).toBeFocused();
+  await expect(link).toHaveAttribute('href', 'https://teams.microsoft.com/l/chat/0/0?users=justin.rogowski@uconn.edu');
+  await expect(link).toHaveAttribute('target', '_blank');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await expect(link.locator('.glare-hover')).toHaveCount(0);
+  await expect(link).toBeFocused();
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await expect(link.locator('.glare-hover')).toHaveCount(1);
+});
+
+test('profile and Teams contact retain their text and native behavior without scripts', async ({ browser }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 320, height: 844 } });
+  const page = await context.newPage();
+  await page.route('https://**/*', route => route.fulfill({ body: '' }));
+  await page.goto('http://127.0.0.1:4391/', { waitUntil: 'domcontentloaded' });
+  await expect(page.getByRole('heading', { level: 1, name: 'Justin Rogowski', exact: true })).toBeVisible();
+  const link = page.getByRole('link', { name: 'Start a Teams Chat', exact: true });
+  await expect(link).toBeVisible();
+  await link.focus();
+  await expect(link).toBeFocused();
+  await expect(link).toHaveAttribute('href', /teams\.microsoft\.com/);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await context.close();
 });
 
 test('built file previews load React and the curated directory without fetching a manifest', async ({ page }) => {

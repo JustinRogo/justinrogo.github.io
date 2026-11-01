@@ -1,0 +1,47 @@
+/* Keep the existing heading measure, wrapping and expanded-About alignment. */
+.profile-name {
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: top;
+}
+
+.profile-name.split-parent {
+  /* Fraunces descenders and the short entrance may extend beyond the line box. */
+  overflow: visible !important;
+}
+
+[data-contact-glare] {
+  --contact-glare-color: #b6eaff;
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+body.light [data-contact-glare] { --contact-glare-color: #0066a6; }
+
+.contact-glare.glare-hover {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  pointer-events: none;
+}
+
+body.light .contact-glare .glare-hover__glare { mix-blend-mode: multiply; }
+.contact-glare .glare-hover__band { will-change: auto; }
+
+/* Native anchor feedback remains present when the decorative effect is absent. */
+.hero-contact a:has([data-contact-glare]):is(:hover, :focus-visible, :active) {
+  border-color: var(--orange);
+}
+
+@media (prefers-reduced-motion: reduce), (prefers-contrast: more), (forced-colors: active) {
+  [data-contact-glare] { display: none; }
+  .profile-name .split-char {
+    transform: none !important;
+    filter: none !important;
+    opacity: 1 !important;
+  }
+}

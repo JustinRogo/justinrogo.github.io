@@ -1,5 +1,17 @@
 # Homepage React migration validation
 
+## Profile Glare Hover and Split Text follow-up — October 31, 2026
+
+The homepage uses pinned React Bits Glare Hover on the native Teams contact link and Split Text inside the existing name heading. Both are vendored at `e12c22192ac7b4b452c5e2feb9b586d74765d696`, with locally bundled `gsap@3.15.0` and `@gsap/react@2.1.2`. The source notices and GSAP license references are included in the production artifact.
+
+- The production build succeeds using `--skip-feed`, preserving the existing uncommitted feed snapshot.
+- The homepage browser suite passes **47 tests** in Microsoft Edge. Added coverage checks the single accessible heading, live reduced-motion cancellation without replay, native link hit testing and keyboard focus, dependency notices, and the heading/contact fallback without JavaScript. Existing layout tests cover 320–1440px in both themes.
+- Fresh live-data screenshots were inspected at 1440px and 390px in both themes, including the settled name and desktop glare. The normal remote fonts and portrait loaded; no application JavaScript errors or horizontal overflow appeared. At those widths, the settled split heading has the same width and height as plain text.
+- The production JavaScript grows from 154,338 to 207,986 bytes gzipped (about 52.4 KiB); CSS grows from 2,002 to 2,388 bytes gzipped. No additional GPU renderer is introduced. The name is a single entrance; the sheen is triggered by interaction and stops after its sweep.
+- The design detector reports 24 advisories on the existing page styling, and none on the new profile integration files or vendored components. Existing appearance outside this change was preserved.
+
+These are local Chromium/Edge checks. Safari/Firefox rendering, real Teams navigation, and deployment were not exercised.
+
 Validated locally on 2026-10-30 with Node.js 24 and headless Microsoft Edge (Chromium) on Windows.
 
 - `npm run test:homepage`: **24 passed** against the static production artifact. Includes 320, 390, 768 and 1440 pixel widths in both themes; native collection disclosures and every manifest destination; keyboard focus and tab wrapping; lazy iframe URLs and retained panel state; request validation, subject mapping and success redirect; profile control; nested strengths/catalog interactions; mouse/touch; reduced motion; rapid switching and resize geometry; loading and failed/invalid/stalled manifests; standalone page paths; Updates assets/aliases; and `file://` fallback.

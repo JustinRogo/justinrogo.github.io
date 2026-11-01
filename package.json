@@ -13,9 +13,11 @@
     "test:updates": "node --test tests/updates.test.mjs tests/updates-permissions.test.mjs tests/link-previews.test.mjs"
   },
   "dependencies": {
+    "@gsap/react": "2.1.2",
     "@supabase/supabase-js": "2.118.0",
     "dompurify": "3.4.17",
     "entities": "4.5.0",
+    "gsap": "3.15.0",
     "quill": "2.0.2",
     "react": "19.3.1",
     "react-dom": "19.3.1",

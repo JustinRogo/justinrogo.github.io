@@ -6,7 +6,7 @@ Live site: https://justinrogo.github.io/
 
 ## Overview
 
-This repository powers a static website built with HTML, CSS, vanilla JavaScript, and two React islands on the homepage. The homepage brings together professional quick links, scheduling tools, UConn Law Library resources, project pages, personal productivity widgets, and experimental web apps.
+This repository powers a static website built with HTML, CSS, vanilla JavaScript, and React islands on the homepage. The homepage brings together professional quick links, scheduling tools, UConn Law Library resources, project pages, personal productivity widgets, and experimental web apps.
 
 The site includes:
 
@@ -112,6 +112,10 @@ The profile, two sidebar cards, Pages & Projects, widget deck and Quick Links us
 
 `GlassMaterial.jsx` places the component in a decorative, inert layer behind each card's content. This keeps text, iframes, forms, native disclosures and existing event handlers separate from the refraction effect. Existing HTML cards expose empty `data-glass-material` slots; React owns only these slots. Theme integration is in `glass-material.css`, separate from the upstream stylesheet. SVG refraction is enabled on desktop with a fine pointer; mobile, reduced motion and upstream browser compatibility checks select the frosted fallback. Higher contrast, reduced transparency and forced colors use an opaque material. The glass material adds no WebGL loop, dependency or external runtime.
 
+`ProfileMotion.jsx` adds the actual React Bits [Glare Hover](https://reactbits.dev/animations/glare-hover) and [Split Text](https://reactbits.dev/text-animations/split-text) components, vendored at the same revision. A 480ms sheen runs on the Teams contact link on mouse entry or keyboard focus. The decorative component receives events from the original anchor through a local `eventTarget` prop; touch uses the native static feedback. The name enters once with an 18ms character stagger and 420ms per-character duration, retaining the existing Fraunces styling and word wrapping. The Split Text source is modified to keep its text visible before font/plugin initialization. Its pinned GSAP dependencies are bundled locally, and their copyright/license notices are included in the build.
+
+Reduced motion, increased contrast, forced colors, and hidden tabs unmount the decorative motion components. The name settles to plain text and does not replay when those preferences are restored. The original heading text and Teams link remain available without JavaScript. Theme and integration styles are in `profile-motion.css`.
+
 ### Homepage backgrounds
 
 `SiteBackground.jsx` owns the fixed `#site-background` island. It uses the official React Bits [Shape Waves](https://reactbits.dev/backgrounds/shape-waves) component, vendored at revision `e12c22192ac7b4b452c5e2feb9b586d74765d696`. The exported `SHAPE_WAVES_SETTINGS` constant preserves the shared URL: empty text, text size 0.24, mixed shapes, background `#00173a`, shape color `#913d00`, hover `#f97316`, direction 175, glow 1.75, flow 2.3, fade 0.3, brightness 0.48, splash strength 0.75, splash radius 28, dot size 0.58, cell size 8, scale 1.6, contrast 3 and speed 0.7.
@@ -128,7 +132,7 @@ The three restored choices reuse earlier implementations from Git history. Antig
 
 ### Homepage React components and ownership
 
-The homepage has two independent roots, `#project-directory-root` and `#widget-tabs-root`, mounted by [`src/homepage/index.jsx`](src/homepage/index.jsx). No router is used; all existing page paths and external links remain normal links.
+The homepage's two content roots, `#project-directory-root` and `#widget-tabs-root`, are mounted by [`src/homepage/index.jsx`](src/homepage/index.jsx). Additional roots own the selected background, decorative glass slots, the name span inside the existing heading, and a decorative slot inside the native Teams link. No router is used; all existing page paths and external links remain normal links.
 
 - `ProjectDirectory.jsx` renders the three native `<details>` collections and recursive page links. `page-tree.js` loads and validates `data/pages.json`, preserves folder/index grouping and carries the curated fallback formerly in `main.js`. File previews, failed/invalid manifests and requests stalled for ten seconds use that fallback.
 - `WidgetTabs.jsx` owns the five main tabs, roving keyboard focus, panel visibility, request form, success redirect and lazy iframe URLs. Visited panels stay mounted, preserving iframe sessions, form values and nested widget state. The profile's existing `#viewStrengthsBtn` is connected through one effect with cleanup.

@@ -23,5 +23,7 @@ __pycache__/
 /assets/vgpu-core-LICENSE.txt
 /assets/vgpu-wgsl-LICENSE.txt
 /assets/vgpu-wgsl-std-LICENSE.txt
+/assets/gsap-LICENSE.txt
+/assets/gsap-react-LICENSE.txt
 /test-results/
 /playwright-report/
