@@ -1,0 +1,313 @@
+import { Component, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { createRoot } from "react-dom/client";
+import {
+  useClock,
+  useMedia,
+  useResource,
+  useRoute,
+  useStored,
+} from "./hooks.js";
+import { integrations, profile } from "./content.js";
+import Home from "./views/Home.jsx";
+import Projects from "./views/Projects.jsx";
+import Tools from "./views/Tools.jsx";
+import About from "./views/About.jsx";
+import More, { parseManifest } from "./views/More.jsx";
+import Settings from "./components/Settings.jsx";
+import Icon from "./components/Icon.jsx";
+import { GlassLayer, Atmosphere } from "./components/Glass.jsx";
+import ExploreMenu from "./components/ExploreMenu.jsx";
+import "./styles.css";
+import "./glass-theme.css";
+
+const destinations = [
+  ["home", "Home"],
+  ["projects", "Projects"],
+  ["tools", "Tools"],
+  ["about", "About"],
+  ["more", "More"],
+];
+function App() {
+  const route = useRoute();
+  const valid = destinations.some(([id]) => id === route.view);
+  const active = valid ? route.view : "missing";
+  const [visited, setVisited] = useState(new Set([active]));
+  if (!visited.has(active)) setVisited(new Set([...visited, active]));
+  const [preferences, setPreferences] = useStored(
+    "jr-v2-preferences",
+    { theme: "system", calm: false, atmosphere: true },
+    (p) =>
+      p &&
+      ["system", "light", "dark"].includes(p.theme) &&
+      typeof p.calm === "boolean" &&
+      typeof p.atmosphere === "boolean",
+  );
+  const [saved, setSaved] = useStored(
+    "jr-v2-saved",
+    [],
+    (p) => Array.isArray(p) && p.every((v) => typeof v === "string"),
+  );
+  const [settings, setSettings] = useState(false);
+  const [visible, setVisible] = useState(() => !document.hidden);
+  useEffect(() => {
+    const update = () => setVisible(!document.hidden);
+    document.addEventListener("visibilitychange", update);
+    return () => document.removeEventListener("visibilitychange", update);
+  }, []);
+  const systemDark = useMedia("(prefers-color-scheme: dark)");
+  const reduced = useMedia("(prefers-reduced-motion: reduce)");
+  const fine = useMedia("(hover: hover) and (pointer: fine)");
+  const highContrast = useMedia("(prefers-contrast: more)");
+  const forcedColors = useMedia("(forced-colors: active)");
+  const theme =
+    preferences.theme === "system"
+      ? systemDark
+        ? "dark"
+        : "light"
+      : preferences.theme;
+  const effects =
+    !reduced && !preferences.calm && !highContrast && !forcedColors && visible;
+  const projects = useResource("../data/pages.json", parseManifest);
+  const weather = useResource(integrations.weather);
+  const time = useClock();
+  const main = useRef(null);
+  const currentView = useRef(active);
+  const initialView = useRef(true);
+  const scrolls = useRef({});
+  useEffect(() => {
+    document.title = `${destinations.find(([id]) => id === active)?.[1] || "Page not found"} · Justin Rogowski`;
+  }, [active]);
+  useEffect(() => {
+    const el = document.documentElement;
+    el.dataset.theme = theme;
+    el.dataset.calm = String(!effects);
+    el.dataset.atmosphere = String(preferences.atmosphere);
+    document.querySelector('meta[name="theme-color"]').content =
+      theme === "dark" ? "#060f23" : "#e6efff";
+  }, [theme, effects, preferences.atmosphere]);
+  useEffect(() => {
+    if (!Array.isArray(saved)) setSaved([]);
+  }, [saved]);
+  useLayoutEffect(() => {
+    if (initialView.current) {
+      initialView.current = false;
+      return;
+    }
+    if (currentView.current === active) return;
+    scrolls.current[currentView.current] = window.scrollY;
+    currentView.current = active;
+    main.current
+      .querySelector("[data-view]:not([hidden]) h1")
+      ?.focus({ preventScroll: true });
+    window.scrollTo({ top: scrolls.current[active] || 0, behavior: "instant" });
+    document.title = `${destinations.find(([id]) => id === active)?.[1] || "Page not found"} · Justin Rogowski`;
+  }, [active]);
+  useEffect(() => {
+    const previous = history.scrollRestoration;
+    history.scrollRestoration = "manual";
+    return () => {
+      history.scrollRestoration = previous;
+    };
+  }, []);
+  const toggleSave = (path) =>
+    setSaved((items) =>
+      (Array.isArray(items) ? items : []).includes(path)
+        ? items.filter((p) => p !== path)
+        : [...(Array.isArray(items) ? items : []), path],
+    );
+  const safeSaved = Array.isArray(saved) ? saved : [];
+  const render = (view) =>
+    ({
+      home: (
+        <Home
+          projects={projects}
+          effects={effects && active === "home"}
+          theme={theme}
+          fine={fine}
+          route={route}
+        />
+      ),
+      projects: (
+        <Projects
+          projects={projects}
+          params={active === "projects" ? route.params : new URLSearchParams()}
+          saved={safeSaved}
+          onSave={toggleSave}
+          effects={effects && fine && active === "projects"}
+        />
+      ),
+      tools: (
+        <Tools
+          params={active === "tools" ? route.params : new URLSearchParams()}
+          isActive={active === "tools"}
+        />
+      ),
+      about: <About />,
+      more: (
+        <More
+          weather={weather}
+          onSettings={() => setSettings(true)}
+          route={route}
+          effects={effects}
+        />
+      ),
+      missing: (
+        <div className="page-heading">
+          <h1 tabIndex={-1}>A little off the map.</h1>
+          <p>
+            This view doesn’t exist. <a href="#/home">Head home</a> or{" "}
+            <a href="#/projects">browse the projects</a>.
+          </p>
+        </div>
+      ),
+    })[view];
+  return (
+    <>
+      <Atmosphere moving={effects && preferences.atmosphere} />
+      <a
+        href="#main"
+        className="skip-link"
+        onClick={(e) => {
+          e.preventDefault();
+          main.current.focus();
+        }}
+      >
+        Skip to content
+      </a>
+      <aside className="sidebar">
+        <GlassLayer radius={24} />
+        <a href="#/home" className="wordmark" aria-label="Justin Rogowski home">
+          jr
+          <Icon name="external" size={28} />
+        </a>
+        <div className="sidebar-identity">
+          Justin Rogowski
+          <span>{profile.role}</span>
+        </div>
+        <div className="sidebar-scroll">
+          <nav className="primary-nav" aria-label="Primary navigation">
+            <GlassLayer radius={20} className="dock-glass" />
+            {destinations.map(([id, label]) => (
+              <a
+                key={id}
+                href={`#/${id}`}
+                aria-current={id === active ? "page" : undefined}
+              >
+                <Icon name={id} size={21} />
+                <span>{label}</span>
+                <span className="nav-active-dot" />
+              </a>
+            ))}
+          </nav>
+          <div className="sidebar-branches">
+            <ExploreMenu route={route} effects={effects} />
+          </div>
+        </div>
+        <div className="sidebar-bottom">
+          <a
+            href="mailto:justin.rogowski@uconn.edu"
+            className="sidebar-contact"
+          >
+            Let’s connect <Icon name="external" size={17} />
+          </a>
+          <div className="sidebar-settings">
+            <button
+              className="icon-button"
+              onClick={() => setSettings(true)}
+              aria-label="Appearance and motion settings"
+            >
+              <Icon name="settings" />
+            </button>
+            <a href="../" className="v1-link">
+              Visit the original site <Icon name="external" size={14} />
+            </a>
+          </div>
+          <span className="prototype-label">An independent V2 prototype</span>
+        </div>
+      </aside>
+      <div className="workspace">
+        <header className="topbar">
+          <GlassLayer radius={20} />
+          <a className="mobile-wordmark" href="#/home">
+            jr
+            <Icon name="external" size={28} />
+          </a>
+          <div className="local-time">
+            <span className="live-dot" />
+            <span>Hartford, CT</span>
+            <time dateTime={time.toISOString()}>
+              {time.toLocaleTimeString("en-US", {
+                hour: "numeric",
+                minute: "2-digit",
+                timeZone: "America/New_York",
+              })}
+            </time>
+            {weather.data?.current && (
+              <span className="topbar-weather">
+                {Math.round(weather.data.current.temperature_2m)}°F
+              </span>
+            )}
+          </div>
+          <button
+            className="icon-button"
+            aria-label="Appearance and motion settings"
+            onClick={() => setSettings(true)}
+          >
+            <Icon name={theme === "dark" ? "moon" : "sun"} size={19} />
+          </button>
+        </header>
+        <main id="main" tabIndex={-1} ref={main}>
+          {[...visited].map((view) => (
+            <div
+              key={view}
+              data-view={view}
+              hidden={active !== view}
+              className={`view view-${view}`}
+            >
+              {render(view)}
+            </div>
+          ))}
+        </main>
+        <footer className="app-footer">
+          <span>Built by Justin.</span>
+          <a href="../">
+            Original site <Icon name="external" size={14} />
+          </a>
+        </footer>
+      </div>
+      {settings && (
+        <Settings
+          preferences={preferences}
+          setPreferences={setPreferences}
+          reduced={reduced}
+          onClose={() => setSettings(false)}
+        />
+      )}
+    </>
+  );
+}
+class Boundary extends Component {
+  state = { failed: false };
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  render() {
+    return this.state.failed ? (
+      <div className="fatal-error">
+        <h1>Something didn’t load.</h1>
+        <p>Please reload the prototype or visit the original site.</p>
+        <button className="button" onClick={() => location.reload()}>
+          Reload
+        </button>
+        <a href="../">Original website</a>
+      </div>
+    ) : (
+      this.props.children
+    );
+  }
+}
+createRoot(document.getElementById("root")).render(
+  <Boundary>
+    <App />
+  </Boundary>,
+);
