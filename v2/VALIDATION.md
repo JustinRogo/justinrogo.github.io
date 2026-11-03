@@ -6,7 +6,7 @@
 | --- | --- |
 | `npm run build:v2` | Passed; isolated React/esbuild bundle |
 | `npm run build -- --skip-feed` | Passed; full artifact with additive `/v2/` output |
-| `npm run test:v2` | **30 cases verified** on Microsoft Edge/Playwright; 28 passed in the full run, then all six assembly tests passed after updating two obsolete background fixtures |
+| `npm run test:v2` | **30 cases verified** on the combined main/V2 tree; 29 passed in the full run and the screenshot-timing case passed after switching its choreography to a controlled browser clock |
 | `npm run test:homepage` | **51 passed**; existing V1 suite, including widgets, backgrounds, themes and URLs |
 | `npm run test:updates` | **22 passed**; existing API, rich text, permissions and link-preview tests |
 | Production HTTP smoke | **22 public URLs returned 200**, including all 15 manifest project paths |
@@ -110,3 +110,9 @@ Four new browser cases cover device defaults, persistence, exclusive renderer mo
 Additional live Edge inspection verified the actual Shape Waves WebGPU renderer reaches active state with correct 1440×1000 dimensions, hides its fallback only once ready, and shows the expected moving shapes behind glass. The still fallback was inspected separately, and mobile Aurora mounts without a canvas. Initial GPU startup can take a few seconds in headless Edge; the fallback keeps content available. These checks do not establish physical-device frame-rate guarantees.
 
 The scoped source design detector reports no findings. Full build and production smoke pass, including all 22 public URLs, five private-source exclusions, byte-identical public copies, and unchanged V1 core hashes. All edits in this follow-up remain within v2; no merge, deployment, commit, or push was performed.
+
+## Approved main integration · November 3, 2026
+
+The user approved merging V2 into main. Latest main updates through 9b540bd were integrated cleanly, retaining the newer Trello snapshot. Comparison against that main revision shows no changes to root homepage files, shared V1 sources, project data, workflows or Vercel configuration. Only the established additive package/build changes and the V2 tree are introduced.
+
+The combined tree builds successfully and passes the production smoke check: 22 public URLs, five excluded source URLs, byte-identical copies and unchanged V1 hashes. The full V2 run passed 29 cases; one screenshot-dependent choreography check missed the short wireframe phase while capturing images. That case now uses Playwright's controlled clock to keep the same real-node identity, measured positions, phase, cleanup and navigation assertions independent of screenshot speed. It passed for desktop and phone. Runtime animation timing is unchanged. All 30 unique cases are verified on the combined tree.

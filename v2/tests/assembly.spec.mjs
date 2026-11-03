@@ -63,6 +63,9 @@ test("desktop and phone assemble the original nodes at measured coordinates and 
 }) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
+  // Screenshots can take longer than the solo Layout phase on slower runners.
+  // Control JS time so capture speed cannot change the choreography being checked.
+  await page.clock.install();
   for (const width of [1440, 375]) {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto(`/v2/?replayIntro=1&capture=${width}#/home`);
@@ -73,6 +76,7 @@ test("desktop and phone assemble the original nodes at measured coordinates and 
     await expect(
       page.locator(".selected-bento .magic-bento__card"),
     ).toHaveCount(4);
+    await page.clock.pauseAt(await page.evaluate(() => Date.now() + 20));
     await page.evaluate(() => {
       const nodes = [
         document.querySelector(".glass-hero"),
@@ -95,7 +99,7 @@ test("desktop and phone assemble the original nodes at measured coordinates and 
       "animation-play-state",
       "paused",
     );
-    await page.waitForTimeout(1250);
+    await page.clock.runFor(1250);
     await expect(layer(page)).toHaveAttribute("data-assembly-stage", "layout");
     expect(
       await page
@@ -119,8 +123,9 @@ test("desktop and phone assemble the original nodes at measured coordinates and 
     await page.screenshot({
       path: shotPath(`assembly-${width}-wireframe.png`),
     });
+    await page.clock.runFor(1300);
     await expect(layer(page)).toHaveAttribute("data-assembly-stage", "content");
-    await page.waitForTimeout(1100);
+    await page.clock.runFor(1100);
     await expect(layer(page)).toHaveAttribute(
       "data-assembly-state",
       "assembling",
@@ -128,6 +133,7 @@ test("desktop and phone assemble the original nodes at measured coordinates and 
     await page.screenshot({
       path: shotPath(`assembly-${width}-construction.png`),
     });
+    await page.clock.runFor(3000);
     await expect(layer(page)).toHaveAttribute(
       "data-assembly-state",
       "complete",
@@ -199,6 +205,7 @@ test("desktop and phone assemble the original nodes at measured coordinates and 
       expect(arrival.y, arrival.id).toBeGreaterThanOrEqual(arrival.top - 30);
       expect(arrival.y, arrival.id).toBeLessThanOrEqual(arrival.bottom + 30);
     }
+    await page.clock.resume();
     await primary(page)
       .getByRole("link", { name: "About", exact: true })
       .click();
