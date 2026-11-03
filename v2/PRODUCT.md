@@ -34,4 +34,8 @@ Respect system reduced motion, high contrast, forced colors, touch input and the
 
 ## Annotated navigation refinement
 
-Desktop branches live in the sidebar below the main destinations, with Projects, Useful shortcuts, and all 11 Quick Links. Only the middle rail region scrolls; contact/settings stay outside it. At 800px and below, branches move to More and the labeled main navigation stays accessible. The hero interaction hint and portrait caption were removed at the user’s request. The Updates featured-title alias is V2-only; the shared manifest is unchanged.
+Desktop branches live in the sidebar below the main destinations, with Projects, Work, UCPEA, For Fun, Useful shortcuts, and all 11 Quick Links. The three original directory collections expose all 15 pages using shared manifest titles and destinations; they start collapsed and open through native buttons. Only the middle rail region scrolls; contact/settings stay outside it. At 800px and below, branches move to More and the labeled main navigation stays accessible. The hero interaction hint and portrait caption were removed at the user’s request. The Updates featured-title alias is V2-only; the shared manifest is unchanged.
+
+## Homepage assembly experiment
+
+Home optionally opens with a finite team-of-cursors construction sequence on its actual components. Five agents on desktop, four on phones, reveal measured real nodes; no mock interface or remount is used. Autoplay runs once per session, with a header replay control and persistent Homepage assembly switch. User interaction and layout changes immediately hand off to the ordinary page. Reduced motion, Calm, increased contrast, and forced colors bypass it. Ambient motion pauses during construction. The system uses the existing GSAP dependency and leaves V1 and deployment unchanged. See ASSEMBLY.md for configuration and verification.

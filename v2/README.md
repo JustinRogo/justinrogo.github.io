@@ -8,7 +8,7 @@ The current direction follows Justin’s explicit revision: **blue/orange glass*
 
 Featured work leads with CT General Statutes Explorer, followed by Law Library Heatmap and AI Corner Updates, using the existing manifest destinations.
 
-Desktop uses a floating glass side rail; phones retain five labeled destinations in a glass bottom dock. A real Branched Menu sits below the main desktop sidebar navigation and exposes project groups, tool shortcuts, and all 11 Quick Links as normal links. Its scroll area keeps contact/settings reachable when branches expand. On phones and compact tablets, the same branches are available in More. The directory remains an efficient searchable list, while Home gets the more expressive composition.
+Desktop uses a floating glass side rail; phones retain five labeled destinations in a glass bottom dock. A real Branched Menu sits below the main desktop sidebar navigation and exposes project filters, the original Work (5 pages), UCPEA (4 pages), and For Fun (6 pages) collections, tool shortcuts, and all 11 Quick Links as normal links. Page titles and destinations come from the shared manifest. Its scroll area keeps contact/settings reachable when branches expand. On phones and compact tablets, the same branches are available in More. The directory remains an efficient searchable list, while Home gets the more expressive composition.
 
 ## Navigation
 
@@ -41,6 +41,10 @@ npm run preview
 ```
 
 Open **http://127.0.0.1:4391/v2/**. This also serves the unchanged homepage and existing project pages. `--skip-feed` preserves the checked-in blog snapshot. The normal existing build still refreshes that feed as before.
+
+## Homepage assembly
+
+Home can be assembled by five colored cursors (four on phones), using the actual components and the existing GSAP dependency. It plays once per session, supports replay from the header, and has a persistent Homepage assembly setting. Reduced motion and Calm mode bypass it. Try `http://127.0.0.1:4392/v2/?replayIntro=1#/home`, or disable it with `?intro=0`. Configuration, component API, cancellation behavior, screenshots, and performance limits are documented in [ASSEMBLY.md](ASSEMBLY.md).
 
 ## React Bits and attribution
 
@@ -79,6 +83,7 @@ React Bits is copyright David Haz, under MIT + Commons Clause. The build include
 
 - `src/index.jsx`: application shell, routes, view ownership, focus/scroll, preferences.
 - `src/hooks.js`: routing, persisted state, media preferences, resource fetches with timeouts and cancellation.
+- `src/assembly/`: real-element ref registration, GSAP choreography, decorative cursors, configuration, and replay/session policy.
 - `src/content.js`: grounded profile copy, source URLs, category rules and catalog URL builder.
 - `src/views/`: five destinations; `src/components/`: shared controls, dialogs, icons, project rows and sketch.
 - `src/styles.css`: V2 layout and controls; `src/glass-theme.css`: the requested glass materials, blue/orange tokens, responsive hero and atmospheric motion.

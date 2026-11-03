@@ -1,6 +1,6 @@
 /*! React Bits — Copyright (c) 2026 David Haz. MIT + Commons Clause; see assets/react-bits-LICENSE.txt.
  * Source revision e12c22192ac7b4b452c5e2feb9b586d74765d696.
- * Local changes: native child anchors, controlled selection, accessible collapsed branches, shared site icons.
+ * Local changes: native child anchors, controlled selection, accessible collapsed branches, shared site icons, per-section row heights.
  */
 "use client";
 
@@ -107,12 +107,13 @@ export default function BranchedMenu({
 
   const r = Math.min(radius, rowHeight / 2 - 2);
   const endX = indent - 8;
-  const rowY = (k) => PAD + k * rowHeight + rowHeight / 2;
-  const branch = (k) =>
-    `M ${trunk} ${rowY(k) - r} A ${r} ${r} 0 0 0 ${trunk + r} ${rowY(k)} H ${endX}`;
-  const reach = (k) =>
-    `M ${trunk} 0 V ${rowY(k) - r} A ${r} ${r} 0 0 0 ${trunk + r} ${rowY(k)} H ${endX}`;
-  const length = (k) => rowY(k) - r + (Math.PI * r) / 2 + (endX - trunk - r);
+  const rowY = (k, height) => PAD + k * height + height / 2;
+  const branch = (k, height) =>
+    `M ${trunk} ${rowY(k, height) - r} A ${r} ${r} 0 0 0 ${trunk + r} ${rowY(k, height)} H ${endX}`;
+  const reach = (k, height) =>
+    `M ${trunk} 0 V ${rowY(k, height) - r} A ${r} ${r} 0 0 0 ${trunk + r} ${rowY(k, height)} H ${endX}`;
+  const length = (k, height) =>
+    rowY(k, height) - r + (Math.PI * r) / 2 + (endX - trunk - r);
 
   return (
     <nav
@@ -142,12 +143,14 @@ export default function BranchedMenu({
         const isOpen = kids ? open.has(i) : false;
         const leafValue = item.value ?? item.label;
         const leafActive = !kids && leafValue === active;
-        const bodyH = kids ? PAD * 2 + kids.length * rowHeight : 0;
+        const sectionHeight = Math.max(rowHeight, item.rowHeight || rowHeight);
+        const bodyH = kids ? PAD * 2 + kids.length * sectionHeight : 0;
         return (
           <div
             key={item.value ?? item.label}
             className="branched-menu__section"
             data-open={isOpen ? "" : undefined}
+            style={{ "--bm-row": `${sectionHeight}px` }}
           >
             <button
               ref={(el) => {
@@ -197,24 +200,30 @@ export default function BranchedMenu({
                     >
                       <path
                         className="branched-menu__base"
-                        d={`M ${trunk} 0 V ${rowY(kids.length - 1) - r}`}
+                        d={
+                          kids.length
+                            ? `M ${trunk} 0 V ${rowY(kids.length - 1, sectionHeight) - r}`
+                            : ""
+                        }
                       />
                       {kids.map((kid, k) => (
                         <path
                           key={kid.value}
                           className="branched-menu__base"
-                          d={branch(k)}
+                          d={branch(k, sectionHeight)}
                         />
                       ))}
                       {kids.map((kid, k) => (
                         <path
                           key={kid.value}
                           className="branched-menu__reach"
-                          d={reach(k)}
+                          d={reach(k, sectionHeight)}
                           style={{
-                            strokeDasharray: length(k),
+                            strokeDasharray: length(k, sectionHeight),
                             strokeDashoffset:
-                              kid.value === active ? 0 : length(k),
+                              kid.value === active
+                                ? 0
+                                : length(k, sectionHeight),
                           }}
                         />
                       ))}

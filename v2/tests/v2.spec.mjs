@@ -439,6 +439,81 @@ test("source failures have recovery actions and retain access to the original si
   await expect(page.locator(".project-row")).toHaveCount(manifest.pages.length);
 });
 
+test("original Work, UCPEA and For Fun collections expose every page on desktop and phone", async ({
+  page,
+}) => {
+  const collections = [
+    [
+      "Work",
+      manifest.pages.filter(
+        (p) =>
+          !p.path.startsWith("Pages/For Fun/") &&
+          !p.path.startsWith("Pages/Work/UCPEA/"),
+      ),
+      5,
+    ],
+    [
+      "UCPEA",
+      manifest.pages.filter((p) => p.path.startsWith("Pages/Work/UCPEA/")),
+      4,
+    ],
+    [
+      "For Fun",
+      manifest.pages.filter((p) => p.path.startsWith("Pages/For Fun/")),
+      6,
+    ],
+  ];
+  for (const width of [1024, 375]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/v2/#/home");
+    await expect(
+      page.locator(".selected-bento .magic-bento__card"),
+    ).toHaveCount(4);
+    if (width < 800)
+      await nav(page).getByRole("link", { name: "More", exact: true }).click();
+    const menu = page
+      .locator(width < 800 ? ".mobile-branches" : ".sidebar-branches")
+      .getByRole("navigation", { name: "Explore shortcuts" });
+    for (const [name, pages, count] of collections) {
+      const toggle = menu.getByRole("button", { name, exact: true });
+      const section = menu.locator(".branched-menu__section").filter({
+        has: page.getByRole("button", { name, exact: true }),
+      });
+      await expect(toggle).toHaveAttribute("aria-expanded", "false");
+      await expect(section.getByRole("link")).toHaveCount(0);
+      await toggle.focus();
+      await page.keyboard.press("Enter");
+      await expect(section.getByRole("link")).toHaveCount(count);
+      for (const item of pages) {
+        const link = section.getByRole("link", {
+          name: item.title,
+          exact: true,
+        });
+        await expect(link).toHaveAttribute(
+          "href",
+          item.href ||
+            `../${item.path.split("/").map(encodeURIComponent).join("/")}`,
+        );
+        await expect(link).toHaveAttribute("target", "_blank");
+        expect(
+          await link.evaluate(
+            (el) =>
+              el.querySelector(".branched-menu__label").getBoundingClientRect()
+                .height <= el.getBoundingClientRect().height,
+          ),
+        ).toBe(true);
+      }
+      await toggle.press("Enter");
+      await expect(section.getByRole("link")).toHaveCount(0);
+    }
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth + 1,
+      ),
+    ).toBe(true);
+  }
+});
+
 test("phone touch destinations remain fixed and content clears the dock", async ({
   browser,
 }) => {

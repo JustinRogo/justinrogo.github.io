@@ -1,9 +1,16 @@
 import { useMemo } from "react";
 import BranchedMenu from "../vendor/BranchedMenu.jsx";
 import Icon from "./Icon.jsx";
-import { resources } from "../content.js";
+import { resources, projectHref } from "../content.js";
 
-export default function ExploreMenu({ route, effects = true, onSelect }) {
+const EMPTY_PAGES = [];
+
+export default function ExploreMenu({
+  route,
+  effects = true,
+  onSelect,
+  pages = EMPTY_PAGES,
+}) {
   const items = useMemo(
     () => [
       {
@@ -34,6 +41,55 @@ export default function ExploreMenu({ route, effects = true, onSelect }) {
             icon: <Icon name="heart" size={16} />,
           },
         ],
+      },
+      {
+        label: "Work",
+        rowHeight: 64,
+        children: pages
+          .filter(
+            (page) =>
+              !page.path.startsWith("Pages/For Fun/") &&
+              !page.path.startsWith("Pages/Work/UCPEA/"),
+          )
+          .sort((a, b) => a.title.localeCompare(b.title))
+          .map((page) => ({
+            value: `page:${page.path}`,
+            label: page.title,
+            href: projectHref(page),
+            target: "_blank",
+            rel: "noopener noreferrer",
+            icon: <Icon name="code" size={16} />,
+          })),
+      },
+      {
+        label: "UCPEA",
+        rowHeight: 64,
+        children: pages
+          .filter((page) => page.path.startsWith("Pages/Work/UCPEA/"))
+          .sort((a, b) => a.title.localeCompare(b.title))
+          .map((page) => ({
+            value: `page:${page.path}`,
+            label: page.title,
+            href: projectHref(page),
+            target: "_blank",
+            rel: "noopener noreferrer",
+            icon: <Icon name="book" size={16} />,
+          })),
+      },
+      {
+        label: "For Fun",
+        rowHeight: 64,
+        children: pages
+          .filter((page) => page.path.startsWith("Pages/For Fun/"))
+          .sort((a, b) => a.title.localeCompare(b.title))
+          .map((page) => ({
+            value: `page:${page.path}`,
+            label: page.title,
+            href: projectHref(page),
+            target: "_blank",
+            rel: "noopener noreferrer",
+            icon: <Icon name="projects" size={16} />,
+          })),
       },
       {
         label: "Useful shortcuts",
@@ -70,7 +126,7 @@ export default function ExploreMenu({ route, effects = true, onSelect }) {
         })),
       },
     ],
-    [],
+    [pages],
   );
   const selected =
     route?.view === "tools"

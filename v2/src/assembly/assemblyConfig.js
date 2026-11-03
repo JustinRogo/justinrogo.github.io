@@ -1,0 +1,46 @@
+// V2 only. Times below are fractions of the configured duration.
+export const assemblyConfig = Object.freeze({
+  enabled: true,
+  cursorCount: 5,
+  mobileCursorCount: 4,
+  duration: 3200,
+  mobileDuration: 2600,
+  intensity: 0.7,
+  oncePerSession: true,
+  sessionKey: "jr-v2-assembly-seen-v1",
+  colors: ["#ff9d5c", "#6bafff", "#5de1c5", "#bf9aff", "#ff90bc", "#ead777"],
+  labels: ["Layout", "Glass", "Type", "Details", "Projects", "Connect"],
+});
+
+export const assemblyTasks = [
+  { id: "shell", cursor: 0, at: 0.12, duration: 0.1, effect: "surface" },
+  { id: "topbar", cursor: 3, at: 0.14, duration: 0.1, effect: "surface" },
+  { id: "hero-frame", cursor: 1, at: 0.19, duration: 0.24, effect: "trace" },
+  { id: "navigation", cursor: 0, at: 0.28, duration: 0.14, effect: "links" },
+  { id: "hero-title", cursor: 2, at: 0.3, duration: 0.16, effect: "text" },
+  { id: "portrait", cursor: 3, at: 0.32, duration: 0.12, effect: "place" },
+  { id: "branches", cursor: 0, at: 0.47, duration: 0.09, effect: "links" },
+  { id: "hero-role", cursor: 2, at: 0.49, duration: 0.07, effect: "text" },
+  {
+    id: "featured-heading",
+    cursor: 4,
+    at: 0.49,
+    duration: 0.06,
+    effect: "text",
+  },
+  { id: "hero-actions", cursor: 3, at: 0.5, duration: 0.1, effect: "place" },
+  {
+    id: "hero-description",
+    cursor: 2,
+    at: 0.59,
+    duration: 0.08,
+    effect: "text",
+  },
+  { id: "featured-0", cursor: 4, at: 0.6, duration: 0.08, effect: "place" },
+  { id: "featured-1", cursor: 1, at: 0.6, duration: 0.07, effect: "place" },
+  { id: "notes", cursor: 1, at: 0.72, duration: 0.09, effect: "place" },
+  { id: "featured-2", cursor: 4, at: 0.76, duration: 0.06, effect: "place" },
+  { id: "featured-3", cursor: 3, at: 0.77, duration: 0.04, effect: "place" },
+  { id: "contact", cursor: 5, at: 0.82, duration: 0.07, effect: "place" },
+  { id: "footer", cursor: 0, at: 0.87, duration: 0.05, effect: "surface" },
+];

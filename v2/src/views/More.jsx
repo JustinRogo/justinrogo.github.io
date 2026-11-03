@@ -117,7 +117,13 @@ function formatDate(date) {
         year: "numeric",
       });
 }
-export default function More({ onSettings, weather, route, effects }) {
+export default function More({
+  onSettings,
+  weather,
+  route,
+  effects,
+  projectPages,
+}) {
   const blog = useResource("../data/pocket-part.json");
   const counts = useResource("../data/cards_count.json");
   const events = useResource(integrations.events, parseEvents);
@@ -132,7 +138,7 @@ export default function More({ onSettings, weather, route, effects }) {
       <section className="mobile-branches glass-host">
         <GlassLayer />
         <h2>Explore</h2>
-        <ExploreMenu route={route} effects={effects} />
+        <ExploreMenu route={route} effects={effects} pages={projectPages} />
       </section>
       <div className="more-top">
         <section className="activity-note">

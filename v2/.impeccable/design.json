@@ -753,22 +753,47 @@
         "indent": 28,
         "trunk": 8,
         "radius": 8,
-        "defaultOpen": [
-          0
-        ],
+        "defaultOpen": [0],
         "drawDuration": "effects ? 420 : 0",
         "foldDuration": "effects ? 300 : 0",
         "selection": "Controlled from route parameters; native anchors and SVG chevron; collapsed content inert."
       }
     },
     "breakpointBehavior": "Base floating rail 208px / workspace 244px; <=1150 rail 183px / workspace 216px; <=800 rail 68px / workspace 90px; <=600 floating dock and 14px main gutters. Bento measures its container using 150px minimum cells and 200px pair cells.",
+    "homepageAssembly": {
+      "source": "v2/src/assembly/",
+      "durationMs": 3200,
+      "mobileDurationMs": 2600,
+      "preparationMs": 160,
+      "cursors": 5,
+      "mobileCursors": 4,
+      "oncePerSession": true,
+      "colors": [
+        "#ff9d5c",
+        "#6bafff",
+        "#5de1c5",
+        "#bf9aff",
+        "#ff90bc",
+        "#ead777"
+      ],
+      "label": "10px / 650 Geist, 6px radius, #071528 ink",
+      "ownership": "Refs onto existing components; lifecycle-scoped GSAP presentation styles; no UI copies or remount",
+      "replay": "Header control, Homepage assembly preference, and ?replayIntro=1",
+      "bypass": "Reduced motion, Calm, increased contrast, forced colors, disabled flag, and ?intro=0",
+      "interrupt": "Input, focus, scroll, navigation, resize, visibility, font and observed geometry changes"
+    },
     "sidebarBranches": {
       "placement": "Below primary navigation in the desktop sidebar; More at widths up to 800px",
       "groups": [
         "Projects",
+        "Work",
+        "UCPEA",
+        "For Fun",
         "Useful shortcuts",
         "Quick links"
       ],
+      "directoryPageCounts": { "Work": 5, "UCPEA": 4, "For Fun": 6 },
+      "directoryRowHeight": 64,
       "quickLinkCount": 11,
       "scroll": "Middle rail scrolls; contact/settings remain outside it",
       "source": "v2/src/components/ExploreMenu.jsx and v2/src/glass-theme.css"

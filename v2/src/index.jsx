@@ -17,6 +17,10 @@ import Settings from "./components/Settings.jsx";
 import Icon from "./components/Icon.jsx";
 import { GlassLayer, Atmosphere } from "./components/Glass.jsx";
 import ExploreMenu from "./components/ExploreMenu.jsx";
+import HomepageAssembly, {
+  AssembleReveal,
+  ReplayAssembly,
+} from "./assembly/HomepageAssembly.jsx";
 import "./styles.css";
 import "./glass-theme.css";
 
@@ -35,12 +39,13 @@ function App() {
   if (!visited.has(active)) setVisited(new Set([...visited, active]));
   const [preferences, setPreferences] = useStored(
     "jr-v2-preferences",
-    { theme: "system", calm: false, atmosphere: true },
+    { theme: "system", calm: false, atmosphere: true, intro: true },
     (p) =>
       p &&
       ["system", "light", "dark"].includes(p.theme) &&
       typeof p.calm === "boolean" &&
-      typeof p.atmosphere === "boolean",
+      typeof p.atmosphere === "boolean" &&
+      (p.intro === undefined || typeof p.intro === "boolean"),
   );
   const [saved, setSaved] = useStored(
     "jr-v2-saved",
@@ -149,6 +154,7 @@ function App() {
           onSettings={() => setSettings(true)}
           route={route}
           effects={effects}
+          projectPages={projects.data?.pages}
         />
       ),
       missing: (
@@ -162,7 +168,10 @@ function App() {
       ),
     })[view];
   return (
-    <>
+    <HomepageAssembly
+      active={active === "home"}
+      enabled={effects && preferences.intro !== false && !settings}
+    >
       <Atmosphere moving={effects && preferences.atmosphere} />
       <a
         href="#main"
@@ -174,88 +183,105 @@ function App() {
       >
         Skip to content
       </a>
-      <aside className="sidebar">
-        <GlassLayer radius={24} />
-        <a href="#/home" className="wordmark" aria-label="Justin Rogowski home">
-          jr
-          <Icon name="external" size={28} />
-        </a>
-        <div className="sidebar-identity">
-          Justin Rogowski
-          <span>{profile.role}</span>
-        </div>
-        <div className="sidebar-scroll">
-          <nav className="primary-nav" aria-label="Primary navigation">
-            <GlassLayer radius={20} className="dock-glass" />
-            {destinations.map(([id, label]) => (
-              <a
-                key={id}
-                href={`#/${id}`}
-                aria-current={id === active ? "page" : undefined}
-              >
-                <Icon name={id} size={21} />
-                <span>{label}</span>
-                <span className="nav-active-dot" />
-              </a>
-            ))}
-          </nav>
-          <div className="sidebar-branches">
-            <ExploreMenu route={route} effects={effects} />
-          </div>
-        </div>
-        <div className="sidebar-bottom">
+      <AssembleReveal id="shell">
+        <aside className="sidebar">
+          <GlassLayer radius={24} />
           <a
-            href="mailto:justin.rogowski@uconn.edu"
-            className="sidebar-contact"
+            href="#/home"
+            className="wordmark"
+            aria-label="Justin Rogowski home"
           >
-            Let’s connect <Icon name="external" size={17} />
-          </a>
-          <div className="sidebar-settings">
-            <button
-              className="icon-button"
-              onClick={() => setSettings(true)}
-              aria-label="Appearance and motion settings"
-            >
-              <Icon name="settings" />
-            </button>
-            <a href="../" className="v1-link">
-              Visit the original site <Icon name="external" size={14} />
-            </a>
-          </div>
-          <span className="prototype-label">An independent V2 prototype</span>
-        </div>
-      </aside>
-      <div className="workspace">
-        <header className="topbar">
-          <GlassLayer radius={20} />
-          <a className="mobile-wordmark" href="#/home">
             jr
             <Icon name="external" size={28} />
           </a>
-          <div className="local-time">
-            <span className="live-dot" />
-            <span>Hartford, CT</span>
-            <time dateTime={time.toISOString()}>
-              {time.toLocaleTimeString("en-US", {
-                hour: "numeric",
-                minute: "2-digit",
-                timeZone: "America/New_York",
-              })}
-            </time>
-            {weather.data?.current && (
-              <span className="topbar-weather">
-                {Math.round(weather.data.current.temperature_2m)}°F
-              </span>
-            )}
+          <div className="sidebar-identity">
+            Justin Rogowski
+            <span>{profile.role}</span>
           </div>
-          <button
-            className="icon-button"
-            aria-label="Appearance and motion settings"
-            onClick={() => setSettings(true)}
-          >
-            <Icon name={theme === "dark" ? "moon" : "sun"} size={19} />
-          </button>
-        </header>
+          <div className="sidebar-scroll">
+            <AssembleReveal id="navigation">
+              <nav className="primary-nav" aria-label="Primary navigation">
+                <GlassLayer radius={20} className="dock-glass" />
+                {destinations.map(([id, label]) => (
+                  <a
+                    key={id}
+                    href={`#/${id}`}
+                    aria-current={id === active ? "page" : undefined}
+                  >
+                    <Icon name={id} size={21} />
+                    <span>{label}</span>
+                    <span className="nav-active-dot" />
+                  </a>
+                ))}
+              </nav>
+            </AssembleReveal>
+            <AssembleReveal id="branches">
+              <div className="sidebar-branches">
+                <ExploreMenu
+                  route={route}
+                  effects={effects}
+                  pages={projects.data?.pages}
+                />
+              </div>
+            </AssembleReveal>
+          </div>
+          <div className="sidebar-bottom">
+            <a
+              href="mailto:justin.rogowski@uconn.edu"
+              className="sidebar-contact"
+            >
+              Let’s connect <Icon name="external" size={17} />
+            </a>
+            <div className="sidebar-settings">
+              <button
+                className="icon-button"
+                onClick={() => setSettings(true)}
+                aria-label="Appearance and motion settings"
+              >
+                <Icon name="settings" />
+              </button>
+              <a href="../" className="v1-link">
+                Visit the original site <Icon name="external" size={14} />
+              </a>
+            </div>
+            <span className="prototype-label">An independent V2 prototype</span>
+          </div>
+        </aside>
+      </AssembleReveal>
+      <div className="workspace">
+        <AssembleReveal id="topbar">
+          <header className="topbar">
+            <GlassLayer radius={20} />
+            <a className="mobile-wordmark" href="#/home">
+              jr
+              <Icon name="external" size={28} />
+            </a>
+            <div className="local-time">
+              <span className="live-dot" />
+              <span>Hartford, CT</span>
+              <time dateTime={time.toISOString()}>
+                {time.toLocaleTimeString("en-US", {
+                  hour: "numeric",
+                  minute: "2-digit",
+                  timeZone: "America/New_York",
+                })}
+              </time>
+              {weather.data?.current && (
+                <span className="topbar-weather">
+                  {Math.round(weather.data.current.temperature_2m)}°F
+                </span>
+              )}
+            </div>
+            <ReplayAssembly />
+            <button
+              className="icon-button"
+              aria-label="Appearance and motion settings"
+              onClick={() => setSettings(true)}
+            >
+              <Icon name={theme === "dark" ? "moon" : "sun"} size={19} />
+            </button>
+          </header>
+        </AssembleReveal>
         <main id="main" tabIndex={-1} ref={main}>
           {[...visited].map((view) => (
             <div
@@ -268,12 +294,14 @@ function App() {
             </div>
           ))}
         </main>
-        <footer className="app-footer">
-          <span>Built by Justin.</span>
-          <a href="../">
-            Original site <Icon name="external" size={14} />
-          </a>
-        </footer>
+        <AssembleReveal id="footer">
+          <footer className="app-footer">
+            <span>Built by Justin.</span>
+            <a href="../">
+              Original site <Icon name="external" size={14} />
+            </a>
+          </footer>
+        </AssembleReveal>
       </div>
       {settings && (
         <Settings
@@ -283,7 +311,7 @@ function App() {
           onClose={() => setSettings(false)}
         />
       )}
-    </>
+    </HomepageAssembly>
   );
 }
 class Boundary extends Component {

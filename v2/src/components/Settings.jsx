@@ -47,6 +47,18 @@ export default function Settings({
       )}
       <label className="switch-row">
         <span>
+          <strong>Homepage assembly</strong>
+          <small>Let a team of cursors assemble Home once per session.</small>
+        </span>
+        <input
+          type="checkbox"
+          role="switch"
+          checked={preferences.intro !== false}
+          onChange={(e) => set({ intro: e.target.checked })}
+        />
+      </label>
+      <label className="switch-row">
+        <span>
           <strong>Atmosphere</strong>
           <small>Blue and orange light, with drifting orbital lines.</small>
         </span>

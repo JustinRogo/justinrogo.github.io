@@ -6,7 +6,7 @@
 | --- | --- |
 | `npm run build:v2` | Passed; isolated React/esbuild bundle |
 | `npm run build -- --skip-feed` | Passed; full artifact with additive `/v2/` output |
-| `npm run test:v2` | **14 passed** on Microsoft Edge/Playwright |
+| `npm run test:v2` | **20 passed** on Microsoft Edge/Playwright (November 3 assembly follow-up) |
 | `npm run test:homepage` | **51 passed**; existing V1 suite, including widgets, backgrounds, themes and URLs |
 | `npm run test:updates` | **22 passed**; existing API, rich text, permissions and link-preview tests |
 | Production HTTP smoke | **22 public URLs returned 200**, including all 15 manifest project paths |
@@ -50,7 +50,7 @@ The six independent review fixes were scoped V2 product documentation, request-p
 - The V1 share control, companion and background gallery are retained only in V1. V2 offers blue/orange orbital atmosphere, actual glass refraction, Tech Text, Magic Bento and Branched Menu interactions instead.
 - No new service worker or offline app-install flow is provided. No continuous GPU background is required.
 
-Final minified output is approximately **348 KB JS / 78 KB CSS**, or **113 KB / 16 KB gzipped**, plus the unchanged 199 KB profile photo and the reused local font. These gzip sizes are informational measurements; the static preview does not enable gzip.
+Final minified output with the GSAP assembly sequence is approximately **429 KB JS / 83 KB CSS**, or **145 KB / 17 KB gzipped**, plus the unchanged 199 KB profile photo and the reused local font. GSAP was already a dependency; its orchestration code is now included in the V2 bundle. These gzip sizes are informational measurements; the static preview does not enable gzip.
 
 ## Change boundary
 
@@ -59,3 +59,15 @@ Only two pre-existing files changed: `package.json` adds three V2 commands, and 
 ## Annotated feedback follow-up
 
 Moved the branch menu into the desktop sidebar and added all 11 existing Quick Links. Compact tablet/phone access lives in More. Removed the selected hero hint and portrait caption. Featured slots now lead with CT General Statutes Explorer, then Law Library Heatmap and AI Corner Updates; original destinations and shared manifest remain unchanged. The full 14-test suite passes. Additional read-only checks at 1343×1244, 1024×768 and 375×900 verify all link destinations, sidebar scrolling, pinned contact/settings, phone More access, removal of the selected captions and horizontal overflow.
+
+## Original directory branches · November 3, 2026
+
+Added expandable Work (5 pages), UCPEA (4 pages), and For Fun (6 pages) sections to the shared branch menu. They use the already-loaded manifest, preserve every original destination, and provide taller rows for long titles. A new browser test checks all 15 links, keyboard expansion/collapse, collapsed accessibility, title fit, and horizontal overflow at 1024px and 375px. Screenshot inspection at 1024×768, 1343×1244 (light), and 375×900 confirms expanded layouts, sidebar scrolling, pinned desktop contact/settings, and mobile More access. The full V2 suite passes 15 tests; the full build and production smoke checks pass. V1 sources and shared project data are unchanged.
+
+## Homepage assembly · November 3, 2026
+
+The full suite passed 20 tests, including five assembly tests. These assert that the original hero, heading, navigation, and card DOM nodes survive the sequence, their layout offsets/sizes stay unchanged, all temporary opacity/transform/clip styles are restored, and pointer arrivals lie within their measured target regions. Tests cover session/replay policy, repeated replay, the first Home activation from a deep link and its router focus, viewport changes, keyboard and route interruption, reduced motion and settings, slow project data, scroll interruption, and zero external writes.
+
+Initial, construction, and completed captures at 375px and 1440px were inspected; additional motion-enabled captures at 430px light, 768px dark, and 1024px light verified touch/tablet layouts, completion, no overflow, and no runtime errors. The existing responsive suite still covers all five widths in both themes. The full build and production smoke pass: all 22 public URLs respond, excluded source paths stay private, and V1 core hashes remain unchanged.
+
+The mechanical design check reported only small label/type and decorative mask-color advisories; the new cursor treatment is documented in DESIGN.md. Frame sampling was exploratory, not a device benchmark. The glass-heavy 1024px light layout did not consistently sustain 60 FPS in automated Edge, including with the intro disabled. Native Safari and physical phones remain untested. The normal glass materials and the final homepage design remain unchanged.
