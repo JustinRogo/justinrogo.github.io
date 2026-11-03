@@ -1,6 +1,6 @@
 # Justin Rogowski · Website V2
 
-An isolated React application at `/v2/`, on `feature/website-v2`. The production homepage remains unchanged. The eventual GitHub Pages preview path is `https://justinrogo.github.io/v2/` once explicitly approved and published.
+An isolated React application at `/v2/`, developed on `feature/website-v2` and approved for publication alongside V1 on `main`. The production homepage remains unchanged. The GitHub Pages URL is `https://justinrogo.github.io/v2/` after the main-branch deployment completes.
 
 ## Direction
 

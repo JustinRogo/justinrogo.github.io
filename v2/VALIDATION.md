@@ -41,7 +41,7 @@ The six independent review fixes were scoped V2 product documentation, request-p
 
 ## Known limits and deliberate deferrals
 
-- This is a branch prototype. Committing and pushing `feature/website-v2` does not merge it into production. The public GitHub Pages `/v2/` URL is not available until a later approved publication.
+- The user approved merging V2 into `main` on November 3, 2026. The existing GitHub Pages workflow publishes `/v2/` alongside V1 after the merge. V2 remains a prototype and does not replace the root homepage.
 - Browser automation used desktop Edge with responsive/touch emulation. Physical iOS/Android devices and native Safari were not tested. Safe-area handling is implemented with `env(safe-area-inset-bottom)`.
 - Microsoft calendar/Bookings embeds are opt-in. Third-party cookies, sign-in or frame restrictions may prevent embedding; the original direct links remain available. No real booking was submitted.
 - Request drafts preview locally. Sending uses the original site after deliberate navigation and selection of “Submit a Request.” V2 has no POST integration.
