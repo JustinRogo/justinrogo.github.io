@@ -1,0 +1,998 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-02T00:07:17.741Z",
+  "title": "Design System: Justin Rogowski V2",
+  "extensions": {
+    "colorMeta": {
+      "bg": {
+        "role": "neutral",
+        "displayName": "Bg",
+        "tonalRamp": [
+          "oklch(15% 0.0236 262.10)",
+          "oklch(26% 0.0236 262.10)",
+          "oklch(38% 0.0236 262.10)",
+          "oklch(49% 0.0236 262.10)",
+          "oklch(61% 0.0236 262.10)",
+          "oklch(72% 0.0236 262.10)",
+          "oklch(84% 0.0236 262.10)",
+          "oklch(95% 0.0236 262.10)"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Surface",
+        "tonalRamp": [
+          "oklch(15% 0.0132 262.38)",
+          "oklch(26% 0.0132 262.38)",
+          "oklch(38% 0.0132 262.38)",
+          "oklch(49% 0.0132 262.38)",
+          "oklch(61% 0.0132 262.38)",
+          "oklch(72% 0.0132 262.38)",
+          "oklch(84% 0.0132 262.38)",
+          "oklch(95% 0.0132 262.38)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "tonalRamp": [
+          "oklch(15% 0.0646 256.55)",
+          "oklch(26% 0.0646 256.55)",
+          "oklch(38% 0.0646 256.55)",
+          "oklch(49% 0.0646 256.55)",
+          "oklch(61% 0.0646 256.55)",
+          "oklch(72% 0.0646 256.55)",
+          "oklch(84% 0.0646 256.55)",
+          "oklch(95% 0.0646 256.55)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted",
+        "tonalRamp": [
+          "oklch(15% 0.0549 255.55)",
+          "oklch(26% 0.0549 255.55)",
+          "oklch(38% 0.0549 255.55)",
+          "oklch(49% 0.0549 255.55)",
+          "oklch(61% 0.0549 255.55)",
+          "oklch(72% 0.0549 255.55)",
+          "oklch(84% 0.0549 255.55)",
+          "oklch(95% 0.0549 255.55)"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Line",
+        "tonalRamp": [
+          "oklch(15% 0.0516 257.68)",
+          "oklch(26% 0.0516 257.68)",
+          "oklch(38% 0.0516 257.68)",
+          "oklch(49% 0.0516 257.68)",
+          "oklch(61% 0.0516 257.68)",
+          "oklch(72% 0.0516 257.68)",
+          "oklch(84% 0.0516 257.68)",
+          "oklch(95% 0.0516 257.68)"
+        ]
+      },
+      "blue": {
+        "role": "secondary",
+        "displayName": "Blue",
+        "tonalRamp": [
+          "oklch(15% 0.1975 260.48)",
+          "oklch(26% 0.1975 260.48)",
+          "oklch(38% 0.1975 260.48)",
+          "oklch(49% 0.1975 260.48)",
+          "oklch(61% 0.1975 260.48)",
+          "oklch(72% 0.1975 260.48)",
+          "oklch(84% 0.1975 260.48)",
+          "oklch(95% 0.1975 260.48)"
+        ]
+      },
+      "blue-hover": {
+        "role": "secondary",
+        "displayName": "Blue Hover",
+        "tonalRamp": [
+          "oklch(15% 0.1818 260.87)",
+          "oklch(26% 0.1818 260.87)",
+          "oklch(38% 0.1818 260.87)",
+          "oklch(49% 0.1818 260.87)",
+          "oklch(61% 0.1818 260.87)",
+          "oklch(72% 0.1818 260.87)",
+          "oklch(84% 0.1818 260.87)",
+          "oklch(95% 0.1818 260.87)"
+        ]
+      },
+      "orange": {
+        "role": "primary",
+        "displayName": "Orange",
+        "tonalRamp": [
+          "oklch(15% 0.1527 40.99)",
+          "oklch(26% 0.1527 40.99)",
+          "oklch(38% 0.1527 40.99)",
+          "oklch(49% 0.1527 40.99)",
+          "oklch(61% 0.1527 40.99)",
+          "oklch(72% 0.1527 40.99)",
+          "oklch(84% 0.1527 40.99)",
+          "oklch(95% 0.1527 40.99)"
+        ]
+      },
+      "tint": {
+        "role": "secondary",
+        "displayName": "Tint",
+        "tonalRamp": [
+          "oklch(15% 0.0378 260.70)",
+          "oklch(26% 0.0378 260.70)",
+          "oklch(38% 0.0378 260.70)",
+          "oklch(49% 0.0378 260.70)",
+          "oklch(61% 0.0378 260.70)",
+          "oklch(72% 0.0378 260.70)",
+          "oklch(84% 0.0378 260.70)",
+          "oklch(95% 0.0378 260.70)"
+        ]
+      },
+      "nav": {
+        "role": "neutral",
+        "displayName": "Nav",
+        "tonalRamp": [
+          "oklch(15% 0.0392 257.92)",
+          "oklch(26% 0.0392 257.92)",
+          "oklch(38% 0.0392 257.92)",
+          "oklch(49% 0.0392 257.92)",
+          "oklch(61% 0.0392 257.92)",
+          "oklch(72% 0.0392 257.92)",
+          "oklch(84% 0.0392 257.92)",
+          "oklch(95% 0.0392 257.92)"
+        ]
+      },
+      "branch-line": {
+        "role": "neutral",
+        "displayName": "Branch Line",
+        "tonalRamp": [
+          "oklch(15% 0.0702 256.84)",
+          "oklch(26% 0.0702 256.84)",
+          "oklch(38% 0.0702 256.84)",
+          "oklch(49% 0.0702 256.84)",
+          "oklch(61% 0.0702 256.84)",
+          "oklch(72% 0.0702 256.84)",
+          "oklch(84% 0.0702 256.84)",
+          "oklch(95% 0.0702 256.84)"
+        ]
+      },
+      "glass-fill": {
+        "role": "neutral",
+        "displayName": "Glass Fill",
+        "tonalRamp": [
+          "oklch(15% 0.0176 253.34)",
+          "oklch(26% 0.0176 253.34)",
+          "oklch(38% 0.0176 253.34)",
+          "oklch(49% 0.0176 253.34)",
+          "oklch(61% 0.0176 253.34)",
+          "oklch(72% 0.0176 253.34)",
+          "oklch(84% 0.0176 253.34)",
+          "oklch(95% 0.0176 253.34)"
+        ]
+      },
+      "glass-edge": {
+        "role": "neutral",
+        "displayName": "Glass Edge",
+        "tonalRamp": [
+          "oklch(15% 0.0000 89.88)",
+          "oklch(26% 0.0000 89.88)",
+          "oklch(38% 0.0000 89.88)",
+          "oklch(49% 0.0000 89.88)",
+          "oklch(61% 0.0000 89.88)",
+          "oklch(72% 0.0000 89.88)",
+          "oklch(84% 0.0000 89.88)",
+          "oklch(95% 0.0000 89.88)"
+        ]
+      },
+      "dark-bg": {
+        "role": "neutral",
+        "displayName": "Dark Bg",
+        "tonalRamp": [
+          "oklch(15% 0.0441 263.23)",
+          "oklch(26% 0.0441 263.23)",
+          "oklch(38% 0.0441 263.23)",
+          "oklch(49% 0.0441 263.23)",
+          "oklch(61% 0.0441 263.23)",
+          "oklch(72% 0.0441 263.23)",
+          "oklch(84% 0.0441 263.23)",
+          "oklch(95% 0.0441 263.23)"
+        ]
+      },
+      "dark-surface": {
+        "role": "neutral",
+        "displayName": "Dark Surface",
+        "tonalRamp": [
+          "oklch(15% 0.0570 258.35)",
+          "oklch(26% 0.0570 258.35)",
+          "oklch(38% 0.0570 258.35)",
+          "oklch(49% 0.0570 258.35)",
+          "oklch(61% 0.0570 258.35)",
+          "oklch(72% 0.0570 258.35)",
+          "oklch(84% 0.0570 258.35)",
+          "oklch(95% 0.0570 258.35)"
+        ]
+      },
+      "dark-ink": {
+        "role": "neutral",
+        "displayName": "Dark Ink",
+        "tonalRamp": [
+          "oklch(15% 0.0153 257.20)",
+          "oklch(26% 0.0153 257.20)",
+          "oklch(38% 0.0153 257.20)",
+          "oklch(49% 0.0153 257.20)",
+          "oklch(61% 0.0153 257.20)",
+          "oklch(72% 0.0153 257.20)",
+          "oklch(84% 0.0153 257.20)",
+          "oklch(95% 0.0153 257.20)"
+        ]
+      },
+      "dark-muted": {
+        "role": "neutral",
+        "displayName": "Dark Muted",
+        "tonalRamp": [
+          "oklch(15% 0.0456 255.65)",
+          "oklch(26% 0.0456 255.65)",
+          "oklch(38% 0.0456 255.65)",
+          "oklch(49% 0.0456 255.65)",
+          "oklch(61% 0.0456 255.65)",
+          "oklch(72% 0.0456 255.65)",
+          "oklch(84% 0.0456 255.65)",
+          "oklch(95% 0.0456 255.65)"
+        ]
+      },
+      "dark-line": {
+        "role": "neutral",
+        "displayName": "Dark Line",
+        "tonalRamp": [
+          "oklch(15% 0.0722 256.32)",
+          "oklch(26% 0.0722 256.32)",
+          "oklch(38% 0.0722 256.32)",
+          "oklch(49% 0.0722 256.32)",
+          "oklch(61% 0.0722 256.32)",
+          "oklch(72% 0.0722 256.32)",
+          "oklch(84% 0.0722 256.32)",
+          "oklch(95% 0.0722 256.32)"
+        ]
+      },
+      "dark-blue": {
+        "role": "secondary",
+        "displayName": "Dark Blue",
+        "tonalRamp": [
+          "oklch(15% 0.1267 253.61)",
+          "oklch(26% 0.1267 253.61)",
+          "oklch(38% 0.1267 253.61)",
+          "oklch(49% 0.1267 253.61)",
+          "oklch(61% 0.1267 253.61)",
+          "oklch(72% 0.1267 253.61)",
+          "oklch(84% 0.1267 253.61)",
+          "oklch(95% 0.1267 253.61)"
+        ]
+      },
+      "dark-blue-hover": {
+        "role": "secondary",
+        "displayName": "Dark Blue Hover",
+        "tonalRamp": [
+          "oklch(15% 0.0786 252.77)",
+          "oklch(26% 0.0786 252.77)",
+          "oklch(38% 0.0786 252.77)",
+          "oklch(49% 0.0786 252.77)",
+          "oklch(61% 0.0786 252.77)",
+          "oklch(72% 0.0786 252.77)",
+          "oklch(84% 0.0786 252.77)",
+          "oklch(95% 0.0786 252.77)"
+        ]
+      },
+      "dark-orange": {
+        "role": "primary",
+        "displayName": "Dark Orange",
+        "tonalRamp": [
+          "oklch(15% 0.1255 55.88)",
+          "oklch(26% 0.1255 55.88)",
+          "oklch(38% 0.1255 55.88)",
+          "oklch(49% 0.1255 55.88)",
+          "oklch(61% 0.1255 55.88)",
+          "oklch(72% 0.1255 55.88)",
+          "oklch(84% 0.1255 55.88)",
+          "oklch(95% 0.1255 55.88)"
+        ]
+      },
+      "dark-tint": {
+        "role": "secondary",
+        "displayName": "Dark Tint",
+        "tonalRamp": [
+          "oklch(15% 0.0790 254.29)",
+          "oklch(26% 0.0790 254.29)",
+          "oklch(38% 0.0790 254.29)",
+          "oklch(49% 0.0790 254.29)",
+          "oklch(61% 0.0790 254.29)",
+          "oklch(72% 0.0790 254.29)",
+          "oklch(84% 0.0790 254.29)",
+          "oklch(95% 0.0790 254.29)"
+        ]
+      },
+      "dark-nav": {
+        "role": "neutral",
+        "displayName": "Dark Nav",
+        "tonalRamp": [
+          "oklch(15% 0.0703 253.91)",
+          "oklch(26% 0.0703 253.91)",
+          "oklch(38% 0.0703 253.91)",
+          "oklch(49% 0.0703 253.91)",
+          "oklch(61% 0.0703 253.91)",
+          "oklch(72% 0.0703 253.91)",
+          "oklch(84% 0.0703 253.91)",
+          "oklch(95% 0.0703 253.91)"
+        ]
+      },
+      "dark-branch-line": {
+        "role": "neutral",
+        "displayName": "Dark Branch Line",
+        "tonalRamp": [
+          "oklch(15% 0.0778 247.11)",
+          "oklch(26% 0.0778 247.11)",
+          "oklch(38% 0.0778 247.11)",
+          "oklch(49% 0.0778 247.11)",
+          "oklch(61% 0.0778 247.11)",
+          "oklch(72% 0.0778 247.11)",
+          "oklch(84% 0.0778 247.11)",
+          "oklch(95% 0.0778 247.11)"
+        ]
+      },
+      "dark-glass-fill": {
+        "role": "neutral",
+        "displayName": "Dark Glass Fill",
+        "tonalRamp": [
+          "oklch(15% 0.0595 258.13)",
+          "oklch(26% 0.0595 258.13)",
+          "oklch(38% 0.0595 258.13)",
+          "oklch(49% 0.0595 258.13)",
+          "oklch(61% 0.0595 258.13)",
+          "oklch(72% 0.0595 258.13)",
+          "oklch(84% 0.0595 258.13)",
+          "oklch(95% 0.0595 258.13)"
+        ]
+      },
+      "dark-glass-edge": {
+        "role": "neutral",
+        "displayName": "Dark Glass Edge",
+        "tonalRamp": [
+          "oklch(15% 0.0817 257.10)",
+          "oklch(26% 0.0817 257.10)",
+          "oklch(38% 0.0817 257.10)",
+          "oklch(49% 0.0817 257.10)",
+          "oklch(61% 0.0817 257.10)",
+          "oklch(72% 0.0817 257.10)",
+          "oklch(84% 0.0817 257.10)",
+          "oklch(95% 0.0817 257.10)"
+        ]
+      },
+      "contrast-muted": {
+        "role": "neutral",
+        "displayName": "Contrast Muted",
+        "tonalRamp": [
+          "oklch(15% 0.0568 252.04)",
+          "oklch(26% 0.0568 252.04)",
+          "oklch(38% 0.0568 252.04)",
+          "oklch(49% 0.0568 252.04)",
+          "oklch(61% 0.0568 252.04)",
+          "oklch(72% 0.0568 252.04)",
+          "oklch(84% 0.0568 252.04)",
+          "oklch(95% 0.0568 252.04)"
+        ]
+      },
+      "contrast-line": {
+        "role": "neutral",
+        "displayName": "Contrast Line",
+        "tonalRamp": [
+          "oklch(15% 0.0598 253.76)",
+          "oklch(26% 0.0598 253.76)",
+          "oklch(38% 0.0598 253.76)",
+          "oklch(49% 0.0598 253.76)",
+          "oklch(61% 0.0598 253.76)",
+          "oklch(72% 0.0598 253.76)",
+          "oklch(84% 0.0598 253.76)",
+          "oklch(95% 0.0598 253.76)"
+        ]
+      },
+      "contrast-dark-muted": {
+        "role": "neutral",
+        "displayName": "Contrast Dark Muted",
+        "tonalRamp": [
+          "oklch(15% 0.0358 253.46)",
+          "oklch(26% 0.0358 253.46)",
+          "oklch(38% 0.0358 253.46)",
+          "oklch(49% 0.0358 253.46)",
+          "oklch(61% 0.0358 253.46)",
+          "oklch(72% 0.0358 253.46)",
+          "oklch(84% 0.0358 253.46)",
+          "oklch(95% 0.0358 253.46)"
+        ]
+      },
+      "contrast-dark-line": {
+        "role": "neutral",
+        "displayName": "Contrast Dark Line",
+        "tonalRamp": [
+          "oklch(15% 0.0484 252.43)",
+          "oklch(26% 0.0484 252.43)",
+          "oklch(38% 0.0484 252.43)",
+          "oklch(49% 0.0484 252.43)",
+          "oklch(61% 0.0484 252.43)",
+          "oklch(72% 0.0484 252.43)",
+          "oklch(84% 0.0484 252.43)",
+          "oklch(95% 0.0484 252.43)"
+        ]
+      },
+      "action-orange": {
+        "role": "primary",
+        "displayName": "Action Orange",
+        "tonalRamp": [
+          "oklch(15% 0.1664 50.59)",
+          "oklch(26% 0.1664 50.59)",
+          "oklch(38% 0.1664 50.59)",
+          "oklch(49% 0.1664 50.59)",
+          "oklch(61% 0.1664 50.59)",
+          "oklch(72% 0.1664 50.59)",
+          "oklch(84% 0.1664 50.59)",
+          "oklch(95% 0.1664 50.59)"
+        ]
+      },
+      "action-orange-hover": {
+        "role": "primary",
+        "displayName": "Action Orange Hover",
+        "tonalRamp": [
+          "oklch(15% 0.1381 54.98)",
+          "oklch(26% 0.1381 54.98)",
+          "oklch(38% 0.1381 54.98)",
+          "oklch(49% 0.1381 54.98)",
+          "oklch(61% 0.1381 54.98)",
+          "oklch(72% 0.1381 54.98)",
+          "oklch(84% 0.1381 54.98)",
+          "oklch(95% 0.1381 54.98)"
+        ]
+      },
+      "action-ink": {
+        "role": "primary",
+        "displayName": "Action Ink",
+        "tonalRamp": [
+          "oklch(15% 0.0434 256.20)",
+          "oklch(26% 0.0434 256.20)",
+          "oklch(38% 0.0434 256.20)",
+          "oklch(49% 0.0434 256.20)",
+          "oklch(61% 0.0434 256.20)",
+          "oklch(72% 0.0434 256.20)",
+          "oklch(84% 0.0434 256.20)",
+          "oklch(95% 0.0434 256.20)"
+        ]
+      },
+      "filter-orange": {
+        "role": "primary",
+        "displayName": "Filter Orange",
+        "tonalRamp": [
+          "oklch(15% 0.1604 50.48)",
+          "oklch(26% 0.1604 50.48)",
+          "oklch(38% 0.1604 50.48)",
+          "oklch(49% 0.1604 50.48)",
+          "oklch(61% 0.1604 50.48)",
+          "oklch(72% 0.1604 50.48)",
+          "oklch(84% 0.1604 50.48)",
+          "oklch(95% 0.1604 50.48)"
+        ]
+      },
+      "filter-ink": {
+        "role": "neutral",
+        "displayName": "Filter Ink",
+        "tonalRamp": [
+          "oklch(15% 0.0493 257.43)",
+          "oklch(26% 0.0493 257.43)",
+          "oklch(38% 0.0493 257.43)",
+          "oklch(49% 0.0493 257.43)",
+          "oklch(61% 0.0493 257.43)",
+          "oklch(72% 0.0493 257.43)",
+          "oklch(84% 0.0493 257.43)",
+          "oklch(95% 0.0493 257.43)"
+        ]
+      },
+      "bento-glow": {
+        "role": "primary",
+        "displayName": "Bento Glow",
+        "tonalRamp": [
+          "oklch(15% 0.1693 51.97)",
+          "oklch(26% 0.1693 51.97)",
+          "oklch(38% 0.1693 51.97)",
+          "oklch(49% 0.1693 51.97)",
+          "oklch(61% 0.1693 51.97)",
+          "oklch(72% 0.1693 51.97)",
+          "oklch(84% 0.1693 51.97)",
+          "oklch(95% 0.1693 51.97)"
+        ]
+      },
+      "tech-accent": {
+        "role": "secondary",
+        "displayName": "Tech Accent",
+        "tonalRamp": [
+          "oklch(15% 0.1569 257.80)",
+          "oklch(26% 0.1569 257.80)",
+          "oklch(38% 0.1569 257.80)",
+          "oklch(49% 0.1569 257.80)",
+          "oklch(61% 0.1569 257.80)",
+          "oklch(72% 0.1569 257.80)",
+          "oklch(84% 0.1569 257.80)",
+          "oklch(95% 0.1569 257.80)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Tech name / DOM fallback",
+        "purpose": "DOM heading uses responsive source sizes; Canvas Tech Text fits configured 120px glyphs into the same line containers."
+      },
+      "headline": {
+        "displayName": "Route headline",
+        "purpose": "Top-level route headings."
+      },
+      "title": {
+        "displayName": "Section title",
+        "purpose": "Base h2 role, with contextual source overrides."
+      },
+      "subtitle": {
+        "displayName": "Item subtitle",
+        "purpose": "Base h3 role."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Inherited family and leading; context defines size."
+      },
+      "label": {
+        "displayName": "Field label",
+        "purpose": "Visible form labels."
+      },
+      "button": {
+        "displayName": "Action label",
+        "purpose": "Standard button text."
+      },
+      "wordmark": {
+        "displayName": "jr wordmark",
+        "purpose": "Lowercase initials beside the SVG northeast arrow."
+      }
+    },
+    "shadows": [
+      {
+        "name": "panel-light",
+        "value": "0 20px 56px -26px rgba(22, 56, 108, 0.34)",
+        "purpose": "--panel-shadow in light theme: floating glass rails, headers, hosts and task surfaces."
+      },
+      {
+        "name": "panel-dark",
+        "value": "0 24px 68px -24px rgba(0, 5, 20, 0.7)",
+        "purpose": "--panel-shadow in dark theme."
+      },
+      {
+        "name": "primary-action",
+        "value": "0 7px 20px -9px #ee6b22a0",
+        "purpose": "Fixed orange primary-button lift."
+      },
+      {
+        "name": "phone-dock",
+        "value": "0 10px 36px -10px #020e2c70",
+        "purpose": "Floating phone navigation."
+      },
+      {
+        "name": "portrait",
+        "value": "0 15px 38px -18px #000c",
+        "purpose": "Portrait frame."
+      },
+      {
+        "name": "orbit-action",
+        "value": "0 12px 28px -12px #04112799",
+        "purpose": "Portrait shortcut tiles."
+      },
+      {
+        "name": "dialog-light",
+        "value": "0 18px 65px -12px #172a4240",
+        "purpose": "Inherited --shadow for solid modal dialogs."
+      },
+      {
+        "name": "dialog-dark",
+        "value": "0 18px 65px -12px #0009",
+        "purpose": "Inherited dark modal shadow."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Inherited view and revised navigation/orbit easing."
+      },
+      {
+        "name": "view-enter",
+        "value": "0.45s var(--ease)",
+        "purpose": "Non-Home vertical settle and blur."
+      },
+      {
+        "name": "blue-drift",
+        "value": "18s ease-in-out infinite alternate",
+        "purpose": "Enabled atmosphere blue field translates (-7%,12%) and scales 1.1."
+      },
+      {
+        "name": "orange-drift",
+        "value": "21s ease-in-out infinite alternate",
+        "purpose": "Enabled atmosphere orange field translates (9%,-12%) and scales 0.85."
+      },
+      {
+        "name": "navigation",
+        "value": "color 0.2s, background 0.2s, transform 0.35s var(--ease)",
+        "purpose": "Desktop hover moves 3px right; dock movement suppressed."
+      },
+      {
+        "name": "orbit-action",
+        "value": "transform 0.4s var(--ease), background 0.2s",
+        "purpose": "Hover moves 6px upward and rotates 7deg."
+      },
+      {
+        "name": "branch-draw",
+        "value": "420ms cubic-bezier(0.23, 1, 0.32, 1)",
+        "purpose": "Actual selection trace; effects-off duration zero."
+      },
+      {
+        "name": "branch-fold",
+        "value": "300ms cubic-bezier(0.23, 1, 0.32, 1)",
+        "purpose": "Actual grid-row fold; effects-off duration zero."
+      },
+      {
+        "name": "branch-marker",
+        "value": "top 220ms cubic-bezier(0.23, 1, 0.32, 1), opacity 150ms ease",
+        "purpose": "Actual branch trunk marker."
+      },
+      {
+        "name": "branch-chevron",
+        "value": "transform 0.3s var(--ease)",
+        "purpose": "Open section rotates SVG chevron 90deg."
+      },
+      {
+        "name": "button-state",
+        "value": "background 0.2s, color 0.2s",
+        "purpose": "Inherited action feedback."
+      },
+      {
+        "name": "switch-thumb",
+        "value": "transform 0.18s",
+        "purpose": "Inherited appearance switch."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "wide-desktop",
+        "value": "min-width: 1600px"
+      },
+      {
+        "name": "narrow-desktop",
+        "value": "max-width: 1150px"
+      },
+      {
+        "name": "compact-rail",
+        "value": "max-width: 800px"
+      },
+      {
+        "name": "phone-dock",
+        "value": "max-width: 600px"
+      }
+    ],
+    "accessibility": {
+      "focus": "Inherited blue 3px outline / 4px offset; bento uses orange 3px / 4px, branches orange 2px / 3px.",
+      "motion": "Optional engines disabled for reduced motion, Calm, high contrast, forced colors, hidden document and inactive views. Fine hover pointers gate bento tilt/spotlight. disableAnimations recreates and resets the bento engine.",
+      "transparency": "GlassLayer becomes opaque for reduced transparency, high contrast or forced colors. Touch/reduced motion keeps frosted glass without SVG refraction.",
+      "contrast": "Final glass-theme.css overrides muted and line colors; atmosphere hidden for reduced transparency/high contrast; forced colors restores system surfaces/borders.",
+      "navigation": "Single labeled rail/dock tree, native project/branch links, collapsed branches aria-hidden and inert; native modal focus/scroll behavior preserved.",
+      "preferences": "V2-specific System/Light/Dark, Calm and Atmosphere persistence."
+    },
+    "rampProvenance": "Tonal ramps are synthesized OKLCH panel previews from each source color's hue and chroma, with stepped lightness. They are not implemented CSS tokens or new usage rules; translucent source colors are previewed without alpha.",
+    "snippetScope": "Self-contained source-derived visual specimens. Glass/bento shows the implemented frosted fallback; Tech Text shows the implemented DOM fallback; expanded branch markup shows actual visual geometry. Real refraction, Canvas interactions, bento engine, and folding/state handlers run in the app. No vendor sample content is presented as portfolio content.",
+    "renderers": {
+      "glassSurface": {
+        "source": "Shared read-only src/homepage/vendor/GlassSurface.jsx via components/Glass.jsx",
+        "renderer": "svg",
+        "borderWidth": 0.09,
+        "brightness": 55,
+        "opacity": 0.94,
+        "blur": 16,
+        "displace": 0.15,
+        "distortionScale": -55,
+        "redOffset": 0,
+        "greenOffset": 2,
+        "blueOffset": 4,
+        "backgroundOpacity": 0.08,
+        "saturation": 1.35,
+        "refraction": "Fine hover pointer and no reduced-motion request; decorative inert layer behind content."
+      },
+      "techText": {
+        "source": "v2/src/vendor/TechText.jsx",
+        "renderer": "Canvas 2D",
+        "fontFamily": "Geist",
+        "fontWeight": 550,
+        "fontSize": 120,
+        "letterSpacing": -0.03,
+        "accentColor": "#5d9fff",
+        "reach": 165,
+        "strokeWidth": 1.5,
+        "specks": 8,
+        "labels": false,
+        "guides": false,
+        "selection": false,
+        "draggable": false,
+        "sweep": false,
+        "bounce": 0.2,
+        "clickKick": true,
+        "intro": "none",
+        "fallback": "DOM h1 when effects disabled; hidden accessible name when canvas enabled; capped device pixel ratio 2 and offscreen pausing."
+      },
+      "magicBento": {
+        "source": "v2/src/vendor/MagicBento.jsx",
+        "columns": 4,
+        "rowHeight": 170,
+        "gap": 16,
+        "radius": 11,
+        "glowColor": "#ff8a36",
+        "textAutoHide": false,
+        "enableMagnetism": false,
+        "enableStars": false,
+        "intro": false,
+        "enableTilt": "effects && fine",
+        "enableSpotlight": "effects && fine",
+        "enableBorderGlow": "effects",
+        "clickEffect": "effects",
+        "disableAnimations": "!effects",
+        "content": "Actual featured manifest projects and a project-index anchor."
+      },
+      "branchedMenu": {
+        "source": "v2/src/vendor/BranchedMenu.jsx",
+        "width": 260,
+        "rowHeight": 44,
+        "fontSize": 12,
+        "indent": 28,
+        "trunk": 8,
+        "radius": 8,
+        "defaultOpen": [
+          0
+        ],
+        "drawDuration": "effects ? 420 : 0",
+        "foldDuration": "effects ? 300 : 0",
+        "selection": "Controlled from route parameters; native anchors and SVG chevron; collapsed content inert."
+      }
+    },
+    "breakpointBehavior": "Desktop rail defaults to 240px; resizes from 200px to min(360px, max(240px, 32% viewport)); workspace offset equals width + 36px. <=800 rail 68px / workspace 90px; <=600 floating dock, 14px gutters, portrait/contact row and strengths below. Bento measures its container using 150px minimum cells and 200px pair cells.",
+    "homepageAssembly": {
+      "source": "v2/src/assembly/",
+      "durationMs": 5800,
+      "mobileDurationMs": 4800,
+      "crewEntry": 0.35,
+      "opening": "Layout alone draws persistent measured outlines; the crew joins to fill the real surfaces",
+      "preparationMs": 160,
+      "cursors": 5,
+      "mobileCursors": 4,
+      "oncePerSession": true,
+      "colors": [
+        "#ff9d5c",
+        "#6bafff",
+        "#5de1c5",
+        "#bf9aff",
+        "#ff90bc",
+        "#ead777"
+      ],
+      "label": "10px / 650 Geist, 3px radius, #071528 ink",
+      "ownership": "Refs onto existing components; lifecycle-scoped GSAP presentation styles; no UI copies or remount",
+      "replay": "Header control, Homepage assembly preference, and ?replayIntro=1",
+      "bypass": "Reduced motion, Calm, increased contrast, forced colors, disabled flag, and ?intro=0",
+      "interrupt": "Input, focus, scroll, navigation, resize, visibility, font and observed geometry changes",
+      "guideCorners": "Measured border-top-left-radius of the real target"
+    },
+    "cliftonStrengths": {
+      "source": "Read-only build extraction from src/homepage/legacy-widgets.js",
+      "domains": {
+        "thinking": "#10b981",
+        "relationship": "#0066ff",
+        "executing": "#7c3aed",
+        "influencing": "#ff7e5f"
+      },
+      "weighting": "35 minus rank across all 34 themes; 595 points total, unchanged by display filters",
+      "reflections": "Original best/overextended passages with native pressed-state buttons",
+      "presentation": "Overview beside reflections on desktop; stacked at 1000px; single-column legend at 600px",
+      "accessibility": "Text chart alternative, labeled percentages, contrast-aware rank badges, native theme disclosures",
+      "homePreview": "Shared weighted color bar beneath the portrait; #/about?section=strengths scrolls and focuses the section heading"
+    },
+    "sidebarBranches": {
+      "placement": "Below primary navigation in the desktop sidebar; More at widths up to 800px",
+      "groups": [
+        "Projects",
+        "Work",
+        "UCPEA",
+        "For Fun",
+        "Useful shortcuts",
+        "Quick links"
+      ],
+      "directoryPageCounts": {
+        "Work": 5,
+        "UCPEA": 4,
+        "For Fun": 6
+      },
+      "directoryRowHeight": 64,
+      "ucpeaHierarchy": {
+        "parent": "UCPEA Member Dashboard",
+        "children": [
+          "Current Contract",
+          "Contract History",
+          "Contract Comparison"
+        ],
+        "indent": 32,
+        "semantics": "Native nested lists; original destinations"
+      },
+      "quickLinkCount": 11,
+      "scroll": "Middle rail scrolls; contact/settings remain outside it",
+      "source": "v2/src/components/ExploreMenu.jsx and v2/src/glass-theme.css"
+    },
+    "sidebarResize": {
+      "source": "v2/src/components/SidebarResize.jsx and v2/src/layout.css",
+      "default": 240,
+      "min": 200,
+      "max": 360,
+      "storage": "jr-v2-sidebar-width",
+      "keyboard": "Left/Right 8px; Shift 24px; Home/End limits; Enter or double-click reset",
+      "breakpoint": "min-width:801px"
+    },
+    "backgroundSelection": {
+      "source": "v2/src/components/PageBackground.jsx and .css; build adapter v2:backgrounds exposes existing V1 renderers read-only",
+      "default": "auto: shape-waves above 800px, aurora at or below 800px",
+      "choices": [
+        "auto",
+        "shape-waves",
+        "antigravity",
+        "fractal",
+        "aurora",
+        "orbits",
+        "none"
+      ],
+      "storage": "jr-v2-preferences.background; atmosphere:false remains None",
+      "ownership": "One selected renderer; no V1 body observer or settings controller; scoped V2 host CSS",
+      "motion": "Still while assembling, hidden, Calm or reduced motion; hidden for contrast/reduced transparency; bounded GPU renderers and static capability fallback",
+      "engines": {
+        "shapeWaves": "Existing React Bits + VGPU/WebGPU",
+        "antigravity": "Existing React Bits/WebGL",
+        "fractal": "Existing site Canvas 2D",
+        "aurora": "Existing site CSS glow structure",
+        "orbits": "Original V2 CSS/SVG"
+      },
+      "palette": [
+        "#0066ff",
+        "#00f2fe",
+        "#7c3aed"
+      ]
+    },
+    "aboutContacts": {
+      "intro": "LinkedIn and GitHub buttons reuse existing contact URLs",
+      "sidebar": "#/about?section=contact scrolls/focuses Say hello; repeated activation and direct refresh supported",
+      "removed": "Sidebar original-site link and prototype label only"
+    }
+  },
+  "components": [
+    {
+      "name": "Primary button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Fixed orange action palette across both themes; hover brightens the fill.",
+      "html": "<button class=\"ds-primary\">Explore my projects <svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.65\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14 m-6-6 6 6-6 6\"/></svg></button>",
+      "css": ".ds-primary{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:46px;padding:11px 18px;border:1px solid var(--line,#a9bfdf);border-radius:5.5px;font-family:Geist,system-ui,sans-serif;font-size:.875rem;font-weight:550;text-decoration:none;cursor:pointer;transition:background .2s,color .2s;background:#f88436;color:#071528;border:0;box-shadow:0 7px 20px -9px #ee6b22a0}.ds-primary:hover{background:#ffa25f;color:#071528}.ds-primary:focus-visible,.ds-secondary:focus-visible,.ds-icon:focus-visible,.ds-field:focus-visible,.ds-nav a:focus-visible,.ds-filter:focus-visible,.ds-project a:focus-visible,.ds-dialog button:focus-visible{outline:3px solid var(--blue,#125cd4);outline-offset:4px;}@media(prefers-reduced-motion:reduce){.ds-primary{transition:none}}"
+    },
+    {
+      "name": "Secondary button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Ruled translucent secondary action with navigation-colored hover.",
+      "html": "<button class=\"ds-secondary\">Keep editing</button>",
+      "css": ".ds-secondary{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:46px;padding:11px 18px;border:1px solid var(--line,#a9bfdf);border-radius:5.5px;font-family:Geist,system-ui,sans-serif;font-size:.875rem;font-weight:550;text-decoration:none;cursor:pointer;transition:background .2s,color .2s;background:color-mix(in srgb,var(--surface,#f1f6ff) 40%,transparent);color:var(--ink,#112847)}.ds-secondary:hover{background:var(--nav,#c8d9f2)}.ds-primary:focus-visible,.ds-secondary:focus-visible,.ds-icon:focus-visible,.ds-field:focus-visible,.ds-nav a:focus-visible,.ds-filter:focus-visible,.ds-project a:focus-visible,.ds-dialog button:focus-visible{outline:3px solid var(--blue,#125cd4);outline-offset:4px;}@media(prefers-reduced-motion:reduce){.ds-secondary{transition:none}}"
+    },
+    {
+      "name": "Icon button",
+      "kind": "button",
+      "refersTo": "icon-button",
+      "description": "Quiet icon action with an accessible label and 44px target.",
+      "html": "<button class=\"ds-icon\" aria-label=\"Appearance and motion settings\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.65\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 7h16 M4 17h16 M8 4v6 M16 14v6\"/></svg></button>",
+      "css": ".ds-icon{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;border:0;border-radius:4px;background:transparent;color:var(--ink,#112847);cursor:pointer}.ds-icon:hover{background:var(--nav,#c8d9f2)}.ds-primary:focus-visible,.ds-secondary:focus-visible,.ds-icon:focus-visible,.ds-field:focus-visible,.ds-nav a:focus-visible,.ds-filter:focus-visible,.ds-project a:focus-visible,.ds-dialog button:focus-visible{outline:3px solid var(--blue,#125cd4);outline-offset:4px;}"
+    },
+    {
+      "name": "Native text field",
+      "kind": "input",
+      "refersTo": "field",
+      "description": "Visible compact label above a native text input.",
+      "html": "<label class=\"ds-label\">Name<input class=\"ds-field\" type=\"text\" placeholder=\"Your name\"></label>",
+      "css": ".ds-label{display:flex;flex-direction:column;gap:8px;font-family:Geist,system-ui,sans-serif;font-size:.78rem;font-weight:550;color:var(--ink,#112847)}.ds-field{min-width:0;max-width:100%;border:1px solid var(--line,#a9bfdf);border-radius:3.5px;background:var(--bg,#e6efff);color:var(--ink,#112847);padding:12px 13px;font-family:Geist,system-ui,sans-serif;font-size:1rem;font-weight:400;caret-color:var(--blue,#125cd4)}.ds-field::placeholder{color:var(--muted,#425875)}.ds-primary:focus-visible,.ds-secondary:focus-visible,.ds-icon:focus-visible,.ds-field:focus-visible,.ds-nav a:focus-visible,.ds-filter:focus-visible,.ds-project a:focus-visible,.ds-dialog button:focus-visible{outline:3px solid var(--blue,#125cd4);outline-offset:4px;}"
+    },
+    {
+      "name": "Labeled navigation",
+      "kind": "nav",
+      "refersTo": "navigation-active",
+      "description": "The shared five-destination rail/dock: orange current text, mixed-color desktop selection, orange phone selection.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Primary navigation\"><a href=\"#/home\" aria-current=\"page\"><svg width=\"21\" height=\"21\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.65\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z\"/></svg><span>Home</span><i class=\"ds-dot\"></i></a><a href=\"#/projects\"><svg width=\"21\" height=\"21\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.65\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z\"/></svg><span>Projects</span></a><a href=\"#/tools\"><svg width=\"21\" height=\"21\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.65\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m14 6 4 4 M4 20l9-9 M20 3a6 6 0 0 1-8 8L4 19a2 2 0 0 1-3-3l8-8a6 6 0 0 1 8-8l-4 4 3 3Z\"/></svg><span>Tools</span></a><a href=\"#/about\"><svg width=\"21\" height=\"21\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.65\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M20 21v-2a7 7 0 0 0-14 0v2 M17 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0\"/></svg><span>About</span></a><a href=\"#/more\"><svg width=\"21\" height=\"21\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.65\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 6h16 M4 12h16 M4 18h16\"/></svg><span>More</span></a></nav>",
+      "css": ".ds-nav{display:flex;flex-direction:column;gap:7px;font-family:Geist,system-ui,sans-serif;}.ds-nav a{display:flex;align-items:center;gap:13px;padding:12px 14px;min-height:48px;border-radius:4px;text-decoration:none;font-size:.88rem;color:var(--muted,#425875)}.ds-nav a:hover{background:var(--nav,#c8d9f2);color:var(--ink,#112847)}.ds-nav a[aria-current]{color:var(--blue,#125cd4);background:var(--tint,#d7e6ff);font-weight:600}.ds-dot{width:5px;height:5px;border-radius:50%;background:currentColor;margin-left:auto}.ds-primary:focus-visible,.ds-secondary:focus-visible,.ds-icon:focus-visible,.ds-field:focus-visible,.ds-nav a:focus-visible,.ds-filter:focus-visible,.ds-project a:focus-visible,.ds-dialog button:focus-visible{outline:3px solid var(--blue,#125cd4);outline-offset:4px;}@media(max-width:600px){.ds-nav{flex-direction:row;gap:0;padding:7px;background:var(--surface,#f1f6ff);border-top:1px solid var(--line,#a9bfdf)}.ds-nav a{flex:1;flex-direction:column;gap:5px;border-radius:4.5px;min-height:57px;padding:7px 2px;font-size:.69rem;justify-content:center;line-height:1.2}.ds-dot{display:none}}@media(forced-colors:active){.ds-nav a{border:1px solid ButtonText}.ds-nav a[aria-current]{outline:2px solid Highlight}}.ds-nav a{border-radius:6px;transition:color .2s,background .2s,transform .35s cubic-bezier(.16,1,.3,1)}.ds-nav a:hover{transform:translateX(3px)}.ds-nav a[aria-current]{color:var(--orange,#a83c04);background:linear-gradient(120deg,color-mix(in srgb,var(--blue,#125cd4) 18%,transparent),color-mix(in srgb,var(--orange,#a83c04) 10%,transparent))}@media(max-width:600px){.ds-nav{background:color-mix(in srgb,var(--surface,#f1f6ff) 94%,transparent);border:0;border-radius:10px;padding:6px;gap:2px}.ds-nav a{border-radius:7px;min-height:59px}.ds-nav a:hover{transform:none}.ds-nav a[aria-current]{background:color-mix(in srgb,var(--orange,#a83c04) 14%,transparent)}}@media(prefers-reduced-motion:reduce){.ds-nav a{transition:none}}"
+    },
+    {
+      "name": "Category filter",
+      "kind": "chip",
+      "refersTo": "filter",
+      "description": "Category filter with count; selected state uses its fixed orange pair.",
+      "html": "<button class=\"ds-filter\" aria-pressed=\"true\">All <span>15</span></button> <button class=\"ds-filter\" aria-pressed=\"false\">Library <span>3</span></button>",
+      "css": ".ds-filter{min-height:42px;padding:8px 15px;border:0;background:none;color:var(--muted,#425875);font-family:Geist,system-ui,sans-serif;font-size:.82rem;border-radius:3.5px;cursor:pointer}.ds-filter span{font-size:.7rem;margin-left:9px;opacity:.75}.ds-filter:hover{background:var(--nav,#c8d9f2)}.ds-filter[aria-pressed=true]{background:#ed7e34;color:#06152b}.ds-primary:focus-visible,.ds-secondary:focus-visible,.ds-icon:focus-visible,.ds-field:focus-visible,.ds-nav a:focus-visible,.ds-filter:focus-visible,.ds-project a:focus-visible,.ds-dialog button:focus-visible{outline:3px solid var(--blue,#125cd4);outline-offset:4px;}@media(forced-colors:active){.ds-filter{border:1px solid ButtonText}}"
+    },
+    {
+      "name": "Technology tag",
+      "kind": "chip",
+      "refersTo": "technology-tag",
+      "description": "Noninteractive technology label with glass fill and a fine rule.",
+      "html": "<div class=\"ds-tags\"><span>Power BI</span><span>Python</span><span>HTML / CSS / JavaScript</span></div>",
+      "css": ".ds-tags{display:flex;flex-wrap:wrap;gap:8px;font-family:Geist,system-ui,sans-serif;color:var(--ink,#112847)}.ds-tags span{font-size:.79rem;padding:8px 13px;background:var(--glass-fill,rgba(235,244,255,.72));border:1px solid var(--line,#a9bfdf);border-radius:3px}"
+    },
+    {
+      "name": "Glass project bento",
+      "kind": "card",
+      "refersTo": "bento-card",
+      "description": "Existing project content and index action on the actual bento's frosted fallback material; dynamic refraction, tilt and spotlight require the app engine.",
+      "html": "<div class=\"ds-bento\"><a class=\"ds-bento-project\" href=\"../Pages/For%20Fun/Wave-Function-Collapse.html\" target=\"_blank\" rel=\"noopener noreferrer\"><h3>Wave Function Collapse</h3><span>Generative Playground</span><p>Generate circuits, islands, and ribbons, or paint a sample to create your own patterns.</p><div class=\"ds-bento-open\">Open project <svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.65\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7 17 17 7 M7 7h10v10\"/></svg></div></a><a class=\"ds-bento-index\" href=\"#/projects\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.65\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z\"/></svg><h3>Keep exploring.</h3><p>Work, library tools,<br>and experiments.</p><div class=\"ds-bento-open\">The project index <svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.65\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14 m-6-6 6 6-6 6\"/></svg></div></a></div>",
+      "css": ".ds-bento{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:170px;gap:16px;font-family:Geist,system-ui,sans-serif;color:var(--ink,#112847)}.ds-bento a{position:relative;display:flex;flex-direction:column;align-items:flex-start;padding:23px 24px;border-radius:11px;background:var(--glass-fill,rgba(235,244,255,.72));backdrop-filter:blur(16px);box-shadow:var(--panel-shadow,0 20px 56px -26px rgba(22,56,108,.34)),inset 0 0 0 1px var(--glass-edge,rgba(255,255,255,.8));color:inherit;text-decoration:none;overflow:hidden}.ds-bento-project{grid-column:span 2;grid-row:span 2;justify-content:flex-end}.ds-bento h3{font-size:1.2rem;margin:0 0 5px;font-weight:550;letter-spacing:-.03em;line-height:1.12}.ds-bento-project h3{font-size:1.7rem;max-width:16ch}.ds-bento a>span{font-size:.7rem;color:var(--muted,#425875)}.ds-bento p{font-size:.76rem;line-height:1.65;color:var(--muted,#425875);margin:10px 0 0}.ds-bento-open{margin-top:auto;padding-top:13px;display:flex;align-items:center;gap:9px;width:100%;font-size:.68rem;font-weight:550;color:var(--orange,#a83c04)}.ds-bento-open svg{margin-left:auto}.ds-bento .ds-bento-index{padding:22px;background:linear-gradient(135deg,#1855bc30,#ff8a3612)}.ds-bento-index>svg{color:var(--orange,#a83c04);margin-bottom:12px}.ds-bento-index h3{font-size:1.1rem}.ds-bento-index p{font-size:.73rem;margin-top:4px}.ds-bento a:focus-visible,.ds-branch a:focus-visible,.ds-branch button:focus-visible{outline:3px solid var(--orange,#a83c04);outline-offset:4px}@media(max-width:600px){.ds-bento{grid-template-columns:1fr;gap:13px;grid-auto-rows:minmax(180px,auto)}.ds-bento-project{grid-column:span 1;grid-row:span 1;min-height:320px}}@media(prefers-reduced-transparency:reduce),(prefers-contrast:more){.ds-bento a{background:var(--surface,#f1f6ff);backdrop-filter:none}}@media(forced-colors:active){.ds-bento a{background:Canvas;border:1px solid CanvasText;box-shadow:none}}"
+    },
+    {
+      "name": "Expanded branch shortcuts",
+      "kind": "nav",
+      "description": "Source-derived expanded branch geometry and native route links. App code owns folding, inert collapsed content, URL selection, and trace animation.",
+      "html": "<nav class=\"ds-branch\" aria-label=\"Explore shortcuts\"><button aria-expanded=\"true\">Projects <svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.65\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m9 5 7 7-7 7\"/></svg></button><div class=\"ds-branch-tree\"><svg class=\"ds-branch-lines\" width=\"28\" height=\"100\" aria-hidden=\"true\"><path d=\"M8 0V72 M8 20A8 8 0 0 0 16 28H24 M8 64A8 8 0 0 0 16 72H24\"/></svg><a href=\"#/projects?group=Work\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.65\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m8 5-7 7 7 7 m8-14 7 7-7 7 M14 2l-4 20\"/></svg> Work &amp; tools</a><a href=\"#/projects?group=Library\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.65\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 5C8 2 3 3 2 4v16c3-1 7-1 10 1 3-2 7-2 10-1V4c-3-1-7-1-10 1Z M12 5v16\"/></svg> Library projects</a></div></nav>",
+      "css": ".ds-branch{position:relative;padding-left:14px;max-width:260px;font-family:Geist,system-ui,sans-serif;font-size:12px;line-height:1.2;color:var(--ink,#112847)}.ds-branch:before{content:\"\";position:absolute;top:8px;bottom:0;left:0;width:2px;border-radius:0.5px;background:linear-gradient(to bottom,var(--branch-line,#86a4ce) 0%,var(--branch-line,#86a4ce) 55%,transparent 100%)}.ds-branch button{display:flex;align-items:center;min-height:44px;margin:0;padding:9px 0;border:0;background:none;color:inherit;font-family:Geist,system-ui,sans-serif;font-size:13px;font-weight:500;cursor:pointer;text-align:left}.ds-branch button>svg{margin-left:12px;color:var(--orange,#a83c04);transform:rotate(90deg)}.ds-branch-tree{position:relative;padding:6px 0}.ds-branch-lines{position:absolute;top:0;left:0;fill:none;stroke:var(--branch-line,#86a4ce);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}.ds-branch a{display:flex;align-items:center;gap:8px;min-height:44px;padding-left:28px;color:var(--muted,#425875);text-decoration:none;transition:color .2s}.ds-branch a:hover{color:var(--ink,#112847)}.ds-bento a:focus-visible,.ds-branch a:focus-visible,.ds-branch button:focus-visible{outline:3px solid var(--orange,#a83c04);outline-offset:4px}@media(prefers-reduced-motion:reduce){.ds-branch a{transition:none}}"
+    },
+    {
+      "name": "Tech name fallback",
+      "kind": "custom",
+      "description": "The actual DOM name shown with effects disabled. Interactive Canvas 2D Tech Text is documented in renderer settings and runs only in the app.",
+      "html": "<h1 class=\"ds-tech-name\" tabindex=\"-1\"><span>Justin</span><span>Rogowski</span></h1>",
+      "css": ".ds-tech-name{font-family:Geist,system-ui,sans-serif;font-size:88px;font-weight:550;line-height:100px;letter-spacing:-.03em;margin:0;color:var(--ink,#112847)}.ds-tech-name span{display:block}.ds-tech-name span:last-child{color:var(--orange,#a83c04)}@media(min-width:1600px){.ds-tech-name{font-size:96px}}@media(max-width:1150px){.ds-tech-name{font-size:74px;line-height:88px}}@media(max-width:800px){.ds-tech-name{font-size:66px}}@media(max-width:600px){.ds-tech-name{font-size:61px;line-height:75px}}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Personal glass workspace",
+    "overview": "Ice-blue or deep navy ground, refractive glass, blue light, orange actions, and orbital geometry give practical information work a vivid interactive setting. Geist and consistent line icons keep the material system legible. This user-pinned world applies only to `v2/` and supersedes its earlier notebook direction.\n\nThe four requested React components define the experience: Tech Text makes the name respond to pointers and taps; Magic Bento presents actual selected projects with light and tilt; Branched Menu unfolds native-link shortcuts; Glass Surface renders refraction behind content. The atmosphere drifts when effects are enabled. Calm mode, system accessibility preferences, touch capabilities, active-view state, and page visibility govern the effects.",
+    "keyCharacteristics": [
+      "Ice-blue and navy themes with legible orange actions and blue illumination.",
+      "Floating glass panels, tighter box corners, soft depth, and orbital lines.",
+      "Interactive identity, content-backed bento, and folding branch shortcuts.",
+      "Native navigation and task controls with deliberate motion and transparency fallbacks."
+    ],
+    "rules": [
+      {
+        "name": "The Semantic Glass Rule",
+        "body": "Use live theme variables for glass, text, and supporting UI; retain the implemented fixed orange primary-action palette.",
+        "section": "colors"
+      },
+      {
+        "name": "The Text Above Refraction Rule",
+        "body": "Keep rendered text and controls outside the distortion layer; the glass filter belongs behind their content.",
+        "section": "typography"
+      },
+      {
+        "name": "The Opaque Escape Rule",
+        "body": "Preserve the implemented fallbacks so readability and operation remain available when refraction, transparency, or motion is suppressed.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** use ice-blue/navy glass with readable orange actions and blue illumination.",
+      "**Do** keep actual Glass Surface refraction behind text and controls.",
+      "**Do** use actual Tech Text, Magic Bento, and Branched Menu implementations for signature interactions.",
+      "**Do** retain native direct project links, visible navigation labels, and title-first index rows.",
+      "**Do** honor Calm, reduced motion, reduced transparency, high contrast, forced colors, and hidden-page behavior."
+    ],
+    "donts": [
+      "**Don't** propagate the scoped V2 system into V1 or root design context.",
+      "**Don't** reintroduce the superseded notebook palette or its static-only atmosphere restriction.",
+      "**Don't** distort text or controls inside the refraction layer.",
+      "**Don't** replace real portfolio content with vendor demo tiles or decorative metrics.",
+      "**Don't** rely on optional effects to expose content, state, or navigation."
+    ]
+  }
+}

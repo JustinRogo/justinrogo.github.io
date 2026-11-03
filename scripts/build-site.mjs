@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { buildSanitizer } from './build-sanitizer.mjs';
 import { refreshPocketPart } from './update-pocket-part.mjs';
 import { buildHomepage } from './build-homepage.mjs';
+import { buildV2 } from '../v2/build.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export async function vendorUpdates() {
@@ -24,6 +25,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   // Local/reproducible builds can retain the existing feed without modifying it.
   if (!process.argv.includes('--skip-feed')) await refreshPocketPart();
   await buildHomepage();
+  await buildV2();
   await buildSanitizer();
   await vendorUpdates();
   const dist = path.join(root, 'dist');
@@ -42,5 +44,12 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
       }
     });
   }
+  // V2 is additive: publish only its entry point and compiled public assets.
+  await mkdir(path.join(dist, 'v2'), { recursive: true });
+  await copyFile(path.join(root, 'v2/index.html'), path.join(dist, 'v2/index.html'));
+  await cp(path.join(root, 'v2/assets'), path.join(dist, 'v2/assets'), {
+    recursive: true,
+    filter: source => !source.endsWith('.json'),
+  });
   console.log('Static site and Updates assets prepared in dist/.');
 }

@@ -1,0 +1,199 @@
+:root {
+  --sidebar-width: 240px;
+}
+.about-social {
+  margin-top: 22px;
+}
+#say-hello {
+  scroll-margin-top: 24px;
+}
+.sidebar-settings-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  font-size: 0.8rem;
+}
+.view-home {
+  container: home / inline-size;
+}
+@media (min-width: 801px) {
+  .sidebar {
+    width: var(--sidebar-width);
+  }
+  .workspace {
+    margin-left: calc(var(--sidebar-width) + 36px);
+  }
+}
+.sidebar > .sidebar-resize[role="separator"] {
+  position: absolute;
+  top: 12px;
+  bottom: 12px;
+  right: -7px;
+  width: 14px;
+  z-index: 3;
+  cursor: col-resize;
+  touch-action: none;
+}
+.sidebar-resize > span {
+  position: absolute;
+  top: calc(50% - 22px);
+  left: 6px;
+  width: 2px;
+  height: 44px;
+  border-radius: 1px;
+  background: var(--branch-line);
+}
+.sidebar-resize:hover > span,
+.sidebar-resize:focus-visible > span,
+.sidebar-resize[data-dragging] > span {
+  background: var(--orange);
+}
+.sidebar-resize:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 1px;
+}
+html:has(.sidebar-resize[data-dragging]) {
+  cursor: col-resize;
+  user-select: none;
+}
+.hero-portrait {
+  aspect-ratio: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.portrait-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+}
+.portrait-contact-actions {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  aspect-ratio: 1;
+  pointer-events: none;
+}
+.portrait-contact-actions .orbit-action {
+  pointer-events: auto;
+}
+.orbit-mail {
+  left: 4%;
+  bottom: 21%;
+  color: var(--blue);
+}
+.orbit-teams {
+  top: 5%;
+  left: 8%;
+  color: var(--blue);
+}
+.orbit-phone {
+  bottom: 5%;
+  right: 7%;
+}
+@media (max-width: 800px) {
+  .portrait-contact-actions .orbit-action {
+    display: grid;
+    width: 44px;
+    height: 44px;
+  }
+  .portrait-stage .portrait-photo {
+    width: 70%;
+  }
+  .orbit-teams {
+    top: 0;
+    left: 0;
+  }
+  .orbit-calendar {
+    top: 0;
+    right: 0;
+  }
+  .orbit-mail {
+    left: 0;
+    bottom: 0;
+  }
+  .orbit-phone {
+    right: 0;
+    bottom: 0;
+  }
+}
+@media (max-width: 600px) {
+  .hero-portrait {
+    position: relative !important;
+    top: auto;
+    right: auto;
+    display: grid;
+    grid-template-columns: 76px minmax(0, 1fr);
+    width: 100%;
+    max-width: none;
+    gap: 15px 12px;
+    margin: 20px 0 0;
+  }
+  .portrait-stage {
+    width: 76px;
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .portrait-stage .portrait-photo {
+    width: 100%;
+  }
+  .portrait-stage .portrait-orbit {
+    display: none;
+  }
+  .portrait-contact-actions {
+    position: static;
+    aspect-ratio: auto;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(44px, 1fr));
+    gap: 6px;
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .portrait-contact-actions .orbit-action {
+    position: static;
+    width: 100%;
+    height: 44px;
+  }
+  .portrait-contact-actions .orbit-action svg {
+    width: 20px;
+    height: 20px;
+  }
+  .hero-portrait .strengths-preview {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: 100%;
+  }
+  .tech-heading {
+    width: 100%;
+  }
+}
+@media (max-width: 360px) {
+  .tech-heading {
+    font-size: clamp(2.5rem, 14vw, 3.25rem);
+  }
+  .portrait-contact-actions {
+    grid-template-columns: repeat(2, minmax(44px, 1fr));
+  }
+}
+@media (min-width: 801px) {
+  @container home (max-width: 600px) {
+    .glass-hero {
+      grid-template-columns: 1fr;
+    }
+    .hero-portrait {
+      width: min(300px, 100%);
+      margin-top: 20px;
+    }
+    .now-panel {
+      grid-template-columns: 1fr;
+    }
+    .now-panel > .now-geometry {
+      grid-column: 1;
+      grid-row: auto;
+    }
+  }
+}

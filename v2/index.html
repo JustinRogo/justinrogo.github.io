@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#efeee8" />
+    <meta
+      name="description"
+      content="Justin Rogowski — library information, useful tools, and unexpected ideas. An independent V2 prototype."
+    />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>Justin Rogowski · A space for possibility</title>
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+    <link
+      rel="preload"
+      href="../Pages/For%20Fun/Wave-Function-Collapse/fonts/Geist.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <script>
+      try {
+        const p = JSON.parse(localStorage.getItem("jr-v2-preferences") || "{}");
+        document.documentElement.dataset.theme =
+          p.theme === "dark" ||
+          (p.theme !== "light" &&
+            matchMedia("(prefers-color-scheme: dark)").matches)
+            ? "dark"
+            : "light";
+      } catch {}
+    </script>
+    <link rel="stylesheet" href="./assets/app.css" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript
+      ><p>
+        This prototype needs JavaScript.
+        <a href="../">Visit the original website</a>.
+      </p></noscript
+    >
+    <script type="module" src="./assets/app.js"></script>
+  </body>
+</html>
