@@ -12,7 +12,7 @@ Home's header has a **Replay intro** control (a refresh icon on phones). Setting
 
 `src/assembly/HomepageAssembly.jsx` provides the target registry, session policy, replay/skip controls, cancellation, and decorative overlay. `AssembleReveal` is a React slot: it composes a ref onto its existing child without adding a DOM wrapper. `SectionTitle` passes normal DOM props through to its existing root. Featured project content registers its existing Magic Bento cell through `closest`, without modifying the vendor engine.
 
-`AssemblyTimeline.js` uses the existing GSAP dependency. It measures visible target bounds at preparation and timeline start, assigns concurrent jobs, and moves pointer tips to their measured anchors. Text/navigation use clipping, glass uses opacity and traced outlines, and placed details/cards use small transforms. Each agent reuses a target-sized SVG guide and a click pulse. Frame tracing uses edge-length proportions to keep cursor travel and outline drawing coordinated.
+`AssemblyTimeline.js` uses the existing GSAP dependency. It measures visible target bounds at preparation and timeline start, assigns jobs, and moves pointer tips to their measured anchors. Layout enters alone and traces the header, hero, navigation shell, and visible project tiles. Its target-sized SVG outlines persist until each corresponding real surface is revealed. Theme, Content, Details, and Projects join after the structural opening; Layout continues tracing the lower tiles, then leaves. Text uses clipping, navigation/glass use opacity, and placed details/cards use small transforms. Navigation keeps its hit regions stable throughout preparation and playback. Each content agent reuses a target-sized selection guide and a click pulse. Frame tracing uses edge-length proportions to keep cursor travel and outline drawing coordinated.
 
 There is one homepage DOM tree throughout. The heading, portrait, links, cards, navigation, and shell are the normal React components. The overlay contains only decorative pointers, guides, and alignment dots. It has no pointer events, accessible content, or keyboard stops. Nothing submits a form or activates an external integration.
 
@@ -28,13 +28,14 @@ Edit `src/assembly/assemblyConfig.js`:
 | --- | --- |
 | `enabled` | `true`; build-time master switch |
 | `cursorCount` / `mobileCursorCount` | 5 / 4; supported range 3–6 |
-| `duration` / `mobileDuration` | 3200 / 2600 ms, plus 160 ms bounded preparation |
+| `duration` / `mobileDuration` | 5800 / 4800 ms, plus 160 ms bounded preparation |
+| `crewEntry` | 0.35 of the timeline; Layout works alone for about 2 seconds on desktop / 1.7 on phones |
 | `colors` / `labels` | Six presets; the first five accents/job labels are used by default |
 | `intensity` | 0.7; guide/pulse strength and placement distance/scale, range 0–1 |
 | `oncePerSession` | `true`; set false to repeat on Home activation |
 | `sessionKey` | `jr-v2-assembly-seen-v1` in sessionStorage, with an in-memory fallback |
 
-The same file defines every task's target ID, cursor, effect, start fraction, and duration fraction. Anchors derive from the effect and the target's visible bounding box. A cursor's travel is scheduled around its previous job. Phones use their actual dock/layout measurements and four agents; offscreen targets stay ordinarily rendered.
+The same file defines `layoutTasks` for the persistent structural guides and `assemblyTasks` for the real component reveals. Both specify target ID, cursor, effect, start fraction, and duration fraction. Anchors derive from the effect and the target's visible bounding box. A cursor's travel is scheduled around its previous job. Phones use their actual dock/layout measurements and four agents; content work goes to Details so Layout can keep its structural role. Offscreen targets stay ordinarily rendered. These outlines contain no mock content or replacement interface.
 
 To include another existing element, attach a slot and add a corresponding task:
 
@@ -54,6 +55,6 @@ The sequence is finite. It has no per-frame React state updates or layout-measur
 
 ## Verification
 
-`npm run test:v2` includes `tests/assembly.spec.mjs`. It checks real-node identity, layout invariance, measured cursor arrivals, style restoration, session and forced replay, repeated replay, resizing, keyboard and route interruption, motion preferences, settings, slow data, scrolling, and external-write prevention. Initial/construction/completed screenshots are saved at 375px and 1440px under the ignored `.impeccable/review/` directory. Additional read-only review covered 430px, 768px, and 1024px, both themes, and touch emulation.
+`npm run test:v2` includes `tests/assembly.spec.mjs`. It checks the solo Layout stage, crew exclusion during that stage, persistent outlines with the real hero still hidden, real-node identity, layout invariance, measured cursor arrivals, style restoration, session and forced replay, repeated replay, resizing, keyboard and route interruption, motion preferences, settings, slow data, scrolling, and external-write prevention. Initial/wireframe/construction/completed screenshots are saved at 375px and 1440px under the ignored `.impeccable/review/` directory. Additional read-only review covered 430px, 768px, and 1024px, both themes, and touch emulation.
 
 All implementation changes are V2-owned. Production V1, project destinations, shared integrations, deployment configuration, and npm dependencies are unchanged.

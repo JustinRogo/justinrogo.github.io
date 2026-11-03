@@ -1,5 +1,5 @@
 import { gsap } from "gsap";
-import { assemblyTasks } from "./assemblyConfig.js";
+import { assemblyTasks, layoutTasks } from "./assemblyConfig.js";
 
 const clamp = (value, low, high) => Math.min(high, Math.max(low, value));
 
@@ -20,6 +20,7 @@ export function createAssemblyTimeline({
   registry,
   cursors,
   guides,
+  wireframes,
   layer,
   grid,
   config,
@@ -35,6 +36,7 @@ export function createAssemblyTimeline({
   const total =
     clamp(compact ? config.mobileDuration : config.duration, 1200, 6000) / 1000;
   const intensity = clamp(config.intensity, 0, 1);
+  const crewEntry = clamp(config.crewEntry ?? 0.35, 0.2, 0.6);
   const context = gsap.context(() => {});
   let timeline;
   let preparing = true;
@@ -67,26 +69,38 @@ export function createAssemblyTimeline({
   function start() {
     // Late local data is included if ready; slower data keeps its normal loading/retry path.
     for (const [id, element] of registry) stage(id, element);
-    const jobs = assemblyTasks.flatMap((task) => {
-      const element = registry.get(task.id);
-      const box = visibleBox(element, viewport);
-      return box ? [{ ...task, element, box }] : [];
-    });
+    const jobs = [...layoutTasks, ...assemblyTasks]
+      .flatMap((task) => {
+        const element = registry.get(task.id);
+        const box = visibleBox(element, viewport);
+        return box ? [{ ...task, element, box }] : [];
+      })
+      .sort((a, b) => a.at - b.at);
     preparing = false;
     context.add(() => {
       timeline = gsap.timeline({ paused: true, onComplete });
+      timeline.set(layer, { attr: { "data-assembly-stage": "layout" } }, 0);
+      timeline.set(
+        layer,
+        { attr: { "data-assembly-stage": "content" } },
+        total * crewEntry,
+      );
       timeline.to(grid, { opacity: intensity, duration: 0.18 }, 0);
-      timeline.to(grid, { opacity: 0, duration: total * 0.2 }, total * 0.38);
+      timeline.to(grid, { opacity: 0, duration: total * 0.18 }, total * 0.62);
       const busy = Array(count).fill(0);
       const positions = entries.slice(0, count);
       cursors.forEach((cursor, i) => {
+        delete cursor.dataset.target;
+        delete cursor.dataset.flip;
         gsap.set(cursor, { ...entries[i], opacity: 0 });
         gsap.set(guides[i], { opacity: 0 });
       });
+      gsap.set([...wireframes.values()], { opacity: 0 });
       for (const job of jobs) {
-        const index = job.cursor % count;
+        // Compact crews give content jobs to Details, keeping Layout on structural work.
+        const index = job.cursor < count ? job.cursor : Math.min(3, count - 1);
         const cursor = cursors[index];
-        const guide = guides[index];
+        const guide = job.wireframe ? wireframes.get(job.id) : guides[index];
         const rect = guide.querySelector("rect");
         const handles = guide.querySelector("path");
         const click = cursor.querySelector(".agent-click");
@@ -104,9 +118,14 @@ export function createAssemblyTimeline({
         const travel = total * 0.1;
         const firstJob = busy[index] === 0;
         const depart = firstJob
-          ? Math.min(total * job.at - travel, index * 0.025)
+          ? index === 0
+            ? Math.max(0, total * job.at - travel)
+            : Math.max(
+                total * crewEntry + index * 0.015,
+                total * job.at - travel,
+              )
           : Math.max(total * job.at - travel, busy[index]);
-        const at = Math.max(total * job.at, depart + total * 0.04);
+        const at = Math.max(total * job.at, depart + total * 0.025);
         const trip = at - depart;
         const duration = total * job.duration;
         busy[index] = at + duration;
@@ -142,10 +161,9 @@ export function createAssemblyTimeline({
 
         const from = { opacity: 0 };
         const to = { opacity: 1, duration, ease: "power3.out" };
-        if (text || job.effect === "links") {
-          from.clipPath = vertical
-            ? "inset(0% 0% 100% 0%)"
-            : "inset(0% 100% 0% 0%)";
+        // Keep navigation hit regions stable even when a click interrupts preparation.
+        if (text) {
+          from.clipPath = "inset(0% 100% 0% 0%)";
           to.clipPath = "inset(0% 0% 0% 0%)";
         } else if (job.effect === "place") {
           from.y = 12 * intensity;
@@ -153,7 +171,16 @@ export function createAssemblyTimeline({
           to.y = 0;
           to.scale = 1;
         }
-        timeline.fromTo(job.element, from, to, at);
+        if (!job.wireframe) {
+          timeline.fromTo(job.element, from, to, at);
+          const wire = wireframes.get(job.id);
+          if (wire)
+            timeline.to(
+              wire,
+              { opacity: 0, duration: 0.22 },
+              at + duration * 0.6,
+            );
+        }
 
         // One reusable measured selection frame per agent, never a duplicate UI.
         // Bound each SVG's paint area to its target instead of five full-screen canvases.
@@ -196,11 +223,12 @@ export function createAssemblyTimeline({
             { strokeDashoffset: 0, duration, ease: "none" },
             at,
           );
-        timeline.to(
-          guide,
-          { opacity: 0, duration: Math.min(0.1, total * 0.025) },
-          at + duration,
-        );
+        if (!job.wireframe)
+          timeline.to(
+            guide,
+            { opacity: 0, duration: Math.min(0.1, total * 0.025) },
+            at + duration,
+          );
         if (stroke) {
           const corners = [
             point(b.left + b.width - 2, b.top + 2),
@@ -246,14 +274,17 @@ export function createAssemblyTimeline({
         }
       }
       cursors.slice(0, count).forEach((cursor, i) => {
-        const at = Math.max(total * 0.9, busy[i]);
+        const at =
+          i === 0
+            ? Math.max(total * 0.38, busy[i] + total * 0.025)
+            : Math.max(total * 0.96, busy[i]);
         timeline.to(
           cursor,
           {
             x: positions[i].x + (i % 2 ? 22 : -22),
             y: positions[i].y - 18,
             opacity: 0,
-            duration: Math.max(0.12, total - at),
+            duration: i === 0 ? 0.24 : Math.max(0.12, total - at),
             ease: "power2.in",
           },
           at,

@@ -10,7 +10,7 @@ import {
   useState,
 } from "react";
 import AgentCursor from "./AgentCursor.jsx";
-import { assemblyConfig } from "./assemblyConfig.js";
+import { assemblyConfig, layoutTasks } from "./assemblyConfig.js";
 import { createAssemblyTimeline } from "./AssemblyTimeline.js";
 import Icon from "../components/Icon.jsx";
 import "./assembly.css";
@@ -65,6 +65,7 @@ export default function HomepageAssembly({
   const registry = useRef(new Map());
   const cursors = useRef([]);
   const guides = useRef([]);
+  const wireframes = useRef(new Map());
   const layer = useRef(null);
   const grid = useRef(null);
   const running = useRef(null);
@@ -142,6 +143,7 @@ export default function HomepageAssembly({
         registry: registry.current,
         cursors: cursors.current,
         guides: guides.current,
+        wireframes: wireframes.current,
         layer: layer.current,
         grid: grid.current,
         config,
@@ -238,6 +240,21 @@ export default function HomepageAssembly({
         data-assembly-state={phase}
       >
         <div className="assembly-grid" ref={grid} />
+        {layoutTasks.map(({ id }) => (
+          <svg
+            key={`wire-${id}`}
+            className="assembly-guide assembly-wireframe"
+            data-wireframe-id={id}
+            ref={(node) => {
+              if (node) wireframes.current.set(id, node);
+              else wireframes.current.delete(id);
+            }}
+            style={{ color: config.colors[0] }}
+          >
+            <rect pathLength="1" />
+            <path />
+          </svg>
+        ))}
         {Array.from({ length: count }, (_, i) => (
           <svg
             key={`guide-${i}`}

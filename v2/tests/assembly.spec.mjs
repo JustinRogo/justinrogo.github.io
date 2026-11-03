@@ -91,6 +91,31 @@ test("desktop and phone assemble the original nodes at measured coordinates and 
       "paused",
     );
     await page.waitForTimeout(1250);
+    await expect(layer(page)).toHaveAttribute("data-assembly-stage", "layout");
+    expect(
+      await page
+        .locator(".agent-cursor")
+        .evaluateAll((nodes) =>
+          nodes
+            .slice(1)
+            .every((node) => getComputedStyle(node).opacity === "0"),
+        ),
+    ).toBe(true);
+    await expect(page.locator(".glass-hero")).toHaveCSS("opacity", "0");
+    expect(
+      await page
+        .locator(".assembly-wireframe")
+        .evaluateAll(
+          (nodes) =>
+            nodes.filter((node) => Number(getComputedStyle(node).opacity) > 0)
+              .length,
+        ),
+    ).toBeGreaterThanOrEqual(2);
+    await page.screenshot({
+      path: shotPath(`assembly-${width}-wireframe.png`),
+    });
+    await expect(layer(page)).toHaveAttribute("data-assembly-stage", "content");
+    await page.waitForTimeout(1100);
     await expect(layer(page)).toHaveAttribute(
       "data-assembly-state",
       "assembling",
@@ -101,6 +126,7 @@ test("desktop and phone assemble the original nodes at measured coordinates and 
     await expect(layer(page)).toHaveAttribute(
       "data-assembly-state",
       "complete",
+      { timeout: 8000 },
     );
     await expect(page.getByRole("button", { name: "Skip intro" })).toHaveCount(
       0,
@@ -144,12 +170,16 @@ test("desktop and phone assemble the original nodes at measured coordinates and 
         overlayHidden:
           getComputedStyle(document.querySelector(".assembly-layer"))
             .visibility === "hidden",
+        wiresHidden: [
+          ...document.querySelectorAll(".assembly-wireframe"),
+        ].every((node) => getComputedStyle(node).opacity === "0"),
         overflow: document.documentElement.scrollWidth > innerWidth + 1,
       };
     });
     expect(result.identity).toBe(true);
     expect(result.clean).toBe(true);
     expect(result.overlayHidden).toBe(true);
+    expect(result.wiresHidden).toBe(true);
     expect(result.overflow).toBe(false);
     expect(Math.max(...result.shifts)).toBeLessThan(2);
     expect(result.arrivals.some((arrival) => arrival.id === "navigation")).toBe(
@@ -172,6 +202,22 @@ test("desktop and phone assemble the original nodes at measured coordinates and 
   expect(errors).toEqual([]);
 });
 
+test("navigation remains clickable during preparation, wireframing, and crew assembly", async ({
+  page,
+}) => {
+  for (const delay of [0, 500, 2300]) {
+    await page.goto(`/v2/?replayIntro=1&navigation=${delay}#/home`);
+    if (delay) await page.waitForTimeout(delay);
+    await primary(page)
+      .getByRole("link", { name: "Projects", exact: true })
+      .click();
+    await expect(page).toHaveURL(/#\/projects$/);
+    await expect(
+      page.getByRole("heading", { name: /^The project index/ }),
+    ).toBeFocused();
+  }
+});
+
 test("session autoplay, forced replay, repeated replay, resize and keyboard interruption work", async ({
   page,
 }) => {
@@ -181,7 +227,9 @@ test("session autoplay, forced replay, repeated replay, resize and keyboard inte
     /preparing|assembling/,
   );
   await page.keyboard.press("Tab");
-  await expect(layer(page)).toHaveAttribute("data-assembly-state", "complete");
+  await expect(layer(page)).toHaveAttribute("data-assembly-state", "complete", {
+    timeout: 8000,
+  });
   await expect(page.locator(".ambient-blue")).toHaveCSS(
     "animation-play-state",
     "running",
@@ -234,7 +282,9 @@ test("the first Home visit from a deep link tolerates router focus and preserves
   await expect(
     page.getByRole("heading", { name: "Justin Rogowski", exact: true }),
   ).toBeFocused();
-  await expect(layer(page)).toHaveAttribute("data-assembly-state", "complete");
+  await expect(layer(page)).toHaveAttribute("data-assembly-state", "complete", {
+    timeout: 8000,
+  });
   await primary(page)
     .getByRole("link", { name: "Projects", exact: true })
     .click();

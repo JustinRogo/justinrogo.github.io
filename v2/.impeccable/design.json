@@ -762,8 +762,10 @@
     "breakpointBehavior": "Base floating rail 208px / workspace 244px; <=1150 rail 183px / workspace 216px; <=800 rail 68px / workspace 90px; <=600 floating dock and 14px main gutters. Bento measures its container using 150px minimum cells and 200px pair cells.",
     "homepageAssembly": {
       "source": "v2/src/assembly/",
-      "durationMs": 3200,
-      "mobileDurationMs": 2600,
+      "durationMs": 5800,
+      "mobileDurationMs": 4800,
+      "crewEntry": 0.35,
+      "opening": "Layout alone draws persistent measured outlines; the crew joins to fill the real surfaces",
       "preparationMs": 160,
       "cursors": 5,
       "mobileCursors": 4,

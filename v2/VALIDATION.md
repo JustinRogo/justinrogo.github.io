@@ -6,7 +6,7 @@
 | --- | --- |
 | `npm run build:v2` | Passed; isolated React/esbuild bundle |
 | `npm run build -- --skip-feed` | Passed; full artifact with additive `/v2/` output |
-| `npm run test:v2` | **20 passed** on Microsoft Edge/Playwright (November 3 assembly follow-up) |
+| `npm run test:v2` | **21 passed** on Microsoft Edge/Playwright (November 3 staged assembly follow-up) |
 | `npm run test:homepage` | **51 passed**; existing V1 suite, including widgets, backgrounds, themes and URLs |
 | `npm run test:updates` | **22 passed**; existing API, rich text, permissions and link-preview tests |
 | Production HTTP smoke | **22 public URLs returned 200**, including all 15 manifest project paths |
@@ -50,7 +50,7 @@ The six independent review fixes were scoped V2 product documentation, request-p
 - The V1 share control, companion and background gallery are retained only in V1. V2 offers blue/orange orbital atmosphere, actual glass refraction, Tech Text, Magic Bento and Branched Menu interactions instead.
 - No new service worker or offline app-install flow is provided. No continuous GPU background is required.
 
-Final minified output with the GSAP assembly sequence is approximately **429 KB JS / 83 KB CSS**, or **145 KB / 17 KB gzipped**, plus the unchanged 199 KB profile photo and the reused local font. GSAP was already a dependency; its orchestration code is now included in the V2 bundle. These gzip sizes are informational measurements; the static preview does not enable gzip.
+Final minified output with the GSAP assembly sequence is approximately **431 KB JS / 83 KB CSS**, or **146 KB / 17 KB gzipped**, plus the unchanged 199 KB profile photo and the reused local font. GSAP was already a dependency; its orchestration code is now included in the V2 bundle. These gzip sizes are informational measurements; the static preview does not enable gzip.
 
 ## Change boundary
 
@@ -71,3 +71,11 @@ The full suite passed 20 tests, including five assembly tests. These assert that
 Initial, construction, and completed captures at 375px and 1440px were inspected; additional motion-enabled captures at 430px light, 768px dark, and 1024px light verified touch/tablet layouts, completion, no overflow, and no runtime errors. The existing responsive suite still covers all five widths in both themes. The full build and production smoke pass: all 22 public URLs respond, excluded source paths stay private, and V1 core hashes remain unchanged.
 
 The mechanical design check reported only small label/type and decorative mask-color advisories; the new cursor treatment is documented in DESIGN.md. Frame sampling was exploratory, not a device benchmark. The glass-heavy 1024px light layout did not consistently sustain 60 FPS in automated Edge, including with the intro disabled. Native Safari and physical phones remain untested. The normal glass materials and the final homepage design remain unchanged.
+
+## Slower, staged assembly · November 3, 2026
+
+The sequence now uses 5800ms on desktop and 4800ms on phones, plus the existing bounded preparation. Layout enters alone, drawing persistent measured header/hero/navigation-shell outlines; the other agents join at 35% to fill the real surfaces and content. Layout continues outlining project tiles before handing off. No mock component tree is introduced.
+
+The full suite passes 21 tests, including six assembly tests. New assertions verify that only Layout appears during the opening, structural outlines are visible while the real hero remains hidden, all guides clear at completion, and navigation works during preparation, wireframing, and crew assembly. Navigation now fades with stable hit regions to avoid clipping a link while a click arrives. Existing identity, layout, interruption, reduced-motion, history, and request-safety coverage remains green. Desktop/phone captures include a separate wireframe stage; the mechanical design check reports no findings for the changed animation sources. Build and production smoke pass; V1 remains unchanged.
+
+The staged sequence was also reviewed at 430px, 768px, and 1024px in light theme (touch emulation at the first two). Each completed with the expected solo Layout opening, later crew entry, no horizontal overflow, and no runtime errors. These captures supplement the 375px/1440px dark-theme wireframe, construction, and completion captures.
