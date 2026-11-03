@@ -1,57 +1,8 @@
-import { useState } from "react";
-import themes from "v2:strengths";
 import { contacts, experience, profile, technologies } from "../content.js";
-import { LinkRow, SectionTitle } from "../components/UI.jsx";
+import { ExternalLink, LinkRow, SectionTitle } from "../components/UI.jsx";
+import Icon from "../components/Icon.jsx";
+import Strengths from "../components/Strengths.jsx";
 
-function Strengths() {
-  const [limit, setLimit] = useState(5);
-  return (
-    <section className="strengths">
-      <SectionTitle>How I’m wired</SectionTitle>
-      <p>My CliftonStrengths themes. Select one to explore it.</p>
-      <div className="filter-row" role="group" aria-label="Strengths to show">
-        {[5, 10, 34].map((n) => (
-          <button
-            key={n}
-            aria-pressed={limit === n}
-            onClick={() => setLimit(n)}
-          >
-            {n === 34 ? "All 34" : `Top ${n}`}
-          </button>
-        ))}
-      </div>
-      <div className="strength-list">
-        {themes.slice(0, limit).map((theme) => (
-          <details
-            key={theme.rank}
-            className={`strength strength-${theme.domain}`}
-          >
-            <summary>
-              <span className="strength-rank">
-                {String(theme.rank).padStart(2, "0")}
-              </span>
-              <strong>{theme.name}</strong>
-              <span className="strength-domain">
-                {
-                  {
-                    thinking: "Strategic thinking",
-                    executing: "Executing",
-                    relationship: "Relationship building",
-                    influencing: "Influencing",
-                  }[theme.domain]
-                }
-              </span>
-              <span className="expand-icon" aria-hidden="true">
-                +
-              </span>
-            </summary>
-            <p>{theme.description.split(": ").slice(1).join(": ")}</p>
-          </details>
-        ))}
-      </div>
-    </section>
-  );
-}
 export default function About() {
   return (
     <>
@@ -75,6 +26,19 @@ export default function About() {
           <p className="large-copy">{profile.bio}</p>
           <p>{profile.approach}</p>
           <p>{profile.personal}</p>
+          <div
+            className="button-row about-social"
+            role="group"
+            aria-label="Social profiles"
+          >
+            {contacts
+              .filter(([title]) => ["LinkedIn", "GitHub"].includes(title))
+              .map(([title, href, icon]) => (
+                <ExternalLink key={title} href={href} className="button">
+                  {title} <Icon name={icon} size={18} />
+                </ExternalLink>
+              ))}
+          </div>
         </div>
       </div>
       <SectionTitle>Making complicated work easier</SectionTitle>
@@ -130,8 +94,14 @@ export default function About() {
         </div>
       </section>
       <Strengths />
-      <section className="contact-section">
-        <SectionTitle>Say hello</SectionTitle>
+      <section
+        className="contact-section"
+        id="say-hello"
+        aria-labelledby="say-hello-heading"
+      >
+        <SectionTitle headingProps={{ id: "say-hello-heading", tabIndex: -1 }}>
+          Say hello
+        </SectionTitle>
         {contacts.map(([title, href, icon]) => (
           <LinkRow key={title} title={title} href={href} icon={icon} />
         ))}

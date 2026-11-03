@@ -25,14 +25,19 @@
 }
 
 .branched-menu::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 8px;
   bottom: 0;
   left: 0;
   width: 2px;
   border-radius: 1px;
-  background: linear-gradient(to bottom, var(--bm-line) 0%, var(--bm-line) 55%, transparent 100%);
+  background: linear-gradient(
+    to bottom,
+    var(--bm-line) 0%,
+    var(--bm-line) 55%,
+    transparent 100%
+  );
 }
 
 .branched-menu__marker {
@@ -147,7 +152,7 @@
   width: 100%;
   height: var(--bm-row);
   margin: 0;
-  padding: 0 0 0 var(--bm-indent);
+  padding: 0 0 0 calc(var(--bm-indent) + var(--bm-depth, 0) * 32px);
   border: 0;
   background: none;
   color: var(--bm-muted);
@@ -158,6 +163,15 @@
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
   transition: color 200ms ease;
+}
+.branched-menu__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.branched-menu__list > li {
+  margin: 0;
+  padding: 0;
 }
 
 @media (hover: hover) and (pointer: fine) {

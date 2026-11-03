@@ -15,14 +15,19 @@ import About from "./views/About.jsx";
 import More, { parseManifest } from "./views/More.jsx";
 import Settings from "./components/Settings.jsx";
 import Icon from "./components/Icon.jsx";
-import { GlassLayer, Atmosphere } from "./components/Glass.jsx";
+import { GlassLayer } from "./components/Glass.jsx";
+import PageBackground, {
+  backgroundOptions,
+} from "./components/PageBackground.jsx";
 import ExploreMenu from "./components/ExploreMenu.jsx";
+import SidebarResize, { useSidebarWidth } from "./components/SidebarResize.jsx";
 import HomepageAssembly, {
   AssembleReveal,
   ReplayAssembly,
 } from "./assembly/HomepageAssembly.jsx";
 import "./styles.css";
 import "./glass-theme.css";
+import "./layout.css";
 
 const destinations = [
   ["home", "Home"],
@@ -32,6 +37,7 @@ const destinations = [
   ["more", "More"],
 ];
 function App() {
+  const sidebar = useSidebarWidth();
   const route = useRoute();
   const valid = destinations.some(([id]) => id === route.view);
   const active = valid ? route.view : "missing";
@@ -39,13 +45,21 @@ function App() {
   if (!visited.has(active)) setVisited(new Set([...visited, active]));
   const [preferences, setPreferences] = useStored(
     "jr-v2-preferences",
-    { theme: "system", calm: false, atmosphere: true, intro: true },
+    {
+      theme: "system",
+      calm: false,
+      atmosphere: true,
+      intro: true,
+      background: "auto",
+    },
     (p) =>
       p &&
       ["system", "light", "dark"].includes(p.theme) &&
       typeof p.calm === "boolean" &&
       typeof p.atmosphere === "boolean" &&
-      (p.intro === undefined || typeof p.intro === "boolean"),
+      (p.intro === undefined || typeof p.intro === "boolean") &&
+      (p.background === undefined ||
+        backgroundOptions.some(({ id }) => id === p.background)),
   );
   const [saved, setSaved] = useStored(
     "jr-v2-saved",
@@ -79,6 +93,7 @@ function App() {
   const currentView = useRef(active);
   const initialView = useRef(true);
   const scrolls = useRef({});
+  const aboutSection = active === "about" ? route.params.get("section") : null;
   useEffect(() => {
     document.title = `${destinations.find(([id]) => id === active)?.[1] || "Page not found"} · Justin Rogowski`;
   }, [active]);
@@ -107,6 +122,15 @@ function App() {
     window.scrollTo({ top: scrolls.current[active] || 0, behavior: "instant" });
     document.title = `${destinations.find(([id]) => id === active)?.[1] || "Page not found"} · Justin Rogowski`;
   }, [active]);
+  useLayoutEffect(() => {
+    const id = { strengths: "cliftonstrengths", contact: "say-hello" }[
+      aboutSection
+    ];
+    if (!id) return;
+    const section = main.current?.querySelector(`#${id}`);
+    section?.scrollIntoView({ block: "start", behavior: "instant" });
+    section?.querySelector("h2")?.focus({ preventScroll: true });
+  }, [aboutSection]);
   useEffect(() => {
     const previous = history.scrollRestoration;
     history.scrollRestoration = "manual";
@@ -172,7 +196,13 @@ function App() {
       active={active === "home"}
       enabled={effects && preferences.intro !== false && !settings}
     >
-      <Atmosphere moving={effects && preferences.atmosphere} />
+      <PageBackground
+        preferences={preferences}
+        moving={effects}
+        theme={theme}
+        fine={fine}
+        suppressed={highContrast || forcedColors}
+      />
       <a
         href="#main"
         className="skip-link"
@@ -185,7 +215,7 @@ function App() {
       </a>
       <AssembleReveal id="shell">
         <aside className="sidebar">
-          <GlassLayer radius={24} />
+          <GlassLayer radius={12} />
           <a
             href="#/home"
             className="wordmark"
@@ -201,7 +231,7 @@ function App() {
           <div className="sidebar-scroll">
             <AssembleReveal id="navigation">
               <nav className="primary-nav" aria-label="Primary navigation">
-                <GlassLayer radius={20} className="dock-glass" />
+                <GlassLayer radius={10} className="dock-glass" />
                 {destinations.map(([id, label]) => (
                   <a
                     key={id}
@@ -227,31 +257,45 @@ function App() {
           </div>
           <div className="sidebar-bottom">
             <a
-              href="mailto:justin.rogowski@uconn.edu"
+              href="#/about?section=contact"
               className="sidebar-contact"
+              onClick={(event) => {
+                if (
+                  aboutSection !== "contact" ||
+                  event.ctrlKey ||
+                  event.metaKey ||
+                  event.shiftKey ||
+                  event.altKey
+                )
+                  return;
+                event.preventDefault();
+                const section = main.current?.querySelector("#say-hello");
+                section?.scrollIntoView({
+                  block: "start",
+                  behavior: "instant",
+                });
+                section?.querySelector("h2")?.focus({ preventScroll: true });
+              }}
             >
-              Let’s connect <Icon name="external" size={17} />
+              Let’s connect <Icon name="arrow" size={17} />
             </a>
             <div className="sidebar-settings">
               <button
-                className="icon-button"
+                className="text-button sidebar-settings-button"
                 onClick={() => setSettings(true)}
                 aria-label="Appearance and motion settings"
               >
-                <Icon name="settings" />
+                <Icon name="settings" /> Settings
               </button>
-              <a href="../" className="v1-link">
-                Visit the original site <Icon name="external" size={14} />
-              </a>
             </div>
-            <span className="prototype-label">An independent V2 prototype</span>
           </div>
+          <SidebarResize {...sidebar} />
         </aside>
       </AssembleReveal>
-      <div className="workspace">
+      <div className="workspace" id="workspace">
         <AssembleReveal id="topbar">
           <header className="topbar">
-            <GlassLayer radius={20} />
+            <GlassLayer radius={10} />
             <a className="mobile-wordmark" href="#/home">
               jr
               <Icon name="external" size={28} />

@@ -382,7 +382,10 @@ test("the requested React Bits render, react to pointers, and stop in Calm mode"
   await page.keyboard.press("Escape");
   await expect(page.locator(".tech-text-canvas")).toHaveCount(0);
   await expect(page.locator(".magic-bento")).not.toHaveAttribute("data-motion");
-  await expect(page.locator(".atmosphere")).not.toHaveClass(/is-moving/);
+  await expect(page.locator(".page-background")).toHaveAttribute(
+    "data-motion",
+    "still",
+  );
 });
 
 test("branched shortcuts use normal links and collapsed groups leave keyboard order", async ({
@@ -484,9 +487,42 @@ test("original Work, UCPEA and For Fun collections expose every page on desktop 
       await toggle.focus();
       await page.keyboard.press("Enter");
       await expect(section.getByRole("link")).toHaveCount(count);
+      if (name === "UCPEA") {
+        await expect(section.getByRole("link").first()).toHaveText(
+          "UCPEA Member Dashboard",
+        );
+        const contracts = section.getByRole("list", {
+          name: "UCPEA Member Dashboard pages",
+          exact: true,
+        });
+        await expect(contracts.getByRole("link")).toHaveText([
+          "Current Contract",
+          "Contract History",
+          "Contract Comparison",
+        ]);
+        await section.getByRole("link").first().focus();
+        for (const label of [
+          "Current Contract",
+          "Contract History",
+          "Contract Comparison",
+        ]) {
+          await page.keyboard.press("Tab");
+          await expect(
+            contracts.getByRole("link", { name: label, exact: true }),
+          ).toBeFocused();
+        }
+      }
       for (const item of pages) {
+        const contractLabel =
+          name === "UCPEA"
+            ? {
+                "UCPEAContract.html": "Current Contract",
+                "UCPEA_Contract_History.html": "Contract History",
+                "UCPEA_Contract_Comparison.html": "Contract Comparison",
+              }[item.path.split("/").pop()]
+            : undefined;
         const link = section.getByRole("link", {
-          name: item.title,
+          name: contractLabel || item.title,
           exact: true,
         });
         await expect(link).toHaveAttribute(

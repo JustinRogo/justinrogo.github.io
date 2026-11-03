@@ -1,0 +1,155 @@
+/* V2 owns these host styles; existing background renderers are read-only imports. */
+:root {
+  --electric-blue: #0066ff;
+  --cyan: #00f2fe;
+  --violet: #7c3aed;
+}
+.page-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  contain: strict;
+}
+.page-background-renderer,
+.page-background .site-background__layers,
+.page-background .background-static,
+.page-background .shape-waves,
+.page-background .antigravity,
+.page-background .site-background__aurora,
+.page-background .fractal-background {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.page-background
+  .site-background__layers[data-background-state="active"]
+  .background-static {
+  visibility: hidden;
+}
+.page-background
+  .site-background__layers:not([data-background-state="active"])
+  .shape-waves {
+  visibility: hidden;
+}
+.page-background[data-background="shape-waves"][data-theme="light"] {
+  opacity: 0.12;
+}
+.page-background[data-background="antigravity"] {
+  opacity: 0.8;
+}
+.page-background[data-background="antigravity"][data-theme="light"] {
+  opacity: 0.65;
+}
+.page-background .fractal-background {
+  opacity: 0.42;
+  mix-blend-mode: screen;
+}
+.page-background[data-theme="light"] .fractal-background {
+  opacity: 0.2;
+  mix-blend-mode: multiply;
+}
+.page-background .glow-aurora {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.2;
+  mix-blend-mode: screen;
+}
+.page-background[data-theme="light"] .glow-aurora {
+  opacity: 0.1;
+  mix-blend-mode: multiply;
+}
+.page-background .glow-aurora-1 {
+  width: min(600px, 110vw);
+  height: min(600px, 90vh);
+  background: radial-gradient(circle, var(--electric-blue), transparent 70%);
+  top: -15%;
+  left: -15%;
+  animation: v2-aurora-blue 25s ease-in-out infinite alternate;
+}
+.page-background .glow-aurora-2 {
+  width: min(700px, 120vw);
+  height: min(700px, 100vh);
+  background: radial-gradient(circle, var(--violet), transparent 70%);
+  top: 15%;
+  right: -25%;
+  animation: v2-aurora-violet 30s ease-in-out infinite alternate;
+}
+.page-background .glow-aurora-3 {
+  width: min(500px, 100vw);
+  height: min(500px, 80vh);
+  background: radial-gradient(circle, var(--orange), transparent 70%);
+  bottom: -10%;
+  left: 20%;
+  animation: v2-aurora-orange 22s ease-in-out infinite alternate;
+}
+.page-background .site-background__aurora[data-animated="false"] .glow-aurora {
+  animation: none;
+}
+@keyframes v2-aurora-blue {
+  to {
+    transform: translate(80px, 50px) scale(1.1);
+  }
+}
+@keyframes v2-aurora-violet {
+  to {
+    transform: translate(-100px, 80px) scale(0.9);
+  }
+}
+@keyframes v2-aurora-orange {
+  to {
+    transform: translate(50px, -60px) scale(1.2);
+  }
+}
+.background-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.background-options > label {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  align-items: start;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  cursor: pointer;
+}
+.background-options > label:has(input:checked) {
+  border-color: var(--blue);
+  background: var(--nav);
+}
+.background-options input {
+  margin: 3px 0 0;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--blue);
+}
+.background-options strong {
+  font-size: 0.85rem;
+  font-weight: 550;
+}
+.background-options small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 0.77rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+@media (max-width: 600px) {
+  .background-options {
+    grid-template-columns: 1fr;
+  }
+}
+@media (prefers-contrast: more),
+  (forced-colors: active),
+  (prefers-reduced-transparency: reduce) {
+  .page-background {
+    display: none;
+  }
+}

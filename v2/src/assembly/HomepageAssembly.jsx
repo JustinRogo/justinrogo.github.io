@@ -17,6 +17,10 @@ import "./assembly.css";
 
 const AssemblyContext = createContext(null);
 
+export function useAssemblyBusy() {
+  return useContext(AssemblyContext)?.busy || false;
+}
+
 // A slot: attach a ref to the existing node without adding layout wrappers.
 export function AssembleReveal({ id, closest, children }) {
   const context = useContext(AssemblyContext);
@@ -221,11 +225,11 @@ export default function HomepageAssembly({
     return () => finish(false);
   }, [active, allowed, replayCount, config]);
 
-  const value = useMemo(
-    () => ({ register, replay, active, enabled: allowed }),
-    [register, replay, active, allowed],
-  );
   const busy = phase === "preparing" || phase === "assembling";
+  const value = useMemo(
+    () => ({ register, replay, active, enabled: allowed, busy }),
+    [register, replay, active, allowed, busy],
+  );
   const count = Math.min(
     6,
     Math.max(3, config.cursorCount, config.mobileCursorCount),

@@ -2,6 +2,7 @@ import { build, context } from "esbuild";
 import { mkdir, copyFile, readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { decodeHTML } from "entities";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 export async function buildV2({ watch = false } = {}) {
@@ -11,6 +12,7 @@ export async function buildV2({ watch = false } = {}) {
     ["node_modules/react/LICENSE", "react-LICENSE.txt"],
     ["node_modules/react-dom/LICENSE", "react-dom-LICENSE.txt"],
     ["node_modules/scheduler/LICENSE", "scheduler-LICENSE.txt"],
+    ["node_modules/vgpu/LICENSE", "vgpu-LICENSE.txt"],
     ["Pages/For Fun/Wave-Function-Collapse/fonts/OFL.txt", "Geist-OFL.txt"],
   ])
     await copyFile(
@@ -51,6 +53,40 @@ export async function buildV2({ watch = false } = {}) {
     },
     plugins: [
       {
+        name: "existing-background-components",
+        setup(builder) {
+          const source = path.join(root, "src/homepage/SiteBackground.jsx");
+          builder.onResolve({ filter: /^v2:backgrounds$/ }, () => ({
+            path: source,
+            namespace: "v2-backgrounds",
+          }));
+          builder.onLoad(
+            { filter: /.*/, namespace: "v2-backgrounds" },
+            async () => {
+              const original = await readFile(source, "utf8");
+              const boundary = original.indexOf(
+                "export function SiteBackground()",
+              );
+              if (boundary < 0)
+                throw new Error(
+                  "Existing background component boundary changed.",
+                );
+              // Expose the existing renderers without V1's body observer/settings owner
+              // or global host CSS. V2 owns selection, motion, theme, and scoped styles.
+              const components = original
+                .slice(0, boundary)
+                .replace(/^import ['"].*\.css['"];?\s*$/gm, "");
+              return {
+                contents: `${components}\nexport { ShapeWavesBackground, AuroraBackground, AntigravityBackground, FractalBackground };`,
+                resolveDir: path.dirname(source),
+                loader: "jsx",
+                watchFiles: [source],
+              };
+            },
+          );
+        },
+      },
+      {
         name: "existing-strengths-content",
         setup(builder) {
           const source = path.join(root, "src/homepage/legacy-widgets.js");
@@ -67,18 +103,40 @@ export async function buildV2({ watch = false } = {}) {
             ]
               .map(([, domain, description, rank, name]) => ({
                 domain,
-                description,
+                description: decodeHTML(description),
                 rank: Number(rank),
-                name,
+                name: decodeHTML(name),
               }))
               .sort((a, b) => a.rank - b.rank);
             if (themes.length !== 34)
               throw new Error(
                 "Expected all 34 existing CliftonStrengths themes.",
               );
+            const reflections = Object.fromEntries(
+              ["best", "overextended"].map((id) => {
+                const match = legacy.match(
+                  new RegExp(
+                    `<div id="${id}" class="content(?: active)?">\\s*<p>([\\s\\S]*?)</p>`,
+                  ),
+                );
+                if (!match)
+                  throw new Error(
+                    `Missing existing CliftonStrengths ${id} reflection.`,
+                  );
+                return [
+                  id,
+                  decodeHTML(
+                    match[1]
+                      .replace(/<[^>]*>/g, "")
+                      .replace(/\s+/g, " ")
+                      .trim(),
+                  ),
+                ];
+              }),
+            );
             return {
-              contents: JSON.stringify(themes),
-              loader: "json",
+              contents: `export default ${JSON.stringify(themes)};\nexport const reflections = ${JSON.stringify(reflections)};`,
+              loader: "js",
               watchFiles: [source],
             };
           });

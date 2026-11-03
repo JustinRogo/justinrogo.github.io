@@ -12,6 +12,7 @@ import Icon from "../components/Icon.jsx";
 import { GlassLayer } from "../components/Glass.jsx";
 import { ExternalLink, LoadState, SectionTitle } from "../components/UI.jsx";
 import { AssembleReveal } from "../assembly/HomepageAssembly.jsx";
+import { StrengthsPreview } from "../components/Strengths.jsx";
 
 function Name({ effects }) {
   return (
@@ -76,7 +77,7 @@ function FeaturedBento({ projects, effects, theme, fine }) {
         rowSpan: index === 0 ? 2 : 1,
         content: (
           <>
-            <GlassLayer radius={22} />
+            <GlassLayer radius={11} />
             <AssembleReveal
               id={`featured-${index}`}
               closest=".magic-bento__cell"
@@ -112,7 +113,7 @@ function FeaturedBento({ projects, effects, theme, fine }) {
           rowSpan: 1,
           content: (
             <>
-              <GlassLayer radius={22} />
+              <GlassLayer radius={11} />
               <AssembleReveal id="featured-3" closest=".magic-bento__cell">
                 <div className="bento-index">
                   <Icon name="projects" size={30} />
@@ -138,7 +139,7 @@ function FeaturedBento({ projects, effects, theme, fine }) {
       columns={4}
       rowHeight={170}
       gap={16}
-      radius={22}
+      radius={11}
       theme={theme}
       glowColor="#ff8a36"
       textAutoHide={false}
@@ -160,7 +161,7 @@ export default function Home({ projects, effects, theme, fine }) {
     <>
       <AssembleReveal id="hero-frame">
         <section className="glass-hero glass-host">
-          <GlassLayer radius={28} />
+          <GlassLayer radius={12} />
           <div className="hero-copy">
             <Name effects={effects} />
             <AssembleReveal id="hero-role">
@@ -185,30 +186,53 @@ export default function Home({ projects, effects, theme, fine }) {
           </div>
           <AssembleReveal id="portrait">
             <div className="hero-portrait">
-              <div className="portrait-orbit orbit-one" />
-              <div className="portrait-orbit orbit-two" />
-              <div className="portrait-photo">
-                <img
-                  src="./assets/justin.png"
-                  alt="Justin Rogowski"
-                  width="240"
-                  height="240"
-                />
+              <div className="portrait-stage">
+                <div className="portrait-orbit orbit-one" />
+                <div className="portrait-orbit orbit-two" />
+                <div className="portrait-photo">
+                  <img
+                    src="./assets/justin.png"
+                    alt="Justin Rogowski"
+                    width="240"
+                    height="240"
+                  />
+                </div>
               </div>
-              <a
-                href="#/tools?panel=booking"
-                className="orbit-action orbit-calendar"
-                aria-label="Book a meeting"
-              >
-                <Icon name="calendar" size={23} />
-              </a>
-              <a
-                href="#/projects?group=For+Fun"
-                className="orbit-action orbit-code"
-                aria-label="Explore creative experiments"
-              >
-                <Icon name="code" size={23} />
-              </a>
+              <div className="portrait-contact-actions">
+                <a
+                  href="#/tools?panel=booking"
+                  className="orbit-action orbit-calendar"
+                  aria-label="Book a meeting"
+                  title="Book a meeting"
+                >
+                  <Icon name="calendar" size={23} />
+                </a>
+                <a
+                  href="mailto:justin.rogowski@uconn.edu"
+                  className="orbit-action orbit-mail"
+                  aria-label="Email Justin"
+                  title="Email Justin"
+                >
+                  <Icon name="mail" size={23} />
+                </a>
+                <ExternalLink
+                  href="https://teams.microsoft.com/l/chat/0/0?users=justin.rogowski@uconn.edu"
+                  className="orbit-action orbit-teams"
+                  aria-label="Start a Teams chat"
+                  title="Start a Teams chat"
+                >
+                  <Icon name="chat" size={23} />
+                </ExternalLink>
+                <a
+                  href="tel:+18605705109"
+                  className="orbit-action orbit-phone"
+                  aria-label="Call Justin"
+                  title="Call Justin"
+                >
+                  <Icon name="phone" size={23} />
+                </a>
+              </div>
+              <StrengthsPreview />
             </div>
           </AssembleReveal>
         </section>
@@ -295,7 +319,7 @@ export default function Home({ projects, effects, theme, fine }) {
                 <GlareHover
                   width="100%"
                   glareOpacity={0.25}
-                  borderRadius="8px"
+                  borderRadius="4px"
                   rimGlint={false}
                 >
                   <span className="contact-glare">

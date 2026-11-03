@@ -4,6 +4,47 @@ import Icon from "./Icon.jsx";
 import { resources, projectHref } from "../content.js";
 
 const EMPTY_PAGES = [];
+const UCPEA_ROOT = "Pages/Work/UCPEA/";
+const contractLabels = [
+  ["UCPEAContract.html", "Current Contract"],
+  ["UCPEA_Contract_History.html", "Contract History"],
+  ["UCPEA_Contract_Comparison.html", "Contract Comparison"],
+];
+function ucpeaLinks(pages) {
+  const scoped = pages.filter((page) => page.path.startsWith(UCPEA_ROOT));
+  const link = (page, label = page.title) => ({
+    value: `page:${page.path}`,
+    label,
+    href: projectHref(page),
+    target: "_blank",
+    rel: "noopener noreferrer",
+  });
+  const dashboard = scoped.find(
+    (page) => page.path === `${UCPEA_ROOT}index.html`,
+  );
+  const contracts = contractLabels.flatMap(([path, label]) => {
+    const page = scoped.find((page) => page.path === `${UCPEA_ROOT}${path}`);
+    return page ? [link(page, label)] : [];
+  });
+  const extra = scoped
+    .filter(
+      (page) =>
+        page !== dashboard &&
+        !contractLabels.some(([path]) => page.path === `${UCPEA_ROOT}${path}`),
+    )
+    .sort((a, b) => a.title.localeCompare(b.title))
+    .map((page) => ({ ...link(page), icon: <Icon name="book" size={16} /> }));
+  return dashboard
+    ? [
+        {
+          ...link(dashboard),
+          icon: <Icon name="book" size={16} />,
+          children: contracts,
+        },
+        ...extra,
+      ]
+    : [...contracts, ...extra];
+}
 
 export default function ExploreMenu({
   route,
@@ -64,17 +105,7 @@ export default function ExploreMenu({
       {
         label: "UCPEA",
         rowHeight: 64,
-        children: pages
-          .filter((page) => page.path.startsWith("Pages/Work/UCPEA/"))
-          .sort((a, b) => a.title.localeCompare(b.title))
-          .map((page) => ({
-            value: `page:${page.path}`,
-            label: page.title,
-            href: projectHref(page),
-            target: "_blank",
-            rel: "noopener noreferrer",
-            icon: <Icon name="book" size={16} />,
-          })),
+        children: ucpeaLinks(pages),
       },
       {
         label: "For Fun",

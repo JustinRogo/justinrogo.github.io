@@ -6,7 +6,7 @@
 | --- | --- |
 | `npm run build:v2` | Passed; isolated React/esbuild bundle |
 | `npm run build -- --skip-feed` | Passed; full artifact with additive `/v2/` output |
-| `npm run test:v2` | **21 passed** on Microsoft Edge/Playwright (November 3 staged assembly follow-up) |
+| `npm run test:v2` | **30 cases verified** on Microsoft Edge/Playwright; 28 passed in the full run, then all six assembly tests passed after updating two obsolete background fixtures |
 | `npm run test:homepage` | **51 passed**; existing V1 suite, including widgets, backgrounds, themes and URLs |
 | `npm run test:updates` | **22 passed**; existing API, rich text, permissions and link-preview tests |
 | Production HTTP smoke | **22 public URLs returned 200**, including all 15 manifest project paths |
@@ -47,10 +47,11 @@ The six independent review fixes were scoped V2 product documentation, request-p
 - Request drafts preview locally. Sending uses the original site after deliberate navigation and selection of “Submit a Request.” V2 has no POST integration.
 - GitHub, weather and events depend on external availability, CORS and rate limits. Loaded API data caches for the app session and refreshes on page reload. Task counts and blog posts reuse existing snapshots with freshness labels.
 - Strengths are extracted from the existing V1 source at build time. The build checks for all 34 and fails clearly if that source format changes.
-- The V1 share control, companion and background gallery are retained only in V1. V2 offers blue/orange orbital atmosphere, actual glass refraction, Tech Text, Magic Bento and Branched Menu interactions instead.
+- The V1 share control and companion remain in V1. V2 now reuses the background gallery under its own settings/lifecycle, alongside actual glass refraction, Tech Text, Magic Bento and Branched Menu.
+- Shape Waves needs WebGPU and Antigravity needs WebGL for motion; their existing static canvases remain visible while initializing or when a GPU renderer is unavailable. Aurora is the default on compact screens and needs no canvas. Calm/reduced-motion settings use still alternatives.
 - No new service worker or offline app-install flow is provided. No continuous GPU background is required.
 
-Final minified output with the GSAP assembly sequence is approximately **431 KB JS / 83 KB CSS**, or **146 KB / 17 KB gzipped**, plus the unchanged 199 KB profile photo and the reused local font. GSAP was already a dependency; its orchestration code is now included in the V2 bundle. These gzip sizes are informational measurements; the static preview does not enable gzip.
+Final minified output with the assembly sequence, expanded strengths content, resizable sidebar, and background gallery is approximately **636 KB JS / 93 KB CSS**, or **214 KB / 19 KB gzipped**, plus the unchanged 199 KB profile photo and reused local font. GSAP and VGPU were already dependencies; no package was added. These gzip sizes are informational measurements; the static preview does not enable gzip.
 
 ## Change boundary
 
@@ -79,3 +80,33 @@ The sequence now uses 5800ms on desktop and 4800ms on phones, plus the existing 
 The full suite passes 21 tests, including six assembly tests. New assertions verify that only Layout appears during the opening, structural outlines are visible while the real hero remains hidden, all guides clear at completion, and navigation works during preparation, wireframing, and crew assembly. Navigation now fades with stable hit regions to avoid clipping a link while a click arrives. Existing identity, layout, interruption, reduced-motion, history, and request-safety coverage remains green. Desktop/phone captures include a separate wireframe stage; the mechanical design check reports no findings for the changed animation sources. Build and production smoke pass; V1 remains unchanged.
 
 The staged sequence was also reviewed at 430px, 768px, and 1024px in light theme (touch emulation at the first two). Each completed with the expected solo Layout opening, later crew entry, no horizontal overflow, and no runtime errors. These captures supplement the 375px/1440px dark-theme wireframe, construction, and completion captures.
+
+## CliftonStrengths and UCPEA hierarchy · November 3, 2026
+
+About now includes all four original domain colors, a rank-weighted all-34 bar/percentage legend, and the original best/overextended reflection passages. The V2 build extracts the passages as text from V1; no V1 initializer runs and no reflection text is duplicated by hand. Weights are 35 − rank: Thinking 206/595 (34.6%), Relationship Building 170/595 (28.6%), Executing 114/595 (19.2%), and Influencing 105/595 (17.6%). Top 5/10/34 filters leave this overview unchanged.
+
+The UCPEA branch keeps all four original destinations, with Member Dashboard first and native nested child links named Current Contract, Contract History, and Contract Comparison. The vendor adaptation supports semantic nested lists and corresponding branch geometry; outer expansion/inert behavior remains intact. Tests verify hierarchy, renamed destinations, label fit, and Dashboard-to-contract Tab order on desktop and phone.
+
+The full suite passes 23 tests. New coverage verifies exact reflection text, keyboard switching, domain percentages/weights/colors, filter-independent overview, badge colors, and responsive overflow in both themes. The existing contrast check passes with purple Executing badges. Screenshot review covered strengths content at 375px and 1024px in both themes and nested UCPEA at 1243px and 375px. The full responsive suite still covers all five widths/themes. The mechanical check noted only contextual caption type levels (now documented) and unchanged upstream 1px branch-marker corners. Full build and all 22 production URL checks pass; V1 core hashes and shared project data remain unchanged.
+
+## Portrait, sidebar, and shape refinement · November 3, 2026
+
+Halved V2-owned box corner radii and matched the Glass Surface, Magic Bento, Glare Hover, and assembly-guide corners to their final hosts. Circular portraits and orbital geometry remain unchanged. The portrait now has native calendar, email, Teams chat, and telephone links, with a shared rank-weighted strengths bar beneath it. Its route (`#/about?section=strengths`) scrolls to and focuses the existing strengths section through click, direct refresh, and browser history. Calendar/booking keep opt-in embeds and direct links without the former cookie/sign-in paragraph.
+
+The desktop rail defaults to 240px and resizes via pointer capture or a labeled keyboard separator. Width saves under a V2-specific key, respects viewport limits, and resets with Enter or double-click. Compact navigation retains its own dimensions. Narrow desktop content uses a container query to stack the hero and notes when the rail leaves insufficient horizontal room. The 320px fallback heading was reduced to prevent text clipping.
+
+The 26-test suite covers contact destinations and 44px touch targets, shared strengths weights, anchored focus/history, pointer and keyboard resizing, persistence and reset, compact breakpoints, exact corner values, and opt-in embeds without external writes. Existing real-node assembly, accessibility, routing, and content coverage remains intact. The responsive capture matrix covers 375/430/768/1024/1440px in both themes; additional captures inspect 320px and maximum rail widths at 801px/1024px. Full build and production smoke pass, including 22 public URLs and unchanged V1 hashes.
+
+The source design detector retained two warnings about the existing Geist font and 144 contextual type/color/radius advisories across the broad existing stylesheets. The font and glass visual system are intentionally preserved for this scoped refinement. The new separator's 1px grip corners are decorative line geometry. No fonts or palette were replaced in response to these generic findings. Captures and detector output remain ignored development artifacts.
+
+## Background selection and About links · November 3, 2026
+
+About now includes secondary LinkedIn/GitHub buttons using the existing contact URLs. The sidebar's “Let’s connect” opens and focuses “Say hello”; repeated activation, direct refresh and history work. The sidebar's original-site link and prototype label are removed; footer access to V1 remains.
+
+Settings adds native radio choices for Device default, Shape Waves, Antigravity, Fractal, Aurora, Orbits, and None. Automatic defaults are Shape Waves above 800px and Aurora on compact screens. Explicit choices persist across visits and resizing, V1's separate preference is untouched, and blocked storage does not prevent selection for the current visit. Existing disabled-atmosphere preferences stay disabled. The V2 build adapter exposes existing background components read-only without V1's body observer, settings owner or host CSS; the build fails clearly if that extraction boundary changes. VGPU's MIT license ships with the other notices.
+
+Four new browser cases cover device defaults, persistence, exclusive renderer mounting, still motion treatments, contrast suppression, blocked storage, V1 preference isolation, assembly pause/resume, social destinations, anchored contact focus/history, and settings keyboard containment. Captures cover four selected backgrounds and Settings at 375px/1440px in both themes. Existing responsive coverage still checks all five widths and all views. Two older assembly fixtures expected the old background to remain mounted while disabled; they now explicitly select Orbits and test its real pause/resume. The full run passed 28 other cases; the corrected six-test assembly suite passed, verifying all 30 unique V2 cases.
+
+Additional live Edge inspection verified the actual Shape Waves WebGPU renderer reaches active state with correct 1440×1000 dimensions, hides its fallback only once ready, and shows the expected moving shapes behind glass. The still fallback was inspected separately, and mobile Aurora mounts without a canvas. Initial GPU startup can take a few seconds in headless Edge; the fallback keeps content available. These checks do not establish physical-device frame-rate guarantees.
+
+The scoped source design detector reports no findings. Full build and production smoke pass, including all 22 public URLs, five private-source exclusions, byte-identical public copies, and unchanged V1 core hashes. All edits in this follow-up remain within v2; no merge, deployment, commit, or push was performed.

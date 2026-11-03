@@ -105,10 +105,6 @@ function EmbedPanel({ type }) {
           {loaded ? "Close embedded view" : "Load embedded view"}
         </button>
       </div>
-      <p className="muted small">
-        Microsoft may require cookies or a sign-in. Opening in a new tab works
-        best on mobile.
-      </p>
       {loaded && (
         <iframe
           src={url}

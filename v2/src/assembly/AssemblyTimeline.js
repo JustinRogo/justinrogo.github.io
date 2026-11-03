@@ -12,7 +12,13 @@ function visibleBox(element, viewport) {
   const right = Math.min(viewport.width - 8, box.right);
   const bottom = Math.min(viewport.height - 8, box.bottom);
   return right - left >= 20 && bottom - top >= 18
-    ? { left, top, width: right - left, height: bottom - top }
+    ? {
+        left,
+        top,
+        width: right - left,
+        height: bottom - top,
+        radius: parseFloat(getComputedStyle(element).borderTopLeftRadius) || 0,
+      }
     : null;
 }
 
@@ -197,7 +203,7 @@ export function createAssemblyTimeline({
               y: 1,
               width: b.width - 2,
               height: b.height - 2,
-              rx: stroke ? 26 : text ? 2 : 12,
+              rx: stroke ? b.radius : text ? 1 : 6,
             },
             strokeDashoffset: 1,
           },

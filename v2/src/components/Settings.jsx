@@ -1,4 +1,5 @@
 import { Dialog } from "./UI.jsx";
+import { backgroundOptions } from "./PageBackground.jsx";
 export default function Settings({
   preferences,
   setPreferences,
@@ -57,18 +58,33 @@ export default function Settings({
           onChange={(e) => set({ intro: e.target.checked })}
         />
       </label>
-      <label className="switch-row">
-        <span>
-          <strong>Atmosphere</strong>
-          <small>Blue and orange light, with drifting orbital lines.</small>
-        </span>
-        <input
-          type="checkbox"
-          role="switch"
-          checked={preferences.atmosphere}
-          onChange={(e) => set({ atmosphere: e.target.checked })}
-        />
-      </label>
+      <fieldset>
+        <legend>Page background</legend>
+        <div className="background-options">
+          {backgroundOptions.map(({ id, name, description }) => (
+            <label key={id}>
+              <input
+                type="radio"
+                name="background"
+                value={id}
+                aria-label={name}
+                checked={
+                  (preferences.atmosphere === false
+                    ? "none"
+                    : preferences.background || "auto") === id
+                }
+                onChange={() =>
+                  set({ background: id, atmosphere: id !== "none" })
+                }
+              />
+              <span>
+                <strong>{name}</strong>
+                <small>{description}</small>
+              </span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
       <p className="small muted">
         Preferences and saved projects stay in this browser. V1 has separate
         settings.

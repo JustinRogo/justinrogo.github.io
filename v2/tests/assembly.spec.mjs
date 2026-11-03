@@ -20,7 +20,12 @@ test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
     localStorage.setItem(
       "jr-v2-preferences",
-      JSON.stringify({ theme: "dark", calm: false, atmosphere: false }),
+      JSON.stringify({
+        theme: "dark",
+        calm: false,
+        atmosphere: true,
+        background: "orbits",
+      }),
     );
     window.__assemblyArrivals = [];
     const observer = new MutationObserver((changes) => {

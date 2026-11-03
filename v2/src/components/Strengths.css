@@ -1,0 +1,207 @@
+/* Original CliftonStrengths domain colors; scoped to this feature, not the site palette. */
+.strengths,
+.strengths-preview {
+  --strength-thinking: #10b981;
+  --strength-relationship: #0066ff;
+  --strength-executing: #7c3aed;
+  --strength-influencing: #ff7e5f;
+}
+:is(.strengths, .strengths-preview) [data-domain="thinking"] {
+  --strength-color: var(--strength-thinking);
+  --strength-badge-ink: #071528;
+}
+:is(.strengths, .strengths-preview) [data-domain="relationship"] {
+  --strength-color: var(--strength-relationship);
+  --strength-badge-ink: #fff;
+}
+:is(.strengths, .strengths-preview) [data-domain="executing"] {
+  --strength-color: var(--strength-executing);
+  --strength-badge-ink: #fff;
+}
+:is(.strengths, .strengths-preview) [data-domain="influencing"] {
+  --strength-color: var(--strength-influencing);
+  --strength-badge-ink: #071528;
+}
+.strengths-preview {
+  display: block;
+  width: min(230px, 85%);
+  min-height: 44px;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.74rem;
+  padding: 4px 0;
+}
+.strengths-preview .strength-domain-bar {
+  margin: 0 0 9px;
+  height: 8px;
+}
+.strengths-preview > span {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.strengths-preview:hover {
+  color: var(--ink);
+}
+.strengths-preview:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 5px;
+}
+#cliftonstrengths {
+  scroll-margin-top: 24px;
+}
+.strengths-introduction {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.85fr) minmax(0, 1.5fr);
+  gap: 30px;
+  align-items: start;
+  margin-top: 26px;
+  margin-bottom: 30px;
+}
+.strength-overview {
+  min-width: 0;
+  margin: 0;
+  padding: 24px;
+  border-radius: 11px;
+  background: var(--glass-fill);
+}
+.strength-overview figcaption {
+  font-weight: 550;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+.strength-overview figcaption > span {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+.strength-domain-bar {
+  display: flex;
+  height: 12px;
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 22px 0;
+}
+.strength-domain-bar > span {
+  flex-basis: 0;
+  background: var(--strength-color);
+}
+.strength-domain-legend {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 13px;
+  font-size: 0.8rem;
+}
+.strength-domain-legend > li {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+.strength-domain-legend strong {
+  margin-left: auto;
+  flex: none;
+  font-weight: 550;
+  font-variant-numeric: tabular-nums;
+}
+.strength-swatch {
+  width: 8px;
+  height: 8px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--strength-color);
+}
+.strength-overview > p {
+  font-size: 0.74rem;
+  color: var(--muted);
+  line-height: 1.65;
+  margin-top: 22px;
+}
+.strength-reflection {
+  min-width: 0;
+}
+.strength-reflection > .filter-row {
+  margin-top: 0;
+  gap: 6px;
+}
+.strength-reflection > .filter-row > button {
+  min-height: 44px;
+  padding-inline: 12px;
+}
+.strength-reflection-content {
+  margin-top: 20px;
+}
+.strength-reflection-content > p {
+  max-width: 70ch;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.85;
+}
+.strengths .strength .strength-rank {
+  background: var(--strength-color);
+  color: var(--strength-badge-ink);
+  flex-shrink: 0;
+}
+.strengths .strength-domain {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.strengths .strength-domain::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--strength-color);
+}
+.strengths .strength-instruction {
+  margin-top: 15px;
+  font-size: 0.8rem;
+}
+.strengths .strength-list {
+  margin-top: 14px;
+}
+@media (max-width: 1000px) {
+  .strengths-introduction {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+  .strength-domain-legend {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 24px;
+  }
+}
+@media (max-width: 600px) {
+  .strength-overview {
+    padding: 22px;
+  }
+  .strength-domain-legend {
+    grid-template-columns: 1fr;
+  }
+  .strength-reflection > .filter-row > button {
+    flex: 1;
+    font-size: 0.76rem;
+  }
+  .strengths .strength-domain {
+    max-width: 88px;
+  }
+}
+@media (forced-colors: active) {
+  .strength-domain-bar {
+    border: 1px solid CanvasText;
+  }
+  .strength-domain-bar > span {
+    border-inline-end: 1px solid CanvasText;
+  }
+  .strengths .strength .strength-rank {
+    background: Canvas;
+    color: CanvasText;
+    border: 1px solid CanvasText;
+  }
+}

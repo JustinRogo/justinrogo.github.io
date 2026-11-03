@@ -24,10 +24,10 @@ export function LinkRow({ title, description, href, icon = "external" }) {
     </ExternalLink>
   );
 }
-export function SectionTitle({ children, action, ...props }) {
+export function SectionTitle({ children, action, headingProps, ...props }) {
   return (
     <div className="section-title" {...props}>
-      <h2>{children}</h2>
+      <h2 {...headingProps}>{children}</h2>
       {action}
     </div>
   );

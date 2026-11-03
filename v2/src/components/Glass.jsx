@@ -2,7 +2,7 @@ import GlassSurface from "../../../src/homepage/vendor/GlassSurface.jsx";
 import { useMedia } from "../hooks.js";
 
 // Refraction belongs behind the controls, never around their rendered content.
-export function GlassLayer({ radius = 24, className = "" }) {
+export function GlassLayer({ radius = 12, className = "" }) {
   const fine = useMedia("(hover: hover) and (pointer: fine)");
   const reduced = useMedia("(prefers-reduced-motion: reduce)");
   const transparency = useMedia("(prefers-reduced-transparency: reduce)");

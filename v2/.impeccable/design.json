@@ -732,7 +732,7 @@
         "columns": 4,
         "rowHeight": 170,
         "gap": 16,
-        "radius": 22,
+        "radius": 11,
         "glowColor": "#ff8a36",
         "textAutoHide": false,
         "enableMagnetism": false,
@@ -753,13 +753,15 @@
         "indent": 28,
         "trunk": 8,
         "radius": 8,
-        "defaultOpen": [0],
+        "defaultOpen": [
+          0
+        ],
         "drawDuration": "effects ? 420 : 0",
         "foldDuration": "effects ? 300 : 0",
         "selection": "Controlled from route parameters; native anchors and SVG chevron; collapsed content inert."
       }
     },
-    "breakpointBehavior": "Base floating rail 208px / workspace 244px; <=1150 rail 183px / workspace 216px; <=800 rail 68px / workspace 90px; <=600 floating dock and 14px main gutters. Bento measures its container using 150px minimum cells and 200px pair cells.",
+    "breakpointBehavior": "Desktop rail defaults to 240px; resizes from 200px to min(360px, max(240px, 32% viewport)); workspace offset equals width + 36px. <=800 rail 68px / workspace 90px; <=600 floating dock, 14px gutters, portrait/contact row and strengths below. Bento measures its container using 150px minimum cells and 200px pair cells.",
     "homepageAssembly": {
       "source": "v2/src/assembly/",
       "durationMs": 5800,
@@ -778,11 +780,26 @@
         "#ff90bc",
         "#ead777"
       ],
-      "label": "10px / 650 Geist, 6px radius, #071528 ink",
+      "label": "10px / 650 Geist, 3px radius, #071528 ink",
       "ownership": "Refs onto existing components; lifecycle-scoped GSAP presentation styles; no UI copies or remount",
       "replay": "Header control, Homepage assembly preference, and ?replayIntro=1",
       "bypass": "Reduced motion, Calm, increased contrast, forced colors, disabled flag, and ?intro=0",
-      "interrupt": "Input, focus, scroll, navigation, resize, visibility, font and observed geometry changes"
+      "interrupt": "Input, focus, scroll, navigation, resize, visibility, font and observed geometry changes",
+      "guideCorners": "Measured border-top-left-radius of the real target"
+    },
+    "cliftonStrengths": {
+      "source": "Read-only build extraction from src/homepage/legacy-widgets.js",
+      "domains": {
+        "thinking": "#10b981",
+        "relationship": "#0066ff",
+        "executing": "#7c3aed",
+        "influencing": "#ff7e5f"
+      },
+      "weighting": "35 minus rank across all 34 themes; 595 points total, unchanged by display filters",
+      "reflections": "Original best/overextended passages with native pressed-state buttons",
+      "presentation": "Overview beside reflections on desktop; stacked at 1000px; single-column legend at 600px",
+      "accessibility": "Text chart alternative, labeled percentages, contrast-aware rank badges, native theme disclosures",
+      "homePreview": "Shared weighted color bar beneath the portrait; #/about?section=strengths scrolls and focuses the section heading"
     },
     "sidebarBranches": {
       "placement": "Below primary navigation in the desktop sidebar; More at widths up to 800px",
@@ -794,11 +811,67 @@
         "Useful shortcuts",
         "Quick links"
       ],
-      "directoryPageCounts": { "Work": 5, "UCPEA": 4, "For Fun": 6 },
+      "directoryPageCounts": {
+        "Work": 5,
+        "UCPEA": 4,
+        "For Fun": 6
+      },
       "directoryRowHeight": 64,
+      "ucpeaHierarchy": {
+        "parent": "UCPEA Member Dashboard",
+        "children": [
+          "Current Contract",
+          "Contract History",
+          "Contract Comparison"
+        ],
+        "indent": 32,
+        "semantics": "Native nested lists; original destinations"
+      },
       "quickLinkCount": 11,
       "scroll": "Middle rail scrolls; contact/settings remain outside it",
       "source": "v2/src/components/ExploreMenu.jsx and v2/src/glass-theme.css"
+    },
+    "sidebarResize": {
+      "source": "v2/src/components/SidebarResize.jsx and v2/src/layout.css",
+      "default": 240,
+      "min": 200,
+      "max": 360,
+      "storage": "jr-v2-sidebar-width",
+      "keyboard": "Left/Right 8px; Shift 24px; Home/End limits; Enter or double-click reset",
+      "breakpoint": "min-width:801px"
+    },
+    "backgroundSelection": {
+      "source": "v2/src/components/PageBackground.jsx and .css; build adapter v2:backgrounds exposes existing V1 renderers read-only",
+      "default": "auto: shape-waves above 800px, aurora at or below 800px",
+      "choices": [
+        "auto",
+        "shape-waves",
+        "antigravity",
+        "fractal",
+        "aurora",
+        "orbits",
+        "none"
+      ],
+      "storage": "jr-v2-preferences.background; atmosphere:false remains None",
+      "ownership": "One selected renderer; no V1 body observer or settings controller; scoped V2 host CSS",
+      "motion": "Still while assembling, hidden, Calm or reduced motion; hidden for contrast/reduced transparency; bounded GPU renderers and static capability fallback",
+      "engines": {
+        "shapeWaves": "Existing React Bits + VGPU/WebGPU",
+        "antigravity": "Existing React Bits/WebGL",
+        "fractal": "Existing site Canvas 2D",
+        "aurora": "Existing site CSS glow structure",
+        "orbits": "Original V2 CSS/SVG"
+      },
+      "palette": [
+        "#0066ff",
+        "#00f2fe",
+        "#7c3aed"
+      ]
+    },
+    "aboutContacts": {
+      "intro": "LinkedIn and GitHub buttons reuse existing contact URLs",
+      "sidebar": "#/about?section=contact scrolls/focuses Say hello; repeated activation and direct refresh supported",
+      "removed": "Sidebar original-site link and prototype label only"
     }
   },
   "components": [
@@ -808,7 +881,7 @@
       "refersTo": "button-primary",
       "description": "Fixed orange action palette across both themes; hover brightens the fill.",
       "html": "<button class=\"ds-primary\">Explore my projects <svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.65\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14 m-6-6 6 6-6 6\"/></svg></button>",
-      "css": ".ds-primary{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:46px;padding:11px 18px;border:1px solid var(--line,#a9bfdf);border-radius:11px;font-family:Geist,system-ui,sans-serif;font-size:.875rem;font-weight:550;text-decoration:none;cursor:pointer;transition:background .2s,color .2s;background:#f88436;color:#071528;border:0;box-shadow:0 7px 20px -9px #ee6b22a0}.ds-primary:hover{background:#ffa25f;color:#071528}.ds-primary:focus-visible,.ds-secondary:focus-visible,.ds-icon:focus-visible,.ds-field:focus-visible,.ds-nav a:focus-visible,.ds-filter:focus-visible,.ds-project a:focus-visible,.ds-dialog button:focus-visible{outline:3px solid var(--blue,#125cd4);outline-offset:4px;}@media(prefers-reduced-motion:reduce){.ds-primary{transition:none}}"
+      "css": ".ds-primary{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:46px;padding:11px 18px;border:1px solid var(--line,#a9bfdf);border-radius:5.5px;font-family:Geist,system-ui,sans-serif;font-size:.875rem;font-weight:550;text-decoration:none;cursor:pointer;transition:background .2s,color .2s;background:#f88436;color:#071528;border:0;box-shadow:0 7px 20px -9px #ee6b22a0}.ds-primary:hover{background:#ffa25f;color:#071528}.ds-primary:focus-visible,.ds-secondary:focus-visible,.ds-icon:focus-visible,.ds-field:focus-visible,.ds-nav a:focus-visible,.ds-filter:focus-visible,.ds-project a:focus-visible,.ds-dialog button:focus-visible{outline:3px solid var(--blue,#125cd4);outline-offset:4px;}@media(prefers-reduced-motion:reduce){.ds-primary{transition:none}}"
     },
     {
       "name": "Secondary button",
@@ -816,7 +889,7 @@
       "refersTo": "button-secondary",
       "description": "Ruled translucent secondary action with navigation-colored hover.",
       "html": "<button class=\"ds-secondary\">Keep editing</button>",
-      "css": ".ds-secondary{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:46px;padding:11px 18px;border:1px solid var(--line,#a9bfdf);border-radius:11px;font-family:Geist,system-ui,sans-serif;font-size:.875rem;font-weight:550;text-decoration:none;cursor:pointer;transition:background .2s,color .2s;background:color-mix(in srgb,var(--surface,#f1f6ff) 40%,transparent);color:var(--ink,#112847)}.ds-secondary:hover{background:var(--nav,#c8d9f2)}.ds-primary:focus-visible,.ds-secondary:focus-visible,.ds-icon:focus-visible,.ds-field:focus-visible,.ds-nav a:focus-visible,.ds-filter:focus-visible,.ds-project a:focus-visible,.ds-dialog button:focus-visible{outline:3px solid var(--blue,#125cd4);outline-offset:4px;}@media(prefers-reduced-motion:reduce){.ds-secondary{transition:none}}"
+      "css": ".ds-secondary{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:46px;padding:11px 18px;border:1px solid var(--line,#a9bfdf);border-radius:5.5px;font-family:Geist,system-ui,sans-serif;font-size:.875rem;font-weight:550;text-decoration:none;cursor:pointer;transition:background .2s,color .2s;background:color-mix(in srgb,var(--surface,#f1f6ff) 40%,transparent);color:var(--ink,#112847)}.ds-secondary:hover{background:var(--nav,#c8d9f2)}.ds-primary:focus-visible,.ds-secondary:focus-visible,.ds-icon:focus-visible,.ds-field:focus-visible,.ds-nav a:focus-visible,.ds-filter:focus-visible,.ds-project a:focus-visible,.ds-dialog button:focus-visible{outline:3px solid var(--blue,#125cd4);outline-offset:4px;}@media(prefers-reduced-motion:reduce){.ds-secondary{transition:none}}"
     },
     {
       "name": "Icon button",
@@ -824,7 +897,7 @@
       "refersTo": "icon-button",
       "description": "Quiet icon action with an accessible label and 44px target.",
       "html": "<button class=\"ds-icon\" aria-label=\"Appearance and motion settings\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.65\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 7h16 M4 17h16 M8 4v6 M16 14v6\"/></svg></button>",
-      "css": ".ds-icon{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;border:0;border-radius:8px;background:transparent;color:var(--ink,#112847);cursor:pointer}.ds-icon:hover{background:var(--nav,#c8d9f2)}.ds-primary:focus-visible,.ds-secondary:focus-visible,.ds-icon:focus-visible,.ds-field:focus-visible,.ds-nav a:focus-visible,.ds-filter:focus-visible,.ds-project a:focus-visible,.ds-dialog button:focus-visible{outline:3px solid var(--blue,#125cd4);outline-offset:4px;}"
+      "css": ".ds-icon{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;border:0;border-radius:4px;background:transparent;color:var(--ink,#112847);cursor:pointer}.ds-icon:hover{background:var(--nav,#c8d9f2)}.ds-primary:focus-visible,.ds-secondary:focus-visible,.ds-icon:focus-visible,.ds-field:focus-visible,.ds-nav a:focus-visible,.ds-filter:focus-visible,.ds-project a:focus-visible,.ds-dialog button:focus-visible{outline:3px solid var(--blue,#125cd4);outline-offset:4px;}"
     },
     {
       "name": "Native text field",
@@ -832,7 +905,7 @@
       "refersTo": "field",
       "description": "Visible compact label above a native text input.",
       "html": "<label class=\"ds-label\">Name<input class=\"ds-field\" type=\"text\" placeholder=\"Your name\"></label>",
-      "css": ".ds-label{display:flex;flex-direction:column;gap:8px;font-family:Geist,system-ui,sans-serif;font-size:.78rem;font-weight:550;color:var(--ink,#112847)}.ds-field{min-width:0;max-width:100%;border:1px solid var(--line,#a9bfdf);border-radius:7px;background:var(--bg,#e6efff);color:var(--ink,#112847);padding:12px 13px;font-family:Geist,system-ui,sans-serif;font-size:1rem;font-weight:400;caret-color:var(--blue,#125cd4)}.ds-field::placeholder{color:var(--muted,#425875)}.ds-primary:focus-visible,.ds-secondary:focus-visible,.ds-icon:focus-visible,.ds-field:focus-visible,.ds-nav a:focus-visible,.ds-filter:focus-visible,.ds-project a:focus-visible,.ds-dialog button:focus-visible{outline:3px solid var(--blue,#125cd4);outline-offset:4px;}"
+      "css": ".ds-label{display:flex;flex-direction:column;gap:8px;font-family:Geist,system-ui,sans-serif;font-size:.78rem;font-weight:550;color:var(--ink,#112847)}.ds-field{min-width:0;max-width:100%;border:1px solid var(--line,#a9bfdf);border-radius:3.5px;background:var(--bg,#e6efff);color:var(--ink,#112847);padding:12px 13px;font-family:Geist,system-ui,sans-serif;font-size:1rem;font-weight:400;caret-color:var(--blue,#125cd4)}.ds-field::placeholder{color:var(--muted,#425875)}.ds-primary:focus-visible,.ds-secondary:focus-visible,.ds-icon:focus-visible,.ds-field:focus-visible,.ds-nav a:focus-visible,.ds-filter:focus-visible,.ds-project a:focus-visible,.ds-dialog button:focus-visible{outline:3px solid var(--blue,#125cd4);outline-offset:4px;}"
     },
     {
       "name": "Labeled navigation",
@@ -840,7 +913,7 @@
       "refersTo": "navigation-active",
       "description": "The shared five-destination rail/dock: orange current text, mixed-color desktop selection, orange phone selection.",
       "html": "<nav class=\"ds-nav\" aria-label=\"Primary navigation\"><a href=\"#/home\" aria-current=\"page\"><svg width=\"21\" height=\"21\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.65\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z\"/></svg><span>Home</span><i class=\"ds-dot\"></i></a><a href=\"#/projects\"><svg width=\"21\" height=\"21\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.65\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z\"/></svg><span>Projects</span></a><a href=\"#/tools\"><svg width=\"21\" height=\"21\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.65\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m14 6 4 4 M4 20l9-9 M20 3a6 6 0 0 1-8 8L4 19a2 2 0 0 1-3-3l8-8a6 6 0 0 1 8-8l-4 4 3 3Z\"/></svg><span>Tools</span></a><a href=\"#/about\"><svg width=\"21\" height=\"21\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.65\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M20 21v-2a7 7 0 0 0-14 0v2 M17 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0\"/></svg><span>About</span></a><a href=\"#/more\"><svg width=\"21\" height=\"21\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.65\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 6h16 M4 12h16 M4 18h16\"/></svg><span>More</span></a></nav>",
-      "css": ".ds-nav{display:flex;flex-direction:column;gap:7px;font-family:Geist,system-ui,sans-serif;}.ds-nav a{display:flex;align-items:center;gap:13px;padding:12px 14px;min-height:48px;border-radius:8px;text-decoration:none;font-size:.88rem;color:var(--muted,#425875)}.ds-nav a:hover{background:var(--nav,#c8d9f2);color:var(--ink,#112847)}.ds-nav a[aria-current]{color:var(--blue,#125cd4);background:var(--tint,#d7e6ff);font-weight:600}.ds-dot{width:5px;height:5px;border-radius:50%;background:currentColor;margin-left:auto}.ds-primary:focus-visible,.ds-secondary:focus-visible,.ds-icon:focus-visible,.ds-field:focus-visible,.ds-nav a:focus-visible,.ds-filter:focus-visible,.ds-project a:focus-visible,.ds-dialog button:focus-visible{outline:3px solid var(--blue,#125cd4);outline-offset:4px;}@media(max-width:600px){.ds-nav{flex-direction:row;gap:0;padding:7px;background:var(--surface,#f1f6ff);border-top:1px solid var(--line,#a9bfdf)}.ds-nav a{flex:1;flex-direction:column;gap:5px;border-radius:9px;min-height:57px;padding:7px 2px;font-size:.69rem;justify-content:center;line-height:1.2}.ds-dot{display:none}}@media(forced-colors:active){.ds-nav a{border:1px solid ButtonText}.ds-nav a[aria-current]{outline:2px solid Highlight}}.ds-nav a{border-radius:12px;transition:color .2s,background .2s,transform .35s cubic-bezier(.16,1,.3,1)}.ds-nav a:hover{transform:translateX(3px)}.ds-nav a[aria-current]{color:var(--orange,#a83c04);background:linear-gradient(120deg,color-mix(in srgb,var(--blue,#125cd4) 18%,transparent),color-mix(in srgb,var(--orange,#a83c04) 10%,transparent))}@media(max-width:600px){.ds-nav{background:color-mix(in srgb,var(--surface,#f1f6ff) 94%,transparent);border:0;border-radius:20px;padding:6px;gap:2px}.ds-nav a{border-radius:14px;min-height:59px}.ds-nav a:hover{transform:none}.ds-nav a[aria-current]{background:color-mix(in srgb,var(--orange,#a83c04) 14%,transparent)}}@media(prefers-reduced-motion:reduce){.ds-nav a{transition:none}}"
+      "css": ".ds-nav{display:flex;flex-direction:column;gap:7px;font-family:Geist,system-ui,sans-serif;}.ds-nav a{display:flex;align-items:center;gap:13px;padding:12px 14px;min-height:48px;border-radius:4px;text-decoration:none;font-size:.88rem;color:var(--muted,#425875)}.ds-nav a:hover{background:var(--nav,#c8d9f2);color:var(--ink,#112847)}.ds-nav a[aria-current]{color:var(--blue,#125cd4);background:var(--tint,#d7e6ff);font-weight:600}.ds-dot{width:5px;height:5px;border-radius:50%;background:currentColor;margin-left:auto}.ds-primary:focus-visible,.ds-secondary:focus-visible,.ds-icon:focus-visible,.ds-field:focus-visible,.ds-nav a:focus-visible,.ds-filter:focus-visible,.ds-project a:focus-visible,.ds-dialog button:focus-visible{outline:3px solid var(--blue,#125cd4);outline-offset:4px;}@media(max-width:600px){.ds-nav{flex-direction:row;gap:0;padding:7px;background:var(--surface,#f1f6ff);border-top:1px solid var(--line,#a9bfdf)}.ds-nav a{flex:1;flex-direction:column;gap:5px;border-radius:4.5px;min-height:57px;padding:7px 2px;font-size:.69rem;justify-content:center;line-height:1.2}.ds-dot{display:none}}@media(forced-colors:active){.ds-nav a{border:1px solid ButtonText}.ds-nav a[aria-current]{outline:2px solid Highlight}}.ds-nav a{border-radius:6px;transition:color .2s,background .2s,transform .35s cubic-bezier(.16,1,.3,1)}.ds-nav a:hover{transform:translateX(3px)}.ds-nav a[aria-current]{color:var(--orange,#a83c04);background:linear-gradient(120deg,color-mix(in srgb,var(--blue,#125cd4) 18%,transparent),color-mix(in srgb,var(--orange,#a83c04) 10%,transparent))}@media(max-width:600px){.ds-nav{background:color-mix(in srgb,var(--surface,#f1f6ff) 94%,transparent);border:0;border-radius:10px;padding:6px;gap:2px}.ds-nav a{border-radius:7px;min-height:59px}.ds-nav a:hover{transform:none}.ds-nav a[aria-current]{background:color-mix(in srgb,var(--orange,#a83c04) 14%,transparent)}}@media(prefers-reduced-motion:reduce){.ds-nav a{transition:none}}"
     },
     {
       "name": "Category filter",
@@ -848,7 +921,7 @@
       "refersTo": "filter",
       "description": "Category filter with count; selected state uses its fixed orange pair.",
       "html": "<button class=\"ds-filter\" aria-pressed=\"true\">All <span>15</span></button> <button class=\"ds-filter\" aria-pressed=\"false\">Library <span>3</span></button>",
-      "css": ".ds-filter{min-height:42px;padding:8px 15px;border:0;background:none;color:var(--muted,#425875);font-family:Geist,system-ui,sans-serif;font-size:.82rem;border-radius:7px;cursor:pointer}.ds-filter span{font-size:.7rem;margin-left:9px;opacity:.75}.ds-filter:hover{background:var(--nav,#c8d9f2)}.ds-filter[aria-pressed=true]{background:#ed7e34;color:#06152b}.ds-primary:focus-visible,.ds-secondary:focus-visible,.ds-icon:focus-visible,.ds-field:focus-visible,.ds-nav a:focus-visible,.ds-filter:focus-visible,.ds-project a:focus-visible,.ds-dialog button:focus-visible{outline:3px solid var(--blue,#125cd4);outline-offset:4px;}@media(forced-colors:active){.ds-filter{border:1px solid ButtonText}}"
+      "css": ".ds-filter{min-height:42px;padding:8px 15px;border:0;background:none;color:var(--muted,#425875);font-family:Geist,system-ui,sans-serif;font-size:.82rem;border-radius:3.5px;cursor:pointer}.ds-filter span{font-size:.7rem;margin-left:9px;opacity:.75}.ds-filter:hover{background:var(--nav,#c8d9f2)}.ds-filter[aria-pressed=true]{background:#ed7e34;color:#06152b}.ds-primary:focus-visible,.ds-secondary:focus-visible,.ds-icon:focus-visible,.ds-field:focus-visible,.ds-nav a:focus-visible,.ds-filter:focus-visible,.ds-project a:focus-visible,.ds-dialog button:focus-visible{outline:3px solid var(--blue,#125cd4);outline-offset:4px;}@media(forced-colors:active){.ds-filter{border:1px solid ButtonText}}"
     },
     {
       "name": "Technology tag",
@@ -856,7 +929,7 @@
       "refersTo": "technology-tag",
       "description": "Noninteractive technology label with glass fill and a fine rule.",
       "html": "<div class=\"ds-tags\"><span>Power BI</span><span>Python</span><span>HTML / CSS / JavaScript</span></div>",
-      "css": ".ds-tags{display:flex;flex-wrap:wrap;gap:8px;font-family:Geist,system-ui,sans-serif;color:var(--ink,#112847)}.ds-tags span{font-size:.79rem;padding:8px 13px;background:var(--glass-fill,rgba(235,244,255,.72));border:1px solid var(--line,#a9bfdf);border-radius:6px}"
+      "css": ".ds-tags{display:flex;flex-wrap:wrap;gap:8px;font-family:Geist,system-ui,sans-serif;color:var(--ink,#112847)}.ds-tags span{font-size:.79rem;padding:8px 13px;background:var(--glass-fill,rgba(235,244,255,.72));border:1px solid var(--line,#a9bfdf);border-radius:3px}"
     },
     {
       "name": "Glass project bento",
@@ -864,14 +937,14 @@
       "refersTo": "bento-card",
       "description": "Existing project content and index action on the actual bento's frosted fallback material; dynamic refraction, tilt and spotlight require the app engine.",
       "html": "<div class=\"ds-bento\"><a class=\"ds-bento-project\" href=\"../Pages/For%20Fun/Wave-Function-Collapse.html\" target=\"_blank\" rel=\"noopener noreferrer\"><h3>Wave Function Collapse</h3><span>Generative Playground</span><p>Generate circuits, islands, and ribbons, or paint a sample to create your own patterns.</p><div class=\"ds-bento-open\">Open project <svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.65\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7 17 17 7 M7 7h10v10\"/></svg></div></a><a class=\"ds-bento-index\" href=\"#/projects\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.65\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z\"/></svg><h3>Keep exploring.</h3><p>Work, library tools,<br>and experiments.</p><div class=\"ds-bento-open\">The project index <svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.65\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14 m-6-6 6 6-6 6\"/></svg></div></a></div>",
-      "css": ".ds-bento{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:170px;gap:16px;font-family:Geist,system-ui,sans-serif;color:var(--ink,#112847)}.ds-bento a{position:relative;display:flex;flex-direction:column;align-items:flex-start;padding:23px 24px;border-radius:22px;background:var(--glass-fill,rgba(235,244,255,.72));backdrop-filter:blur(16px);box-shadow:var(--panel-shadow,0 20px 56px -26px rgba(22,56,108,.34)),inset 0 0 0 1px var(--glass-edge,rgba(255,255,255,.8));color:inherit;text-decoration:none;overflow:hidden}.ds-bento-project{grid-column:span 2;grid-row:span 2;justify-content:flex-end}.ds-bento h3{font-size:1.2rem;margin:0 0 5px;font-weight:550;letter-spacing:-.03em;line-height:1.12}.ds-bento-project h3{font-size:1.7rem;max-width:16ch}.ds-bento a>span{font-size:.7rem;color:var(--muted,#425875)}.ds-bento p{font-size:.76rem;line-height:1.65;color:var(--muted,#425875);margin:10px 0 0}.ds-bento-open{margin-top:auto;padding-top:13px;display:flex;align-items:center;gap:9px;width:100%;font-size:.68rem;font-weight:550;color:var(--orange,#a83c04)}.ds-bento-open svg{margin-left:auto}.ds-bento .ds-bento-index{padding:22px;background:linear-gradient(135deg,#1855bc30,#ff8a3612)}.ds-bento-index>svg{color:var(--orange,#a83c04);margin-bottom:12px}.ds-bento-index h3{font-size:1.1rem}.ds-bento-index p{font-size:.73rem;margin-top:4px}.ds-bento a:focus-visible,.ds-branch a:focus-visible,.ds-branch button:focus-visible{outline:3px solid var(--orange,#a83c04);outline-offset:4px}@media(max-width:600px){.ds-bento{grid-template-columns:1fr;gap:13px;grid-auto-rows:minmax(180px,auto)}.ds-bento-project{grid-column:span 1;grid-row:span 1;min-height:320px}}@media(prefers-reduced-transparency:reduce),(prefers-contrast:more){.ds-bento a{background:var(--surface,#f1f6ff);backdrop-filter:none}}@media(forced-colors:active){.ds-bento a{background:Canvas;border:1px solid CanvasText;box-shadow:none}}"
+      "css": ".ds-bento{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:170px;gap:16px;font-family:Geist,system-ui,sans-serif;color:var(--ink,#112847)}.ds-bento a{position:relative;display:flex;flex-direction:column;align-items:flex-start;padding:23px 24px;border-radius:11px;background:var(--glass-fill,rgba(235,244,255,.72));backdrop-filter:blur(16px);box-shadow:var(--panel-shadow,0 20px 56px -26px rgba(22,56,108,.34)),inset 0 0 0 1px var(--glass-edge,rgba(255,255,255,.8));color:inherit;text-decoration:none;overflow:hidden}.ds-bento-project{grid-column:span 2;grid-row:span 2;justify-content:flex-end}.ds-bento h3{font-size:1.2rem;margin:0 0 5px;font-weight:550;letter-spacing:-.03em;line-height:1.12}.ds-bento-project h3{font-size:1.7rem;max-width:16ch}.ds-bento a>span{font-size:.7rem;color:var(--muted,#425875)}.ds-bento p{font-size:.76rem;line-height:1.65;color:var(--muted,#425875);margin:10px 0 0}.ds-bento-open{margin-top:auto;padding-top:13px;display:flex;align-items:center;gap:9px;width:100%;font-size:.68rem;font-weight:550;color:var(--orange,#a83c04)}.ds-bento-open svg{margin-left:auto}.ds-bento .ds-bento-index{padding:22px;background:linear-gradient(135deg,#1855bc30,#ff8a3612)}.ds-bento-index>svg{color:var(--orange,#a83c04);margin-bottom:12px}.ds-bento-index h3{font-size:1.1rem}.ds-bento-index p{font-size:.73rem;margin-top:4px}.ds-bento a:focus-visible,.ds-branch a:focus-visible,.ds-branch button:focus-visible{outline:3px solid var(--orange,#a83c04);outline-offset:4px}@media(max-width:600px){.ds-bento{grid-template-columns:1fr;gap:13px;grid-auto-rows:minmax(180px,auto)}.ds-bento-project{grid-column:span 1;grid-row:span 1;min-height:320px}}@media(prefers-reduced-transparency:reduce),(prefers-contrast:more){.ds-bento a{background:var(--surface,#f1f6ff);backdrop-filter:none}}@media(forced-colors:active){.ds-bento a{background:Canvas;border:1px solid CanvasText;box-shadow:none}}"
     },
     {
       "name": "Expanded branch shortcuts",
       "kind": "nav",
       "description": "Source-derived expanded branch geometry and native route links. App code owns folding, inert collapsed content, URL selection, and trace animation.",
       "html": "<nav class=\"ds-branch\" aria-label=\"Explore shortcuts\"><button aria-expanded=\"true\">Projects <svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.65\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m9 5 7 7-7 7\"/></svg></button><div class=\"ds-branch-tree\"><svg class=\"ds-branch-lines\" width=\"28\" height=\"100\" aria-hidden=\"true\"><path d=\"M8 0V72 M8 20A8 8 0 0 0 16 28H24 M8 64A8 8 0 0 0 16 72H24\"/></svg><a href=\"#/projects?group=Work\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.65\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m8 5-7 7 7 7 m8-14 7 7-7 7 M14 2l-4 20\"/></svg> Work &amp; tools</a><a href=\"#/projects?group=Library\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.65\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 5C8 2 3 3 2 4v16c3-1 7-1 10 1 3-2 7-2 10-1V4c-3-1-7-1-10 1Z M12 5v16\"/></svg> Library projects</a></div></nav>",
-      "css": ".ds-branch{position:relative;padding-left:14px;max-width:260px;font-family:Geist,system-ui,sans-serif;font-size:12px;line-height:1.2;color:var(--ink,#112847)}.ds-branch:before{content:\"\";position:absolute;top:8px;bottom:0;left:0;width:2px;border-radius:1px;background:linear-gradient(to bottom,var(--branch-line,#86a4ce) 0%,var(--branch-line,#86a4ce) 55%,transparent 100%)}.ds-branch button{display:flex;align-items:center;min-height:44px;margin:0;padding:9px 0;border:0;background:none;color:inherit;font-family:Geist,system-ui,sans-serif;font-size:13px;font-weight:500;cursor:pointer;text-align:left}.ds-branch button>svg{margin-left:12px;color:var(--orange,#a83c04);transform:rotate(90deg)}.ds-branch-tree{position:relative;padding:6px 0}.ds-branch-lines{position:absolute;top:0;left:0;fill:none;stroke:var(--branch-line,#86a4ce);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}.ds-branch a{display:flex;align-items:center;gap:8px;min-height:44px;padding-left:28px;color:var(--muted,#425875);text-decoration:none;transition:color .2s}.ds-branch a:hover{color:var(--ink,#112847)}.ds-bento a:focus-visible,.ds-branch a:focus-visible,.ds-branch button:focus-visible{outline:3px solid var(--orange,#a83c04);outline-offset:4px}@media(prefers-reduced-motion:reduce){.ds-branch a{transition:none}}"
+      "css": ".ds-branch{position:relative;padding-left:14px;max-width:260px;font-family:Geist,system-ui,sans-serif;font-size:12px;line-height:1.2;color:var(--ink,#112847)}.ds-branch:before{content:\"\";position:absolute;top:8px;bottom:0;left:0;width:2px;border-radius:0.5px;background:linear-gradient(to bottom,var(--branch-line,#86a4ce) 0%,var(--branch-line,#86a4ce) 55%,transparent 100%)}.ds-branch button{display:flex;align-items:center;min-height:44px;margin:0;padding:9px 0;border:0;background:none;color:inherit;font-family:Geist,system-ui,sans-serif;font-size:13px;font-weight:500;cursor:pointer;text-align:left}.ds-branch button>svg{margin-left:12px;color:var(--orange,#a83c04);transform:rotate(90deg)}.ds-branch-tree{position:relative;padding:6px 0}.ds-branch-lines{position:absolute;top:0;left:0;fill:none;stroke:var(--branch-line,#86a4ce);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}.ds-branch a{display:flex;align-items:center;gap:8px;min-height:44px;padding-left:28px;color:var(--muted,#425875);text-decoration:none;transition:color .2s}.ds-branch a:hover{color:var(--ink,#112847)}.ds-bento a:focus-visible,.ds-branch a:focus-visible,.ds-branch button:focus-visible{outline:3px solid var(--orange,#a83c04);outline-offset:4px}@media(prefers-reduced-motion:reduce){.ds-branch a{transition:none}}"
     },
     {
       "name": "Tech name fallback",
@@ -886,7 +959,7 @@
     "overview": "Ice-blue or deep navy ground, refractive glass, blue light, orange actions, and orbital geometry give practical information work a vivid interactive setting. Geist and consistent line icons keep the material system legible. This user-pinned world applies only to `v2/` and supersedes its earlier notebook direction.\n\nThe four requested React components define the experience: Tech Text makes the name respond to pointers and taps; Magic Bento presents actual selected projects with light and tilt; Branched Menu unfolds native-link shortcuts; Glass Surface renders refraction behind content. The atmosphere drifts when effects are enabled. Calm mode, system accessibility preferences, touch capabilities, active-view state, and page visibility govern the effects.",
     "keyCharacteristics": [
       "Ice-blue and navy themes with legible orange actions and blue illumination.",
-      "Floating glass panels, rounded geometry, soft depth, and orbital lines.",
+      "Floating glass panels, tighter box corners, soft depth, and orbital lines.",
       "Interactive identity, content-backed bento, and folding branch shortcuts.",
       "Native navigation and task controls with deliberate motion and transparency fallbacks."
     ],
