@@ -43,6 +43,9 @@ export function createAssemblyTimeline({
     clamp(compact ? config.mobileDuration : config.duration, 1200, 6000) / 1000;
   const intensity = clamp(config.intensity, 0, 1);
   const crewEntry = clamp(config.crewEntry ?? 0.35, 0.2, 0.6);
+  // Preparation hides the real nodes before playback takes its own snapshots.
+  // Revert it last: GSAP's equal-time tween sorting differs between JS engines.
+  const preparation = gsap.context(() => {});
   const context = gsap.context(() => {});
   let timeline;
   let preparing = true;
@@ -64,7 +67,7 @@ export function createAssemblyTimeline({
     if (!preparing || !assemblyTasks.some((task) => task.id === id)) return;
     if (!visibleBox(element, viewport) || staged.has(element)) return;
     staged.add(element);
-    context.add(() => gsap.set(element, { opacity: 0 }));
+    preparation.add(() => gsap.set(element, { opacity: 0 }));
   }
   context.add(() => {
     gsap.set(layer, { visibility: "visible", opacity: 1 });
@@ -305,6 +308,7 @@ export function createAssemblyTimeline({
     destroy: () => {
       preparing = false;
       context.revert();
+      preparation.revert();
     },
     get duration() {
       return total * 1000;

@@ -219,6 +219,36 @@ test("desktop and phone assemble the original nodes at measured coordinates and 
   expect(errors).toEqual([]);
 });
 
+test("cleanup restores content when equal-time tweens revert in creation order", async ({ page }) => {
+  await page.addInitScript(() => {
+    const sort = Array.prototype.sort;
+    Array.prototype.sort = function (compare) {
+      // GSAP's equal-time comparator returns a negative value in both directions.
+      // Firefox can keep those tweens in creation order, unlike Chromium.
+      if (!this.length || !this.every((entry) =>
+        typeof entry?.g === "number" && typeof entry?.t?.revert === "function"
+      )) return sort.call(this, compare);
+      const order = new Map(this.map((entry, index) => [entry, index]));
+      return sort.call(this, (a, b) =>
+        a.g === b.g ? order.get(a) - order.get(b) : compare(a, b)
+      );
+    };
+  });
+  await page.goto("/v2/");
+  await expect(layer(page)).toHaveAttribute("data-assembly-state", "assembling");
+  await expect(layer(page)).toHaveAttribute("data-assembly-state", "complete", { timeout: 10000 });
+  const hidden = await page.locator("[data-assembly-id],.magic-bento__cell")
+    .evaluateAll((nodes) => nodes.filter((node) => getComputedStyle(node).opacity === "0")
+      .map((node) => node.dataset.assemblyId || node.className));
+  expect(hidden).toEqual([]);
+  expect(await page.locator("[data-assembly-id],.magic-bento__cell")
+    .evaluateAll((nodes) => nodes.every((node) =>
+      !node.style.opacity && !node.style.transform && !node.style.clipPath
+    ))).toBe(true);
+  await expect(page.locator(".glass-hero")).toHaveCSS("opacity", "1");
+  await expect(page.locator(".hero-actions")).toHaveCSS("opacity", "1");
+});
+
 test("navigation remains clickable during preparation, wireframing, and crew assembly", async ({
   page,
 }) => {

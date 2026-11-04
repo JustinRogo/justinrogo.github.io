@@ -18,7 +18,7 @@ There is one homepage DOM tree throughout. The heading, portrait, links, cards, 
 
 The V2 HTML entry starts with an empty React root instead of boot-time loading copy; the existing no-JavaScript link to V1 remains available.
 
-The initial layout is reserved by the actual components. GSAP temporarily owns presentation styles inside a lifecycle context; it never replaces text, inserts interface copies, or changes layout-driving dimensions. At completion or interruption, the context restores the original inline styles. No homepage remount, overlay-to-page crossfade, or final component swap occurs.
+The initial layout is reserved by the actual components. GSAP temporarily owns presentation styles inside lifecycle contexts; it never replaces text, inserts interface copies, or changes layout-driving dimensions. Preparation's temporary opacity styles have their own context, which is restored after the playback context at completion or interruption. This keeps equal-time tween cleanup ordering from leaving content invisible in Firefox. No homepage remount, overlay-to-page crossfade, or final component swap occurs.
 
 ## Configuration and choreography
 
