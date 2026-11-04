@@ -46,7 +46,7 @@ test("all manifest destinations survive, with filtering, direct title links and 
   page,
 }) => {
   await page.goto("/v2/#/projects");
-  await expect(page.locator(".project-row")).toHaveCount(manifest.pages.length);
+  await expect(page.locator(".project-card")).toHaveCount(manifest.pages.length);
   for (const item of manifest.pages) {
     await expect(
       page.getByRole("link", { name: `Open ${item.title}`, exact: true }),
@@ -60,9 +60,9 @@ test("all manifest destinations survive, with filtering, direct title links and 
     .getByRole("group", { name: "Project categories" })
     .getByRole("button", { name: /^For Fun/ })
     .click();
-  await expect(page.locator(".project-row")).toHaveCount(6);
+  await expect(page.locator(".project-card")).toHaveCount(6);
   await page.getByRole("searchbox", { name: "Search projects" }).fill("wave");
-  await expect(page.locator(".project-row")).toHaveCount(1);
+  await expect(page.locator(".project-card")).toHaveCount(1);
   await page
     .getByRole("button", { name: "Save Wave Function Collapse", exact: true })
     .click();
@@ -88,7 +88,7 @@ test("all manifest destinations survive, with filtering, direct title links and 
     page.getByRole("heading", { name: "No projects found." }),
   ).toBeVisible();
   await page.getByRole("button", { name: "Browse all projects" }).click();
-  await expect(page.locator(".project-row")).toHaveCount(manifest.pages.length);
+  await expect(page.locator(".project-card")).toHaveCount(manifest.pages.length);
 });
 
 test("browser history, direct routes, navigation focus and refreshes work", async ({
@@ -426,7 +426,7 @@ test("branched shortcuts use normal links and collapsed groups leave keyboard or
   await shortcuts
     .getByRole("link", { name: "Library projects", exact: true })
     .click();
-  await expect(page.locator(".project-row")).toHaveCount(3);
+  await expect(page.locator(".project-card")).toHaveCount(3);
 });
 
 test("source failures have recovery actions and retain access to the original site", async ({
@@ -439,7 +439,7 @@ test("source failures have recovery actions and retain access to the original si
   await expect(page.getByRole("button", { name: "Try again" })).toBeVisible();
   await page.unroute("**/data/pages.json");
   await page.getByRole("button", { name: "Try again" }).click();
-  await expect(page.locator(".project-row")).toHaveCount(manifest.pages.length);
+  await expect(page.locator(".project-card")).toHaveCount(manifest.pages.length);
 });
 
 test("original Work, UCPEA and For Fun collections expose every page on desktop and phone", async ({
@@ -654,4 +654,37 @@ test("responsive visual and overflow review across five sizes, both themes and e
     }
   }
   expect(errors).toEqual([]);
+});
+
+test("Projects & Pages uses a responsive bento gallery with a UCPEA filter", async ({ page }) => {
+  await page.goto("/v2/#/projects");
+  await expect(page.getByRole("heading", { name: "Projects & Pages", exact: true })).toBeVisible();
+  await expect(page.locator(".view-projects .page-heading p, .view-projects .end-note")).toHaveCount(0);
+  await expect(page.locator(".project-bento .magic-bento__card")).toHaveCount(manifest.pages.length);
+  await page.getByRole("group", { name: "Project categories" }).getByRole("button", { name: /^UCPEA/ }).click();
+  await expect(page).toHaveURL(/group=UCPEA/);
+  const unionPages = manifest.pages.filter((project) => project.path.includes("/UCPEA/"));
+  await expect(page.locator(".project-card")).toHaveCount(unionPages.length);
+  for (const project of unionPages) {
+    await expect(page.getByRole("heading", { name: project.title, exact: true })).toBeVisible();
+  }
+  await page.getByRole("searchbox", { name: "Search projects" }).fill("comparison");
+  await expect(page.locator(".project-card")).toHaveCount(1);
+  await page.getByRole("button", { name: /^Save UCPEA Contract Comparison/ }).click();
+  await page.getByRole("button", { name: /^Saved/ }).click();
+  await page.reload();
+  await expect(page.locator(".project-card")).toHaveCount(1);
+  await expect(page.getByRole("button", { name: /^Unsave UCPEA Contract Comparison/ })).toHaveAttribute("aria-pressed", "true");
+  await page.goto("/v2/#/projects");
+  for (const width of [375, 781, 921, 1440]) {
+    await page.setViewportSize({ width, height: 1004 });
+    await expect(page.locator(".project-bento .magic-bento__card")).toHaveCount(manifest.pages.length);
+    await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
+    const clipped = await page.locator(".project-card").evaluateAll((cards) => cards.some((card) => {
+      const parent = card.closest(".magic-bento__card").getBoundingClientRect();
+      const content = card.getBoundingClientRect();
+      return content.bottom > parent.bottom + 1 || content.right > parent.right + 1;
+    }));
+    expect(clipped).toBe(false);
+  }
 });

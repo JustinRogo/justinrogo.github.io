@@ -1,7 +1,12 @@
-import { groupOf, projectHref } from "../content.js";
+import { groupOf } from "../content.js";
 import Icon from "../components/Icon.jsx";
-import { ProjectRow } from "../components/Project.jsx";
+import { ProjectCard } from "../components/Project.jsx";
 import { LoadState } from "../components/UI.jsx";
+import MagicBento from "../vendor/MagicBento.jsx";
+
+const inGroup = (project, group) =>
+  group === "All" ||
+  (group === "UCPEA" ? project.path.includes("/UCPEA/") : groupOf(project) === group);
 
 export function setProjectParams(params, changes, replace = false) {
   const next = new URLSearchParams(params);
@@ -14,14 +19,21 @@ export function setProjectParams(params, changes, replace = false) {
     window.dispatchEvent(new HashChangeEvent("hashchange"));
   } else location.hash = hash;
 }
-export default function Projects({ projects, params, saved, onSave, effects }) {
+export default function Projects({
+  projects,
+  params,
+  saved,
+  onSave,
+  effects,
+  theme,
+}) {
   const group = params.get("group") || "All";
   const query = params.get("q") || "";
   const onlySaved = params.get("saved") === "1";
   const pages = projects.data?.pages || [];
   const matches = pages.filter(
     (p) =>
-      (group === "All" || groupOf(p) === group) &&
+      inGroup(p, group) &&
       (!onlySaved || saved.includes(p.path)) &&
       `${p.title} ${p.description} ${p.category}`
         .toLowerCase()
@@ -30,12 +42,7 @@ export default function Projects({ projects, params, saved, onSave, effects }) {
   return (
     <>
       <div className="page-heading">
-        <h1 tabIndex={-1}>
-          The project index<span className="title-dot">.</span>
-        </h1>
-        <p>
-          Useful tools, library work, and things built just to see what happens.
-        </p>
+        <h1 tabIndex={-1}>Projects &amp; Pages</h1>
       </div>
       <div className="project-toolbar">
         <label className="search-field">
@@ -62,7 +69,7 @@ export default function Projects({ projects, params, saved, onSave, effects }) {
         </button>
       </div>
       <div className="filter-row" role="group" aria-label="Project categories">
-        {["All", "Work", "Library", "For Fun"].map((value) => (
+        {["All", "Work", "Library", "UCPEA", "For Fun"].map((value) => (
           <button
             key={value}
             aria-pressed={group === value}
@@ -72,10 +79,7 @@ export default function Projects({ projects, params, saved, onSave, effects }) {
           >
             {value}
             <span>
-              {
-                pages.filter((p) => value === "All" || groupOf(p) === value)
-                  .length
-              }
+              {pages.filter((p) => inGroup(p, value)).length}
             </span>
           </button>
         ))}
@@ -91,17 +95,36 @@ export default function Projects({ projects, params, saved, onSave, effects }) {
       >
         {() =>
           matches.length ? (
-            <div className="project-list">
-              {matches.map((p) => (
-                <ProjectRow
-                  key={p.path}
-                  project={p}
-                  saved={saved.includes(p.path)}
-                  onSave={onSave}
-                  effects={effects}
-                />
-              ))}
-            </div>
+            <MagicBento
+              className="project-bento"
+              items={matches.map((project) => ({
+                id: project.path,
+                content: (
+                  <ProjectCard
+                    project={project}
+                    saved={saved.includes(project.path)}
+                    onSave={onSave}
+                  />
+                ),
+              }))}
+              columns={3}
+              rowHeight={195}
+              radius={12}
+              gap={14}
+              theme={theme}
+              glowColor="#f97316"
+              textAutoHide={false}
+              enableStars={effects}
+              particleCount={38}
+              spotlightRadius={320}
+              enableSpotlight={effects}
+              enableBorderGlow={effects}
+              enableTilt={effects}
+              enableMagnetism={effects}
+              disableAnimations={!effects}
+              intro={false}
+              style={{ gridAutoRows: "minmax(195px, auto)" }}
+            />
           ) : (
             <div className="empty-state">
               <Icon name="search" size={32} />
@@ -127,10 +150,6 @@ export default function Projects({ projects, params, saved, onSave, effects }) {
           )
         }
       </LoadState>
-      <p className="end-note">
-        A small collection, always evolving. Each project opens in its original
-        home.
-      </p>
     </>
   );
 }

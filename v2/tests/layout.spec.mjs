@@ -183,3 +183,18 @@ test("box corners are halved, circular portraits remain circular, and booking em
     .click();
   await expect(page.locator("iframe.service-frame")).toHaveCount(0);
 });
+
+test("compact sidebar settings stays inside the rail and opens settings", async ({ page }) => {
+  for (const width of [601, 781, 800, 801]) {
+    await page.setViewportSize({ width, height: 1004 });
+    await page.goto("/v2/");
+    const button = page.locator(".sidebar-settings-button");
+    await expect(button.locator("span")).toBeVisible({ visible: width > 800 });
+    const rail = await page.locator(".sidebar").boundingBox();
+    const bounds = await button.boundingBox();
+    expect(bounds.x).toBeGreaterThanOrEqual(rail.x);
+    expect(bounds.x + bounds.width).toBeLessThanOrEqual(rail.x + rail.width);
+    await button.click();
+    await expect(page.getByRole("dialog")).toBeVisible();
+  }
+});

@@ -76,7 +76,9 @@ test("desktop and phone assemble the original nodes at measured coordinates and 
     await expect(
       page.locator(".selected-bento .magic-bento__card"),
     ).toHaveCount(4);
-    await page.clock.pauseAt(await page.evaluate(() => Date.now() + 20));
+    // Record settled font geometry, as the cold-load intro now does.
+    await page.evaluate(() => document.fonts.ready);
+    await page.clock.pauseAt(await page.evaluate(() => Date.now() + 100));
     await page.evaluate(() => {
       const nodes = [
         document.querySelector(".glass-hero"),
@@ -225,7 +227,7 @@ test("navigation remains clickable during preparation, wireframing, and crew ass
       .click();
     await expect(page).toHaveURL(/#\/projects$/);
     await expect(
-      page.getByRole("heading", { name: /^The project index/ }),
+      page.getByRole("heading", { name: /^Projects & Pages/ }),
     ).toBeFocused();
   }
 });
@@ -390,4 +392,17 @@ test("late project data remains live and scroll interruption cannot strand hidde
         ),
       ),
   ).toBe(true);
+});
+
+test("cold-load fonts settle before automatic assembly starts", async ({ page }) => {
+  await page.route("**/*.woff2", async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 650));
+    await route.continue();
+  });
+  await page.goto("/v2/");
+  await page.evaluate(() => document.fonts.ready);
+  await expect(layer(page)).toHaveAttribute("data-assembly-state", "assembling");
+  await page.waitForTimeout(1000);
+  await expect(layer(page)).toHaveAttribute("data-assembly-state", "assembling");
+  await expect(page.locator(".agent-cursor").first()).toBeVisible();
 });

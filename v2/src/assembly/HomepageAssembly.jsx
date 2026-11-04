@@ -215,9 +215,16 @@ export default function HomepageAssembly({
         });
         measured.forEach((element) => observer.observe(element));
       };
-      // Brief bounded preparation; data and font failures can never hold up the site.
-      startTimer = setTimeout(start, 160);
-      watchdog = setTimeout(() => finish(), timeline.duration + 700);
+      // Cold-load fonts can change geometry and cancel an already running intro.
+      // Wait for them before measuring, with a bound for stalled font requests.
+      startTimer = setTimeout(start, 1200);
+      Promise.resolve(document.fonts?.ready).then(() => {
+        if (!finished && !started) {
+          clearTimeout(startTimer);
+          startTimer = setTimeout(start, 160);
+        }
+      });
+      watchdog = setTimeout(() => finish(), timeline.duration + 1900);
     } catch {
       // Failure is always an ordinary, visible homepage.
       finish();
