@@ -163,6 +163,7 @@ function App() {
           saved={safeSaved}
           onSave={toggleSave}
           effects={effects && fine && active === "projects"}
+          theme={theme}
         />
       ),
       tools: (
@@ -285,7 +286,7 @@ function App() {
                 onClick={() => setSettings(true)}
                 aria-label="Appearance and motion settings"
               >
-                <Icon name="settings" /> Settings
+                <Icon name="settings" /> <span>Settings</span>
               </button>
             </div>
           </div>

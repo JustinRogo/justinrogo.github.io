@@ -17,6 +17,55 @@
 .view-home {
   container: home / inline-size;
 }
+.project-bento {
+  --mb-ink: var(--ink) !important;
+  --mb-muted: var(--muted) !important;
+  --mb-surface: var(--surface) !important;
+  --mb-line: var(--line) !important;
+  --mb-focus: var(--orange) !important;
+}
+.project-bento .magic-bento__card {
+  border: 1px solid var(--line);
+}
+.project-bento .magic-bento__content {
+  padding: 22px;
+}
+.project-card {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  gap: 20px;
+}
+.project-card .project-description {
+  flex: 1;
+  overflow-wrap: anywhere;
+}
+.project-card .project-description h2 {
+  font-size: 1.2rem;
+  line-height: 1.3;
+}
+.project-card .project-actions {
+  flex-direction: row;
+  justify-content: flex-end;
+  gap: 6px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.project-card .icon-button {
+  min-width: 44px;
+  min-height: 44px;
+}
+@media (max-width: 800px) {
+  .sidebar-settings-button {
+    justify-content: center;
+    width: 44px;
+    gap: 0;
+  }
+  .sidebar-settings-button > span {
+    display: none;
+  }
+}
 @media (min-width: 801px) {
   .sidebar {
     width: var(--sidebar-width);
