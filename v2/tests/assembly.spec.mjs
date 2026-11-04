@@ -235,7 +235,7 @@ test("navigation remains clickable during preparation, wireframing, and crew ass
   }
 });
 
-test("session autoplay, forced replay, repeated replay, resize and keyboard interruption work", async ({
+test("page-load autoplay, forced replay, repeated replay, resize and keyboard interruption work", async ({
   page,
 }) => {
   await page.goto("/v2/#/home");
@@ -257,6 +257,11 @@ test("session autoplay, forced replay, repeated replay, resize and keyboard inte
   await primary(page).getByRole("link", { name: "Home", exact: true }).click();
   await expect(layer(page)).toHaveAttribute("data-assembly-state", "complete");
   await page.reload();
+  await expect(layer(page)).toHaveAttribute(
+    "data-assembly-state",
+    /preparing|assembling/,
+  );
+  await page.keyboard.press("Escape");
   await expect(layer(page)).toHaveAttribute("data-assembly-state", "complete");
   await page.getByRole("button", { name: "Replay animation" }).click();
   await expect(layer(page)).toHaveAttribute(
@@ -285,6 +290,27 @@ test("session autoplay, forced replay, repeated replay, resize and keyboard inte
   await page.keyboard.press("Escape");
   await expect(layer(page)).toHaveAttribute("data-assembly-state", "complete");
 });
+
+for (const width of [1440, 375]) {
+  test(`automatic intro survives a reload and a legacy session flag at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.addInitScript(() => {
+      // Existing visitors keep this marker from the old once-per-tab policy.
+      sessionStorage.setItem("jr-v2-assembly-seen-v1", "1");
+    });
+    await page.goto("/v2/");
+    for (let load = 0; load < 2; load++) {
+      if (load) await page.reload();
+      await expect(layer(page)).toHaveAttribute("data-assembly-state", "assembling");
+      await page.waitForTimeout(1000);
+      await expect(layer(page)).toHaveAttribute("data-assembly-state", "assembling");
+      await expect(page.locator(".agent-cursor").first()).toBeVisible();
+      await page.keyboard.press("Escape");
+      await expect(layer(page)).toHaveAttribute("data-assembly-state", "complete");
+      await expect(page.locator(".hero-actions a").first()).toHaveCSS("opacity", "1");
+    }
+  });
+}
 
 test("the first Home visit from a deep link tolerates router focus and preserves navigation", async ({
   page,

@@ -104,22 +104,15 @@ export default function HomepageAssembly({
       return;
     }
     const force = replayCount > handledReplay.current || queryReplay.current;
-    let seen = attempted.current;
-    try {
-      seen ||=
-        config.oncePerSession &&
-        sessionStorage.getItem(config.sessionKey) === "1";
-    } catch {}
-    if (seen && !force && config.oncePerSession) {
+    // Remember playback only for this document. A reload should play the intro
+    // again, while navigating back to Home should keep the page ready to use.
+    if (attempted.current && !force && config.oncePerLoad) {
       setPhase("complete");
       return;
     }
     attempted.current = true;
     handledReplay.current = replayCount;
     queryReplay.current = false;
-    try {
-      sessionStorage.setItem(config.sessionKey, "1");
-    } catch {}
     let finished = false;
     let started = false;
     let startTimer;

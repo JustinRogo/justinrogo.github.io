@@ -49,7 +49,7 @@ export default function Settings({
       <label className="switch-row">
         <span>
           <strong>Homepage assembly</strong>
-          <small>Let a team of cursors assemble Home once per session.</small>
+          <small>Let a team of cursors assemble Home when the page loads.</small>
         </span>
         <input
           type="checkbox"

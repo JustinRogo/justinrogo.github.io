@@ -7,8 +7,7 @@ export const assemblyConfig = Object.freeze({
   mobileDuration: 4800,
   crewEntry: 0.35,
   intensity: 0.7,
-  oncePerSession: true,
-  sessionKey: "jr-v2-assembly-seen-v1",
+  oncePerLoad: true,
   colors: ["#ff9d5c", "#6bafff", "#5de1c5", "#bf9aff", "#ff90bc", "#ead777"],
   labels: ["Layout", "Theme", "Content", "Details", "Projects", "Connect"],
 });

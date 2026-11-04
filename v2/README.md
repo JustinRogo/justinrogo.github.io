@@ -66,7 +66,7 @@ Open **http://127.0.0.1:4391/v2/**. This also serves the unchanged homepage and 
 
 ## Homepage assembly
 
-Home can be assembled by five colored cursors (four on phones), using the actual components and the existing GSAP dependency. Layout first draws a persistent wireframe; the other agents then add glass, content, and details over roughly six seconds (five on phones). It plays once per session, supports replay from the header, and has a persistent Homepage assembly setting. Reduced motion and Calm mode bypass it. Try `http://127.0.0.1:4392/v2/?replayIntro=1#/home`, or disable it with `?intro=0`. Configuration, component API, cancellation behavior, screenshots, and performance limits are documented in [ASSEMBLY.md](ASSEMBLY.md).
+Home can be assembled by five colored cursors (four on phones), using the actual components and the existing GSAP dependency. Layout first draws a persistent wireframe; the other agents then add glass, content, and details over roughly six seconds (five on phones). It plays once per page load, including reloads, supports replay from the header, and has a persistent Homepage assembly setting. Returning to Home through navigation does not replay it. Reduced motion and Calm mode bypass it. Try `http://127.0.0.1:4392/v2/?replayIntro=1#/home`, or disable it with `?intro=0`. Configuration, component API, cancellation behavior, screenshots, and performance limits are documented in [ASSEMBLY.md](ASSEMBLY.md).
 
 ## React Bits and attribution
 
