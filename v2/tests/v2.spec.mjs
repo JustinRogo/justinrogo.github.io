@@ -312,16 +312,16 @@ test("small text contrast and system contrast preferences meet the accessibility
   await expect(page.locator("html")).toHaveAttribute("data-calm", "false");
 });
 
-test("all 34 existing strengths are available and disclosures work by keyboard", async ({
+test("all 34 existing strengths are available and flip cards work by keyboard", async ({
   page,
 }) => {
   await page.goto("/v2/#/about");
   await expect(page.locator(".strength")).toHaveCount(5);
   await page.getByRole("button", { name: "All 34", exact: true }).click();
   await expect(page.locator(".strength")).toHaveCount(34);
-  await page.locator(".strength summary").first().focus();
+  await page.locator(".strength.flip-card").first().focus();
   await page.keyboard.press("Enter");
-  await expect(page.locator(".strength").first()).toHaveAttribute("open", "");
+  await expect(page.locator(".strength").first()).toHaveAttribute("aria-pressed", "true");
 });
 
 test("the requested React Bits render, react to pointers, and stop in Calm mode", async ({

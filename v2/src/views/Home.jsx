@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 import TechText from "../vendor/TechText.jsx";
 import MagicBento from "../vendor/MagicBento.jsx";
-import GlareHover from "../../../src/homepage/vendor/GlareHover.jsx";
 import {
   profile,
   featuredPaths,
@@ -14,6 +13,9 @@ import { ExternalLink, LoadState, SectionTitle } from "../components/UI.jsx";
 import { AssembleReveal } from "../assembly/HomepageAssembly.jsx";
 import { StrengthsPreview } from "../components/Strengths.jsx";
 import LawEvents from "../components/LawEvents.jsx";
+import PocketPart from "../components/PocketPart.jsx";
+import { ProjectPreview } from "../components/Project.jsx";
+import "./Home.css";
 
 function Name({ effects }) {
   return (
@@ -86,12 +88,10 @@ function FeaturedBento({ projects, effects, theme, fine }) {
               <div className={`bento-project bento-project-${index}`}>
                 {index === 0 ? (
                   <div className="bento-statutes-art" aria-hidden="true">
-                    <Icon name="book" size={100} />
-                    <span>CT</span>
+                    <span>§§</span>
                   </div>
-                ) : (
-                  <Icon name={index === 1 ? "projects" : "mail"} size={35} />
-                )}
+                ) : null}
+                <ProjectPreview project={project} className="featured-project-preview" />
                 <div className="bento-copy">
                   <h3>{featuredTitles[project.path] || project.title}</h3>
                   <span className="project-category">{project.category}</span>
@@ -259,47 +259,14 @@ export default function Home({ projects, effects, theme, fine }) {
           />
         )}
       </LoadState>
-      <div className="home-lower">
+      <div className="home-lower home-feeds">
         <AssembleReveal id="notes">
-          <div><LawEvents effects={effects} theme={theme} /></div>
+          <div className="home-events-column"><LawEvents effects={effects} theme={theme} /></div>
+        </AssembleReveal>
+        <AssembleReveal id="pocket-part">
+          <div className="home-blog-column"><PocketPart effects={effects} /></div>
         </AssembleReveal>
       </div>
-      <AssembleReveal id="contact">
-        <section className="home-connect glass-host">
-          <GlassLayer />
-          <h2>Have a good problem?</h2>
-          <p>
-            I’m drawn to complicated, repetitive, or mildly annoying problems
-            that could use a better process.
-          </p>
-          <div className="button-row">
-            <a className="button primary" href="#/tools?panel=booking">
-              Let’s find a time <Icon name="calendar" size={18} />
-            </a>
-            <ExternalLink
-              href="https://teams.microsoft.com/l/chat/0/0?users=justin.rogowski@uconn.edu"
-              className="text-link"
-            >
-              {effects ? (
-                <GlareHover
-                  width="100%"
-                  glareOpacity={0.25}
-                  borderRadius="4px"
-                  rimGlint={false}
-                >
-                  <span className="contact-glare">
-                    Start a Teams chat <Icon name="external" size={17} />
-                  </span>
-                </GlareHover>
-              ) : (
-                <span className="contact-glare">
-                  Start a Teams chat <Icon name="external" size={17} />
-                </span>
-              )}
-            </ExternalLink>
-          </div>
-        </section>
-      </AssembleReveal>
     </>
   );
 }

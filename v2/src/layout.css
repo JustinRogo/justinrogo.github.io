@@ -61,6 +61,19 @@
   min-height: 44px;
   font-size: 0.8rem;
 }
+.sidebar-settings {
+  justify-content: center;
+}
+@media (min-width: 601px) {
+  .sidebar {
+    inset: 0 auto 0 0;
+    border-radius: 0;
+    box-shadow: none; /* taste-skill-ignore: removes the floating rail shadow when docking. */
+  }
+  .workspace {
+    margin-left: 68px;
+  }
+}
 .view-home {
   container: home / inline-size;
 }
@@ -222,7 +235,7 @@
     width: var(--sidebar-width);
   }
   .workspace {
-    margin-left: calc(var(--sidebar-width) + 36px);
+    margin-left: var(--sidebar-width);
   }
 }
 .sidebar > .sidebar-resize[role="separator"] {

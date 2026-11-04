@@ -4,7 +4,7 @@ import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import vm from 'node:vm';
-import { parsePocketPart, refreshPocketPart } from '../scripts/update-pocket-part.mjs';
+import { featuredImage, parsePocketPart, refreshPocketPart } from '../scripts/update-pocket-part.mjs';
 
 function item(day, extra = '') {
   return `<item><title>Post ${day} &amp; news &#8217;</title>
@@ -34,6 +34,34 @@ test('invalid feeds or posts cannot replace the saved feed', () => {
     rss(item('23').replace('Fri, 23 Oct 2026 12:00:00 GMT', 'not a date'))]) {
     assert.throws(() => parsePocketPart(xml));
   }
+});
+
+test('featured metadata handles attribute order and entities, and rejects unsafe image URLs', () => {
+  assert.equal(featuredImage(`<meta content="/poster.png?a=1&amp;b=2" property="og:image">`, 'https://library.law.uconn.edu/post/'),
+    'https://library.law.uconn.edu/poster.png?a=1&b=2');
+  assert.equal(featuredImage(`<meta property='og:image' content='javascript:alert(1)'><meta name='twitter:image' content='https://images.example.com/post.jpg'>`),
+    'https://images.example.com/post.jpg');
+  assert.equal(featuredImage('<meta property="og:image" content="http://images.example.com/post.jpg">'), '');
+});
+
+test('refresh prefers featured images and retains saved images when article metadata is unavailable', async t => {
+  const directory = await mkdtemp(path.join(os.tmpdir(), 'pocket-part-images-'));
+  t.after(() => rm(directory, { recursive: true, force: true }));
+  const output = path.join(directory, 'posts.json');
+  const requests = [];
+  const fetchImpl = async url => {
+    requests.push(url);
+    return { ok: true, text: async () => url.includes('/feed/') ? rss(item('23'))
+      : '<meta property="og:image" content="https://images.example.com/featured.png">' };
+  };
+  const first = await refreshPocketPart({ output, fetchImpl });
+  assert.equal(first.items[0].thumbnail, 'https://images.example.com/featured.png');
+  assert.deepEqual(requests, ['https://library.law.uconn.edu/category/blog/feed/', 'https://library.law.uconn.edu/post-23/']);
+  const second = await refreshPocketPart({ output, fetchImpl: async url => {
+    if (!url.includes('/feed/')) throw new Error('Metadata offline');
+    return { ok: true, text: async () => rss(item('23')) };
+  } });
+  assert.equal(second.items[0].thumbnail, first.items[0].thumbnail);
 });
 
 test('refresh writes current posts and preserves the exact saved file on HTTP, network and parse failures', async t => {

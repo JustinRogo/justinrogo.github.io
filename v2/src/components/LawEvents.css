@@ -2,28 +2,31 @@
   position: relative;
   min-width: 0;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 12px;
   background: none;
   border: 0;
-  box-shadow: none;
+  box-shadow: none; /* taste-skill-ignore: explicitly removes upstream shadows. */
   overflow-x: clip;
 }
-.event-carousel { grid-column: 1 / -1; justify-self: center; }
+.law-events > h2 { grid-column: 1 / -1; margin: 0 0 4px; font-size: 1.45rem; }
+.event-carousel { grid-column: 1 / -1; justify-self: center; gap: 12px; }
 .law-events > .load-state, .law-events > .muted { grid-column: 1 / -1; }
-.event-calendar-link { grid-column: 1; grid-row: 2; align-self: center; white-space: nowrap; }
-.event-playback { grid-column: 2; grid-row: 2; justify-self: end; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; }
-.law-events .carousel-card { background: none; box-shadow: none; overflow: visible; }
+.event-calendar-link { grid-column: 1; grid-row: 3; justify-self: center; white-space: nowrap; min-height: 44px; }
+.law-events .carousel-controls { gap: 8px; }
+.law-events .event-playback { display: inline-grid; place-items: center; flex: none; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: var(--nav); color: var(--ink); }
+.law-events .carousel-counter { color: var(--muted); }
+.law-events .carousel-card { background: none; box-shadow: none; overflow: visible; } /* taste-skill-ignore: explicitly removes upstream shadows. */
 .law-events .carousel-viewport { padding-bottom: 36px; box-sizing: content-box; }
-.law-events .carousel-arrow { width: 44px; height: 44px; background: var(--nav); color: var(--ink); box-shadow: none; }
+.law-events .carousel-arrow { width: 44px; height: 44px; background: var(--nav); color: var(--ink); box-shadow: none; } /* taste-skill-ignore: explicitly removes upstream shadows. */
 .law-events .carousel-dot { width: 22px; height: 44px; }
 .law-events .carousel-dot-mark { background: var(--line); }
 .law-events .carousel-dot.is-active .carousel-dot-mark { background: var(--orange); }
-.law-events .carousel-card-rim { box-shadow: none; }
+.law-events .carousel-card-rim { box-shadow: none; } /* taste-skill-ignore: explicitly removes upstream shadows. */
 .event-carousel-link { display: block; height: 100%; border-radius: inherit; text-decoration: none; text-align: center; }
 .event-carousel-link:focus-visible { outline: 3px solid var(--orange); outline-offset: -3px; }
-.event-card-body { display: flex; flex-direction: column; gap: 20px; padding: 28px; height: 100%; box-sizing: border-box; border-radius: inherit; background: var(--surface); color: var(--ink); }
-.event-card-body h3 { flex-shrink: 0; margin: 0; font-size: clamp(1.05rem, 2vw, 1.4rem); line-height: 1.4; overflow-wrap: anywhere; }
+.event-card-body { display: flex; flex-direction: column; gap: 16px; padding: 22px; height: 100%; box-sizing: border-box; border-radius: inherit; background: var(--surface); color: var(--ink); }
+.event-card-body h3 { flex-shrink: 0; margin: 0; font-size: 1.05rem; line-height: 1.4; overflow-wrap: anywhere; }
 .event-card-body > img { display: block; width: 100%; min-height: 0; height: auto; flex: 1; object-fit: contain; }
 .event-card-body > img[hidden] { display: none; }
 .event-date { color: var(--muted); font-size: 0.9rem; margin: 10px 0 0; line-height: 1.6; }

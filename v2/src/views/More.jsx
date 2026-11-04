@@ -10,6 +10,7 @@ import Icon from "../components/Icon.jsx";
 import ExploreMenu from "../components/ExploreMenu.jsx";
 import { GlassLayer } from "../components/Glass.jsx";
 import { parseEvents } from "../events.js";
+import { parsePocketPart } from "../pocketPart.js";
 
 export function parseManifest(text) {
   const value = JSON.parse(text);
@@ -112,7 +113,7 @@ export default function More({
   effects,
   projectPages,
 }) {
-  const blog = useResource("../data/pocket-part.json");
+  const blog = useResource("../data/pocket-part.json", parsePocketPart);
   const counts = useResource("../data/cards_count.json");
   const events = useResource(integrations.events, parseEvents);
   return (

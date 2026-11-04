@@ -4,11 +4,11 @@ An isolated React application at `/v2/`, developed on `feature/website-v2` and a
 
 ## Direction
 
-The current direction follows Justin’s explicit revision: **blue/orange glass**, expressive motion, and substantial use of the four linked React Bits implementations. Deep navy and ice-blue themes use translucent refractive surfaces, orange primary actions, orbital geometry, a pointer-reactive Tech Text name, and a Magic Bento selection of actual projects. The earlier warm-gray notebook treatment has been replaced.
+The current direction follows Justin’s explicit revision: **blue/orange glass**, expressive motion, and substantial use of the linked React Bits implementations. Deep navy and ice-blue themes use translucent refractive surfaces, orange primary actions, orbital geometry, a pointer-reactive Tech Text name, and a Magic Bento selection of actual projects. The earlier warm-gray notebook treatment has been replaced.
 
-Featured work leads with CT General Statutes Explorer, followed by Law Library Heatmap and AI Corner Updates, using the existing manifest destinations.
+Featured work leads with CT General Statutes Explorer, followed by Law Library Heatmap and AI Corner Updates, using the existing manifest destinations. Each shows its existing project screenshot through the shared ProjectPreview component. The statutes card uses a small section-sign emblem in place of its former oversized book/CT artwork.
 
-Desktop uses a floating glass side rail; phones retain five labeled destinations in a glass bottom dock. A real Branched Menu sits below the main desktop sidebar navigation and exposes project filters, the original Work (5 pages), UCPEA (4 pages), and For Fun (6 pages) collections, tool shortcuts, and all 11 Quick Links as normal links. Page titles and destinations come from the shared manifest. Its scroll area keeps contact/settings reachable when branches expand. On phones and compact tablets, the same branches are available in More. The directory remains an efficient searchable list, while Home gets the more expressive composition.
+Desktop and tablet navigation docks flush to the left edge at full viewport height, with square outer corners and centered Settings. The workspace begins at its right edge; phones retain five labeled destinations in a glass bottom dock. A real Branched Menu sits below the main desktop sidebar navigation and exposes project filters, the original Work (5 pages), UCPEA (4 pages), and For Fun (6 pages) collections, tool shortcuts, and all 11 Quick Links as normal links. Page titles and destinations come from the shared manifest. Its scroll area keeps contact/settings reachable when branches expand. On phones and compact tablets, the same branches are available in More. The directory remains an efficient searchable list, while Home gets the more expressive composition.
 
 The UCPEA branch puts Member Dashboard first, with Current Contract, Contract History, and Contract Comparison nested underneath. These shortened sidebar labels preserve the original destinations and leave the project directory's manifest titles unchanged.
 
@@ -16,9 +16,11 @@ The desktop rail now defaults to 240px. Drag its right edge or focus the separat
 
 A button beside the desktop wordmark collapses the rail to a 72px icon-only navigation. The choice persists separately from the expanded width, which is restored on expansion. Navigation links retain accessible names and hover titles; contact and settings stay reachable. Tablet and phone navigation retain their existing responsive layouts.
 
-Home’s former “Around here lately” panel is replaced by the live UConn Law events feed in the official React Bits Carousel. The requested preset uses autoplay, arrows, pause on hover, 16px corners, square cards, and no outer frame. The component is centered with a maximum width of 440px and includes its native dot indicators, swipe gestures, and keyboard navigation. Every card remains a native event link with a centered title, optional uncropped poster beneath it, and Eastern date/time below the square. There is no added UConn Law card label or duplicate selected-event footer. A pause/play control provides persistent playback control; keyboard focus also pauses autoplay. Calm mode, reduced motion, high contrast, and hidden views stop autoplay, while manual navigation remains available without animation when motion is disabled. This DOM carousel replaces the previous WebGL Circular Gallery and its generated card textures. Missing/failed images leave the title and date visible. Empty/error states retain the full calendar link and errors offer a retry. More shares the same feed parser and cache.
+Home’s former “Around here lately” panel is replaced by the live UConn Law events feed in the official React Bits Carousel. The requested preset uses autoplay, arrows, pause on hover, 16px corners, square cards, and no outer frame. The component is centered at a maximum width of 340px, advances every eight seconds, and includes native dot indicators (a compact slide count on phones), swipe gestures, and keyboard navigation. Every card remains a native event link with a centered title, optional uncropped poster beneath it, and Eastern date/time below the square. There is no added UConn Law card label or duplicate selected-event footer. A pause/play button sits directly beside the carousel navigation and provides persistent playback control; keyboard focus also pauses autoplay. Calm mode, reduced motion, high contrast, and hidden views stop autoplay, while manual navigation remains available without animation when motion is disabled. This DOM carousel replaces the previous WebGL Circular Gallery and its generated card textures. Missing/failed images leave the title and date visible. Empty/error states retain the full calendar link and errors offer a retry. More shares the same feed parser and cache.
 
-The events section has no surrounding surface, border, shadow, or visible heading. Cards sit directly over the page background, with the calendar link and gallery controls underneath. Other glass surfaces retain their existing appearance and accessibility preferences.
+The events section opens with a visible “UConn Law Events” heading and has no surrounding surface, border, or shadow. Cards sit directly over the page background, with the centered View Event Calendar link underneath. At viewport widths of 1200px and above, events sit beside The Pocket Part; the event column stays in view while the blog stacks when the viewport is tall enough. Smaller screens show the feeds vertically. Other glass surfaces retain their existing appearance and accessibility preferences.
+
+The former “Have a good problem?” contact block is replaced by The Pocket Part blog feed using React Bits Scroll Stack. Four saved posts become native links with a 50/50 featured-image and date/title split: side by side on desktop, alternating image left/right with each post, and image above text on phones. Without a working image, text uses the full card. The feed refresh now reads each article’s featured-image metadata, preferring it to inline RSS images, and preserves saved images if article retrieval fails. The browser loads the same local snapshot used by More, without cross-origin article requests. Calm/reduced-motion/high-contrast modes show an ordinary list of cards. Empty/error states keep the full-blog link and errors offer retry.
 
 The portrait has calendar, email, Teams chat, and telephone links. Its shared four-color strengths bar opens and focuses the full CliftonStrengths section at `#/about?section=strengths`. On phones, contact buttons sit beside the photo and the strengths bar sits beneath it. Calendar and booking keep direct links and opt-in embeds without the former cookie/sign-in disclaimer.
 
@@ -28,13 +30,13 @@ Settings offers Shape Waves, Antigravity, Fractal, Aurora, Orbits, and None. Dev
 
 Projects uses wide, tall, and compact Magic Bento cards. Container queries respond to the actual available width, including sidebar resizing: three columns above 1000px, two above 560px, and one below. Tablet cards use a separate full-width/pair arrangement, and phone cards grow naturally with their content. Search, filters, and saved projects retain their original behavior.
 
-All 15 project cards include committed JPEG screenshots of their destinations, loaded lazily without live embeds or a screenshot service. The Front Desk Planner preview shows its public sign-in page. To refresh previews, start the local V2 server and run `node v2/capture-project-previews.mjs`; this permits only GET/HEAD requests. `v2/assets/project-previews/sources.json` records the captured destinations and dates. Build/deployment copies these assets normally; it does not recapture pages.
+All 15 project cards and the three featured Home project cards share the same committed JPEG screenshots of their destinations, loaded lazily without live embeds or a screenshot service. The Front Desk Planner preview shows its public sign-in page. To refresh previews, start the local V2 server and run `node v2/capture-project-previews.mjs`; this permits only GET/HEAD requests. `v2/assets/project-previews/sources.json` records the captured destinations and dates. Build/deployment copies these assets normally; it does not recapture pages.
 
 ## Navigation
 
 | Destination | Contents |
 | --- | --- |
-| Home | Profile, introduction, featured projects, UConn Law events, contact |
+| Home | Profile, introduction, featured projects, UConn Law events, Pocket Part blog stack |
 | Projects | All 15 manifest projects, search, category filters, saved projects |
 | Tools | Five catalog searches, calendar, booking, local request preview, searchable quick links |
 | About | Biography, experience, leadership, education, skills, interests, all 34 strengths, contacts |
@@ -68,20 +70,22 @@ Home can be assembled by five colored cursors (four on phones), using the actual
 
 ## React Bits and attribution
 
-The original implementations are pinned to revision `e12c22192ac7b4b452c5e2feb9b586d74765d696` of [React Bits](https://github.com/DavidHDev/react-bits). Carousel is pinned separately to `ff5121ef4e11d7988025fad7c1e23ac40d251bce`.
+About uses [Flip Card](https://reactbits.dev/micro/flip-card), pinned to `1eeb6f105c68b964289d85dabbe84a1d551f3797`. All 34 original strength descriptions and rankings remain unchanged. Top 5, Top 10, and All 34 select themes by rank before arranging them by domain in overview order: Strategic Thinking, Relationship Building, Executing, Influencing. Filters retain card state for themes that remain in view. Closed cards are 180px tall; flipped cards span two columns and two rows in a dense bento grid, with neighboring cards filling available space. Phones use two compact columns and full-width expanded cards. Domain colors fill both faces, with contrasting ink. The front shows rank, name, and domain; the back shows the full description. Click/tap, keyboard Enter/Space, and the original drag/spring interaction work without leaving About. Calm/reduced-motion/contrast settings use an instant face change. Local changes support fluid card dimensions, accessible descriptions, and the existing motion preference. Personal reflections use the same Flip Card, with the complete best passage on the front and overextended passage on the back. Both faces determine its stable height; dragging is disabled so long passages remain easy to scroll on phones.
 
-- [Carousel](https://reactbits.dev/components/carousel): the official DOM/spring implementation, without demo content or icon dependencies. Local changes provide a site-specific accessible label, Calm mode, and focus/inert handling so only the current event link is keyboard reachable. Existing site icons replace upstream demo icons. The React Bits license applies; no new runtime dependency is needed.
+The original implementations are pinned to revision `e12c22192ac7b4b452c5e2feb9b586d74765d696` of [React Bits](https://github.com/DavidHDev/react-bits). Carousel is pinned separately to `ff5121ef4e11d7988025fad7c1e23ac40d251bce`; Scroll Stack to `3e619ca31732d5d6849ecd5130ddd7b266aa7bd7`.
+
+- [Carousel](https://reactbits.dev/components/carousel): the official DOM/spring implementation, without demo content or icon dependencies. Local changes provide a site-specific accessible label, Calm mode, and focus/inert handling so only the current event link is keyboard reachable. Existing site icons replace upstream demo icons; an extra-controls slot holds the playback button. The React Bits license applies; no new runtime dependency is needed.
 
 - [Tech Text](https://reactbits.dev/text-animations/tech-text): the actual canvas implementation turns letters in the name into dashed paths under a pointer; tapping can kick letters. Automatic sweep and dragging are off. Calm/reduced-motion modes render normal DOM text.
 - [Glass Surface](https://reactbits.dev/components/glass-surface): reuse the existing vendored implementation behind the hero, navigation and selected surfaces. SVG refraction on supported fine-pointer devices; frosted fallback on touch, reduced motion and unsupported browsers. Text and controls stay outside the filter layer.
 - [Magic Bento](https://reactbits.dev/components/magic-bento): the upstream interaction/grid engine presents real manifest projects, with edge lighting, a pointer spotlight, mild tilt and click response. Stars and magnetism are off. Upstream sample dashboards/artwork and their icon dependencies were removed; site-owned content fills the cards.
 - [Branched Menu](https://reactbits.dev/micro/branched-menu): upstream trunk/branch geometry, folding and selection tracing. Local changes add native child links, controlled URL selection, accessible collapsed groups, SVG expanders and the existing icon system, avoiding extra icon dependencies.
-- [Glare Hover](https://reactbits.dev/animations/glare-hover): actual existing vendored component; a sheen on the Teams contact link. It does not intercept the anchor.
+- [Scroll Stack](https://reactbits.dev/components/scroll-stack): official sticky-slot and depth/scale engine, using the pile preset values (zero stack distance, item scale 0.015, base scale 0.9, dim 0.12, rotation 3). It follows native page scrolling without intercepting the wheel. Local changes provide static Calm/contrast behavior and reveal a covered card when its link receives keyboard focus. No new dependency.
 - [Spotlight Card](https://reactbits.dev/components/spotlight-card): upstream source added under `src/vendor/`; a subtle pointer light on project rows. Fine-pointer use only, no ambient loop, grain or edge glare.
 - Shape Waves and Antigravity reuse the existing V1 React Bits renderers, presets, static fallbacks, pixel budgets, and cleanup. Shape Waves uses the existing VGPU dependency/WebGPU; Antigravity uses WebGL. Aurora and Fractal reuse the existing site components. A V2 build adapter exposes these without V1’s settings/body observer or host CSS. V2 owns selection and styles; V1 sources stay unchanged. `vgpu-LICENSE.txt` accompanies the existing notices.
 - [Dock](https://reactbits.dev/components/dock) informed the compact persistent navigation, but the navigation is custom React and CSS, with fixed touch targets. It is not represented as the upstream Dock implementation.
 
-React Bits is copyright David Haz, under MIT + Commons Clause. The build includes the full existing license, upstream notices, React/React DOM/scheduler licenses, GSAP notices, and the Geist OFL. The Settings panel links to the React Bits license. Shared source files are never modified. The portrait is Justin’s existing public UConn photo; `assets/justin.png.json` records its origin.
+React Bits is copyright David Haz, under MIT + Commons Clause. The build includes the full existing license, upstream notices, React/React DOM/scheduler licenses, GSAP and Motion-family notices, and the Geist OFL. The Settings panel links to the React Bits license. Shared source files are never modified. The portrait is Justin’s existing public UConn photo; `assets/justin.png.json` records its origin.
 
 ## Existing functionality inventory
 
@@ -91,7 +95,7 @@ React Bits is copyright David Haz, under MIT + Commons Clause. The build include
 | Project directory | Same `data/pages.json`, same destinations, added search/filter/save |
 | Calendar / Book a Meeting | Same Outlook/Bookings URLs; open directly or explicitly load an embed |
 | Submit a Request | Validated local preview; deliberate link to V1’s live form and existing public board |
-| CliftonStrengths | All 34 ranks/descriptions and both best/overextended passages extracted from V1 at build time; original four domain colors, rank-weighted color bar/percentage legend, reflection controls, filters and native disclosures |
+| CliftonStrengths | All 34 ranks/descriptions and both best/overextended passages extracted from V1 at build time; original four domain colors, rank-weighted color bar/percentage legend, reflection Flip Card, rank filters and compact expanding domain cards |
 | Library catalog | Same Primo and LibGuides destinations, all five query builders rebuilt in React |
 | Professional resources and contact links | Tools quick links and About contacts; all existing resource links retained |
 | Clock / Hartford weather | Eastern Time clock and the existing Open-Meteo endpoint |
@@ -109,7 +113,7 @@ React Bits is copyright David Haz, under MIT + Commons Clause. The build include
 - `src/hooks.js`: routing, persisted state, media preferences, resource fetches with timeouts and cancellation.
 - `src/assembly/`: real-element ref registration, GSAP choreography, decorative cursors, configuration, and replay/session policy.
 - `src/content.js`: grounded profile copy, source URLs, category rules and catalog URL builder.
-- `src/strengths.js` / `src/components/Strengths.jsx`: source-derived themes/reflections, all-34 domain weighting, overview, reflection controls, and ranked disclosures.
+- `src/strengths.js` / `src/components/Strengths.jsx`: source-derived themes/reflections, all-34 domain weighting, overview, reflection Flip Card, and compact domain-colored Flip Cards with expanding descriptions.
 - `src/views/`: five destinations; `src/components/`: shared controls, dialogs, icons, project rows and sketch.
 - `src/styles.css`: V2 layout and controls; `src/glass-theme.css`: the requested glass materials, blue/orange tokens, responsive hero and atmospheric motion.
 - `src/components/PageBackground.jsx` / `.css`: selected background host, device defaults, motion policy, and scoped host/settings styles.
@@ -117,7 +121,7 @@ React Bits is copyright David Haz, under MIT + Commons Clause. The build include
 - `serve.mjs`: local static preview with watch support.
 - `tests/`: browser interactions, responsive captures and optional GET-only live-source smoke check.
 
-No new npm dependencies, backend, authentication, database, service worker, or deployment rewrite. The build copies only `v2/index.html` and public `v2/assets/` into `dist/v2/`; source, tests and design notes stay out of the production artifact.
+Motion 14.9.1 supports the official Flip Card implementation. No new backend, authentication, database, service worker, or deployment rewrite. The build copies only `v2/index.html` and public `v2/assets/` into `dist/v2/`; source, tests and design notes stay out of the production artifact.
 
 ## Verification and limits
 

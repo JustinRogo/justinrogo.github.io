@@ -111,7 +111,7 @@ test("desktop sidebar resizes by pointer and keyboard, persists, and yields to c
   await expect(handle).toHaveAttribute("aria-valuenow", "320");
   const sideBox = await sidebar.boundingBox(),
     workspace = await page.locator(".workspace").boundingBox();
-  expect(workspace.x).toBeGreaterThan(sideBox.x + sideBox.width);
+  expect(workspace.x).toBe(sideBox.x + sideBox.width);
   await page.reload();
   await expect(sidebar).toHaveCSS("width", "320px");
   await handle.focus();
@@ -151,7 +151,7 @@ test("box corners are halved, circular portraits remain circular, and booking em
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("/v2/#/home");
   for (const [selector, radius] of [
-    [".sidebar", "12px"],
+    [".sidebar", "0px"],
     [".topbar", "10px"],
     [".glass-hero", "12px"],
     [".hero-actions .primary", "5.5px"],

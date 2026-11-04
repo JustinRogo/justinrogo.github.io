@@ -172,7 +172,7 @@ function App() {
           isActive={active === "tools"}
         />
       ),
-      about: <About />,
+      about: <About effects={effects && active === "about"} fine={fine} />,
       more: (
         <More
           weather={weather}

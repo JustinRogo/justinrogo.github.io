@@ -3,7 +3,7 @@ import { ExternalLink, LinkRow, SectionTitle } from "../components/UI.jsx";
 import Icon from "../components/Icon.jsx";
 import Strengths from "../components/Strengths.jsx";
 
-export default function About() {
+export default function About({ effects, fine }) {
   return (
     <>
       <div className="page-heading">
@@ -93,7 +93,7 @@ export default function About() {
           ))}
         </div>
       </section>
-      <Strengths />
+      <Strengths effects={effects} fine={fine} />
       <section
         className="contact-section"
         id="say-hello"

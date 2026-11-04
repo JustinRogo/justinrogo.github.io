@@ -59,6 +59,35 @@ export function parsePocketPart(xml) {
   return items.slice(0, ITEM_LIMIT);
 }
 
+// WordPress's featured image is often absent from its RSS article body.
+export function featuredImage(html, base) {
+  for (const tag of html.matchAll(/<meta\b[^>]*>/gi)) {
+    const attributes = Object.fromEntries([...tag[0].matchAll(/([\w:-]+)\s*=\s*(["'])(.*?)\2/gs)]
+      .map((match) => [match[1].toLowerCase(), decodeXml(match[3])]));
+    if (/^(og:image|twitter:image)$/i.test(attributes.property || attributes.name || "")) {
+      const image = httpsUrl(attributes.content, base);
+      if (image) return image;
+    }
+  }
+  return '';
+}
+
+async function withFeaturedImage(post, fetchImpl, saved) {
+  // Metadata requests stay on the blog origin; the browser uses only the saved snapshot.
+  if (new URL(post.link).origin !== new URL(SOURCE_URL).origin) return post;
+  try {
+    const response = await fetchImpl(post.link, {
+      headers: { accept: 'text/html', 'user-agent': 'justinrogo.github.io Pocket Part feed/1.0' },
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!response.ok) throw new Error(`Post request failed: ${response.status}`);
+    const image = featuredImage(await response.text(), post.link);
+    return { ...post, thumbnail: image || post.thumbnail };
+  } catch {
+    return { ...post, thumbnail: post.thumbnail || httpsUrl(saved?.thumbnail) };
+  }
+}
+
 function validSnapshot(snapshot) {
   return snapshot.schemaVersion === 1 && snapshot.sourceUrl === SOURCE_URL &&
     Array.isArray(snapshot.items) && snapshot.items.length > 0 &&
@@ -67,6 +96,9 @@ function validSnapshot(snapshot) {
 }
 
 export async function refreshPocketPart({ output = OUTPUT, fetchImpl = fetch, now = () => new Date() } = {}) {
+  let existing;
+  try { existing = JSON.parse(await readFile(output, 'utf8')); } catch { /* No saved feed yet. */ }
+  const savedItems = Array.isArray(existing?.items) ? existing.items : [];
   let snapshot;
   try {
     const response = await fetchImpl(SOURCE_URL, {
@@ -78,11 +110,10 @@ export async function refreshPocketPart({ output = OUTPUT, fetchImpl = fetch, no
       schemaVersion: 1,
       generatedAt: now().toISOString(),
       sourceUrl: SOURCE_URL,
-      items: parsePocketPart(await response.text()),
+      items: await Promise.all(parsePocketPart(await response.text()).map(post =>
+        withFeaturedImage(post, fetchImpl, savedItems.find(item => item?.link === post.link)))),
     };
   } catch (error) {
-    let existing;
-    try { existing = JSON.parse(await readFile(output, 'utf8')); } catch { /* No usable saved feed. */ }
     if (!existing || !validSnapshot(existing)) throw error;
     console.warn(`Pocket Part refresh failed; preserving the saved posts: ${error.message}`);
     return existing;

@@ -12,6 +12,10 @@ export async function buildV2({ watch = false } = {}) {
     ["node_modules/react/LICENSE", "react-LICENSE.txt"],
     ["node_modules/react-dom/LICENSE", "react-dom-LICENSE.txt"],
     ["node_modules/scheduler/LICENSE", "scheduler-LICENSE.txt"],
+    ["node_modules/motion/LICENSE.md", "motion-LICENSE.txt"],
+    ["node_modules/framer-motion/LICENSE.md", "framer-motion-LICENSE.txt"],
+    ["node_modules/motion-dom/LICENSE.md", "motion-dom-LICENSE.txt"],
+    ["node_modules/motion-utils/LICENSE.md", "motion-utils-LICENSE.txt"],
     ["node_modules/vgpu/LICENSE", "vgpu-LICENSE.txt"],
     ["Pages/For Fun/Wave-Function-Collapse/fonts/OFL.txt", "Geist-OFL.txt"],
   ])

@@ -63,25 +63,19 @@ test("CliftonStrengths preserves V1 reflections, domain colors, and all-34 rank 
     await expect(page.locator(".strength")).toHaveCount(limit);
     await expect(chart).toHaveAttribute("aria-label", label);
   }
-  await expect(page.locator(".strength-reflection-content p")).toHaveText(
+  const reflection = page.locator(".strength-reflection-card");
+  await expect(reflection.locator(".flip-card__face--front p")).toHaveText(
     originalReflection("best"),
   );
-  const overextended = page.getByRole("button", {
-    name: "When I’m overextended",
-    exact: true,
-  });
-  await overextended.focus();
+  await expect(reflection.locator(".flip-card__face--back p")).toHaveText(originalReflection("overextended"));
+  await reflection.focus();
   await page.keyboard.press("Enter");
-  await expect(overextended).toHaveAttribute("aria-pressed", "true");
-  await expect(
-    page.getByRole("region", { name: "When I’m overextended", exact: true }),
-  ).toContainText(originalReflection("overextended"));
-  await page
-    .getByRole("button", { name: "When I’m at my best", exact: true })
-    .click();
-  await expect(page.locator(".strength-reflection-content p")).toHaveText(
-    originalReflection("best"),
-  );
+  await expect(reflection).toHaveAttribute("aria-pressed", "true");
+  await expect(reflection).toHaveAttribute("aria-label", /When I’m overextended/);
+  await expect(reflection.locator(".flip-card__face--back")).toHaveAttribute("aria-hidden", "false");
+  await page.keyboard.press("Space");
+  await expect(reflection).toHaveAttribute("aria-pressed", "false");
+  await expect(reflection.locator(".flip-card__face--front")).toHaveAttribute("aria-hidden", "false");
 });
 
 test("strengths overview and reflections fit narrow screens in both themes", async ({
@@ -124,6 +118,14 @@ test("strengths overview and reflections fit narrow screens in both themes", asy
           () => document.documentElement.scrollWidth <= innerWidth + 1,
         ),
       ).toBe(true);
+      const reflection = page.locator(".strength-reflection-card");
+      await reflection.focus();
+      await page.keyboard.press("Enter");
+      await expect(reflection).toHaveAttribute("data-fade", "back");
+      await expect(reflection.locator(".flip-card__rotor")).toHaveCSS("transform", "none");
+      for (const face of await reflection.locator(".strength-reflection-content").all()) {
+        expect(await face.evaluate(el => el.scrollHeight <= el.clientHeight + 1)).toBe(true);
+      }
       await page.getByRole("button", { name: "All 34", exact: true }).click();
       for (const [id, , , color] of expected) {
         await expect(

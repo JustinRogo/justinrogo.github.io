@@ -68,6 +68,9 @@ test("desktop and phone assemble the original nodes at measured coordinates and 
   await page.clock.install();
   for (const width of [1440, 375]) {
     await page.setViewportSize({ width, height: 1000 });
+    // Freeze before navigation: otherwise asset loading can consume Layout's
+    // brief phase before the screenshot sequence has taken control of time.
+    await page.clock.pauseAt(await page.evaluate(() => Date.now() + 10000));
     await page.goto(`/v2/?replayIntro=1&capture=${width}#/home`);
     await expect(layer(page)).toHaveAttribute(
       "data-assembly-state",
@@ -78,7 +81,7 @@ test("desktop and phone assemble the original nodes at measured coordinates and 
     ).toHaveCount(4);
     // Record settled font geometry, as the cold-load intro now does.
     await page.evaluate(() => document.fonts.ready);
-    await page.clock.pauseAt(await page.evaluate(() => Date.now() + 100));
+    await page.clock.runFor(100);
     await page.evaluate(() => {
       const nodes = [
         document.querySelector(".glass-hero"),

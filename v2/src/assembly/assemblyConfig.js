@@ -54,5 +54,5 @@ export const assemblyTasks = [
   { id: "notes", cursor: 1, at: 0.83, duration: 0.06, effect: "place" },
   { id: "featured-3", cursor: 3, at: 0.88, duration: 0.04, effect: "place" },
   { id: "footer", cursor: 1, at: 0.93, duration: 0.025, effect: "surface" },
-  { id: "contact", cursor: 5, at: 0.94, duration: 0.025, effect: "place" },
+  { id: "pocket-part", cursor: 5, at: 0.94, duration: 0.025, effect: "place" },
 ];

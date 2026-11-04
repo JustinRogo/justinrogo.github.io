@@ -3,7 +3,7 @@
 .strengths-preview {
   --strength-thinking: #10b981;
   --strength-relationship: #0066ff;
-  --strength-executing: #7c3aed;
+  --strength-executing: #7c3aed; /* taste-skill-ignore: preserve the requested Executing domain color. */
   --strength-influencing: #ff7e5f;
 }
 :is(.strengths, .strengths-preview) [data-domain="thinking"] {
@@ -125,22 +125,22 @@
 .strength-reflection {
   min-width: 0;
 }
-.strength-reflection > .filter-row {
-  margin-top: 0;
-  gap: 6px;
-}
-.strength-reflection > .filter-row > button {
-  min-height: 44px;
-  padding-inline: 12px;
-}
+.strength-reflection-card .flip-card__rotor { position: relative; display: grid; }
+.strength-reflection-card .flip-card__face { position: relative; grid-area: 1 / 1; }
 .strength-reflection-content {
-  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  height: 100%;
+  padding: 26px;
 }
+.strength-reflection-content > strong { font-size: 1.35rem; line-height: 1.3; font-weight: 550; }
 .strength-reflection-content > p {
   max-width: 70ch;
-  color: var(--muted);
-  font-size: 0.88rem;
-  line-height: 1.85;
+  margin: 0;
+  color: var(--ink);
+  font-size: 0.95rem;
+  line-height: 1.7;
 }
 .strengths .strength .strength-rank {
   background: var(--strength-color);
@@ -167,6 +167,28 @@
 .strengths .strength-list {
   margin-top: 14px;
 }
+.strengths .strength-flip-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 160px), 1fr)); grid-auto-rows: 180px; grid-auto-flow: row dense; gap: 12px; }
+.strength-domain-group, .strength-domain-grid { display: contents; }
+.strength-cell { min-width: 0; scroll-margin-block: 24px 100px; }
+.strength-cell.is-expanded { grid-column: span 2; grid-row: span 2; }
+.strengths .strength.flip-card { border: 0; height: 100%; }
+.strengths .strength .flip-card__rotor { position: absolute; display: block; min-height: 0; height: 100%; }
+.strengths .strength .flip-card__face { position: absolute; }
+.strength-card-front, .strength-card-back { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; min-height: 0; height: 100%; padding: 16px; }
+.strength-card-back { gap: 12px; padding: 20px; }
+.strengths .strength.flip-card .strength-rank { display: block; width: auto; height: auto; border-radius: 0; font-size: 1.8rem; line-height: 1; font-weight: 500; }
+.strength-card-front .strength-name { margin-top: auto; }
+.strength-name { font-size: 1.1rem; line-height: 1.2; font-weight: 550; overflow-wrap: anywhere; }
+.strength-card-back .strength-name { font-size: 1.35rem; }
+.strength-card-domain { font-size: 0.75rem; line-height: 1.35; }
+.strength-card-back > p { margin: 0; font-size: 0.95rem; line-height: 1.55; }
+.strength-card-hint { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; margin-top: auto; padding-top: 4px; }
+.strengths .strength.flip-card:focus-visible { outline: 3px solid var(--ink); outline-offset: 4px; }
+.strength-reflection-card:focus-visible { outline: 3px solid var(--ink); outline-offset: 4px; }
+.strengths [data-motion="still"] .flip-card__face { transition: none; }
+@media (forced-colors: active) {
+  .strengths .strength.flip-card .flip-card__face { background: Canvas; color: CanvasText; border: 2px solid CanvasText; }
+}
 @media (max-width: 1000px) {
   .strengths-introduction {
     grid-template-columns: 1fr;
@@ -178,30 +200,32 @@
   }
 }
 @media (max-width: 600px) {
+  .strengths .strength-flip-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .strength-reflection-content { padding: 20px; }
   .strength-overview {
     padding: 22px;
   }
   .strength-domain-legend {
     grid-template-columns: 1fr;
   }
-  .strength-reflection > .filter-row > button {
-    flex: 1;
-    font-size: 0.76rem;
-  }
   .strengths .strength-domain {
     max-width: 88px;
   }
 }
+@media (max-width: 300px) {
+  .strengths .strength-flip-list { grid-template-columns: minmax(0, 1fr); }
+  .strength-cell.is-expanded { grid-column: span 1; }
+}
 @media (forced-colors: active) {
   .strength-domain-bar {
-    border: 1px solid CanvasText;
+    border: 1px solid CanvasText; /* taste-skill-ignore: forced-colors accessibility boundary. */
   }
   .strength-domain-bar > span {
-    border-inline-end: 1px solid CanvasText;
+    border-inline-end: 1px solid CanvasText; /* taste-skill-ignore: forced-colors accessibility boundary. */
   }
   .strengths .strength .strength-rank {
     background: Canvas;
     color: CanvasText;
-    border: 1px solid CanvasText;
+    border: 1px solid CanvasText; /* taste-skill-ignore: forced-colors accessibility boundary. */
   }
 }

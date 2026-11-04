@@ -1,0 +1,28 @@
+.home-lower.home-feeds { grid-template-columns: minmax(0, 1fr); align-items: start; gap: 28px; }
+.home-events-column, .home-blog-column { min-width: 0; }
+.home-blog-column .home-pocket-part { margin-top: 0; }
+@media (min-width: 1200px) {
+  .home-lower.home-feeds { grid-template-columns: 340px minmax(0, 1fr); gap: 32px; }
+}
+@media (min-width: 1200px) and (min-height: 650px) {
+  .home-events-column { position: sticky; top: 24px; }
+}
+.selected-bento .bento-project { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.65fr); grid-template-rows: 1fr auto; gap: 10px 16px; padding: 20px; }
+.selected-bento .bento-project .bento-copy { grid-column: 1; grid-row: 1; min-width: 0; padding-top: 0; }
+.selected-bento .bento-project .bento-open { grid-column: 1 / -1; grid-row: 2; margin-top: 0; padding-top: 0; max-width: none; }
+.selected-bento .featured-project-preview { grid-column: 2; grid-row: 1; align-self: start; width: 100%; height: auto; max-height: 100%; aspect-ratio: 16 / 10; border-radius: 5px; background: var(--nav); }
+.selected-bento .featured-project-preview img { object-fit: contain; object-position: top; }
+.selected-bento .bento-project-0 { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); grid-template-rows: auto 1fr auto; gap: 12px 16px; }
+.selected-bento .bento-project-0 .bento-statutes-art { grid-column: 1; grid-row: 1; height: 36px; margin: 0; }
+.selected-bento .bento-project-0 .bento-statutes-art > span { font-size: 2rem; line-height: 1; }
+.selected-bento .bento-project-0 .bento-copy { grid-row: 2; }
+.selected-bento .bento-project-0 .bento-copy h3 { font-size: clamp(1.25rem, 2vw, 1.55rem); max-width: none; }
+.selected-bento .bento-project-0 .featured-project-preview { grid-row: 1 / 3; max-height: 230px; }
+.selected-bento .bento-project-0 .bento-open { grid-row: 3; }
+.selected-bento .bento-project-2 .bento-copy p { display: none; }
+.selected-bento .bento-project-2 { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr); }
+.selected-bento .bento-project-2 .bento-copy h3 { font-size: 1.05rem; }
+@media (max-width: 600px) {
+  .selected-bento .magic-bento__cell:first-child { min-height: 340px; }
+  .selected-bento .bento-project { gap: 12px; }
+}

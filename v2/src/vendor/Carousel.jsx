@@ -1,7 +1,8 @@
 /*! React Bits — Copyright (c) 2026 David Haz. MIT + Commons Clause; see assets/react-bits-LICENSE.txt.
  * Source revision ff5121ef4e11d7988025fad7c1e23ac40d251bce.
  * Local changes: remove demo content/icon dependencies; add site label and Calm mode;
- * keep inactive event links out of focus order and focus the region on keyboard navigation.
+ * keep inactive event links out of focus order and focus the region on keyboard navigation;
+ * allow adjacent playback controls and use unpadded slide counts.
  */
 'use client';
 
@@ -177,6 +178,7 @@ export default function Carousel({
   onChange,
   label = 'Carousel',
   disableAnimations = false,
+  extraControls,
   className = '',
   style
 }) {
@@ -668,10 +670,10 @@ export default function Carousel({
       {indicator === 'counter' && (
         <div className="carousel-counter">
           <span ref={counterRef} className="carousel-counter-current">
-            {String(active + 1).padStart(2, '0')}
+            {active + 1}
           </span>
           <span>/</span>
-          <span>{String(count).padStart(2, '0')}</span>
+          <span>{count}</span>
         </div>
       )}
 
@@ -686,6 +688,7 @@ export default function Carousel({
           <Chevron />
         </button>
       )}
+      {extraControls}
     </div>
   ) : null;
   const inside = frame && !round;
