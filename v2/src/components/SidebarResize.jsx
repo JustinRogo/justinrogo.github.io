@@ -4,6 +4,9 @@ import { useMedia, useStored } from "../hooks.js";
 export const DEFAULT_SIDEBAR_WIDTH = 240;
 const MIN_WIDTH = 200;
 export function useSidebarWidth() {
+  const [savedCollapsed, setCollapsed] = useStored(
+    "jr-v2-sidebar-collapsed", false, (value) => typeof value === "boolean",
+  );
   const [saved, setSaved] = useStored(
     "jr-v2-sidebar-width",
     DEFAULT_SIDEBAR_WIDTH,
@@ -21,16 +24,19 @@ export function useSidebarWidth() {
     Math.max(DEFAULT_SIDEBAR_WIDTH, Math.floor(viewport * 0.32)),
   );
   const width = Math.min(saved, max);
+  const collapsed = desktop && savedCollapsed;
   useLayoutEffect(() => {
     const root = document.documentElement;
     const previous = root.style.getPropertyValue("--sidebar-width");
-    root.style.setProperty("--sidebar-width", `${width}px`);
+    root.style.setProperty("--sidebar-width", `${collapsed ? 72 : width}px`);
+    root.dataset.sidebar = collapsed ? "compact" : "expanded";
     return () => {
       if (previous) root.style.setProperty("--sidebar-width", previous);
       else root.style.removeProperty("--sidebar-width");
     };
-  }, [width]);
-  return { width, min: MIN_WIDTH, max, desktop, onChange: setSaved };
+  }, [width, collapsed]);
+  return { width, min: MIN_WIDTH, max, desktop, onChange: setSaved,
+    collapsed, toggle: () => setCollapsed((value) => !value) };
 }
 
 export default function SidebarResize({ width, min, max, desktop, onChange }) {

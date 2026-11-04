@@ -14,17 +14,27 @@ The UCPEA branch puts Member Dashboard first, with Current Contract, Contract Hi
 
 The desktop rail now defaults to 240px. Drag its right edge or focus the separator and use Left/Right arrows to resize; Shift makes larger steps, Home/End select the limits, and Enter or double-click resets it. Width persists across visits. Compact navigation still takes over below 801px. V2 box corners are half their original radius, while the photo remains circular.
 
+A button beside the desktop wordmark collapses the rail to a 72px icon-only navigation. The choice persists separately from the expanded width, which is restored on expansion. Navigation links retain accessible names and hover titles; contact and settings stay reachable. Tablet and phone navigation retain their existing responsive layouts.
+
+Home’s former “Around here lately” panel is replaced by the live UConn Law events feed. Every Circular Gallery card contains a centered event title above a smaller, uncropped poster when available, with no added UConn Law label. Each card’s caption shows its Eastern date and time. Native links follow the rendered card geometry, preserving mouse/keyboard activation and browser link menus; dragging browses without opening an event. The duplicate selected-event footer has been removed. Card textures are composed locally from the actual title and feed image, with title-only fallbacks for missing or inaccessible posters. Static cards preserve that same title/poster/date order. A slower drift than the shared preset uses bend 1.5, fade edges 0.12, auto-scroll 0.35, scroll ease 0.1, radius 0.07, aspect 1.06, and wave 0.6. Previous/next controls and a pause button are keyboard accessible; vertical wheel gestures continue to scroll the page. Calm mode, reduced motion, high contrast, a single event, or unavailable WebGL use ordinary linked event cards. Empty/error states retain the full calendar link and errors offer a retry. More shares the same feed parser and cache.
+
+The events section has no surrounding surface, border, shadow, or visible heading. Cards sit directly over the page background, with the calendar link and gallery controls underneath. Other glass surfaces retain their existing appearance and accessibility preferences.
+
 The portrait has calendar, email, Teams chat, and telephone links. Its shared four-color strengths bar opens and focuses the full CliftonStrengths section at `#/about?section=strengths`. On phones, contact buttons sit beside the photo and the strengths bar sits beneath it. Calendar and booking keep direct links and opt-in embeds without the former cookie/sign-in disclaimer.
 
 About’s introduction includes LinkedIn and GitHub buttons using the existing profile URLs. The sidebar’s “Let’s connect” opens and focuses “Say hello” at `#/about?section=contact`; the sidebar no longer includes the original-site link or prototype label. The original site remains accessible from the page footer.
 
-Settings offers Shape Waves, Antigravity, Fractal, Aurora, Orbits, and None. Device default selects Shape Waves above 800px and Aurora at 800px or below. Explicit choices persist across resizing and visits. Existing disabled-atmosphere preferences remain disabled. Only the selected renderer mounts; Calm/reduced motion use still alternatives. Contrast and reduced-transparency preferences suppress the background. Motion pauses during assembly and when the page is hidden.
+Settings offers Shape Waves, Antigravity, Fractal, Aurora, Orbits, and None. Device default selects Shape Waves above 800px and Aurora at 800px or below. Explicit choices persist across resizing and visits. Existing disabled-atmosphere preferences remain disabled. Only the selected renderer mounts; Calm/reduced motion use still alternatives. Contrast preferences suppress the background. Reduced transparency makes glass surfaces opaque while preserving the selected background. Motion pauses during assembly and when the page is hidden.
+
+Projects uses wide, tall, and compact Magic Bento cards. Container queries respond to the actual available width, including sidebar resizing: three columns above 1000px, two above 560px, and one below. Tablet cards use a separate full-width/pair arrangement, and phone cards grow naturally with their content. Search, filters, and saved projects retain their original behavior.
+
+All 15 project cards include committed JPEG screenshots of their destinations, loaded lazily without live embeds or a screenshot service. The Front Desk Planner preview shows its public sign-in page. To refresh previews, start the local V2 server and run `node v2/capture-project-previews.mjs`; this permits only GET/HEAD requests. `v2/assets/project-previews/sources.json` records the captured destinations and dates. Build/deployment copies these assets normally; it does not recapture pages.
 
 ## Navigation
 
 | Destination | Contents |
 | --- | --- |
-| Home | Profile, introduction, featured experiment, selected practical tools, current activity, contact |
+| Home | Profile, introduction, featured projects, UConn Law events, contact |
 | Projects | All 15 manifest projects, search, category filters, saved projects |
 | Tools | Five catalog searches, calendar, booking, local request preview, searchable quick links |
 | About | Biography, experience, leadership, education, skills, interests, all 34 strengths, contacts |
@@ -58,7 +68,9 @@ Home can be assembled by five colored cursors (four on phones), using the actual
 
 ## React Bits and attribution
 
-All implementations are pinned to revision `e12c22192ac7b4b452c5e2feb9b586d74765d696` of [React Bits](https://github.com/DavidHDev/react-bits).
+The original implementations are pinned to revision `e12c22192ac7b4b452c5e2feb9b586d74765d696` of [React Bits](https://github.com/DavidHDev/react-bits). Circular Gallery is pinned separately to `e2eb04d89d5be5a633dba7b2d4adfd274e053767`.
+
+- [Circular Gallery](https://reactbits.dev/components/circular-gallery): the official WebGL2 component, without demo images. Local changes expose selection and renderer status, provide missing-poster fallback images, preserve vertical scrolling, and keep keyboard selection consistent with the site controls. It mounts only while Home can animate and releases GPU resources when replaced by the static cards. The existing React Bits license applies.
 
 - [Tech Text](https://reactbits.dev/text-animations/tech-text): the actual canvas implementation turns letters in the name into dashed paths under a pointer; tapping can kick letters. Automatic sweep and dragging are off. Calm/reduced-motion modes render normal DOM text.
 - [Glass Surface](https://reactbits.dev/components/glass-surface): reuse the existing vendored implementation behind the hero, navigation and selected surfaces. SVG refraction on supported fine-pointer devices; frosted fallback on touch, reduced motion and unsupported browsers. Text and controls stay outside the filter layer.

@@ -55,7 +55,6 @@ export default function PageBackground({
   suppressed,
 }) {
   const compact = useMedia("(max-width: 800px)");
-  const lessTransparency = useMedia("(prefers-reduced-transparency: reduce)");
   const busy = useAssemblyBusy();
   const choice = preferences.background || "auto";
   const selected =
@@ -66,7 +65,8 @@ export default function PageBackground({
           ? "aurora"
           : "shape-waves"
         : choice;
-  const animated = moving && !busy && !suppressed && !lessTransparency;
+  // Reduced transparency controls glass surfaces, not the chosen page artwork.
+  const animated = moving && !busy && !suppressed;
   const light = theme === "light";
   return (
     <div
@@ -77,7 +77,7 @@ export default function PageBackground({
       aria-hidden="true"
       inert
     >
-      {!suppressed && !lessTransparency && selected !== "none" && (
+      {!suppressed && selected !== "none" && (
         <div
           className="page-background-renderer"
           key={`${selected}-${theme}-${animated}`}

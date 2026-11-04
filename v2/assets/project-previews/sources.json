@@ -1,0 +1,93 @@
+[
+  {
+    "path": "Pages/Updates/index.html",
+    "image": "updates-index.jpg",
+    "url": "https://justinrogo.vercel.app/updates",
+    "captured": "2026-11-04T05:20:33.882Z"
+  },
+  {
+    "path": "Pages/For Fun/Spider/index.html",
+    "image": "for-fun-spider-index.jpg",
+    "url": "http://127.0.0.1:4392/Pages/For%20Fun/Spider/index.html",
+    "captured": "2026-11-04T05:20:37.032Z"
+  },
+  {
+    "path": "Pages/For Fun/Birds.html",
+    "image": "for-fun-birds.jpg",
+    "url": "http://127.0.0.1:4392/Pages/For%20Fun/Birds.html",
+    "captured": "2026-11-04T05:20:40.134Z"
+  },
+  {
+    "path": "Pages/For Fun/Game-of-Life.html",
+    "image": "for-fun-game-of-life.jpg",
+    "url": "http://127.0.0.1:4392/Pages/For%20Fun/Game-of-Life.html",
+    "captured": "2026-11-04T05:20:43.441Z"
+  },
+  {
+    "path": "Pages/For Fun/StrategicFramework2.html",
+    "image": "for-fun-strategicframework2.jpg",
+    "portraitImage": "for-fun-strategicframework2-portrait.jpg",
+    "url": "http://127.0.0.1:4392/Pages/For%20Fun/StrategicFramework2.html",
+    "captured": "2026-11-04T05:20:46.931Z"
+  },
+  {
+    "path": "Pages/For Fun/Tarot/index.html",
+    "image": "for-fun-tarot-index.jpg",
+    "url": "http://127.0.0.1:4392/Pages/For%20Fun/Tarot/index.html",
+    "captured": "2026-11-04T05:20:49.604Z"
+  },
+  {
+    "path": "Pages/For Fun/Wave-Function-Collapse.html",
+    "image": "for-fun-wave-function-collapse.jpg",
+    "url": "http://127.0.0.1:4392/Pages/For%20Fun/Wave-Function-Collapse.html",
+    "captured": "2026-11-04T05:20:52.337Z"
+  },
+  {
+    "path": "Pages/Work/Library/Desk Planner/index.html",
+    "image": "work-library-desk-planner-index.jpg",
+    "url": "http://127.0.0.1:4392/Pages/Work/Library/Desk%20Planner/index.html",
+    "captured": "2026-11-04T05:20:54.822Z"
+  },
+  {
+    "path": "Pages/Work/Library/heatmap.html",
+    "image": "work-library-heatmap.jpg",
+    "url": "http://127.0.0.1:4392/Pages/Work/Library/heatmap.html",
+    "captured": "2026-11-04T05:20:57.234Z"
+  },
+  {
+    "path": "Pages/Work/Library/Timeline_LawLib.html",
+    "image": "work-library-timeline-lawlib.jpg",
+    "url": "http://127.0.0.1:4392/Pages/Work/Library/Timeline_LawLib.html",
+    "captured": "2026-11-04T05:21:00.375Z"
+  },
+  {
+    "path": "Pages/Work/UCPEA/index.html",
+    "image": "work-ucpea-index.jpg",
+    "url": "http://127.0.0.1:4392/Pages/Work/UCPEA/index.html",
+    "captured": "2026-11-04T05:21:03.220Z"
+  },
+  {
+    "path": "Pages/Work/UCPEA/UCPEA_Contract_Comparison.html",
+    "image": "work-ucpea-ucpea-contract-comparison.jpg",
+    "url": "http://127.0.0.1:4392/Pages/Work/UCPEA/UCPEA_Contract_Comparison.html",
+    "captured": "2026-11-04T05:21:05.695Z"
+  },
+  {
+    "path": "Pages/Work/UCPEA/UCPEAContract.html",
+    "image": "work-ucpea-ucpeacontract.jpg",
+    "url": "http://127.0.0.1:4392/Pages/Work/UCPEA/UCPEAContract.html",
+    "captured": "2026-11-04T05:21:08.504Z"
+  },
+  {
+    "path": "Pages/Work/UCPEA/UCPEA_Contract_History.html",
+    "image": "work-ucpea-ucpea-contract-history.jpg",
+    "url": "http://127.0.0.1:4392/Pages/Work/UCPEA/UCPEA_Contract_History.html",
+    "captured": "2026-11-04T05:21:11.427Z"
+  },
+  {
+    "path": "Pages/Work/cgs/index.html",
+    "image": "work-cgs-index.jpg",
+    "url": "https://uconn-law-library.github.io/CGS/#/",
+    "captured": "2026-11-04T05:21:14.284Z"
+  }
+]

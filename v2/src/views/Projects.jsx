@@ -31,6 +31,11 @@ export default function Projects({
   const query = params.get("q") || "";
   const onlySaved = params.get("saved") === "1";
   const pages = projects.data?.pages || [];
+  const tileSize = (project) => {
+    const index = pages.indexOf(project);
+    if (index % 8 === 4 && index + 3 < pages.length) return "tall";
+    return [0, 3, 7].includes(index % 8) ? "wide" : "compact";
+  };
   const matches = pages.filter(
     (p) =>
       inGroup(p, group) &&
@@ -99,9 +104,11 @@ export default function Projects({
               className="project-bento"
               items={matches.map((project) => ({
                 id: project.path,
+                className: `project-tile project-tile--${tileSize(project)}`,
                 content: (
                   <ProjectCard
                     project={project}
+                    tall={tileSize(project) === "tall"}
                     saved={saved.includes(project.path)}
                     onSave={onSave}
                   />
@@ -123,7 +130,6 @@ export default function Projects({
               enableMagnetism={effects}
               disableAnimations={!effects}
               intro={false}
-              style={{ gridAutoRows: "minmax(195px, auto)" }}
             />
           ) : (
             <div className="empty-state">

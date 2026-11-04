@@ -1,4 +1,10 @@
 const paths = {
+  collapse: "M3 3h18v18H3z M9 3v18 m8-13-4 4 4 4",
+  expand: "M3 3h18v18H3z M9 3v18 m4-13 4 4-4 4",
+  previous: "m15 6-6 6 6 6",
+  next: "m9 6 6 6-6 6",
+  pause: "M8 5v14 M16 5v14",
+  play: "m8 4 12 8-12 8Z",
   home: "m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z",
   projects: "M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z",
   tools:

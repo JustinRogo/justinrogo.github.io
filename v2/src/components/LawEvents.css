@@ -1,0 +1,35 @@
+.law-events {
+  position: relative;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  background: none;
+  border: 0;
+  box-shadow: none;
+}
+.law-events-stage { grid-column: 1 / -1; height: clamp(330px, 36vw, 440px); }
+.law-events > .load-state, .law-events > .muted { grid-column: 1 / -1; }
+.event-calendar-link { grid-column: 1; grid-row: 2; align-self: center; white-space: nowrap; }
+.event-gallery-controls { grid-column: 2; grid-row: 2; justify-self: end; display: flex; align-items: center; gap: 6px; }
+.event-gallery-controls .icon-button { width: 44px; height: 44px; }
+.event-count { color: var(--muted); font-size: 0.8rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.event-date { color: var(--muted); font-size: 0.82rem; margin: 0 0 8px; line-height: 1.6; }
+.law-events-list { grid-column: 1 / -1; list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.law-events-list > li { min-width: 0; }
+.event-static-card { text-decoration: none; display: block; text-align: center; }
+.event-card-body { padding: 22px; border-radius: 12px; background: var(--surface); margin-bottom: 12px; }
+.event-card-body > img { width: 100%; height: auto; max-height: 220px; object-fit: contain; display: block; margin-top: 20px; }
+.event-card-body > img[hidden] { display: none; }
+.event-static-card h3 { font-size: 1.05rem; line-height: 1.45; margin: 0; overflow-wrap: anywhere; }
+.event-static-card p:not(.event-date) { font-size: 0.82rem; color: var(--muted); margin: 8px 0 0; }
+.event-static-card:hover h3 { color: var(--blue); }
+@container home (max-width: 760px) {
+  .law-events-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  .law-events { gap: 8px; }
+  .event-calendar-link { font-size: 0.8rem; }
+  .law-events-stage { height: 340px; }
+  .law-events-list { grid-template-columns: 1fr; }
+}

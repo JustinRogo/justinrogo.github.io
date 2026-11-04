@@ -1,6 +1,7 @@
 /*! React Bits — Copyright (c) 2026 David Haz. MIT + Commons Clause; see assets/react-bits-LICENSE.txt.
  * Source revision e12c22192ac7b4b452c5e2feb9b586d74765d696.
- * Local changes: remove demo data/art/icon dependencies; recreate motion engine on live preference changes.
+ * Local changes: remove demo data/art/icon dependencies; recreate motion engine on live preference changes;
+ * accept item-level cell classes for responsive site layouts.
  */
 "use client";
 
@@ -853,7 +854,7 @@ const MagicBento = ({
             ref={(element) => {
               cellRefs.current[index] = element;
             }}
-            className="magic-bento__cell"
+            className={`magic-bento__cell ${entry.className || ""}`.trim()}
             style={{
               gridColumn: `span ${Math.min(span, Math.max(1, Math.round(entry.colSpan ?? 1)))}`,
               gridRow: `span ${Math.max(1, Math.round(entry.rowSpan ?? 1))}`,

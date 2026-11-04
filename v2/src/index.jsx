@@ -225,11 +225,21 @@ function App() {
             jr
             <Icon name="external" size={28} />
           </a>
+          <button
+            className="icon-button sidebar-toggle"
+            aria-label={sidebar.collapsed ? "Expand navigation" : "Collapse navigation"}
+            aria-expanded={!sidebar.collapsed}
+            aria-controls="sidebar-navigation"
+            title={sidebar.collapsed ? "Expand navigation" : "Collapse navigation"}
+            onClick={sidebar.toggle}
+          >
+            <Icon name={sidebar.collapsed ? "expand" : "collapse"} />
+          </button>
           <div className="sidebar-identity">
             Justin Rogowski
             <span>{profile.role}</span>
           </div>
-          <div className="sidebar-scroll">
+          <div className="sidebar-scroll" id="sidebar-navigation">
             <AssembleReveal id="navigation">
               <nav className="primary-nav" aria-label="Primary navigation">
                 <GlassLayer radius={10} className="dock-glass" />
@@ -237,6 +247,8 @@ function App() {
                   <a
                     key={id}
                     href={`#/${id}`}
+                    aria-label={label}
+                    title={label}
                     aria-current={id === active ? "page" : undefined}
                   >
                     <Icon name={id} size={21} />
@@ -260,6 +272,8 @@ function App() {
             <a
               href="#/about?section=contact"
               className="sidebar-contact"
+              aria-label="Let’s connect"
+              title="Let’s connect"
               onClick={(event) => {
                 if (
                   aboutSection !== "contact" ||
@@ -278,7 +292,7 @@ function App() {
                 section?.querySelector("h2")?.focus({ preventScroll: true });
               }}
             >
-              Let’s connect <Icon name="arrow" size={17} />
+              <span>Let’s connect</span> <Icon name="arrow" size={17} />
             </a>
             <div className="sidebar-settings">
               <button
@@ -290,7 +304,7 @@ function App() {
               </button>
             </div>
           </div>
-          <SidebarResize {...sidebar} />
+          {!sidebar.collapsed && <SidebarResize {...sidebar} />}
         </aside>
       </AssembleReveal>
       <div className="workspace" id="workspace">

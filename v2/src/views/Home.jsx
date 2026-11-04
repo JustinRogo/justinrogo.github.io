@@ -13,6 +13,7 @@ import { GlassLayer } from "../components/Glass.jsx";
 import { ExternalLink, LoadState, SectionTitle } from "../components/UI.jsx";
 import { AssembleReveal } from "../assembly/HomepageAssembly.jsx";
 import { StrengthsPreview } from "../components/Strengths.jsx";
+import LawEvents from "../components/LawEvents.jsx";
 
 function Name({ effects }) {
   return (
@@ -260,43 +261,7 @@ export default function Home({ projects, effects, theme, fine }) {
       </LoadState>
       <div className="home-lower">
         <AssembleReveal id="notes">
-          <aside className="glass-host now-panel">
-            <GlassLayer />
-            <h2>Around here lately</h2>
-            <p>
-              Tending plants.
-              <br />
-              Working in Power BI.
-              <br />
-              Other duties as assigned.
-            </p>
-            <a href="#/more" className="text-link">
-              Notes & activity <Icon name="arrow" size={17} />
-            </a>
-            <svg
-              className="now-geometry"
-              viewBox="0 0 280 100"
-              aria-hidden="true"
-            >
-              <g fill="none" stroke="currentColor" strokeWidth="1">
-                <ellipse cx="140" cy="55" rx="100" ry="32" />
-                <ellipse
-                  cx="140"
-                  cy="55"
-                  rx="100"
-                  ry="32"
-                  transform="rotate(-22 140 55)"
-                />
-                <ellipse
-                  cx="140"
-                  cy="55"
-                  rx="100"
-                  ry="32"
-                  transform="rotate(22 140 55)"
-                />
-              </g>
-            </svg>
-          </aside>
+          <div><LawEvents effects={effects} theme={theme} /></div>
         </AssembleReveal>
       </div>
       <AssembleReveal id="contact">

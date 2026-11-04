@@ -1235,9 +1235,6 @@ main {
     background: var(--surface);
     backdrop-filter: none;
   }
-  .atmosphere {
-    display: none;
-  }
 }
 @media (prefers-contrast: more) {
   :root {

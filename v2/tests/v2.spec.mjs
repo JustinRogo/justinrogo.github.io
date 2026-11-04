@@ -341,7 +341,14 @@ test("the requested React Bits render, react to pointers, and stop in Calm mode"
   await expect(
     page.getByRole("heading", { level: 1, name: "Justin Rogowski" }),
   ).toBeVisible();
-  await expect(page.locator(".glass-hero .glass-surface")).toBeVisible();
+  const reducedTransparency = await page.evaluate(() =>
+    matchMedia("(prefers-reduced-transparency: reduce)").matches,
+  );
+  await expect(page.locator(
+    reducedTransparency
+      ? ".glass-hero .glass-layer-opaque"
+      : ".glass-hero .glass-surface",
+  )).toBeVisible();
   const filterIds = await page
     .locator(".glass-surface__filter filter")
     .evaluateAll((nodes) => nodes.map((node) => node.id));

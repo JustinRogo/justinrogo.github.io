@@ -9,6 +9,7 @@ import {
 import Icon from "../components/Icon.jsx";
 import ExploreMenu from "../components/ExploreMenu.jsx";
 import { GlassLayer } from "../components/Glass.jsx";
+import { parseEvents } from "../events.js";
 
 export function parseManifest(text) {
   const value = JSON.parse(text);
@@ -34,19 +35,6 @@ const safeUrl = (value) => {
   } catch {
     return null;
   }
-};
-const parseEvents = (xml) => {
-  const doc = new DOMParser().parseFromString(xml, "text/xml");
-  if (doc.querySelector("parsererror"))
-    throw new Error("Unreadable events feed");
-  return [...doc.querySelectorAll("item")]
-    .slice(0, 5)
-    .map((item) => ({
-      title: item.querySelector("title")?.textContent,
-      href: safeUrl(item.querySelector("link")?.textContent),
-      date: item.querySelector("pubDate")?.textContent,
-    }))
-    .filter((e) => e.href && e.title);
 };
 function GithubFeed() {
   const site = useResource(
@@ -233,7 +221,7 @@ export default function More({
           >
             {(data) =>
               data.length ? (
-                data.map((e) => (
+                data.slice(0, 5).map((e) => (
                   <LinkRow
                     key={e.href}
                     title={e.title}

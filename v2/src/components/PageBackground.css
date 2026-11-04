@@ -146,9 +146,7 @@
     grid-template-columns: 1fr;
   }
 }
-@media (prefers-contrast: more),
-  (forced-colors: active),
-  (prefers-reduced-transparency: reduce) {
+@media (prefers-contrast: more), (forced-colors: active) {
   .page-background {
     display: none;
   }
