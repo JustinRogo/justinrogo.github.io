@@ -38,16 +38,3 @@ export function eventDate(date) {
     timeZone: "America/New_York", timeZoneName: "short",
   });
 }
-
-// A missing poster still presents real event information inside the gallery.
-export function eventPoster(event, theme = "dark") {
-  const escape = (value) => String(value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&apos;" })[char]);
-  const lines = [];
-  for (const word of event.title.split(/\s+/)) {
-    if (!lines.length || lines.at(-1).length + word.length > 29) lines.push(word);
-    else lines[lines.length - 1] += ` ${word}`;
-  }
-  const title = lines.slice(0, 8).map((line, index) => `<tspan x="360" y="${84 + index * 52}">${escape(line)}</tspan>`).join("");
-  const dark = theme === "dark";
-  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="720" height="720" viewBox="0 0 720 720"><rect width="720" height="720" fill="${dark ? "#102b50" : "#f1f6ff"}"/><text text-anchor="middle" fill="${dark ? "#eef5ff" : "#112847"}" font-family="Arial,sans-serif" font-weight="600" font-size="40">${title}</text></svg>`)}`;
-}

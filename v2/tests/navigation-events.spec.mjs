@@ -55,100 +55,122 @@ test("navigation collapses by keyboard, keeps names/settings, persists, and rest
   await expect(resize).toHaveAttribute("aria-valuenow", String(expandedWidth));
 });
 
-test("events use native card links with manual controls, pause, and vertical page scrolling", async ({ page, context }) => {
+test("events use the React Bits Carousel with native links, swipe, arrows, and keyboard navigation", async ({ page, context }) => {
   const errors = [];
   page.on("pageerror", error => errors.push(error.message));
   await page.setViewportSize({ width: 1201, height: 1004 });
   await page.goto("/v2/?intro=0#/home");
   const section = page.locator(".law-events");
+  const carousel = section.getByRole("region", { name: "Upcoming UConn Law events" });
+  const current = () => carousel.locator(".carousel-slide[data-current]");
   await section.scrollIntoViewIfNeeded();
-  await expect(page.getByText("Around here lately", { exact: true })).toHaveCount(0);
-  await expect(section.locator(".circular-gallery")).toHaveAttribute("data-renderer", "webgl");
-  await section.getByRole("button", { name: "Pause event gallery" }).click();
-  await expect(section.getByRole("button", { name: "Play event gallery" })).toBeVisible();
-  await expect(section.locator(".event-count")).toHaveText("1 / 4");
-  await expect(section.locator(".circular-gallery-labels")).toContainText("Nov 5, 12:45 PM EST");
-  await expect(section.locator(".circular-gallery-labels")).toContainText("Nov 5, 1:45 PM EST");
-  await expect(section.locator('[data-gallery-list] a').first()).toHaveAttribute("aria-label", /Connect in the Café/);
-  await expect(section.locator(".event-selection,.event-title,.event-card-brand")).toHaveCount(0);
-  await section.getByRole("button", { name: "Next event" }).click();
-  const card = section.getByRole("link", { name: /Law and public service/ });
+  await expect(carousel).not.toHaveClass(/has-frame/);
+  await expect(section.locator(".circular-gallery,canvas,.event-selection,.event-card-brand")).toHaveCount(0);
+  await section.getByRole("button", { name: "Pause events" }).click();
+  await carousel.getByRole("button", { name: "Next slide", exact: true }).click();
+  await expect(current()).toHaveAttribute("aria-label", "2 of 4");
+  const card = current().getByRole("link");
   await expect(card).toHaveAttribute("href", "https://events.uconn.edu/law-school/event/2");
-  await expect(card).toHaveAttribute("target", "_blank");
-  await expect(card).toHaveAttribute("aria-current", "true");
+  await expect(card).toContainText("Law and public service");
+  await expect(card).toContainText("1:45 PM EST");
   const [clicked] = await Promise.all([context.waitForEvent("page"), card.click()]);
   await expect(clicked).toHaveURL("https://events.uconn.edu/law-school/event/2");
   await clicked.close();
   await page.bringToFront();
-  await card.focus();
+  await carousel.focus();
   await page.keyboard.press("ArrowRight");
-  await expect(section.getByRole("link", { name: /Library research workshop/ })).toBeFocused();
+  await expect(current()).toHaveAttribute("aria-label", "3 of 4");
+  await page.keyboard.press("Tab");
+  await expect(current().getByRole("link")).toBeFocused();
   const [keyboard] = await Promise.all([context.waitForEvent("page"), page.keyboard.press("Enter")]);
   await expect(keyboard).toHaveURL("https://events.uconn.edu/law-school/event/3");
   await keyboard.close();
   await page.bringToFront();
-  const dragCard = section.getByRole("link", { name: /Library research workshop/ });
-  await dragCard.scrollIntoViewIfNeeded();
+  const dragCard = current().getByRole("link");
+  await dragCard.hover();
   const box = await dragCard.boundingBox();
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
   await page.mouse.down();
-  await page.mouse.move(box.x + box.width / 2 - 90, box.y + box.height / 2, { steps: 8 });
+  await page.mouse.move(box.x + box.width / 2 - 150, box.y + box.height / 2, { steps: 8 });
   await page.mouse.up();
   await page.waitForTimeout(150);
   expect(context.pages()).toHaveLength(1);
-  await section.getByRole("link", { name: /Connect in the Café/ }).focus();
+  await carousel.focus();
   await page.keyboard.press("Home");
-  await expect(section.locator(".event-count")).toHaveText("1 / 4");
-  await section.getByRole("link", { name: /Connect in the Café/ }).hover();
+  await expect(current()).toHaveAttribute("aria-label", "1 of 4");
+  await current().getByRole("link").hover();
   const before = await page.evaluate(() => scrollY);
-  await page.mouse.wheel(0, 220);
-  await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(before);
-  await section.getByRole("button", { name: "Play event gallery" }).click();
-  await expect(section.getByRole("button", { name: "Pause event gallery" })).toBeVisible();
+  await page.mouse.wheel(0, -160);
+  await expect.poll(() => page.evaluate(() => scrollY)).toBeLessThan(before);
   await page.getByRole("navigation", { name: "Primary navigation", exact: true }).getByRole("link", { name: "More", exact: true }).click();
-  await expect(section.locator("canvas")).toHaveCount(0);
+  await expect(section.locator(".event-carousel")).toHaveAttribute("data-autoplay", "false");
   expect(errors).toEqual([]);
 });
 
-test("gallery fits narrow screens and both themes; reduced motion and lost WebGL show accessible event cards", async ({ page }) => {
-  await mkdir(".impeccable/events", { recursive: true });
-  for (const width of [1440, 768, 390, 320]) {
-    await page.setViewportSize({ width, height: 1000 });
-    await page.goto(`/v2/?intro=0&galleryWidth=${width}#/home`);
-    const section = page.locator(".law-events");
-    await section.scrollIntoViewIfNeeded();
-    await expect(section.locator(".circular-gallery")).toHaveAttribute("data-renderer", "webgl");
-    await section.getByRole("button", { name: "Pause event gallery" }).click();
-    await page.screenshot({ path: `.impeccable/events/${width}-gallery.png` });
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-  }
-  await page.emulateMedia({ reducedMotion: "reduce" });
+test("autoplay advances, pauses on hover, resumes after leaving, and supports explicit pause", async ({ page }) => {
+  await page.clock.install({ time: new Date("2026-11-04T12:00:00Z") });
+  await page.clock.pauseAt(new Date("2026-11-04T12:01:00Z"));
+  await page.goto("/v2/?intro=0#/home");
   const section = page.locator(".law-events");
-  await expect(section.locator("canvas")).toHaveCount(0);
-  await expect(section.locator(".event-static-card")).toHaveCount(4);
-  for (const card of await section.locator(".event-static-card").all()) {
-    await expect(card.locator(".event-card-body h3")).toBeVisible();
-    await expect(card.locator(".event-card-body h3")).toHaveCSS("text-align", "center");
-    const poster = card.locator(".event-card-body img");
-    if (await poster.count()) {
-      expect(await card.evaluate(el => Boolean(el.querySelector("h3").compareDocumentPosition(el.querySelector("img")) & Node.DOCUMENT_POSITION_FOLLOWING))).toBe(true);
-    }
-    await expect(card.locator(".event-date")).toContainText("PM EST");
-  }
-  await expect(section.getByRole("link", { name: /Law and public service/ })).toHaveAttribute("href", "https://events.uconn.edu/law-school/event/2");
-  await page.locator(".topbar").getByRole("button", { name: "Appearance and motion settings" }).click();
-  await page.getByRole("radio", { name: "Light", exact: true }).check();
-  await page.keyboard.press("Escape");
+  const carousel = section.locator(".event-carousel");
+  const current = () => carousel.locator(".carousel-slide[data-current]");
   await section.scrollIntoViewIfNeeded();
-  await page.screenshot({ path: ".impeccable/events/320-light-still.png" });
-  await page.emulateMedia({ reducedMotion: "no-preference" });
-  await expect(section.locator("canvas")).toHaveCount(1);
-  await section.locator("canvas").evaluate(canvas => canvas.dispatchEvent(new Event("webglcontextlost", { cancelable: true })));
-  await expect(section.locator("canvas")).toHaveCount(0);
-  await expect(section.locator(".event-static-card")).toHaveCount(4);
+  await page.mouse.move(0, 0);
+  await page.clock.runFor(4200);
+  await expect(current()).toHaveAttribute("aria-label", "2 of 4");
+  const box = await carousel.boundingBox();
+  await page.mouse.move(box.x + box.width / 2, box.y + 80);
+  await page.clock.runFor(7000);
+  await expect(current()).toHaveAttribute("aria-label", "2 of 4");
+  await page.mouse.move(0, 0);
+  await page.clock.runFor(3200);
+  await expect(current()).toHaveAttribute("aria-label", "3 of 4");
+  await section.getByRole("button", { name: "Pause events" }).click();
+  await expect(carousel).toHaveAttribute("data-autoplay", "false");
+  await page.clock.runFor(7000);
+  await expect(current()).toHaveAttribute("aria-label", "3 of 4");
 });
 
-test("events have no section surface or duplicate details across transparency and contrast modes", async ({ page, context }) => {
+test("square event cards fit narrow screens and both themes; Calm and reduced motion keep manual controls", async ({ page }) => {
+  await mkdir(".impeccable/events/carousel", { recursive: true });
+  for (const width of [1440, 768, 390, 320]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto(`/v2/?intro=0&carouselWidth=${width}#/home`);
+    const section = page.locator(".law-events");
+    await section.scrollIntoViewIfNeeded();
+    await section.getByRole("button", { name: "Pause events" }).click();
+    const card = section.locator(".carousel-slide[data-current] .event-card-body");
+    const box = await card.boundingBox();
+    expect(Math.abs(box.width - box.height)).toBeLessThan(1);
+    await expect(card).toHaveCSS("border-radius", "16px");
+    await expect(card.locator("h3")).toHaveCSS("text-align", "center");
+    const date = await section.locator(".carousel-slide[data-current] .event-date").boundingBox();
+    expect(date.y).toBeGreaterThanOrEqual(box.y + box.height);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await page.screenshot({ path: `.impeccable/events/carousel/${width}.png` });
+  }
+  const section = page.locator(".law-events");
+  const carousel = section.locator(".event-carousel");
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await expect(carousel).toHaveAttribute("data-motion", "still");
+  await expect(carousel).toHaveAttribute("data-autoplay", "false");
+  await carousel.getByRole("button", { name: "Next slide", exact: true }).click();
+  await expect(carousel.locator(".carousel-slide[data-current]")).toHaveAttribute("aria-label", "2 of 4");
+  await page.locator(".topbar").getByRole("button", { name: "Appearance and motion settings" }).click();
+  await page.getByRole("radio", { name: "Light", exact: true }).check();
+  await page.getByRole("switch", { name: /^Calm mode/ }).check();
+  await page.keyboard.press("Escape");
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await expect(carousel).toHaveAttribute("data-motion", "still");
+  await section.scrollIntoViewIfNeeded();
+  await expect(carousel.locator(".carousel-slide[data-current]")).toHaveCSS("visibility", "visible");
+  await expect(carousel.locator(".carousel-slide[data-current] .event-card-body")).toBeVisible();
+  await page.screenshot({ path: ".impeccable/events/carousel/320-light-calm.png" });
+  await carousel.getByRole("button", { name: "Next slide", exact: true }).click();
+  await expect(carousel.locator(".carousel-slide[data-current]")).toHaveAttribute("aria-label", "3 of 4");
+});
+
+test("events keep their frameless layout in transparency and contrast modes", async ({ page, context }) => {
   const cdp = await context.newCDPSession(page);
   await cdp.send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-reduced-transparency", value: "reduce" }] });
   await page.goto("/v2/?intro=0#/home");
@@ -157,15 +179,14 @@ test("events have no section surface or duplicate details across transparency an
   await expect(section).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
   await expect(section).toHaveCSS("border-top-width", "0px");
   await expect(section).toHaveCSS("box-shadow", "none");
-  await expect(page.locator(".glass-hero > .glass-layer")).toHaveClass(/glass-layer-opaque/);
   await page.emulateMedia({ contrast: "more" });
-  await expect(section.locator(".glass-layer,.event-selection")).toHaveCount(0);
-  await expect(section.locator(".event-static-card")).toHaveCount(4);
+  await expect(section.locator(".event-carousel")).toHaveAttribute("data-autoplay", "false");
+  await expect(section.locator(".carousel-slide[data-current] a")).toHaveAttribute("href", "https://events.uconn.edu/law-school/event/1");
   await page.emulateMedia({ contrast: "no-preference", forcedColors: "active" });
   await expect(section.locator(".glass-layer")).toHaveCount(0);
 });
 
-test("empty, failed, and malformed event feeds keep the calendar link and a retry action", async ({ page }) => {
+test("empty and malformed event feeds keep the calendar link and a retry action", async ({ page }) => {
   await page.route("**/live/rss/**", route => route.fulfill({ contentType: "application/rss+xml", body: "<rss><channel/></rss>" }));
   await page.goto("/v2/?intro=0#/home");
   const section = page.locator(".law-events");
@@ -176,5 +197,5 @@ test("empty, failed, and malformed event feeds keep the calendar link and a retr
   await expect(section).toContainText("The events feed is unavailable");
   await page.route("**/live/rss/**", route => route.fulfill({ contentType: "application/rss+xml", body: feed }));
   await section.getByRole("button", { name: "Try again" }).click();
-  await expect(section.locator(".circular-gallery")).toHaveCount(1);
+  await expect(section.locator(".event-carousel")).toHaveCount(1);
 });
