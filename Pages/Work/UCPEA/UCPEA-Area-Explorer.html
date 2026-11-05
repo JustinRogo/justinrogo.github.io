@@ -681,36 +681,36 @@ dialog,#settings{border:1px solid var(--edge);border-radius:12px;padding:24px;ba
 @media(max-width:360px){header{padding:0 12px}h1{font-size:15px}.brand .sub{display:none}.header-actions button{padding:7px 8px}.map-toolbar{gap:6px;padding:8px 12px}.map-toolbar select{max-width:130px}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 /* Center the identity on the viewport, independently of the two menus. */
+.steward-filter{margin:18px 0}.switch-label{position:relative;display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0;font-size:13px;font-weight:400;cursor:pointer;min-height:28px}.switch-label input{position:absolute;right:0;z-index:1;width:40px;height:28px;min-height:28px;padding:0;opacity:0;cursor:pointer}.switch-track{position:relative;flex:none;width:36px;height:20px;border:1px solid var(--muted);border-radius:20px;background:var(--active)}.switch-track::after{content:'';position:absolute;top:3px;left:3px;width:12px;height:12px;border-radius:50%;background:var(--muted)}.switch-label input:checked+.switch-track{background:var(--accent);border-color:var(--accent)}.switch-label input:checked+.switch-track::after{left:19px;background:var(--surface)}.switch-label input:focus-visible+.switch-track{outline:3px solid var(--accent);outline-offset:3px}
+#resources-open{border-radius:999px;background:#206a7c;border-color:#206a7c;color:#fff;padding:7px 18px;font-weight:600}#resources-open:hover{background:#195665;border-color:#195665}:root[data-theme="dark"] #resources-open{background:#7fc7d4;border-color:#7fc7d4;color:#182a31}:root[data-theme="dark"] #resources-open:hover{background:#a2d7e1;border-color:#a2d7e1}.area-focus[aria-pressed="true"]{background:var(--active)}
+.icon-button{width:36px;padding:7px;display:flex;align-items:center;justify-content:center}.icon-button svg{width:20px;height:20px}.campus-group{display:flex;align-items:center;flex-wrap:wrap;gap:6px;max-width:100%}.campus-label{font-size:13px;font-weight:600;margin-right:4px}.campus-group button{font-size:12px;min-height:32px;padding:6px 9px}.campus-group button[aria-pressed="true"]{background:var(--active);border-color:var(--muted)}.area-group{border-bottom:1px solid var(--edge)}.area-heading{display:flex;align-items:center;gap:4px;min-height:60px}.area-toggle{width:32px;flex:none;padding:0;border:0;background:transparent;font-size:22px}.area-focus{display:flex;align-items:center;justify-content:space-between;gap:8px;flex:1;min-width:0;padding:10px 4px;border:0;background:transparent;text-align:left}.area-focus .area-num{width:auto;min-width:66px;padding:0 5px;font-size:14px;line-height:28px}.area-count{font-size:12px;color:var(--muted);white-space:nowrap}.area-children[hidden]{display:none}.area-children{padding:0 0 8px 36px}.area-children .result{min-height:44px;padding:10px 6px;margin:0}.area-children .result:last-child{border-bottom:0}.area-children .result-name{font-size:13px;font-weight:400}
 .map-sheet{grid-column:-2/-1}
 header{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:16px}.header-resources{justify-self:start}.brand{justify-self:center;justify-content:center;text-align:center}.header-actions{justify-self:end}
 .workspace{--drawer-size:322px;grid-template-columns:var(--drawer-size) 18px minmax(0,1fr)}.sidebar{padding-right:8px}.drawer-closed .workspace{grid-template-columns:18px minmax(0,1fr);padding-left:0}.drawer-rail{height:100%;width:18px;min-height:0;padding:0;border:0;border-radius:0;background:transparent;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:24px;line-height:1}.drawer-rail:hover{background:var(--active);color:var(--ink)}.drawer-rail:active{transform:none}.drawer-rail:focus-visible{outline-offset:-3px}
 #resources{position:fixed;inset:64px auto auto 16px;margin:0;width:280px;max-width:calc(100vw - 32px);max-height:calc(100dvh - 80px);overflow:auto;padding:20px;background:var(--surface);color:var(--ink);border:1px solid var(--edge);border-radius:12px}#resources::backdrop{background:transparent}#resources a{display:block;padding:12px 0;color:var(--ink);text-decoration:none;border-bottom:1px solid var(--edge)}#resources a:last-child{border-bottom:0}#resources a:hover{text-decoration:underline;text-underline-offset:3px}#resources .dialog-head{margin-bottom:8px}
 @media(max-width:1000px){.workspace{--drawer-size:282px}}
 @media(max-width:650px){header{height:100px;grid-template-columns:1fr 1fr;grid-template-rows:44px 44px;gap:0;padding:4px 16px 8px}.brand{grid-column:1/-1;grid-row:1}.header-resources{grid-row:2;grid-column:1}.header-actions{grid-row:2;grid-column:2}.header-resources button{font-size:12px;min-height:40px;padding:7px 10px}.workspace,.drawer-closed .workspace{display:grid;grid-template-columns:24px minmax(0,1fr);height:calc(100% - 100px);padding:0}.map-sheet{min-height:0}.sidebar{top:100px;right:24px;padding:16px}.drawer-rail{width:24px}.browse .drawer-rail{position:absolute;z-index:1001;top:100px;bottom:0;right:0;height:calc(100% - 100px);background:var(--ground);border-left:1px solid var(--edge)}#settings,#resources{top:100px;max-height:calc(100dvh - 112px)}#resources{left:12px;max-width:calc(100vw - 24px)}}
+@media(max-width:650px){.map-toolbar{flex-wrap:wrap;gap:10px;align-items:flex-start}.campus-group{width:100%}.campus-label{width:100%}.campus-group button{flex:1 1 calc((100% - 12px)/3);min-height:36px;padding:6px 5px}.header-actions .icon-button{width:40px;padding:7px}}
 </style>
 </head>
 <body>
 <header>
  <div class="header-resources"><button id="resources-open" popovertarget="resources" aria-expanded="false">Resources</button></div>
- <div class="brand"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 7 11 3l10 4 8-4v22l-8 4-10-4-8 4Z"/><path d="M11 3v22M21 7v22M6 16l9-5 9 6"/></svg><div><h1>UCPEA Area Explorer</h1><div class="sub">Buildings, coverage &amp; stewards</div></div></div>
- <div class="header-actions"><button id="settings-open" popovertarget="settings" aria-expanded="false">Settings</button></div>
+ <div class="brand"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 7 11 3l10 4 8-4v22l-8 4-10-4-8 4Z"/><path d="M11 3v22M21 7v22M6 16l9-5 9 6"/></svg><div><h1>UCPEA Area Explorer</h1></div></div>
+ <div class="header-actions"><button id="theme-toggle" class="icon-button" aria-label="Switch to dark mode" title="Switch to dark mode" aria-pressed="false"></button><button id="settings-open" popovertarget="settings" aria-expanded="false">Settings</button></div>
 </header>
 <main class="workspace">
  <aside class="sidebar" id="directory" aria-label="Search and filter locations">
   <label for="search">Search buildings, areas or stewards</label>
   <div class="search-wrap"><input type="search" id="search" placeholder="Try Babbidge, Area 7, or a name" autocomplete="off"><button id="clear-search" aria-label="Clear search" hidden>×</button></div>
-  <div class="filters">
-   <div><label for="area-filter">UCPEA area</label><select id="area-filter"><option value="">All areas</option></select></div>
-   <div><label for="coverage-filter">Steward listing</label><select id="coverage-filter"><option value="">All locations</option><option value="assigned">Stewards listed</option><option value="none">None listed</option></select></div>
-   <div class="wide"><label for="sort-order">Sort locations</label><select id="sort-order"><option value="area">Area number</option><option value="name">Building name (A–Z)</option></select></div>
-  </div>
+  <div class="steward-filter"><label class="switch-label" for="unassigned-only"><span>Filter areas with no Stewards</span><input id="unassigned-only" type="checkbox" role="switch"><span class="switch-track" aria-hidden="true"></span></label></div>
   <div class="filter-foot"><label style="font-weight:400;margin:0;display:flex;gap:7px;align-items:center"><input id="in-view" type="checkbox" style="width:16px;min-height:16px;margin:0">Only in map view</label><button class="text-button" id="reset">Reset filters</button></div>
   <div class="list-head"><h2 id="results-count" aria-live="polite"></h2><button class="text-button small" id="fit-results">Fit results</button></div>
   <div class="results" id="results" aria-label="Matching locations"></div>
  </aside>
  <button class="drawer-rail" id="browse-toggle" aria-expanded="true" aria-controls="directory" aria-label="Collapse search" title="Collapse search"><span aria-hidden="true">‹</span></button>
  <section class="map-sheet" aria-label="Interactive area map">
-  <div class="map-toolbar"><div class="summary"><strong id="map-count"></strong><span class="muted" id="map-context"></span></div><div class="tools"><select id="location-view" aria-label="Map view"><option value="" selected disabled>Go to view…</option><option value="storrs">Storrs</option><option value="hartford">Hartford</option><option value="waterbury">Waterbury</option><option value="avery-point">Avery Point</option><option value="stamford">Stamford</option><option value="all">All locations</option></select></div></div>
+  <div class="map-toolbar"><div class="summary"><strong id="map-count"></strong><span class="muted" id="map-context"></span></div><div class="campus-group" role="group" aria-labelledby="campus-heading"><span class="campus-label" id="campus-heading">Campus</span><button data-campus="storrs" aria-pressed="false">Storrs</button><button data-campus="hartford" aria-pressed="false">Hartford</button><button data-campus="waterbury" aria-pressed="false">Waterbury</button><button data-campus="avery-point" aria-pressed="false">Avery Point</button><button data-campus="stamford" aria-pressed="false">Stamford</button><button data-campus="all" aria-pressed="false">All locations</button></div></div>
   <div id="data-alert" class="data-alert" role="status" hidden></div>
   <div class="map-stage">
    <div id="map" role="region" aria-label="UCPEA location map. Use arrow keys to pan and plus or minus to zoom." tabindex="0"></div>
@@ -733,7 +733,7 @@ header{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:1
  <div class="settings-actions"><button id="export">Export CSV</button><button id="about-open">About</button></div>
  <div class="settings-source"><h3>Live Google My Maps</h3><p>Updates automatically every five minutes while this tab is visible.</p><p id="google-status" role="status"></p><button id="refresh-google">Refresh now</button></div>
 </section>
-<dialog id="about"><div class="dialog-head"><h2>About this map</h2><button class="close" id="about-close" aria-label="Close about">×</button></div><p>Explore UCPEA Areas by building location or steward. Select a footprint, a numbered marker, or a directory result to see its area, coverage description, and steward listing.</p><ul><li>Search matches building names, area numbers, coverage descriptions and steward names. Multiple words narrow your results.</li><li>Search, area, and steward-listing filters work together. Steward names are searchable and appear in location details. “Only in map view” uses footprint intersection with the visible map.</li><li>Sort locations by area number or building name. “Fit results” frames the filtered locations. The Map view menu provides Storrs, Hartford, Waterbury, Avery Point, Stamford, and All locations without clearing your filters. Choose 1–12 repeating area colors in Settings; all buildings in the same area share a color.</li><li>The data updates from Google My Maps on opening and every five minutes while the tab is visible. If the live connection fails, the last available data stays visible. The offline basemap shows source footprints without streets. The optional Positron street map uses OpenFreeMap and requires internet access. It is flat, without terrain shading, contour lines or 3D buildings. If it cannot load, the map automatically switches to offline mode.</li><li>Keyboard: Tab through controls; Enter selects a result; map arrows pan; + and − zoom. Escape closes location details.</li></ul><p class="small">Map library: <a href="https://leafletjs.com" target="_blank" rel="noopener noreferrer">Leaflet 1.9.4</a>, BSD-2-Clause. Positron basemap: <a href="https://openfreemap.org" target="_blank" rel="noopener noreferrer">OpenFreeMap</a>, © <a href="https://openmaptiles.org" target="_blank" rel="noopener noreferrer">OpenMapTiles</a>, data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a>. Rendered with MapLibre GL JS 4.7.1 and MapLibre GL Leaflet 0.0.22. Positron is derived from CartoDB basemaps designed by Stamen and Paul Norman; design licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>, with upstream CartoDB design under <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener noreferrer">CC BY 3.0</a>. Unused shaded raster sources and terrain/3D layers are omitted.</p><details><summary>Leaflet license</summary><pre style="white-space:pre-wrap;font:12px/1.5 'Segoe UI',sans-serif">BSD 2-Clause License
+<dialog id="about"><div class="dialog-head"><h2>About this map</h2><button class="close" id="about-close" aria-label="Close about">×</button></div><p>Explore UCPEA Areas by building location or steward. Select a footprint, a numbered marker, or a directory result to see its area, coverage description, and steward listing.</p><ul><li>Search matches building names, area numbers, coverage descriptions and steward names. Multiple words narrow your results.</li><li>Search, the no-stewards toggle, and the viewport filter work together. The toggle shows only areas with no steward names listed anywhere in that area. Steward names are searchable and appear in location details. “Only in map view” uses footprint intersection with the visible map.</li><li>Use the arrow to expand locations. Selecting an Area name focuses and highlights it without changing filters or expanding the list. Areas stay in numeric order; locations within an area are alphabetical. “Fit results” frames the filtered locations. The Campus buttons provide Storrs, Hartford, Waterbury, Avery Point, Stamford, and All locations without clearing your filters. Choose 1–12 repeating area colors in Settings; all buildings in the same area share a color.</li><li>The data updates from Google My Maps on opening and every five minutes while the tab is visible. If the live connection fails, the last available data stays visible. The offline basemap shows source footprints without streets. The optional Positron street map uses OpenFreeMap and requires internet access. It is flat, without terrain shading, contour lines or 3D buildings. If it cannot load, the map automatically switches to offline mode.</li><li>Keyboard: Tab through controls; Enter selects a result; map arrows pan; + and − zoom. Escape closes location details.</li></ul><p class="small">Map library: <a href="https://leafletjs.com" target="_blank" rel="noopener noreferrer">Leaflet 1.9.4</a>, BSD-2-Clause. Positron basemap: <a href="https://openfreemap.org" target="_blank" rel="noopener noreferrer">OpenFreeMap</a>, © <a href="https://openmaptiles.org" target="_blank" rel="noopener noreferrer">OpenMapTiles</a>, data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a>. Rendered with MapLibre GL JS 4.7.1 and MapLibre GL Leaflet 0.0.22. Positron is derived from CartoDB basemaps designed by Stamen and Paul Norman; design licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>, with upstream CartoDB design under <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener noreferrer">CC BY 3.0</a>. Unused shaded raster sources and terrain/3D layers are omitted.</p><details><summary>Leaflet license</summary><pre style="white-space:pre-wrap;font:12px/1.5 'Segoe UI',sans-serif">BSD 2-Clause License
 
 Copyright (c) 2010-2023, Volodymyr Agafonkin
 Copyright (c) 2010-2011, CloudMade
@@ -1485,12 +1485,16 @@ const escapeHTML=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;'
 const normalize=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
 let areas=[...new Set(DATA.features.map(f=>f.properties.area))].sort((a,b)=>Number(a)-Number(b));
 const COLOR_PALETTES={light:['#267d86','#3f70b5','#b77b27','#aa5369','#50854e','#b36535','#218aaf','#8b8634','#bd4c4c','#87624e','#348b74','#647a96'],dark:['#66bac4','#80a9eb','#dfb15f','#da8a9e','#95bf83','#dfa078','#70c0dd','#c5c076','#ee9494','#c5a68f','#7dc5ad','#9bafc9']};
-let preferences={theme:matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light',colorCount:4};
+let preferences={theme:'light',colorCount:4};
 try{const saved=JSON.parse(localStorage.getItem('ucpea-map-settings')||'{}');if(['light','dark'].includes(saved.theme))preferences.theme=saved.theme;if(Number.isInteger(saved.colorCount)&&saved.colorCount>=1&&saved.colorCount<=12)preferences.colorCount=saved.colorCount;}catch{}
 document.documentElement.dataset.theme=preferences.theme;
 function savePreferences(){try{localStorage.setItem('ucpea-map-settings',JSON.stringify(preferences));}catch{}}
 function areaColor(area){return COLOR_PALETTES[preferences.theme][(Number(area)-1)%preferences.colorCount];}
+function selectionColors(){return preferences.theme==='dark'?{fill:'#ff61d7',outline:'#ffb0ee'}:{fill:'#e000bf',outline:'#92007c'};}
 function updateSettingsUI(){
+ const dark=preferences.theme==='dark',label=dark?'Switch to light mode':'Switch to dark mode';
+ $('theme-toggle').setAttribute('aria-label',label);$('theme-toggle').title=label;$('theme-toggle').setAttribute('aria-pressed',String(dark));
+ $('theme-toggle').innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(dark?'<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/>':'<path d="M20.5 13.5A8.5 8.5 0 0 1 10.5 3.4a8.5 8.5 0 1 0 10 10.1Z"/>')+'</svg>';
  $('theme').value=preferences.theme;$('color-count').value=preferences.colorCount;
  $('color-count-value').textContent=preferences.colorCount+' '+(preferences.colorCount===1?'color':'colors');
  $('color-count').setAttribute('aria-valuetext',preferences.colorCount+' repeating '+(preferences.colorCount===1?'color':'colors'));
@@ -1511,6 +1515,7 @@ function basemapStyle(){
 }
 function setTheme(theme){preferences.theme=theme==='dark'?'dark':'light';document.documentElement.dataset.theme=preferences.theme;savePreferences();updateSettingsUI();render();if(streetLayer)streetLayer.getMaplibreMap().setStyle(basemapStyle());}
 $('theme').onchange=()=>setTheme($('theme').value);
+$('theme-toggle').onclick=()=>setTheme(preferences.theme==='light'?'dark':'light');
 $('color-count').oninput=()=>setColorCount($('color-count').value);
 $('color-less').onclick=()=>setColorCount(preferences.colorCount-1);$('color-more').onclick=()=>setColorCount(preferences.colorCount+1);
 $('settings').addEventListener('toggle',ev=>$('settings-open').setAttribute('aria-expanded',String(ev.newState==='open')));
@@ -1531,9 +1536,10 @@ function baseStyle(f){const color=areaColor(f.properties.area);return {color,wei
 function applyFeatureStyles(){
  for(const e of entries.values()){
   const highlighted=highlightedArea?e.f.properties.area===highlightedArea:e.f.id===selected;
-  const color=areaColor(e.f.properties.area);e.dot.setStyle({fillColor:color});
-  if(e.labelColor!==color){e.label.setIcon(L.divIcon({className:'',html:'<span class="area-label" style="border-color:'+color+'">'+escapeHTML(e.f.properties.area)+'</span>',iconSize:[24,18],iconAnchor:[12,9]}));e.labelColor=color;}
-  e.shape.setStyle(highlighted?{color:preferences.theme==='dark'?'#f1f3f5':'#182a31',weight:3,fillColor:areaColor(e.f.properties.area),fillOpacity:.65,opacity:1}:baseStyle(e.f));
+  const selection=selectionColors(),color=highlighted?selection.fill:areaColor(e.f.properties.area),outline=highlighted?selection.outline:color;
+  e.dot.setStyle({fillColor:color,color:highlighted?selection.outline:'#ffffff',weight:highlighted?3:2});
+  if(e.labelColor!==outline){e.label.setIcon(L.divIcon({className:'',html:'<span class="area-label" style="border-color:'+outline+'">'+escapeHTML(e.f.properties.area)+'</span>',iconSize:[24,18],iconAnchor:[12,9]}));e.labelColor=outline;}
+  e.shape.setStyle(highlighted?{color:selection.outline,weight:3,fillColor:selection.fill,fillOpacity:.65,opacity:1}:baseStyle(e.f));
  }
 }
 function prepareEntries(data){
@@ -1552,7 +1558,6 @@ function prepareEntries(data){
  return {built,bounds:combined};
 }
 const initial=prepareEntries(DATA);initial.built.forEach((entry,id)=>entries.set(id,entry));allBounds=initial.bounds;
-for(const a of areas)$('area-filter').add(new Option('Area '+a,a));
 // Geographic views stay valid when area assignments change in a replacement file.
 const regionalBounds={hartford:L.latLngBounds([41.72,-72.74],[41.82,-72.63]),waterbury:L.latLngBounds([41.54,-73.06],[41.58,-73.02]),'avery-point':L.latLngBounds([41.305,-72.08],[41.325,-72.05]),stamford:L.latLngBounds([41.045,-73.555],[41.065,-73.53])};
 function goToView(view){
@@ -1560,30 +1565,51 @@ function goToView(view){
  if(view==='storrs')fit(storrsBounds,15);
  else if(view==='all')fit(allBounds,17);
  else if(regionalBounds[view]){const bounds=L.latLngBounds([]);for(const e of entries.values())if(regionalBounds[view].contains(e.center))bounds.extend(e.bounds);fit(bounds,17);}
- $('location-view').value='';
+ updateCampusButtons(view);
 }
 function searchTokens(){let q=normalize($('search').value).replace(/\barea\s+(\d+)\b/g,'area$1');return q.split(/\s+/).filter(Boolean);}
-function matches(entry){
- const p=entry.f.properties,a=$('area-filter').value,c=$('coverage-filter').value;
- if(a&&p.area!==a||c==='none'&&p.stewards.length||c==='assigned'&&!p.stewards.length)return false;
+function matches(entry,areasWithStewards){
+ const p=entry.f.properties;
+ if($('unassigned-only').checked&&areasWithStewards.has(p.area))return false;
  for(const t of searchTokens()){if(/^area\d+$/.test(t)){if(p.area!==t.slice(4))return false;}else if(/^\d+$/.test(t)){if(p.area!==t&&!entry.haystack.split(' ').includes(t))return false;}else if(!entry.haystack.includes(t))return false;}
  return !$('in-view').checked||map.getBounds().intersects(entry.bounds);
 }
 function render(){
- if(highlightedArea&&$('area-filter').value!==highlightedArea)highlightedArea=null;
- filtered=DATA.features.filter(f=>matches(entries.get(f.id))).sort($('sort-order').value==='area'?(a,b)=>Number(a.properties.area)-Number(b.properties.area)||byName(a,b):byName);
+ const areasWithStewards=new Set(DATA.features.filter(f=>f.properties.stewards.length).map(f=>f.properties.area));
+ filtered=DATA.features.filter(f=>matches(entries.get(f.id),areasWithStewards)).sort((a,b)=>Number(a.properties.area)-Number(b.properties.area)||byName(a,b));
  if(selected&&!filtered.some(f=>f.id===selected))closeDetail(false);
  applyFeatureStyles();
  visibleGroup.clearLayers();
  const occupied=[];
  for(const f of filtered){const e=entries.get(f.id);visibleGroup.addLayer(e.shape);if(map.getZoom()<16)visibleGroup.addLayer(e.dot);if(map.getZoom()>=15){const p=map.latLngToContainerPoint(e.center);if(!occupied.some(o=>Math.abs(o.x-p.x)<30&&Math.abs(o.y-p.y)<22)){visibleGroup.addLayer(e.label);occupied.push(p);}}}
+ for(const f of filtered)if(highlightedArea?f.properties.area===highlightedArea:f.id===selected)entries.get(f.id).shape.bringToFront();
  const areaCount=new Set(filtered.map(f=>f.properties.area)).size;
  $('results-count').textContent=filtered.length+' of '+DATA.features.length+' locations';
  $('map-count').textContent=filtered.length+' '+(filtered.length===1?'location':'locations');$('map-context').textContent=' across '+areaCount+' '+(areaCount===1?'area':'areas');
  $('fit-results').disabled=!filtered.length;$('export').disabled=!filtered.length;
  $('clear-search').hidden=!$('search').value;
- $('results').innerHTML=filtered.length?filtered.map(f=>{const p=f.properties;return '<button class="result" data-id="'+f.id+'" aria-pressed="'+(selected===f.id)+'"><span class="area-num" style="--feature-color:'+areaColor(p.area)+'" aria-label="Area '+escapeHTML(p.area)+'">'+escapeHTML(p.area)+'</span><span class="result-copy"><span class="result-name">'+escapeHTML(p.building)+'</span></span></button>';}).join(''):'<div class="no-results"><strong>No matching locations</strong><p class="muted small" style="margin-top:8px">Try a shorter search or reset your filters. If “Only in map view” is checked, zoom out to include more locations.</p></div>';
+ renderDirectory();
 }
+const expandedAreas=new Set();
+function updateCampusButtons(view){for(const b of document.querySelectorAll('[data-campus]'))b.setAttribute('aria-pressed',String(b.dataset.campus===view));}
+function renderDirectory(){
+ const active=document.activeElement,scroll=$('results').scrollTop;
+ const restore=active?.closest('#results')?(active.dataset.expandArea?'[data-expand-area="'+active.dataset.expandArea+'"]':active.dataset.focusArea?'[data-focus-area="'+active.dataset.focusArea+'"]':active.dataset.id?'[data-id="'+active.dataset.id+'"]':null):null;
+ const groups=new Map();for(const f of filtered){const area=f.properties.area;if(!groups.has(area))groups.set(area,[]);groups.get(area).push(f);}
+ const selectedArea=entries.get(selected)?.f.properties.area;
+ $('results').innerHTML=groups.size?[...groups].map(([area,locations])=>{
+  const open=expandedAreas.has(area),id='area-children-'+area;
+  return '<section class="area-group" aria-label="Area '+area+'"><div class="area-heading"><button class="area-toggle" data-expand-area="'+area+'" aria-expanded="'+open+'" aria-controls="'+id+'" aria-label="'+(open?'Collapse':'Expand')+' Area '+area+'"><span aria-hidden="true">'+(open?'⌄':'›')+'</span></button><button class="area-focus" data-focus-area="'+area+'" aria-pressed="'+(highlightedArea===area||selectedArea===area)+'" aria-label="Focus Area '+area+' on map"><span class="area-num" style="--feature-color:'+areaColor(area)+'">Area '+area+'</span><span class="area-count">'+locations.length+' '+(locations.length===1?'location':'locations')+'</span></button></div><div class="area-children" id="'+id+'"'+(open?'':' hidden')+'>'+locations.sort(byName).map(f=>'<button class="result" data-id="'+f.id+'" aria-pressed="'+(selected===f.id)+'"><span class="result-copy"><span class="result-name">'+escapeHTML(f.properties.building)+'</span></span></button>').join('')+'</div></section>';
+ }).join(''):'<div class="no-results"><strong>No matching locations</strong><p class="muted small" style="margin-top:8px">Try a shorter search or reset your filters. If “Only in map view” is checked, zoom out to include more locations.</p></div>';
+ if(restore)$('results').querySelector(restore)?.focus({preventScroll:true});$('results').scrollTop=scroll;
+}
+function focusArea(area){
+ closeDetail(false);highlightedArea=area;updateCampusButtons('');render();
+ const bounds=L.latLngBounds([]);for(const e of entries.values())if(e.f.properties.area===area)bounds.extend(e.bounds);
+ if(innerWidth<=650)setBrowse(false);fit(bounds);
+ if(innerWidth>650)$('results').querySelector('[data-focus-area="'+area+'"]')?.focus({preventScroll:true});
+}
+
 function fit(bounds,maxZoom=17){if(bounds.isValid())map.fitBounds(bounds,{padding:[36,36],maxZoom,animate:!reduced});}
 function fitFiltered(){const b=L.latLngBounds([]);for(const f of filtered)b.extend(entries.get(f.id).bounds);fit(b);}
 let desktopDrawerOpen=true,mobileDrawerOpen=false;
@@ -1596,27 +1622,31 @@ function syncDrawer(){
 }
 function setBrowse(open){if(innerWidth<=650)mobileDrawerOpen=open;else desktopDrawerOpen=open;syncDrawer();if(open)$('search').focus();else $('browse-toggle').focus();}
 function closeDetail(focus=true){const previous=selected;selected=null;applyFeatureStyles();$('detail').hidden=true;for(const b of $('results').querySelectorAll('[aria-pressed="true"]'))b.setAttribute('aria-pressed','false');if(focus){if(innerWidth<=650)$('browse-toggle').focus();else $('results').querySelector('[data-id="'+previous+'"]')?.focus();}}
-function selectFeature(id,{navigate=true,focus=true}={}){
+function selectFeature(id,{navigate=true,focus=true,preserveAreaHighlight=false}={}){
  const e=entries.get(id);if(!e)return;
- closeDetail(false);selected=id;if(navigate&&innerWidth<=650)setBrowse(false);applyFeatureStyles();e.shape.bringToFront();
+ closeDetail(false);selected=id;if(!preserveAreaHighlight)highlightedArea=null;if(navigate&&innerWidth<=650)setBrowse(false);applyFeatureStyles();renderDirectory();e.shape.bringToFront();
  const p=e.f.properties,buildings=[...new Set(DATA.features.filter(f=>f.properties.area===p.area).map(f=>f.properties.building))].sort((a,b)=>a.localeCompare(b));
  $('detail').innerHTML='<div class="detail-top"><span class="area">UCPEA Area '+escapeHTML(p.area)+'</span><button class="close" id="detail-close" aria-label="Close location details">×</button></div><h2>'+escapeHTML(p.building)+'</h2><h3>Coverage description</h3><p>'+escapeHTML(p.includes||'No description supplied.')+'</p><h3>Current Stewards</h3>'+(p.stewards.length?'<ul class="steward-list">'+p.stewards.map(s=>'<li>'+escapeHTML(s)+'</li>').join('')+'</ul>':'<p>No stewards listed.</p>')+'<div class="detail-actions"><button id="zoom-feature">Zoom to location</button><button id="show-area">Show Area '+escapeHTML(p.area)+'</button></div><h3>Buildings in Area '+escapeHTML(p.area)+'</h3><ul class="area-buildings">'+buildings.map(name=>'<li>'+escapeHTML(name)+'</li>').join('')+'</ul>';
  $('detail').hidden=false;
- $('detail-close').onclick=()=>closeDetail();$('zoom-feature').onclick=()=>zoomFeature(e);$('show-area').onclick=()=>{resetValues();$('area-filter').value=p.area;highlightedArea=p.area;render();fitFiltered();};
+ $('detail-close').onclick=()=>closeDetail();$('zoom-feature').onclick=()=>zoomFeature(e);$('show-area').onclick=()=>focusArea(p.area);
  for(const b of $('results').querySelectorAll('.result'))b.setAttribute('aria-pressed',String(Number(b.dataset.id)===id));
  if(navigate)zoomFeature(e);if(focus)$('detail-close').focus({preventScroll:true});
 }
 function zoomFeature(e){const panel=innerWidth>650?Math.min(390,map.getSize().x*.5):0;map.fitBounds(e.bounds,{paddingTopLeft:[36,36],paddingBottomRight:[panel+36,innerWidth<=650?Math.min(330,map.getSize().y*.55):36],maxZoom:18,animate:!reduced});}
-function resetValues(){highlightedArea=null;$('search').value='';$('area-filter').value='';$('coverage-filter').value='';$('in-view').checked=false;}
+function resetValues(){highlightedArea=null;$('search').value='';$('unassigned-only').checked=false;$('in-view').checked=false;}
 function refresh(){render();}
-$('results').addEventListener('click',ev=>{const b=ev.target.closest('[data-id]');if(b)selectFeature(Number(b.dataset.id));});
+$('results').addEventListener('click',ev=>{
+ const toggle=ev.target.closest('[data-expand-area]');if(toggle){const area=toggle.dataset.expandArea;if(expandedAreas.has(area))expandedAreas.delete(area);else expandedAreas.add(area);renderDirectory();return;}
+ const parent=ev.target.closest('[data-focus-area]');if(parent){focusArea(parent.dataset.focusArea);return;}
+ const b=ev.target.closest('[data-id]');if(b)selectFeature(Number(b.dataset.id));
+});
 $('search').addEventListener('input',refresh);
-for(const id of ['area-filter','coverage-filter','in-view'])$(id).addEventListener('change',()=>{render();if(id!=='in-view'&&!$('in-view').checked)fitFiltered();});
-$('sort-order').addEventListener('change',render);
+for(const id of ['unassigned-only','in-view'])$(id).addEventListener('change',()=>{render();if(id!=='in-view'&&!$('in-view').checked)fitFiltered();});
 $('clear-search').onclick=()=>{$('search').value='';render();$('search').focus();};
 $('reset').onclick=()=>{resetValues();render();};
 $('fit-results').onclick=()=>{if(innerWidth<=650)setBrowse(false);fitFiltered();};
-$('location-view').onchange=()=>goToView($('location-view').value);
+document.querySelector('.campus-group').addEventListener('click',ev=>{const button=ev.target.closest('[data-campus]');if(button&&!button.disabled)goToView(button.dataset.campus);});
+map.on('dragstart',()=>updateCampusButtons(''));
 $('browse-toggle').onclick=()=>setBrowse($('browse-toggle').getAttribute('aria-expanded')!=='true');
 map.on('moveend',()=>{if($('in-view').checked)render();});map.on('zoomend',render);
 function showNote(s){$('map-note').textContent=s;$('map-note').hidden=!s;}
@@ -1675,26 +1705,24 @@ const googleInterval=Math.max(1,Number(sourceConfig.refreshMinutes)||5)*60000;
 function dataBusy(busy){dataLoading=busy;$('refresh-google').disabled=busy;}
 function setDataAlert(message){$('data-alert').textContent=message;$('data-alert').hidden=!message;}
 function updateDataViews(){
- for(const option of $('location-view').options){if(!option.value)continue;option.disabled=option.value==='all'?false:option.value==='storrs'?![...entries.values()].some(e=>storrsBounds.contains(e.center)):![...entries.values()].some(e=>regionalBounds[option.value]?.contains(e.center));}
- $('location-view').value='';
+ for(const button of document.querySelectorAll('[data-campus]')){const view=button.dataset.campus;button.disabled=view==='all'?false:view==='storrs'?![...entries.values()].some(e=>storrsBounds.contains(e.center)):![...entries.values()].some(e=>regionalBounds[view]?.contains(e.center));}
 }
-function fitInitialData(){const storrs=[...entries.values()].some(e=>storrsBounds.contains(e.center));fit(storrs?storrsBounds:allBounds,storrs?15:17);}
+function fitInitialData(){const storrs=[...entries.values()].some(e=>storrsBounds.contains(e.center));fit(storrs?storrsBounds:allBounds,storrs?15:17);updateCampusButtons(storrs?'storrs':'all');}
 function replaceDataset(data,name,{preserveView=false}={}){
  // Construct all layers before committing; live refreshes retain the visitor's view.
  const next=prepareEntries(data),oldSelected=entries.get(selected)?.f.properties;
- const state={search:$('search').value,area:$('area-filter').value,coverage:$('coverage-filter').value,inView:$('in-view').checked,highlight:highlightedArea,scroll:$('results').scrollTop};
+ const state={search:$('search').value,noStewards:$('unassigned-only').checked,inView:$('in-view').checked,highlight:highlightedArea,scroll:$('results').scrollTop};
  visibleGroup.clearLayers();selected=null;highlightedArea=null;$('detail').hidden=true;$('detail').replaceChildren();
  DATA=data;entries.clear();next.built.forEach((entry,id)=>entries.set(id,entry));allBounds=next.bounds;
  areas=[...new Set(DATA.features.map(f=>f.properties.area))].sort((a,b)=>Number(a)-Number(b));
- $('area-filter').replaceChildren(new Option('All areas',''));for(const area of areas)$('area-filter').add(new Option('Area '+area,area));
  resetValues();
- if(preserveView){$('search').value=state.search;$('area-filter').value=areas.includes(state.area)?state.area:'';$('coverage-filter').value=state.coverage;$('in-view').checked=state.inView;highlightedArea=areas.includes(state.highlight)?state.highlight:null;}
+ if(preserveView){$('search').value=state.search;$('unassigned-only').checked=state.noStewards;$('in-view').checked=state.inView;highlightedArea=areas.includes(state.highlight)?state.highlight:null;}
  render();updateDataViews();
  if(!preserveView)fitInitialData();
  else if(oldSelected){
   let candidates=filtered.filter(f=>f.properties.building===oldSelected.building&&f.properties.area===oldSelected.area);
   if(!candidates.length)candidates=filtered.filter(f=>f.properties.building===oldSelected.building);
-  if(candidates.length===1)selectFeature(candidates[0].id,{navigate:false,focus:false});
+  if(candidates.length===1)selectFeature(candidates[0].id,{navigate:false,focus:false,preserveAreaHighlight:true});
  }
  if(preserveView)$('results').scrollTop=state.scroll;
  setDataAlert('');
@@ -1739,3 +1767,6 @@ window.UCPEA={get data(){return DATA;},map,entries,get filtered(){return filtere
 startDataSource();
 </script>
 </body></html>
+
+
+
