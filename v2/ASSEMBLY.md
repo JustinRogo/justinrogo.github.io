@@ -28,7 +28,7 @@ Edit `src/assembly/assemblyConfig.js`:
 | --- | --- |
 | `enabled` | `true`; build-time master switch |
 | `cursorCount` / `mobileCursorCount` | 5 / 4; supported range 3–6 |
-| `duration` / `mobileDuration` | 5800 / 4800 ms, plus 160 ms bounded preparation |
+| `duration` / `mobileDuration` | 5800 / 4800 ms after preparation. Preparation waits for fonts and normally starts playback 160 ms after they settle, with a four-second startup limit. |
 | `crewEntry` | 0.35 of the timeline; Layout works alone for about 2 seconds on desktop / 1.7 on phones |
 | `colors` / `labels` | Six presets; the first five accents/job labels are used by default |
 | `intensity` | 0.7; guide/pulse strength and placement distance/scale, range 0–1 |
@@ -48,7 +48,7 @@ The child must be a DOM element or pass its `ref` and DOM props to its existing 
 
 ## Interruption, data, and performance
 
-Pointer down, focus, keyboard input, scrolling, route changes, viewport changes, document visibility, and late font/hero/navigation geometry changes immediately reveal the ordinary page. There is no input lock or artificial wait for remote data. Content ready during preparation joins the timeline; content arriving later uses its normal loading/retry path and stays visible. A watchdog and cleanup path prevent stranded hidden elements.
+Pointer down, keyboard input, and route changes reveal the ordinary page. Once playback starts, a change in scroll position or viewport dimensions, focus on a control, or late font/hero/navigation geometry changes also end it. Autoplay measures the viewport when playback begins and can resume preparation when a tab becomes visible again. There is no input lock or artificial wait for remote data. Content ready during preparation joins the timeline. Content arriving later uses its normal loading/retry path and stays visible. A watchdog and cleanup path prevent stranded hidden elements.
 
 The sequence is finite. It has no per-frame React state updates or layout-measurement loop. Ambient drift pauses during construction and resumes afterward. Guide paint areas are bounded to their targets. The existing refractive glass remains visually unchanged after handoff. Automated Edge measurements on the glass-heavy 1024px light layout did not consistently sustain 60 FPS, including with the intro disabled; physical-device performance and Safari remain unverified.
 

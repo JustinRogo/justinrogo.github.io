@@ -32,15 +32,6 @@ export function createAssemblyTimeline({
   config,
   onComplete,
 }) {
-  const viewport = { width: innerWidth, height: innerHeight };
-  const compact = viewport.width <= 600;
-  const count = clamp(
-    Math.round(compact ? config.mobileCursorCount : config.cursorCount),
-    3,
-    Math.min(6, cursors.length),
-  );
-  const total =
-    clamp(compact ? config.mobileDuration : config.duration, 1200, 6000) / 1000;
   const intensity = clamp(config.intensity, 0, 1);
   const crewEntry = clamp(config.crewEntry ?? 0.35, 0.2, 0.6);
   // Preparation hides the real nodes before playback takes its own snapshots.
@@ -48,23 +39,13 @@ export function createAssemblyTimeline({
   const preparation = gsap.context(() => {});
   const context = gsap.context(() => {});
   let timeline;
+  let duration;
   let preparing = true;
   const staged = new Set();
-  const point = (x, y) => ({
-    x: clamp(x, 8, viewport.width - 27),
-    y: clamp(y, 8, viewport.height - 37),
-  });
-  const entries = [
-    { x: -32, y: viewport.height * 0.3 },
-    { x: viewport.width * 0.7, y: -48 },
-    { x: viewport.width * 0.32, y: viewport.height + 32 },
-    { x: viewport.width + 32, y: viewport.height * 0.4 },
-    { x: viewport.width * 0.85, y: viewport.height + 32 },
-    { x: -32, y: viewport.height * 0.7 },
-  ];
 
   function stage(id, element) {
     if (!preparing || !assemblyTasks.some((task) => task.id === id)) return;
+    const viewport = { width: innerWidth, height: innerHeight };
     if (!visibleBox(element, viewport) || staged.has(element)) return;
     staged.add(element);
     preparation.add(() => gsap.set(element, { opacity: 0 }));
@@ -76,6 +57,27 @@ export function createAssemblyTimeline({
   for (const [id, element] of registry) stage(id, element);
 
   function start() {
+    const viewport = { width: innerWidth, height: innerHeight };
+    const compact = viewport.width <= 600;
+    const count = clamp(
+      Math.round(compact ? config.mobileCursorCount : config.cursorCount),
+      3,
+      Math.min(6, cursors.length),
+    );
+    duration = clamp(compact ? config.mobileDuration : config.duration, 1200, 6000);
+    const total = duration / 1000;
+    const point = (x, y) => ({
+      x: clamp(x, 8, viewport.width - 27),
+      y: clamp(y, 8, viewport.height - 37),
+    });
+    const entries = [
+      { x: -32, y: viewport.height * 0.3 },
+      { x: viewport.width * 0.7, y: -48 },
+      { x: viewport.width * 0.32, y: viewport.height + 32 },
+      { x: viewport.width + 32, y: viewport.height * 0.4 },
+      { x: viewport.width * 0.85, y: viewport.height + 32 },
+      { x: -32, y: viewport.height * 0.7 },
+    ];
     // Late local data is included if ready; slower data keeps its normal loading/retry path.
     for (const [id, element] of registry) stage(id, element);
     const jobs = [...layoutTasks, ...assemblyTasks]
@@ -311,7 +313,7 @@ export function createAssemblyTimeline({
       preparation.revert();
     },
     get duration() {
-      return total * 1000;
+      return duration;
     },
   };
 }

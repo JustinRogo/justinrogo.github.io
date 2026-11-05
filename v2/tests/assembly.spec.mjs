@@ -453,15 +453,40 @@ test("late project data remains live and scroll interruption cannot strand hidde
   ).toBe(true);
 });
 
-test("cold-load fonts settle before automatic assembly starts", async ({ page }) => {
+test("direct Home autoplay waits for cold-load fonts and reaches the crew stage", async ({ page }) => {
+  const { promise: fontReady, resolve: releaseFont } = Promise.withResolvers();
   await page.route("**/*.woff2", async (route) => {
-    await new Promise((resolve) => setTimeout(resolve, 650));
+    await fontReady;
     await route.continue();
   });
-  await page.goto("/v2/");
+  try {
+    await page.goto("/v2/#/home", { waitUntil: "domcontentloaded" });
+    await expect(layer(page)).toHaveAttribute("data-assembly-state", "preparing");
+    await page.evaluate(() => {
+      window.visualViewport?.dispatchEvent(new Event("resize"));
+      document.dispatchEvent(new Event("visibilitychange"));
+      document.querySelector("#main").focus({ preventScroll: true });
+    });
+    await page.setViewportSize({ width: 768, height: 900 });
+    await page.evaluate(() => {
+      Object.defineProperty(document, "hidden", { configurable: true, value: true });
+      document.dispatchEvent(new Event("visibilitychange"));
+    });
+    await expect(layer(page)).toHaveAttribute("data-assembly-state", "skipped");
+    await page.evaluate(() => {
+      delete document.hidden;
+      document.dispatchEvent(new Event("visibilitychange"));
+    });
+    await expect(layer(page)).toHaveAttribute("data-assembly-state", "preparing");
+    // Hold the font past the old 1.2-second limit, which started the intro too early.
+    await page.waitForTimeout(1500);
+    expect(await layer(page).getAttribute("data-assembly-state")).toBe("preparing");
+  } finally {
+    releaseFont();
+  }
   await page.evaluate(() => document.fonts.ready);
   await expect(layer(page)).toHaveAttribute("data-assembly-state", "assembling");
-  await page.waitForTimeout(1000);
+  await expect(layer(page)).toHaveAttribute("data-assembly-stage", "content");
   await expect(layer(page)).toHaveAttribute("data-assembly-state", "assembling");
-  await expect(page.locator(".agent-cursor").first()).toBeVisible();
+  await expect(layer(page)).toHaveAttribute("data-assembly-state", "complete", { timeout: 8000 });
 });

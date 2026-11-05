@@ -17,6 +17,11 @@ import "./assembly.css";
 
 const AssemblyContext = createContext(null);
 
+function viewportDimensions() {
+  const viewport = window.visualViewport;
+  return [innerWidth, innerHeight, viewport?.width, viewport?.height, viewport?.scale];
+}
+
 export function useAssemblyBusy() {
   return useContext(AssemblyContext)?.busy || false;
 }
@@ -110,16 +115,20 @@ export default function HomepageAssembly({
       setPhase("complete");
       return;
     }
-    attempted.current = true;
-    handledReplay.current = replayCount;
-    queryReplay.current = false;
     let finished = false;
     let started = false;
     let startTimer;
     let watchdog;
     let observer;
+    let viewport = viewportDimensions();
+    let scrollPosition;
     const cleanups = [];
     let timeline;
+    const rememberAttempt = () => {
+      attempted.current = true;
+      handledReplay.current = replayCount;
+      queryReplay.current = false;
+    };
     const finish = (update = true) => {
       if (finished) return;
       finished = true;
@@ -135,6 +144,10 @@ export default function HomepageAssembly({
       target?.addEventListener(name, listener, options);
       cleanups.push(() => target?.removeEventListener(name, listener, options));
     };
+    const interrupt = () => {
+      rememberAttempt();
+      finish();
+    };
     try {
       timeline = createAssemblyTimeline({
         registry: registry.current,
@@ -146,19 +159,20 @@ export default function HomepageAssembly({
         config,
         onComplete: () => finish(),
       });
-      running.current = { timeline, finish };
+      running.current = { timeline, finish: interrupt };
       setPhase("preparing");
-      const interrupt = () => finish();
       for (const name of ["pointerdown", "keydown", "wheel"])
         listen(window, name, interrupt, { capture: true, passive: true });
       listen(
         window,
         "focusin",
         (event) => {
-          // The router focuses Home's heading in its layout effect, before preparation ends.
-          if (!started && event.target.matches?.('[data-view="home"] h1'))
-            return;
-          finish();
+          if (
+            started &&
+            !event.target.matches?.('#main, [data-view="home"] h1')
+          ) {
+            finish();
+          }
         },
         { capture: true, passive: true },
       );
@@ -166,18 +180,41 @@ export default function HomepageAssembly({
         window,
         "scroll",
         () => {
-          if (started) finish();
+          if (
+            started &&
+            (scrollX !== scrollPosition.x || scrollY !== scrollPosition.y)
+          ) {
+            finish();
+          }
         },
         { capture: true, passive: true },
       );
-      listen(window, "resize", interrupt, { passive: true });
-      listen(window.visualViewport, "resize", interrupt, { passive: true });
-      listen(document, "visibilitychange", interrupt);
+      const onResize = () => {
+        const dimensions = viewportDimensions();
+        if (
+          (started || force) &&
+          dimensions.some((value, index) => value !== viewport[index])
+        ) {
+          interrupt();
+        }
+      };
+      listen(window, "resize", onResize, { passive: true });
+      listen(window.visualViewport, "resize", onResize, { passive: true });
+      listen(document, "visibilitychange", () => {
+        if (document.hidden) finish();
+      });
       listen(document.fonts, "loadingdone", () => {
         if (started) finish();
       });
       const start = () => {
         if (finished || started) return;
+        if (document.hidden) {
+          finish();
+          return;
+        }
+        rememberAttempt();
+        viewport = viewportDimensions();
+        scrollPosition = { x: scrollX, y: scrollY };
         started = true;
         clearTimeout(startTimer);
         try {
@@ -187,6 +224,7 @@ export default function HomepageAssembly({
           return;
         }
         setPhase("assembling");
+        watchdog = setTimeout(() => finish(), timeline.duration + 1900);
         // Responsive/font geometry changes hand off immediately rather than chase moving targets.
         const measured = ["hero-frame", "navigation"]
           .map((id) => registry.current.get(id))
@@ -209,15 +247,14 @@ export default function HomepageAssembly({
         measured.forEach((element) => observer.observe(element));
       };
       // Cold-load fonts can change geometry and cancel an already running intro.
-      // Wait for them before measuring, with a bound for stalled font requests.
-      startTimer = setTimeout(start, 1200);
+      // Give them time to settle without delaying playback on a warm load.
+      startTimer = setTimeout(start, 4000);
       Promise.resolve(document.fonts?.ready).then(() => {
         if (!finished && !started) {
           clearTimeout(startTimer);
           startTimer = setTimeout(start, 160);
         }
       });
-      watchdog = setTimeout(() => finish(), timeline.duration + 1900);
     } catch {
       // Failure is always an ordinary, visible homepage.
       finish();

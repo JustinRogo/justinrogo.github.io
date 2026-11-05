@@ -71,6 +71,7 @@ function App() {
   useEffect(() => {
     const update = () => setVisible(!document.hidden);
     document.addEventListener("visibilitychange", update);
+    update();
     return () => document.removeEventListener("visibilitychange", update);
   }, []);
   const systemDark = useMedia("(prefers-color-scheme: dark)");
