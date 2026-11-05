@@ -5,13 +5,14 @@ import { fileURLToPath } from 'node:url';
 import { vendorUpdates } from './build-site.mjs';
 import { buildSanitizer } from './build-sanitizer.mjs';
 import { buildHomepage } from './build-homepage.mjs';
+import { buildV2 } from '../v2/build.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 try { process.loadEnvFile(path.join(root, '.env.local')); } catch (error) { if (error.code !== 'ENOENT') throw error; }
 await buildSanitizer();
 const { default: handler } = await import('../api/updates.mjs');
 await vendorUpdates();
-const homepageWatcher = await buildHomepage({ watch: true });
+const watchers = await Promise.all([buildHomepage({ watch: true }), buildV2({ watch: true })]);
 const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.png': 'image/png', '.jpg': 'image/jpeg', '.gif': 'image/gif', '.woff2': 'font/woff2', '.webmanifest': 'application/manifest+json', '.pdf': 'application/pdf' };
 const port = Number(process.env.PORT || 4388);
 const server = http.createServer(async (req, res) => {
@@ -41,12 +42,13 @@ const server = http.createServer(async (req, res) => {
       return;
     }
     if (!['GET', 'HEAD'].includes(req.method)) { res.writeHead(405); res.end(); return; }
-    const routes = { '/updates': '/Pages/Updates/index.html', '/updates/': '/Pages/Updates/index.html', '/updates/embed': '/Pages/Updates/embed.html' };
+    const routes = { '/updates': '/Pages/Updates/index.html', '/updates/': '/Pages/Updates/index.html', '/updates/embed': '/Pages/Updates/embed.html', '/v2': '/index.html', '/v2/': '/index.html', '/v2/index.html': '/index.html' };
     let pathname = decodeURIComponent(routes[url.pathname] || url.pathname);
     if (pathname === '/') pathname = '/index.html';
     const parts = pathname.split('/').filter(Boolean);
-    const allowedRoots = ['assets', 'data', 'Maps', 'Pages', 'favicon.svg', 'index.html', 'main.js', 'style.css'];
-    if (!allowedRoots.includes(parts[0]) || parts.some(part => part.startsWith('.') || part === 'node_modules') || /\.(md|sql|mjs|bak)$/i.test(pathname)) {
+    const allowedRoots = ['assets', 'data', 'Maps', 'Pages', 'favicon.svg', 'index.html', 'original.html', 'main.js', 'style.css'];
+    const publicAsset = allowedRoots.includes(parts[0]) || pathname.startsWith('/v2/assets/');
+    if (!publicAsset || parts.some(part => part.startsWith('.') || part === 'node_modules') || /\.(md|sql|mjs|bak)$/i.test(pathname)) {
       res.writeHead(404); res.end('Not found'); return;
     }
     let filename = path.resolve(root, `.${pathname}`);
@@ -65,7 +67,7 @@ const server = http.createServer(async (req, res) => {
 });
 server.listen(port, '127.0.0.1', () => console.log(`Local: http://127.0.0.1:${port}/ (Updates preview: /updates?preview=1)`));
 async function shutdown() {
-  await homepageWatcher.dispose();
+  await Promise.all(watchers.map(watcher => watcher.dispose()));
   server.close();
 }
 process.once('SIGINT', shutdown);

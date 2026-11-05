@@ -4,6 +4,8 @@ Personal GitHub Pages site for Justin Rogowski. The site functions as a polished
 
 Live site: https://justinrogo.github.io/
 
+V2 is the primary homepage. Existing links under `/v2/` still open V2, and the original homepage is available at `/original.html`.
+
 ## Overview
 
 This repository powers a static website built with HTML, CSS, vanilla JavaScript, and React islands on the homepage. The homepage brings together professional quick links, scheduling tools, UConn Law Library resources, project pages, personal productivity widgets, and experimental web apps.
@@ -25,6 +27,7 @@ The site includes:
 ```text
 .
 ├── index.html
+├── original.html
 ├── style.css
 ├── main.js
 ├── data/
@@ -53,9 +56,9 @@ The site includes:
 
 ## Main site features
 
-### Homepage
+### Original homepage
 
-The homepage is the main landing page for the site. It includes Justin’s profile, UConn Law Library links, quick contact buttons, embedded scheduling tools, and a project/page directory.
+The original homepage lives at `/original.html`. It includes Justin’s profile, UConn Law Library links, quick contact buttons, embedded scheduling tools, and a project/page directory. See [the V2 README](v2/README.md) for the current homepage.
 
 Key homepage areas include:
 

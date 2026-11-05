@@ -192,7 +192,7 @@ export default function Home({ projects, effects, theme, fine }) {
                 <div className="portrait-orbit orbit-two" />
                 <div className="portrait-photo">
                   <img
-                    src="./assets/justin.png"
+                    src="/v2/assets/justin.png"
                     alt="Justin Rogowski"
                     width="240"
                     height="240"

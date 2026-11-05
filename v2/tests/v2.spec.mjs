@@ -610,8 +610,13 @@ test("phone touch destinations remain fixed and content clears the dock", async 
 });
 
 test("V1 core files remain byte-identical to the base branch", async () => {
+  const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
+  const archive = await readFile(new URL("original.html", root), "utf8");
+  // The original root index before it moved to /original.html, with LF endings.
+  expect(hash(archive.replace(/\r\n/g, "\n"))).toBe(
+    "49e4784399f7deb0e864dcb34575e769ad29e77c64553907933ce670ecdd194d",
+  );
   for (const name of [
-    "index.html",
     "main.js",
     "style.css",
     "data/pages.json",
@@ -622,7 +627,6 @@ test("V1 core files remain byte-identical to the base branch", async () => {
       cwd: root,
       maxBuffer: 4 * 1024 * 1024,
     });
-    const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
     // Git's CRLF checkout normalization is not a source change.
     expect(hash(Buffer.from(current.toString().replace(/\r\n/g, "\n")))).toBe(
       hash(original),

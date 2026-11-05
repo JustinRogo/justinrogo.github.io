@@ -34,7 +34,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   await mkdir(dist, { recursive: true });
   // Match the existing site's public roots, without exposing source, SQL, or env files.
   const excluded = new Set(['node_modules', '.git', '.claude', '.agents', '.codex', '.openai', '.impeccable']);
-  for (const entry of ['assets', 'data', 'Maps', 'Pages', 'favicon.svg', 'index.html', 'main.js', 'style.css']) {
+  for (const entry of ['assets', 'data', 'Maps', 'Pages', 'favicon.svg', 'index.html', 'original.html', 'main.js', 'style.css']) {
     await access(path.join(root, entry));
     await cp(path.join(root, entry), path.join(dist, entry), {
       recursive: true,
@@ -44,9 +44,9 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
       }
     });
   }
-  // V2 is additive: publish only its entry point and compiled public assets.
+  // Keep /v2/ working from the same entry point as the primary homepage.
   await mkdir(path.join(dist, 'v2'), { recursive: true });
-  await copyFile(path.join(root, 'v2/index.html'), path.join(dist, 'v2/index.html'));
+  await copyFile(path.join(dist, 'index.html'), path.join(dist, 'v2/index.html'));
   await cp(path.join(root, 'v2/assets'), path.join(dist, 'v2/assets'), {
     recursive: true,
     filter: source => !source.endsWith('.json'),

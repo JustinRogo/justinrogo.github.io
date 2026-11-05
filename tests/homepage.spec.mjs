@@ -16,11 +16,29 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
-async function open(page, url = '/') {
+async function open(page, url = '/original.html') {
   await page.goto(url, { waitUntil: 'domcontentloaded' });
   await expect(mainTabs(page).getByRole('tab')).toHaveCount(5);
   await expect(page.locator('.page-collection')).toHaveCount(3);
 }
+
+test('the primary homepage and V2 bookmarks share the same app and link to the original', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  for (const url of ['/', '/v2/#/home']) {
+    await page.goto(url);
+    await expect(page.getByRole('navigation', { name: 'Primary navigation' })).toBeVisible();
+    const portrait = page.locator('.portrait-photo img');
+    await expect.poll(() => portrait.evaluate(img => img.naturalWidth)).toBeGreaterThan(0);
+    await expect(page.locator('.selected-bento .magic-bento__card')).toHaveCount(4);
+    const original = page.getByRole('link', { name: 'Original site', exact: true });
+    await expect(original).toHaveAttribute('href', '/original.html');
+    await original.click();
+    await expect(mainTabs(page).getByRole('tab')).toHaveCount(5);
+  }
+  await page.goto('/#/tools?panel=request');
+  const legacyForm = page.getByRole('link', { name: 'Open the live site’s request tools' });
+  await expect(legacyForm).toHaveAttribute('href', '../original.html#widget-tabs-root');
+});
 
 async function assertIndicator(page) {
   await expect.poll(() => page.evaluate(() => {
@@ -71,7 +89,7 @@ test('manifest loading remains accessible and a stalled fetch times out to fallb
     await route.fulfill({ json: manifest }).catch(() => {});
   });
   try {
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await page.goto('/original.html', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#pageTree')).toHaveAttribute('aria-busy', 'true');
     await expect(page.locator('#pageTree').getByRole('status')).toHaveText('Loading pages...');
     // Install clock after React starts, then advance only the manifest timeout.
@@ -430,7 +448,7 @@ test('profile and Teams contact retain their text and native behavior without sc
   const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 320, height: 844 } });
   const page = await context.newPage();
   await page.route('https://**/*', route => route.fulfill({ body: '' }));
-  await page.goto('http://127.0.0.1:4391/', { waitUntil: 'domcontentloaded' });
+  await page.goto('http://127.0.0.1:4391/original.html', { waitUntil: 'domcontentloaded' });
   await expect(page.getByRole('heading', { level: 1, name: 'Justin Rogowski', exact: true })).toBeVisible();
   const link = page.getByRole('link', { name: 'Start a Teams Chat', exact: true });
   await expect(link).toBeVisible();
@@ -444,7 +462,7 @@ test('profile and Teams contact retain their text and native behavior without sc
 test('built file previews load React and the curated directory without fetching a manifest', async ({ page }) => {
   let manifestRequests = 0;
   page.on('request', request => { if (request.url().endsWith('/data/pages.json')) manifestRequests++; });
-  await page.goto(new URL('../dist/index.html', import.meta.url).href, { waitUntil: 'domcontentloaded' });
+  await page.goto(new URL('../dist/original.html', import.meta.url).href, { waitUntil: 'domcontentloaded' });
   await expect(mainTabs(page).getByRole('tab')).toHaveCount(5);
   await expect(page.locator('.page-collection')).toHaveCount(3);
   await page.locator('.page-collection summary').last().click();

@@ -1076,6 +1076,13 @@ textarea {
   font-size: 1.12rem;
   color: var(--ink);
 }
+.about-experience {
+  margin-top: 32px;
+  padding: clamp(16px, 3vw, 28px);
+}
+.about-experience > .section-title {
+  margin: 0 0 16px;
+}
 .experience-list {
   border-top: 1px solid var(--line);
 }
@@ -1089,6 +1096,10 @@ textarea {
 .experience-list p {
   font-size: 0.9rem;
   color: var(--muted);
+}
+.experience-list article:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
 }
 .about-columns {
   display: grid;
@@ -1135,13 +1146,6 @@ textarea {
 }
 .strengths {
   margin-top: 52px;
-}
-.strengths > .section-title {
-  margin-bottom: 12px;
-}
-.strengths > p {
-  font-size: 0.9rem;
-  color: var(--muted);
 }
 .strength-list {
   margin-top: 24px;

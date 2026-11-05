@@ -1,6 +1,6 @@
 # Justin Rogowski · Website V2
 
-An isolated React application at `/v2/`, developed on `feature/website-v2` and approved for publication alongside V1 on `main`. The production homepage remains unchanged. The GitHub Pages URL is `https://justinrogo.github.io/v2/` after the main-branch deployment completes.
+V2 is the React homepage at `https://justinrogo.github.io/`. Existing `/v2/` bookmarks open the same app. The original homepage is available at `/original.html`.
 
 ## Direction
 
@@ -53,7 +53,7 @@ npm ci
 npm run dev:v2
 ```
 
-Open **http://127.0.0.1:4392/v2/**. This read-only source-tree server watches V2 and shared imports; refresh the browser after edits. It does not run the Updates backend and rejects POST requests. Use `npm run build:v2` for a one-time independent build.
+Open **http://127.0.0.1:4392/**. This read-only source-tree server watches V2 and shared imports. Refresh the browser after edits. It rejects POST requests. Use `npm run build:v2` for a one-time independent build.
 
 To inspect the complete static artifact:
 
@@ -62,7 +62,7 @@ npm run build -- --skip-feed
 npm run preview
 ```
 
-Open **http://127.0.0.1:4391/v2/**. This also serves the unchanged homepage and existing project pages. `--skip-feed` preserves the checked-in blog snapshot. The normal existing build still refreshes that feed as before.
+Open **http://127.0.0.1:4391/**. The preview also serves the original homepage at `/original.html` and existing project pages. `--skip-feed` preserves the checked-in blog snapshot. The normal build refreshes the feed.
 
 ## Homepage assembly
 
@@ -121,7 +121,7 @@ React Bits is copyright David Haz, under MIT + Commons Clause. The build include
 - `serve.mjs`: local static preview with watch support.
 - `tests/`: browser interactions, responsive captures and optional GET-only live-source smoke check.
 
-Motion 14.9.1 supports the official Flip Card implementation. No new backend, authentication, database, service worker, or deployment rewrite. The build copies only `v2/index.html` and public `v2/assets/` into `dist/v2/`; source, tests and design notes stay out of the production artifact.
+Motion 14.9.1 supports the official Flip Card implementation. The build publishes the root `index.html` at `/` and `/v2/`, serves the shared V2 bundle from `/v2/assets/`, and copies the original HTML to `/original.html` alongside its existing assets.
 
 ## Verification and limits
 
@@ -129,4 +129,4 @@ Run `npm run test:v2`, `npm run test:homepage`, and `npm run test:updates`. The 
 
 The responsive suite captures 375, 430, 768, 1024 and 1440 pixels in both themes, including all views at phone and desktop widths. It also checks touch targets, dock clearance, history, refreshes, direct links, keyboard/focus behavior, saved projects, request safety, all search destinations and all 34 strengths. See [VALIDATION.md](VALIDATION.md) for recorded results and known limits.
 
-Existing files changed: **`package.json`** (three additive commands) and **`scripts/build-site.mjs`** (V2 build and public-output copy). All other changes are in `v2/`. Root `index.html`, `main.js`, `style.css`, V1 components, data, project pages, deployment workflows and Vercel configuration are unchanged. A pre-existing untracked `Pages/.claude/` directory was left untouched.
+V2 owns the root entry point and the application source under `v2/`. V1 retains its HTML in `original.html` and continues to use `main.js`, `style.css`, and the `src/homepage` build.

@@ -16,7 +16,7 @@ export function ProjectPreview({ project, tall = false, className = "" }) {
       ) : (
         <img
           className="project-preview-landscape"
-          src={`./assets/project-previews/${previewName}.jpg`}
+          src={`/v2/assets/project-previews/${previewName}.jpg`}
           alt={`Screenshot of ${project.title}`}
           loading="lazy"
           decoding="async"
@@ -28,7 +28,7 @@ export function ProjectPreview({ project, tall = false, className = "" }) {
       {tall && !previewFailed && (
         <img
           className="project-preview-portrait"
-          src={`./assets/project-previews/${previewName}-portrait.jpg`}
+          src={`/v2/assets/project-previews/${previewName}-portrait.jpg`}
           alt={`Screenshot of ${project.title}`}
           loading="lazy"
           decoding="async"

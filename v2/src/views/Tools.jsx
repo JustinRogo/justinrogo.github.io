@@ -177,7 +177,7 @@ function RequestPanel({ active }) {
           Ready to send a real request? Open the original site and choose
           “Submit a Request.” Your draft stays here for reference.
         </p>
-        <ExternalLink href="../#widget-tabs-root" className="text-link">
+        <ExternalLink href="../original.html#widget-tabs-root" className="text-link">
           Open the live site’s request tools <Icon name="external" size={16} />
         </ExternalLink>
         <ExternalLink href={integrations.board} className="text-link">

@@ -1,5 +1,6 @@
 import { contacts, experience, profile, technologies } from "../content.js";
 import { ExternalLink, LinkRow, SectionTitle } from "../components/UI.jsx";
+import { GlassLayer } from "../components/Glass.jsx";
 import Icon from "../components/Icon.jsx";
 import Strengths from "../components/Strengths.jsx";
 
@@ -16,7 +17,7 @@ export default function About({ effects, fine }) {
       </div>
       <div className="about-intro">
         <img
-          src="./assets/justin.png"
+          src="/v2/assets/justin.png"
           width="240"
           height="240"
           alt="Justin Rogowski"
@@ -41,15 +42,20 @@ export default function About({ effects, fine }) {
           </div>
         </div>
       </div>
-      <SectionTitle>Making complicated work easier</SectionTitle>
-      <div className="experience-list">
-        {experience.map(([title, text]) => (
-          <article key={title}>
-            <h3>{title}</h3>
-            <p>{text}</p>
-          </article>
-        ))}
-      </div>
+      <section className="about-experience glass-host" aria-labelledby="experience-heading">
+        <GlassLayer />
+        <SectionTitle headingProps={{ id: "experience-heading" }}>
+          Making complicated work easier
+        </SectionTitle>
+        <div className="experience-list">
+          {experience.map(([title, text]) => (
+            <article key={title}>
+              <h3>{title}</h3>
+              <p>{text}</p>
+            </article>
+          ))}
+        </div>
+      </section>
       <div className="about-columns">
         <section>
           <h2>Leadership & service</h2>

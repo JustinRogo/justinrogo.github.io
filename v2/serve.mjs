@@ -4,14 +4,17 @@ import path from "node:path";
 import { readFile, stat } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { buildV2 } from "./build.mjs";
+import { buildHomepage } from "../scripts/build-homepage.mjs";
 const root = fileURLToPath(new URL("../", import.meta.url));
 await buildV2({ watch: process.argv.includes("--watch") });
+await buildHomepage();
 const types = {
   ".html": "text/html",
   ".js": "text/javascript",
   ".css": "text/css",
   ".json": "application/json",
   ".png": "image/png",
+  ".jpg": "image/jpeg",
   ".svg": "image/svg+xml",
   ".webp": "image/webp",
   ".woff2": "font/woff2",
@@ -31,7 +34,8 @@ http
         res.writeHead(301, { Location: "/v2/" }).end();
         return;
       }
-      let file = path.resolve(root, `.${pathname}`);
+      const entry = ["/v2/", "/v2/index.html"].includes(pathname) ? "/index.html" : pathname;
+      let file = path.resolve(root, `.${entry}`);
       const relative = path.relative(root, file);
       if (
         relative.startsWith("..") ||
@@ -55,5 +59,5 @@ http
     }
   })
   .listen(4392, "127.0.0.1", () =>
-    console.log("V2 preview: http://127.0.0.1:4392/v2/"),
+    console.log("V2 preview: http://127.0.0.1:4392/"),
   );

@@ -14,7 +14,7 @@ The user delegates design selection and requests an intentional app experience o
 
 ## Preservation and source truth
 
-V1’s root HTML, CSS, JavaScript, React sources, project pages, URLs, integrations and deployment rewrites stay unchanged. All V2 rendering, state and styles belong to `v2/`; shared vendored React Bits sources and font files are read-only imports. The only existing files changed are additive npm commands and the main build’s additional V2 step/public output copy. The user approved merging `feature/website-v2` into `main` on November 3, 2026, publishing V2 at `/v2/` alongside V1.
+V2 is the root homepage, with `/v2/` retained for existing links. V1’s original HTML lives at `/original.html` alongside its existing CSS and JavaScript, so its relative URLs and integrations continue to resolve. V2 rendering, state and styles belong to `v2/`. Shared vendored React Bits sources and font files are read-only imports.
 
 `data/pages.json` remains the project source of truth. Professional copy and strengths come from the existing homepage and source; no credentials or accomplishments are invented. The build extracts all 34 strengths and both best/overextended reflection passages from V1’s source without invoking its DOM initializer. About includes the four original domain colors and a rank-weighted overview of all 34 themes, using 35 − rank points; Top 5/10/34 controls do not change that overview. The existing portrait is downloaded unchanged with provenance recorded alongside it.
 

@@ -363,7 +363,7 @@ function App() {
         <AssembleReveal id="footer">
           <footer className="app-footer">
             <span>Built by Justin.</span>
-            <a href="../">
+            <a href="/original.html">
               Original site <Icon name="external" size={14} />
             </a>
           </footer>
@@ -389,11 +389,11 @@ class Boundary extends Component {
     return this.state.failed ? (
       <div className="fatal-error">
         <h1>Something didn’t load.</h1>
-        <p>Please reload the prototype or visit the original site.</p>
+        <p>Please reload the page or visit the original site.</p>
         <button className="button" onClick={() => location.reload()}>
           Reload
         </button>
-        <a href="../">Original website</a>
+        <a href="/original.html">Original website</a>
       </div>
     ) : (
       this.props.children

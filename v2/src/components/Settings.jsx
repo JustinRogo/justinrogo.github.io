@@ -90,7 +90,7 @@ export default function Settings({
         settings.
       </p>
       <a
-        href="./assets/react-bits-LICENSE.txt"
+        href="/v2/assets/react-bits-LICENSE.txt"
         target="_blank"
         rel="noopener noreferrer"
         className="text-link"

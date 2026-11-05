@@ -7,6 +7,7 @@ import {
   domains,
 } from "../strengths.js";
 import { SectionTitle } from "./UI.jsx";
+import { GlassLayer } from "./Glass.jsx";
 import Icon from "./Icon.jsx";
 import FlipCard from "../vendor/FlipCard.jsx";
 import "./Strengths.css";
@@ -59,7 +60,6 @@ function DomainOverview() {
           </li>
         ))}
       </ul>
-      <p>Weights run from 34 points at rank 1 to one point at rank 34.</p>
     </figure>
   );
 }
@@ -145,32 +145,38 @@ export default function Strengths({ effects = true, fine = false }) {
       id="cliftonstrengths"
       aria-labelledby="cliftonstrengths-heading"
     >
-      <SectionTitle
-        headingProps={{ id: "cliftonstrengths-heading", tabIndex: -1 }}
-      >
-        How I’m wired
-      </SectionTitle>
-      <p>My CliftonStrengths themes, and how they show up in my work.</p>
+      <div className="strengths-heading glass-host">
+        <GlassLayer />
+        <SectionTitle
+          headingProps={{ id: "cliftonstrengths-heading", tabIndex: -1 }}
+        >
+          How I’m wired
+        </SectionTitle>
+        <p>My CliftonStrengths themes, and how they show up in my work.</p>
+      </div>
       <div className="strengths-introduction">
         <DomainOverview />
         <Reflections effects={effects} />
       </div>
-      <div className="filter-row" role="group" aria-label="Strengths to show">
-        {[5, 10, 34].map((n) => (
-          <button
-            key={n}
-            type="button"
-            aria-pressed={limit === n}
-            aria-controls={listId}
-            onClick={() => setLimit(n)}
-          >
-            {n === 34 ? "All 34" : `Top ${n}`}
-          </button>
-        ))}
+      <div className="strength-controls glass-host">
+        <GlassLayer />
+        <div className="filter-row" role="group" aria-label="Strengths to show">
+          {[5, 10, 34].map((n) => (
+            <button
+              key={n}
+              type="button"
+              aria-pressed={limit === n}
+              aria-controls={listId}
+              onClick={() => setLimit(n)}
+            >
+              {n === 34 ? "All 34" : `Top ${n}`}
+            </button>
+          ))}
+        </div>
+        <p className="strength-instruction">
+          Flip a card to expand its description.
+        </p>
       </div>
-      <p className="strength-instruction">
-        Flip a card to expand its description.
-      </p>
       <p className="sr-only" role="status">
         Showing {limit} of 34 themes.
       </p>
