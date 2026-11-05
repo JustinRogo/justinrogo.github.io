@@ -180,12 +180,36 @@ test("request preview cannot submit externally and keeps its draft across views"
   expect(writes).toEqual([]);
 });
 
+test("the topbar switches themes directly and phone settings are available from More", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 900 });
+  await page.emulateMedia({ colorScheme: "dark" });
+  await page.goto("/v2/?intro=0#/home");
+  const root = page.locator("html");
+  const topbar = page.locator(".topbar");
+  await expect(root).toHaveAttribute("data-theme", "dark");
+  const light = topbar.getByRole("button", { name: "Switch to light mode" });
+  await light.focus();
+  await light.press("Enter");
+  await expect(root).toHaveAttribute("data-theme", "light");
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await page.reload();
+  await expect(root).toHaveAttribute("data-theme", "light");
+  await topbar.getByRole("button", { name: "Switch to dark mode" }).click();
+  await expect(root).toHaveAttribute("data-theme", "dark");
+  await nav(page).getByRole("link", { name: "More", exact: true }).click();
+  await page.getByRole("button", { name: "Appearance & motion" }).click();
+  await expect(page.getByRole("radio", { name: "Dark", exact: true })).toBeChecked();
+  await page.getByRole("radio", { name: "System", exact: true }).check();
+  await page.emulateMedia({ colorScheme: "light" });
+  await expect(root).toHaveAttribute("data-theme", "light");
+});
+
 test("settings support keyboard dismissal, focus return, persistence and system reduced motion", async ({
   page,
 }) => {
   await page.goto("/v2/");
   const trigger = page
-    .locator(".topbar")
+    .locator(".sidebar")
     .getByRole("button", { name: "Appearance and motion settings" });
   await trigger.click();
   const dialog = page.getByRole("dialog");
@@ -382,7 +406,7 @@ test("the requested React Bits render, react to pointers, and stop in Calm mode"
     )
     .toBeGreaterThan(0.2);
   await page
-    .locator(".topbar")
+    .locator(".sidebar")
     .getByRole("button", { name: "Appearance and motion settings" })
     .click();
   await page.getByRole("switch", { name: /^Calm mode/ }).check();

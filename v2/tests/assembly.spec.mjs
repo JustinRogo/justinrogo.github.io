@@ -395,7 +395,7 @@ test("motion preferences, disabling the intro, and changing reduced motion alway
   ).toBeDisabled();
   await page.goto("/v2/#/home");
   await page
-    .locator(".topbar")
+    .locator(".sidebar")
     .getByRole("button", { name: "Appearance and motion settings" })
     .click();
   await page.getByRole("switch", { name: /^Homepage assembly/ }).uncheck();
@@ -404,7 +404,7 @@ test("motion preferences, disabling the intro, and changing reduced motion alway
     page.getByRole("button", { name: "Replay animation" }),
   ).toBeDisabled();
   await page
-    .locator(".topbar")
+    .locator(".sidebar")
     .getByRole("button", { name: "Appearance and motion settings" })
     .click();
   await page.getByRole("switch", { name: /^Homepage assembly/ }).check();

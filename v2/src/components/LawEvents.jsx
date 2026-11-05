@@ -4,7 +4,7 @@ import { eventDate, parseEvents } from "../events.js";
 import { useMedia, useResource } from "../hooks.js";
 import { useAssemblyBusy } from "../assembly/HomepageAssembly.jsx";
 import Carousel from "../vendor/Carousel.jsx";
-import { ExternalLink, LoadState } from "./UI.jsx";
+import { ExternalLink, LoadState, SectionTitle } from "./UI.jsx";
 import Icon from "./Icon.jsx";
 import "./LawEvents.css";
 
@@ -74,7 +74,9 @@ export default function LawEvents({ effects, theme }) {
   const events = useResource(integrations.events, parseEvents);
   return (
     <section className="law-events" aria-labelledby="law-events-title">
-      <h2 id="law-events-title">UConn Law Events</h2>
+      <SectionTitle glass headingProps={{ id: "law-events-title" }}>
+        UConn Law Events
+      </SectionTitle>
       <LoadState resource={events} message="The events feed is unavailable right now.">
         {(data) => data.length
           ? <EventCarousel events={data} effects={effects} theme={theme} />

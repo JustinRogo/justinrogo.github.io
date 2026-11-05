@@ -1,6 +1,32 @@
 .home-pocket-part { margin-top: 28px; min-width: 0; container-type: inline-size; }
-.home-pocket-part > .section-title { margin: 0 0 12px; }
-.pocket-intro { margin: 0 0 24px; }
+.home-pocket-part > .section-title {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 12px;
+  margin: 0 0 12px;
+}
+.pocket-intro {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  margin: 0;
+  font-size: 0.85rem;
+}
+.home-pocket-part .section-title .text-link {
+  grid-column: 2;
+  grid-row: 1;
+  white-space: nowrap;
+}
+@container (min-width: 501px) {
+  .home-pocket-part > .section-title {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    column-gap: 24px;
+  }
+  .pocket-intro {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .home-pocket-part .section-title .text-link { grid-column: 3; }
+}
 .pocket-stack { --pocket-card-height: 320px; }
 .pocket-stack .scroll-stack__inner { padding-inline: 0; }
 .pocket-stack:not(.is-static) .scroll-stack__end { min-height: max(100px, calc(88svh - var(--pocket-card-height))); }
@@ -26,9 +52,8 @@
 @media (max-width: 600px) {
   .pocket-stack { --pocket-card-height: 360px; }
   .pocket-post-link.has-image { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); }
-  .home-pocket-part > .section-title { gap: 12px; }
   .home-pocket-part .section-title h2 { font-size: 1.3rem; }
-  .home-pocket-part .section-title .text-link { font-size: 0.8rem; white-space: nowrap; }
+  .home-pocket-part .section-title .text-link { font-size: 0.8rem; }
   .pocket-post-copy { gap: 8px; padding: 16px 20px; }
   .pocket-post-copy time { font-size: 0.8rem; }
 }

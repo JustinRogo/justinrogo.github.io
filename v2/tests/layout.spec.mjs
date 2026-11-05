@@ -14,6 +14,35 @@ test.beforeEach(async ({ page }) => {
   );
 });
 
+test("topbar follows the content edges across viewport and sidebar widths", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 2560, height: 1000 });
+  await page.goto("/v2/#/home");
+
+  const expectAligned = async () => {
+    const topbar = await page.locator(".topbar").boundingBox();
+    const hero = await page.locator(".glass-hero").boundingBox();
+    expect(topbar.x).toBeCloseTo(hero.x);
+    expect(topbar.width).toBeCloseTo(hero.width);
+  };
+
+  await expectAligned();
+  const handle = page.getByRole("separator", { name: "Resize sidebar" });
+  await handle.focus();
+  await page.keyboard.press("End");
+  await expect(handle).toHaveAttribute("aria-valuenow", "360");
+  await expectAligned();
+  await page.locator(".sidebar-toggle").click();
+  await expect(page.locator(".sidebar")).toHaveCSS("width", "72px");
+  await expectAligned();
+
+  for (const width of [3840, 1440, 1150, 801, 800, 601, 600, 320]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await expectAligned();
+  }
+});
+
 test("portrait contacts and shared strengths preview work on desktop and phone", async ({
   page,
 }) => {
@@ -145,17 +174,17 @@ test("desktop sidebar resizes by pointer and keyboard, persists, and yields to c
   ).toBe(true);
 });
 
-test("box corners are halved, circular portraits remain circular, and booking embeds stay opt-in without the removed disclaimer", async ({
+test("glass corners follow the preset, portraits stay circular, and booking embeds stay opt-in", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("/v2/#/home");
   for (const [selector, radius] of [
     [".sidebar", "0px"],
-    [".topbar", "10px"],
-    [".glass-hero", "12px"],
+    [".topbar", "6px"],
+    [".glass-hero", "6px"],
     [".hero-actions .primary", "5.5px"],
-    [".magic-bento__card", "11px"],
+    [".magic-bento__card", "6px"],
   ]) {
     await expect(page.locator(selector).first()).toHaveCSS(
       "border-top-left-radius",

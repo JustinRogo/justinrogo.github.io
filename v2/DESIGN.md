@@ -14,7 +14,7 @@ colors:
   nav: "#c8d9f2"
   branch-line: "#86a4ce"
   glass-fill: "rgba(235, 244, 255, 0.72)"
-  glass-edge: "rgba(255, 255, 255, 0.8)"
+  glass-edge: "rgba(65, 88, 120, 0.48)"
   dark-bg: "#060f23"
   dark-surface: "#0e203b"
   dark-ink: "#eef5ff"
@@ -27,7 +27,7 @@ colors:
   dark-nav: "#173456"
   dark-branch-line: "#49749b"
   dark-glass-fill: "rgba(11, 30, 58, 0.68)"
-  dark-glass-edge: "rgba(168, 204, 255, 0.23)"
+  dark-glass-edge: "rgba(32, 51, 78, 0.85)"
   contrast-muted: "#304965"
   contrast-line: "#637e9f"
   contrast-dark-muted: "#d0e2f8"
@@ -121,10 +121,10 @@ rounded:
   search: "6px"
   tool-navigation: "7px"
   orbit-action: "8.5px"
-  topbar-phone: "9px"
-  topbar: "10px"
+  topbar-phone: "6px"
+  topbar: "6px"
   panel: "11px"
-  glass-host: "12px"
+  glass-host: "6px"
   phone-sheet: "12px 12px 0 0"
   circle: "50%"
 spacing:
@@ -244,7 +244,7 @@ The palette uses a cool luminous ground with blue illumination and orange intera
 - **Ice / navy page** (`bg`, `dark-bg`) and **solid surface** (`surface`, `dark-surface`): theme ground and opaque control/dialog/fallback material.
 - **Ink / supporting ink** (`ink`, `muted`, dark counterparts): primary and secondary text; `contrast-*` values are high-contrast overrides.
 - **Rules / branches** (`line`, `branch-line`, dark counterparts): field outlines, ruled rows, and branch geometry.
-- **Glass fill / edge** (`glass-fill`, `glass-edge`, dark counterparts): translucent material and reflected rims; `nav` supplies hover and segmented surfaces.
+- **Glass fill / edge** (`glass-fill`, `glass-edge`, dark counterparts): translucent material and dark inset rims shared by refractive and frosted panels. `nav` supplies hover and segmented surfaces.
 
 **The Semantic Glass Rule.** Use live theme variables for glass, text, and supporting UI; retain the implemented fixed orange primary-action palette.
 
@@ -279,7 +279,7 @@ Spacing is contextual; frontmatter lists reused steps without imposing a new mat
 
 Glass is structural throughout V2. Floating rails, headers, hero, and lower panels use theme-specific panel shadows. Project lists and task surfaces use translucent fills, blur, and larger curves; bento adds reflected rims and pointer illumination. Dialogs remain solid and retain their inherited modal shadow.
 
-GlassLayer imports the actual shared Glass Surface renderer. Its inert decorative SVG layer sits behind controls, using blur (16), opacity (0.94), distortion scale (-55), and channel offsets (0 / 2 / 4). Fine-pointer devices may refract; touch and reduced motion use frosted glass. Reduced transparency, high contrast, and forced colors make layers opaque. The dock uses a near-opaque surface mix (94%) for labels.
+GlassLayer uses the shared Glass Surface SVG renderer behind controls, including on featured tiles. The React Bits preset sets a border width factor of 0.05, map brightness of 42%, map opacity of 0.51, frost opacity of 0.2, displacement scale of −110, and red offset of 5. Fine-pointer devices may refract. Touch and reduced motion use frosted glass. Reduced transparency, high contrast, and forced colors make layers opaque. The dock uses a near-opaque surface mix (94%) for labels.
 
 Settings offers the original Shape Waves, Antigravity, Fractal, and Aurora backgrounds, V2's Orbits, and None. Device default selects Shape Waves above 800px and Aurora on compact screens. An explicit choice persists in V2 preferences. The old disabled-atmosphere setting maps to None. Only the selected renderer mounts. The existing Shape Waves/Antigravity engines keep their pixel budgets, fallback canvases and disposal; Aurora uses three drifting CSS light fields, and Fractal uses the original bounded canvas. Orbits keeps V2's blue/orange light and SVG ellipses. Motion pauses during assembly and while hidden. Calm/reduced motion use still versions; contrast and reduced transparency suppress the layer. The background-specific blue/cyan/violet tokens preserve the original background palette alongside the existing semantic orange.
 
@@ -287,7 +287,7 @@ Settings offers the original Shape Waves, Antigravity, Fractal, and Aurora backg
 
 ## Shapes
 
-Box corners use half the previous V2 radii: glass hero/sidebar 12px, bento and panels 11px, header/dock 10px, buttons 5.5px, and fields 3.5px. Decorative renderer and construction-guide corners match their actual hosts. The frontmatter records the remaining contextual values. Portraits and orbital geometry retain circles and ellipses.
+The glass hero, topbar, mobile dock, and featured bento use 6px corners. The desktop rail is square. Other panels use 11px, buttons use 5.5px, and fields use 3.5px. Construction guides follow the host corners. Portraits and orbital geometry retain circles and ellipses.
 
 Line icons remain inline SVG with rounded caps/joins and the existing stroke (1.65). Branched Menu uses real trunk, arc, and trace geometry. The leading statutes tile uses the shared book icon with CT lettering; the featured destinations are CT General Statutes Explorer, Law Library Heatmap, and AI Corner Updates.
 
@@ -303,7 +303,7 @@ Line icons remain inline SVG with rounded caps/joins and the existing stroke (1.
 - **Portrait contacts:** calendar, email, Teams chat, and telephone are native labeled links. Four floating controls surround the portrait on larger screens and form a compact row beside it on phones. The shared rank-weighted four-color strengths bar links directly to `#/about?section=strengths`, scrolling to and focusing its heading; direct refresh and history retain normal routing.
 - **About contacts:** the introduction adds secondary LinkedIn/GitHub buttons using existing contact destinations. Sidebar “Let’s connect” opens `#/about?section=contact`, scrolling to and focusing “Say hello.” The sidebar keeps a labeled Settings control; the original-site link and prototype label are removed there. Original-site access remains in the footer.
 - **Glass hosts:** separate decorative renderer layers sit behind normal content; task/feed surfaces use their observed frosted variants. Do not apply distortion to the controls themselves.
-- **Dialogs / settings:** centered native dialogs become phone bottom sheets, retaining focus containment, Escape/outside dismissal, focus return, and scroll restoration. Preview closes on destination/panel changes. Settings offer System/Light/Dark, Calm, Homepage assembly, and Page background with V2 persistence. Backgrounds use a labeled native radio group: two columns on desktop, one on phones, with short descriptions and 12px insets.
+- **Dialogs / settings:** centered native dialogs become phone bottom sheets, retaining focus containment, Escape/outside dismissal, focus return, and scroll restoration. Preview closes on destination/panel changes. The topbar switches directly between Light and Dark. The full Settings dialog opens from the sidebar or from More on phones and offers System/Light/Dark, Calm, Homepage assembly, and Page background with V2 persistence. Backgrounds use a labeled native radio group: two columns on desktop, one on phones, with short descriptions and 12px insets.
 - **Homepage assembly:** a finite, session-only GSAP sequence manipulates existing nodes through ref slots, without layout wrappers or interface copies. Layout enters alone to trace persistent, measured outlines of the header, hero, navigation shell, and project tiles; the crew joins at 35% of the timeline to add Theme, Content, Details, and Projects. Each outline fades as its real component fills in. Five cursors (four at phone widths) use short job labels, click pulses, selection handles, target-sized tracing guides, text masks, opacity reveals, and small placement transforms. Navigation hit regions stay stable during the reveal. Default duration is 5800ms / 4800ms plus 160ms preparation. Input, navigation, resizing, visibility, and late geometry changes immediately restore normal presentation. Ambient drift pauses during construction. Replay is in the header; motion/contrast preferences override it. Decorative agent labels use 10px/650 Geist on the configured pastel colors, 3px corners, and the existing #071528 action ink. The grid's black alpha is a mask coefficient, not a new product color. See ASSEMBLY.md.
 - **Motion:** light fields drift alternately over (18s) and (21s); branches, orbit actions, navigation, glare, and inherited view entrances give shorter feedback. Tech Text and bento react to interaction. Reduced motion, Calm, high contrast, forced colors, active-view state, and document visibility gate optional engines. Exact observed timings and renderer settings live in the sidecar.
 

@@ -46,10 +46,18 @@ export default function PocketPart({ effects }) {
   const posts = useResource("../data/pocket-part.json", parsePocketPart);
   return (
     <section className="home-pocket-part" aria-labelledby="pocket-part-title">
-      <SectionTitle headingProps={{ id: "pocket-part-title" }} action={
-        <ExternalLink href={blogUrl} className="text-link">All posts <Icon name="external" size={16} /></ExternalLink>
-      }>The Pocket Part</SectionTitle>
-      <p className="muted pocket-intro">From the UConn Law Library blog.</p>
+      <SectionTitle
+        glass
+        headingProps={{ id: "pocket-part-title" }}
+        description={<p className="muted pocket-intro">From the UConn Law Library blog.</p>}
+        action={
+          <ExternalLink href={blogUrl} className="text-link">
+            All posts <Icon name="external" size={16} />
+          </ExternalLink>
+        }
+      >
+        The Pocket Part
+      </SectionTitle>
       <LoadState resource={posts} message="The Pocket Part feed is unavailable right now.">
         {(data) => data.items.length ? <PostStack posts={data.items} effects={effects} />
           : <p className="muted">No posts returned. Visit The Pocket Part for the latest stories.</p>}

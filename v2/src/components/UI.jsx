@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { GlassLayer } from "./Glass.jsx";
 import Icon from "./Icon.jsx";
 export function ExternalLink({ href, children, className = "", ...props }) {
   const external = /^(https?:|\.\.\/)/.test(href);
@@ -24,10 +25,19 @@ export function LinkRow({ title, description, href, icon = "external" }) {
     </ExternalLink>
   );
 }
-export function SectionTitle({ children, action, headingProps, ...props }) {
+export function SectionTitle({
+  children,
+  action,
+  description,
+  headingProps,
+  glass = false,
+  ...props
+}) {
   return (
-    <div className="section-title" {...props}>
+    <div className={glass ? "section-title glass-host" : "section-title"} {...props}>
+      {glass && <GlassLayer />}
       <h2 {...headingProps}>{children}</h2>
+      {description}
       {action}
     </div>
   );

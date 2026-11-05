@@ -8,11 +8,17 @@ test.beforeEach(async ({ page }) => {
     return route.abort();
   });
 });
-const openSettings = (page) =>
-  page
-    .locator(".topbar")
+const openSettings = async (page) => {
+  if (page.viewportSize().width <= 600) {
+    await page.getByRole("link", { name: "More", exact: true }).click();
+    await page.getByRole("button", { name: "Appearance & motion" }).click();
+    return;
+  }
+  await page
+    .locator(".sidebar")
     .getByRole("button", { name: "Appearance and motion settings" })
     .click();
+};
 
 test("background defaults follow device size; explicit choices persist and only the selected renderer mounts", async ({
   page,
@@ -186,6 +192,7 @@ test("background settings and selected still backgrounds fit both themes on desk
       for (const name of ["Shape Waves", "Antigravity", "Fractal", "Aurora"]) {
         await dialog.getByRole("radio", { name, exact: true }).check();
         await page.keyboard.press("Escape");
+        if (width <= 600) await page.goBack();
         await page.screenshot({
           path: `.impeccable/review/backgrounds/${width}-${theme}-${name.replace(" ", "-")}.png`,
         });

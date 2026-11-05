@@ -12,7 +12,11 @@
   --nav: #c8d9f2;
   --branch-line: #86a4ce;
   --glass-fill: rgba(235, 244, 255, 0.72);
-  --glass-edge: rgba(255, 255, 255, 0.8);
+  --glass-edge: rgba(65, 88, 120, 0.48);
+  --glass-inner-shadow: rgba(24, 42, 68, 0.22);
+  --glass-rim: inset 0 0 0 1px var(--glass-edge),
+    inset 0 0 12px 3px var(--glass-inner-shadow);
+  --glass-radius: 6px;
   --panel-shadow: 0 20px 56px -26px rgba(22, 56, 108, 0.34);
 }
 :root[data-theme="dark"] {
@@ -28,7 +32,8 @@
   --nav: #173456;
   --branch-line: #49749b;
   --glass-fill: rgba(11, 30, 58, 0.68);
-  --glass-edge: rgba(168, 204, 255, 0.23);
+  --glass-edge: rgba(32, 51, 78, 0.85);
+  --glass-inner-shadow: rgba(0, 7, 22, 0.58);
   --panel-shadow: 0 24px 68px -24px rgba(0, 5, 20, 0.7);
 }
 body::before {
@@ -119,6 +124,7 @@ body::before {
   display: none;
 }
 .workspace {
+  --page-gutter: 32px;
   position: relative;
   z-index: 1;
   margin-left: 244px;
@@ -126,7 +132,7 @@ body::before {
 .glass-host {
   position: relative;
   isolation: isolate;
-  border-radius: 12px;
+  border-radius: var(--glass-radius);
   background: transparent;
   box-shadow: var(--panel-shadow);
 }
@@ -144,6 +150,11 @@ body::before {
 }
 .glass-layer > .glass-surface {
   border-radius: inherit !important;
+  box-shadow: var(--glass-rim);
+}
+.glass-layer .glass-surface__rim,
+.selected-bento .magic-bento__rim {
+  display: none;
 }
 .glass-layer .glass-surface__content {
   padding: 0;
@@ -155,7 +166,7 @@ body::before {
   inset: 18px auto 18px 18px;
   width: 208px;
   border: 0;
-  border-radius: 12px;
+  border-radius: var(--glass-radius);
   padding: 28px 19px 22px;
   background: transparent;
   box-shadow: var(--panel-shadow);
@@ -223,8 +234,9 @@ body::before {
   position: relative;
   isolation: isolate;
   border: 0;
-  border-radius: 10px;
-  margin: 18px 32px 0;
+  border-radius: var(--glass-radius);
+  width: calc(min(100%, var(--page-max-width)) - 2 * var(--page-gutter));
+  margin: 18px auto 0;
   padding: 0 24px;
   height: 65px;
   box-shadow: var(--panel-shadow);
@@ -240,7 +252,7 @@ body::before {
 }
 main {
   padding-top: 26px;
-  padding-inline: 32px;
+  padding-inline: var(--page-gutter);
 }
 .app-footer {
   padding-inline: 32px;
@@ -429,6 +441,10 @@ main {
 .view-home > .section-title {
   margin-top: 32px;
 }
+.section-title.glass-host {
+  min-height: 52px;
+  padding: 8px 14px;
+}
 .view-home > .section-title h2 {
   font-size: 1.3rem;
 }
@@ -437,8 +453,6 @@ main {
   --mb-muted: var(--muted) !important;
   --mb-surface: transparent !important;
   --mb-shadow: var(--panel-shadow) !important;
-  --mb-edge: var(--glass-edge) !important;
-  --mb-highlight: var(--glass-edge) !important;
   --mb-focus: var(--orange) !important;
   --mb-line: var(--line) !important;
 }
@@ -446,10 +460,7 @@ main {
   height: 100%;
   position: relative;
   padding: 0;
-}
-.selected-bento .magic-bento__card {
-  overflow: hidden;
-  background: var(--glass-fill);
+  border-radius: inherit;
 }
 .selected-bento .magic-bento__card:focus-visible {
   outline: 3px solid var(--orange);
@@ -566,7 +577,6 @@ main {
 }
 .bento-index {
   padding: 22px;
-  background: linear-gradient(135deg, #1855bc30, #ff8a3612);
 }
 .bento-index > svg {
   color: var(--orange);
@@ -694,7 +704,6 @@ main {
   padding: 0 22px;
   background: var(--glass-fill);
   backdrop-filter: blur(18px);
-  box-shadow: var(--panel-shadow);
 }
 .project-row:first-child {
   border-top: 0 !important;
@@ -729,14 +738,12 @@ main {
   background: var(--glass-fill);
   border-radius: 11px;
   backdrop-filter: blur(18px);
-  box-shadow: var(--panel-shadow);
 }
 .about-intro {
   background: var(--glass-fill);
   padding: 30px;
   border-radius: 12px;
   backdrop-filter: blur(16px);
-  box-shadow: var(--panel-shadow);
 }
 .experience-list,
 .about-columns,
@@ -762,8 +769,18 @@ main {
 .weather-note {
   background: var(--glass-fill);
   border-radius: 11px;
-  box-shadow: var(--panel-shadow);
   backdrop-filter: blur(14px);
+}
+.project-list,
+.tool-content,
+.about-intro,
+.activity-note,
+.weather-note {
+  box-shadow: var(--panel-shadow), var(--glass-rim);
+}
+.about-columns,
+.strength-overview {
+  box-shadow: var(--glass-rim);
 }
 .sheet {
   background: var(--surface);
@@ -788,6 +805,7 @@ main {
 }
 @media (max-width: 1150px) {
   .workspace {
+    --page-gutter: 22px;
     margin-left: 216px;
   }
   .sidebar {
@@ -795,12 +813,8 @@ main {
     padding: 27px 14px 20px;
   }
   .topbar {
-    margin-inline: 22px;
     padding-inline: 20px;
     gap: 14px;
-  }
-  main {
-    padding-inline: 22px;
   }
   .glass-hero {
     padding: 28px;
@@ -864,6 +878,7 @@ main {
 }
 @media (max-width: 800px) {
   .workspace {
+    --page-gutter: 18px;
     margin-left: 90px;
   }
   .sidebar {
@@ -886,13 +901,13 @@ main {
     font-size: 0.6rem;
   }
   .topbar {
-    margin: 14px 18px 0;
+    margin-top: 14px;
     height: 60px;
     padding-inline: 16px;
     gap: 10px;
   }
   main {
-    padding: 22px 18px;
+    padding-block: 22px;
   }
   .glass-hero {
     padding: 25px;
@@ -957,6 +972,7 @@ main {
 }
 @media (max-width: 600px) {
   .workspace {
+    --page-gutter: 14px;
     margin-left: 0;
     padding-bottom: calc(108px + env(safe-area-inset-bottom));
   }
@@ -964,7 +980,6 @@ main {
     inset: auto 12px calc(10px + env(safe-area-inset-bottom));
     width: calc(100% - 24px);
     padding: 0;
-    border-radius: 10px;
     box-shadow: 0 10px 36px -10px #020e2c70;
   }
   .sidebar > .glass-layer {
@@ -974,13 +989,15 @@ main {
     margin: 0;
     padding: 6px;
     border: 0;
-    border-radius: 10px;
+    border-radius: var(--glass-radius);
     gap: 2px;
     background: transparent;
     backdrop-filter: none;
   }
   .primary-nav > .dock-glass {
     display: block;
+  }
+  .primary-nav > .dock-glass:not(.glass-layer-opaque) {
     background: color-mix(in srgb, var(--surface) 94%, transparent);
   }
   .primary-nav > a {
@@ -997,10 +1014,9 @@ main {
     background: color-mix(in srgb, var(--orange) 14%, transparent);
   }
   .topbar {
-    margin: 12px 14px 0;
+    margin-top: 12px;
     height: 57px;
     padding-inline: 15px;
-    border-radius: 9px;
   }
   .mobile-wordmark {
     font-size: 2.1rem;
@@ -1014,11 +1030,10 @@ main {
     gap: 7px;
   }
   main {
-    padding: 17px 14px 15px;
+    padding-block: 17px 15px;
   }
   .glass-hero {
     padding: 24px 23px 22px;
-    border-radius: 12px;
     grid-template-columns: 1fr;
     overflow: hidden;
   }
@@ -1088,8 +1103,7 @@ main {
     border-width: 1px;
   }
   .view-home > .section-title {
-    margin: 26px 4px 17px;
-    align-items: flex-start;
+    margin: 26px 0 17px;
   }
   .view-home > .section-title h2 {
     font-size: 1.25rem;
@@ -1225,6 +1239,9 @@ main {
   }
 }
 @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  :root {
+    --glass-rim: 0 0 transparent;
+  }
   .glass-layer,
   .project-list,
   .tool-content,

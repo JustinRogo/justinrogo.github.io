@@ -64,8 +64,9 @@ function GithubFeed() {
     )
     .slice(0, 6);
   return (
-    <section>
-      <SectionTitle>From the workbench</SectionTitle>
+    <section className="more-feed-panel glass-host" aria-labelledby="workbench-title">
+      <GlassLayer />
+      <SectionTitle headingProps={{ id: "workbench-title" }}>From the workbench</SectionTitle>
       <p className="muted">Recent public commits across three repositories.</p>
       {sources.some(([s]) => s.loading) && (
         <p role="status">Checking GitHub…</p>
@@ -171,8 +172,10 @@ export default function More({
           </LoadState>
         </section>
       </div>
-      <section className="blog-feed">
+      <section className="blog-feed more-feed-panel glass-host" aria-labelledby="more-pocket-part-title">
+        <GlassLayer />
         <SectionTitle
+          headingProps={{ id: "more-pocket-part-title" }}
           action={
             <ExternalLink
               href="https://library.law.uconn.edu/the-pocket-part/"
@@ -214,8 +217,9 @@ export default function More({
       </section>
       <div className="more-columns">
         <GithubFeed />
-        <section>
-          <SectionTitle>At UConn Law</SectionTitle>
+        <section className="more-feed-panel glass-host" aria-labelledby="more-law-events-title">
+          <GlassLayer />
+          <SectionTitle headingProps={{ id: "more-law-events-title" }}>At UConn Law</SectionTitle>
           <LoadState
             resource={events}
             message="The events feed isn’t available in this browser."

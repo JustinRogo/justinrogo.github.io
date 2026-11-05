@@ -80,7 +80,7 @@ function FeaturedBento({ projects, effects, theme, fine }) {
         rowSpan: index === 0 ? 2 : 1,
         content: (
           <>
-            <GlassLayer radius={11} />
+            <GlassLayer />
             <AssembleReveal
               id={`featured-${index}`}
               closest=".magic-bento__cell"
@@ -114,7 +114,7 @@ function FeaturedBento({ projects, effects, theme, fine }) {
           rowSpan: 1,
           content: (
             <>
-              <GlassLayer radius={11} />
+              <GlassLayer />
               <AssembleReveal id="featured-3" closest=".magic-bento__cell">
                 <div className="bento-index">
                   <Icon name="projects" size={30} />
@@ -140,7 +140,7 @@ function FeaturedBento({ projects, effects, theme, fine }) {
       columns={4}
       rowHeight={170}
       gap={16}
-      radius={11}
+      radius={6}
       theme={theme}
       glowColor="#ff8a36"
       textAutoHide={false}
@@ -162,7 +162,7 @@ export default function Home({ projects, effects, theme, fine }) {
     <>
       <AssembleReveal id="hero-frame">
         <section className="glass-hero glass-host">
-          <GlassLayer radius={12} />
+          <GlassLayer />
           <div className="hero-copy">
             <Name effects={effects} />
             <AssembleReveal id="hero-role">
@@ -240,6 +240,7 @@ export default function Home({ projects, effects, theme, fine }) {
       </AssembleReveal>
       <AssembleReveal id="featured-heading">
         <SectionTitle
+          glass
           action={
             <a href="#/projects" className="text-link">
               All projects <Icon name="arrow" size={17} />

@@ -393,6 +393,7 @@ svg {
   color: var(--muted);
 }
 .workspace {
+  --page-max-width: 1300px;
   margin-left: 226px;
 }
 .topbar {
@@ -403,8 +404,6 @@ svg {
   padding: 0 48px;
   border-bottom: 1px solid var(--line);
   font-size: 0.75rem;
-  max-width: 1600px;
-  margin: auto;
 }
 .topbar-title {
   color: var(--muted);
@@ -437,7 +436,7 @@ svg {
   display: none;
 }
 main {
-  max-width: 1300px;
+  max-width: var(--page-max-width);
   margin: auto;
   padding: 36px 48px 20px;
   min-height: calc(100svh - 176px);
@@ -462,7 +461,7 @@ main {
   display: flex;
   justify-content: space-between;
   gap: 16px;
-  max-width: 1300px;
+  max-width: var(--page-max-width);
   margin: 36px auto 0;
   padding: 20px 48px 32px;
   color: var(--muted);
@@ -1279,14 +1278,24 @@ textarea {
 .post:hover h3 {
   color: var(--blue);
 }
+.more-feed-panel {
+  min-width: 0;
+  padding: clamp(16px, 3vw, 28px);
+}
+.more-feed-panel > .section-title {
+  margin: 0 0 12px;
+}
+.blog-feed {
+  margin-top: 24px;
+}
 .blog-feed > .small {
   margin-top: 18px;
 }
 .more-columns {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 44px;
-  margin: 8px 0 45px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin: 24px 0 45px;
 }
 .more-columns .link-row {
   padding: 17px 0;
@@ -1520,9 +1529,6 @@ textarea {
     gap: 8px;
     font-size: 0.7rem;
   }
-  .more-columns {
-    gap: 28px;
-  }
   .home-connect h2 {
     font-size: 1.9rem;
   }
@@ -1649,8 +1655,8 @@ textarea {
     padding: 22px;
   }
   .more-columns {
-    grid-template-columns: 1fr;
-    gap: 0;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
   }
   .about-columns {
     gap: 28px;

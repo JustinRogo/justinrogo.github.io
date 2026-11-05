@@ -169,10 +169,12 @@ test("square event cards fit narrow screens and both themes; Calm and reduced mo
   await expect(carousel).toHaveAttribute("data-autoplay", "false");
   await carousel.getByRole("button", { name: "Next slide", exact: true }).click();
   await expect(carousel.locator(".carousel-slide[data-current]")).toHaveAttribute("aria-label", "2 of 4");
-  await page.locator(".topbar").getByRole("button", { name: "Appearance and motion settings" }).click();
+  await page.getByRole("link", { name: "More", exact: true }).click();
+  await page.getByRole("button", { name: "Appearance & motion" }).click();
   await page.getByRole("radio", { name: "Light", exact: true }).check();
   await page.getByRole("switch", { name: /^Calm mode/ }).check();
   await page.keyboard.press("Escape");
+  await page.goBack();
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await expect(carousel).toHaveAttribute("data-motion", "still");
   await section.scrollIntoViewIfNeeded();
@@ -183,12 +185,15 @@ test("square event cards fit narrow screens and both themes; Calm and reduced mo
   await expect(carousel.locator(".carousel-slide[data-current]")).toHaveAttribute("aria-label", "3 of 4");
 });
 
-test("events keep their frameless layout in transparency and contrast modes", async ({ page, context }) => {
+test("the events heading becomes opaque and the carousel stays frameless in accessibility modes", async ({ page, context }) => {
   const cdp = await context.newCDPSession(page);
   await cdp.send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-reduced-transparency", value: "reduce" }] });
   await page.goto("/v2/?intro=0#/home");
   const section = page.locator(".law-events");
-  await expect(section.locator(".glass-layer,.event-selection,.event-card-brand")).toHaveCount(0);
+  const headingGlass = section.locator(".section-title > .glass-layer");
+  await expect(headingGlass).toHaveClass(/glass-layer-opaque/);
+  await expect(section.locator(".glass-layer")).toHaveCount(1);
+  await expect(section.locator(".event-selection,.event-card-brand")).toHaveCount(0);
   await expect(section).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
   await expect(section).toHaveCSS("border-top-width", "0px");
   await expect(section).toHaveCSS("box-shadow", "none");
@@ -196,7 +201,7 @@ test("events keep their frameless layout in transparency and contrast modes", as
   await expect(section.locator(".event-carousel")).toHaveAttribute("data-autoplay", "false");
   await expect(section.locator(".carousel-slide[data-current] a")).toHaveAttribute("href", "https://events.uconn.edu/law-school/event/1");
   await page.emulateMedia({ contrast: "no-preference", forcedColors: "active" });
-  await expect(section.locator(".glass-layer")).toHaveCount(0);
+  await expect(headingGlass).toHaveClass(/glass-layer-opaque/);
 });
 
 test("empty and malformed event feeds keep the calendar link and a retry action", async ({ page }) => {

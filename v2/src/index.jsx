@@ -84,6 +84,8 @@ function App() {
         ? "dark"
         : "light"
       : preferences.theme;
+  const nextTheme = theme === "dark" ? "light" : "dark";
+  const themeAction = `Switch to ${nextTheme} mode`;
   const effects =
     !reduced && !preferences.calm && !highContrast && !forcedColors && visible;
   const projects = useResource("../data/pages.json", parseManifest);
@@ -216,7 +218,7 @@ function App() {
       </a>
       <AssembleReveal id="shell">
         <aside className="sidebar">
-          <GlassLayer radius={12} />
+          <GlassLayer />
           <a
             href="#/home"
             className="wordmark"
@@ -242,7 +244,7 @@ function App() {
           <div className="sidebar-scroll" id="sidebar-navigation">
             <AssembleReveal id="navigation">
               <nav className="primary-nav" aria-label="Primary navigation">
-                <GlassLayer radius={10} className="dock-glass" />
+                <GlassLayer className="dock-glass" />
                 {destinations.map(([id, label]) => (
                   <a
                     key={id}
@@ -310,7 +312,7 @@ function App() {
       <div className="workspace" id="workspace">
         <AssembleReveal id="topbar">
           <header className="topbar">
-            <GlassLayer radius={10} />
+            <GlassLayer />
             <a className="mobile-wordmark" href="#/home">
               jr
               <Icon name="external" size={28} />
@@ -333,11 +335,15 @@ function App() {
             </div>
             <ReplayAssembly />
             <button
+              type="button"
               className="icon-button"
-              aria-label="Appearance and motion settings"
-              onClick={() => setSettings(true)}
+              aria-label={themeAction}
+              title={themeAction}
+              onClick={() =>
+                setPreferences((current) => ({ ...current, theme: nextTheme }))
+              }
             >
-              <Icon name={theme === "dark" ? "moon" : "sun"} size={19} />
+              <Icon name={nextTheme === "light" ? "sun" : "moon"} size={19} />
             </button>
           </header>
         </AssembleReveal>

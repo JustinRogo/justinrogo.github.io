@@ -86,10 +86,12 @@ test("Pocket Part remains readable on phones, in both themes, and with Calm or r
   await page.emulateMedia({ reducedMotion: "reduce" });
   await expect(stack).toHaveClass(/is-static/);
   await expect(stack.locator(".scroll-stack__slot").first()).toHaveCSS("position", "relative");
-  await page.locator(".topbar").getByRole("button", { name: "Appearance and motion settings" }).click();
+  await page.getByRole("link", { name: "More", exact: true }).click();
+  await page.getByRole("button", { name: "Appearance & motion" }).click();
   await page.getByRole("radio", { name: "Light", exact: true }).check();
   await page.getByRole("switch", { name: /^Calm mode/ }).check();
   await page.keyboard.press("Escape");
+  await page.goBack();
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await expect(stack).toHaveClass(/is-static/);
   await stack.locator(".pocket-post-link").first().scrollIntoViewIfNeeded();

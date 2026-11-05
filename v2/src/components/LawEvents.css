@@ -9,7 +9,7 @@
   box-shadow: none; /* taste-skill-ignore: explicitly removes upstream shadows. */
   overflow-x: clip;
 }
-.law-events > h2 { grid-column: 1 / -1; margin: 0 0 4px; font-size: 1.45rem; }
+.law-events > .section-title { grid-column: 1 / -1; margin: 0 0 4px; }
 .event-carousel { grid-column: 1 / -1; justify-self: center; gap: 12px; }
 .law-events > .load-state, .law-events > .muted { grid-column: 1 / -1; }
 .event-calendar-link { grid-column: 1; grid-row: 3; justify-self: center; white-space: nowrap; min-height: 44px; }
