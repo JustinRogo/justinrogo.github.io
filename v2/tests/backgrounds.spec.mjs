@@ -157,7 +157,7 @@ test("social profile buttons and the sidebar contact shortcut preserve native de
   ).toHaveCount(0);
   const connect = page
     .locator(".sidebar")
-    .getByRole("link", { name: "Let’s connect" });
+    .getByRole("link", { name: "Contact" });
   await connect.click();
   await expect(page).toHaveURL(/#\/about\?section=contact$/);
   await expect(page.locator("#say-hello-heading")).toBeFocused();

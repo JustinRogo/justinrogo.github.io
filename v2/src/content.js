@@ -101,9 +101,11 @@ export const featuredPaths = [
   "Pages/Work/cgs/index.html",
   "Pages/Work/Library/heatmap.html",
   "Pages/Updates/index.html",
+  "Pages/For Fun/Tarot/index.html",
 ];
 export const featuredTitles = {
   "Pages/Updates/index.html": "AI Corner Updates",
+  "Pages/For Fun/Tarot/index.html": "Midnight Tarot",
 };
 export function catalogUrl(type, query) {
   if (type === "Research guides")

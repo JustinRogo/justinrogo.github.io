@@ -470,8 +470,7 @@ main {
   position: relative;
   z-index: 1;
 }
-.bento-project,
-.bento-index {
+.bento-project {
   height: 100%;
   padding: 23px 24px;
   display: flex;
@@ -479,15 +478,13 @@ main {
   align-items: flex-start;
   position: relative;
 }
-.bento-project h3,
-.bento-index h3 {
+.bento-project h3 {
   font-size: 1.2rem;
   margin: 0 0 5px;
   font-weight: 550;
   letter-spacing: -0.03em;
 }
-.bento-project p,
-.bento-index p {
+.bento-project p {
   font-size: 0.76rem;
   line-height: 1.65;
   color: var(--muted);
@@ -574,25 +571,6 @@ main {
 }
 .bento-project-2 h3 {
   font-size: 1.05rem;
-}
-.bento-index {
-  padding: 22px;
-}
-.bento-index > svg {
-  color: var(--orange);
-  margin-bottom: 12px;
-  width: 22px;
-  height: 22px;
-}
-.bento-index h3 {
-  font-size: 1.1rem;
-}
-.bento-index p {
-  font-size: 0.73rem;
-  margin-top: 4px;
-}
-.bento-index .bento-open {
-  font-size: 0.64rem;
 }
 .home-lower {
   display: grid;
@@ -844,8 +822,7 @@ main {
     height: 45px;
     border-radius: 6.5px;
   }
-  .bento-project,
-  .bento-index {
+  .bento-project {
     padding: 20px;
   }
   .bento-project-0 .bento-copy h3 {
@@ -865,15 +842,6 @@ main {
   }
   .bento-project-2 h3 {
     font-size: 1.02rem;
-  }
-  .bento-index > svg {
-    display: none;
-  }
-  .bento-index h3 {
-    font-size: 1.05rem;
-  }
-  .bento-index p {
-    font-size: 0.7rem;
   }
 }
 @media (max-width: 800px) {
@@ -1126,8 +1094,7 @@ main {
   .selected-bento .magic-bento__cell:first-child {
     min-height: 320px;
   }
-  .bento-project,
-  .bento-index {
+  .bento-project {
     padding: 23px;
   }
   .bento-project-0 .bento-copy {
@@ -1162,15 +1129,6 @@ main {
   }
   .bento-project-2 p {
     font-size: 0.75rem;
-  }
-  .bento-index h3 {
-    font-size: 1.35rem;
-  }
-  .bento-index p {
-    font-size: 0.8rem;
-  }
-  .bento-index .bento-open {
-    font-size: 0.72rem;
   }
   .home-lower {
     grid-template-columns: 1fr;

@@ -274,8 +274,8 @@ function App() {
             <a
               href="#/about?section=contact"
               className="sidebar-contact"
-              aria-label="Let’s connect"
-              title="Let’s connect"
+              aria-label="Contact"
+              title="Contact"
               onClick={(event) => {
                 if (
                   aboutSection !== "contact" ||
@@ -294,7 +294,7 @@ function App() {
                 section?.querySelector("h2")?.focus({ preventScroll: true });
               }}
             >
-              <span>Let’s connect</span> <Icon name="arrow" size={17} />
+              <span>Contact</span> <Icon name="arrow" size={17} />
             </a>
             <div className="sidebar-settings">
               <button
@@ -367,7 +367,7 @@ function App() {
         </main>
         <AssembleReveal id="footer">
           <footer className="app-footer">
-            <span>Built by Justin.</span>
+            <span>Built with ✨ by Justin</span>
             <a href="/original.html">
               Original site <Icon name="external" size={14} />
             </a>

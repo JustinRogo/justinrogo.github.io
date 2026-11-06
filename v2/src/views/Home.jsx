@@ -106,34 +106,7 @@ function FeaturedBento({ projects, effects, theme, fine }) {
             </AssembleReveal>
           </>
         ),
-      }))
-      .concat([
-        {
-          id: "all-projects",
-          href: "#/projects",
-          colSpan: 1,
-          rowSpan: 1,
-          content: (
-            <>
-              <GlassLayer />
-              <AssembleReveal id="featured-3" closest=".magic-bento__cell">
-                <div className="bento-index">
-                  <Icon name="projects" size={30} />
-                  <h3>Project index</h3>
-                  <p>
-                    Work, library tools,
-                    <br />
-                    and experiments.
-                  </p>
-                  <span className="bento-open" aria-hidden="true">
-                    <Icon name="arrow" size={18} />
-                  </span>
-                </div>
-              </AssembleReveal>
-            </>
-          ),
-        },
-      ]);
+      }));
   }, [projects.data]);
   return (
     <MagicBento
@@ -264,8 +237,8 @@ export default function Home({ projects, effects, theme, fine }) {
       <div className="home-lower home-feeds">
         <AssembleReveal id="notes">
           <div className="home-events-column">
-            <LawEvents effects={effects} theme={theme} />
             <MyDay />
+            <LawEvents effects={effects} theme={theme} />
           </div>
         </AssembleReveal>
         <AssembleReveal id="pocket-part">
