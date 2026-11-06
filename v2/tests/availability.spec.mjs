@@ -41,16 +41,41 @@ test("Outlook import retains availability only and handles recurrence, DST and a
 
 test("Tools displays the native calendar, keeps the donation link and moves old quick links to More", async ({ page }) => {
   await page.route("https://**/*", (route) => route.abort());
-  await page.route("**/data/outlook-availability.json", (route) => route.fulfill({ json: snapshot }));
+  const busyDay = [
+    ...snapshot.days["2026-11-05"],
+    { label: "Busy", start: "2026-11-05T16:00:00Z", end: "2026-11-05T17:00:00Z" },
+    { label: "Tentative", start: "2026-11-05T19:00:00Z", end: "2026-11-05T20:00:00Z" },
+    { label: "Busy", start: "2026-11-05T21:30:00Z", end: "2026-11-05T22:00:00Z" },
+  ];
+  await page.route("**/data/outlook-availability.json", (route) => route.fulfill({
+    json: { ...snapshot, days: { ...snapshot.days, "2026-11-05": busyDay } },
+  }));
   await page.clock.setFixedTime(new Date("2026-11-05T15:00:00Z"));
-  await page.setViewportSize({ width: 320, height: 900 });
+  await page.setViewportSize({ width: 1247, height: 1244 });
   await page.goto("/#/tools?panel=calendar");
-  await expect(page.getByRole("table", { name: "November 2026 availability" })).toBeVisible();
-  await expect(page.locator(".calendar-agenda")).toContainText("9:00 AM – 10:30 AM");
+  await expect(page.getByRole("heading", { name: "My Calendar" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "View in Outlook" })).toBeVisible();
+  await expect(page.getByText("Published Outlook availability, in Eastern Time.")).toHaveCount(0);
+  const month = page.getByRole("table", { name: "November 2026 availability" });
+  const thursday = month.getByRole("button", { name: /Thursday, November 5, 2026/ });
+  const agenda = month.locator(".calendar-agenda");
+  await expect(thursday.getByText("9:00 AM – 10:30 AM")).toBeVisible();
+  await expect(thursday.getByText("+1 more")).toBeVisible();
+  await expect(agenda).toHaveCount(0);
+  await thursday.click();
+  await expect(agenda.getByText("4:30 PM – 5:00 PM")).toBeVisible();
+  await thursday.click();
+  await expect(agenda).toHaveCount(0);
+
+  await page.setViewportSize({ width: 320, height: 900 });
+  await expect(thursday.getByText("9:00 AM – 10:30 AM")).toBeHidden();
+  await thursday.click();
+  await expect(agenda).toContainText("9:00 AM – 10:30 AM");
   await page.getByRole("button", { name: /Friday, November 6, 2026/ }).click();
-  await expect(page.locator(".calendar-agenda")).toContainText("All day");
+  await expect(agenda).toContainText("All day");
   await page.getByRole("button", { name: "Next month" }).click();
   await expect(page.getByRole("table", { name: "December 2026 availability" })).toBeVisible();
+  await expect(page.locator(".calendar-agenda")).toHaveCount(0);
   await expect(page.locator("iframe")).toHaveCount(0);
   const donation = page.getByRole("link", { name: "Donate to the Law Library" });
   await expect(donation).toBeVisible();
@@ -65,6 +90,9 @@ test("Tools displays the native calendar, keeps the donation link and moves old 
   await page.goto("/?intro=0#/home");
   const topbar = page.locator(".topbar");
   const rim = await topbar.boundingBox();
+  const donateButton = await donation.boundingBox();
+  const weather = await topbar.locator(".local-time").boundingBox();
   const themeButton = await topbar.getByRole("button", { name: /switch to/i }).boundingBox();
+  expect(donateButton.x + donateButton.width).toBeLessThanOrEqual(weather.x);
   expect(themeButton.x + themeButton.width).toBeLessThanOrEqual(rim.x + rim.width);
 });

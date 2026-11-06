@@ -317,6 +317,12 @@ function App() {
               jr
               <Icon name="external" size={28} />
             </a>
+            <a className="topbar-donate" href={donationUrl} target="_blank"
+              rel="noopener noreferrer" aria-label="Donate to the Law Library"
+              title="Donate to the Law Library">
+              <Icon name="heart" size={16} />
+              <span>Donate to the Law Library</span>
+            </a>
             <div className="local-time">
               <span className="live-dot" />
               <span className="topbar-location">Hartford, CT</span>
@@ -333,12 +339,6 @@ function App() {
                 </span>
               )}
             </div>
-            <a className="topbar-donate" href={donationUrl} target="_blank"
-              rel="noopener noreferrer" aria-label="Donate to the Law Library"
-              title="Donate to the Law Library">
-              <Icon name="heart" size={16} />
-              <span>Donate to the Law Library</span>
-            </a>
             <ReplayAssembly />
             <button
               type="button"

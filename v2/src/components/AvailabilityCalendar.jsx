@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { calendarTimeZone, civilDate, easternDay, shiftDay } from "../calendarDates.js";
 import { integrations } from "../content.js";
 import { useResource } from "../hooks.js";
@@ -11,6 +11,7 @@ const dayFormat = new Intl.DateTimeFormat("en-US", { dateStyle: "full", timeZone
 const timeFormat = new Intl.DateTimeFormat("en-US", { timeStyle: "short", timeZone: calendarTimeZone });
 const updatedFormat = new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeStyle: "short", timeZone: calendarTimeZone });
 const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const visibleEntryLimit = 3;
 
 function parseSnapshot(text) {
   const snapshot = JSON.parse(text);
@@ -40,6 +41,7 @@ function CalendarMonth({ snapshot }) {
   const today = easternDay(new Date());
   const hasToday = today >= firstDay && today <= lastDay;
   const [selection, setSelection] = useState(null);
+  const [expanded, setExpanded] = useState(false);
   const selected = selection || (hasToday ? today : lastDay);
   const monthStart = `${selected.slice(0, 7)}-01`;
   const weekdayOffset = civilDate(monthStart).getUTCDay();
@@ -49,13 +51,17 @@ function CalendarMonth({ snapshot }) {
   const nextMonth = dateAfterMonth.toISOString().slice(0, 10);
   const daysInMonth = civilDate(shiftDay(nextMonth, -1)).getUTCDate();
   const weekCount = Math.ceil((weekdayOffset + daysInMonth) / 7);
-  const selectedEntries = days[selected] || [];
+
+  function selectDay(day, showEntries = false) {
+    setSelection(day);
+    setExpanded(showEntries);
+  }
 
   function moveMonth(offset) {
     const target = civilDate(monthStart);
     target.setUTCMonth(target.getUTCMonth() + offset);
     const day = target.toISOString().slice(0, 10);
-    setSelection(day < firstDay ? firstDay : day);
+    selectDay(day < firstDay ? firstDay : day);
   }
 
   return (
@@ -68,7 +74,7 @@ function CalendarMonth({ snapshot }) {
             disabled={monthStart.slice(0, 7) === firstDay.slice(0, 7)} onClick={() => moveMonth(-1)}>
             <Icon name="previous" size={16} />
           </button>
-          <button className="button" type="button" disabled={!hasToday || selected === today} onClick={() => setSelection(today)}>
+          <button className="button" type="button" disabled={!hasToday || selected === today} onClick={() => selectDay(today)}>
             Today
           </button>
           <button className="icon-button" type="button" aria-label="Next month"
@@ -80,38 +86,63 @@ function CalendarMonth({ snapshot }) {
       <table aria-label={`${monthFormat.format(civilDate(monthStart))} availability`}>
         <thead><tr>{weekdays.map((day) => <th scope="col" key={day}>{day}</th>)}</tr></thead>
         <tbody>
-          {Array.from({ length: weekCount }, (_, week) => (
-            <tr key={week}>
-              {weekdays.map((_, column) => {
-                const day = shiftDay(firstCell, week * 7 + column);
-                const available = day >= monthStart && day < nextMonth && day >= firstDay && day <= lastDay;
-                const count = days[day]?.length || 0;
-                return (
-                  <td key={day}>
-                    {available ? (
-                      <button type="button" aria-pressed={day === selected}
-                        aria-current={day === today ? "date" : undefined}
-                        aria-label={`${dayFormat.format(civilDate(day))}, ${count} entries`}
-                        onClick={() => setSelection(day)}>
-                        <span>{Number(day.slice(8))}</span>
-                        {count > 0 && <span className="calendar-count" aria-hidden="true">{count}</span>}
-                      </button>
-                    ) : <span className="calendar-inactive-day">{Number(day.slice(8))}</span>}
-                  </td>
-                );
-              })}
-            </tr>
-          ))}
+          {Array.from({ length: weekCount }, (_, week) => {
+            const weekStart = shiftDay(firstCell, week * 7);
+            const showAgenda = expanded && selected >= weekStart && selected <= shiftDay(weekStart, 6);
+            return (
+              <Fragment key={weekStart}>
+                <tr>
+                  {weekdays.map((_, column) => {
+                    const day = shiftDay(weekStart, column);
+                    const available = day >= monthStart && day < nextMonth && day >= firstDay && day <= lastDay;
+                    const entries = days[day] || [];
+                    const count = entries.length;
+                    return (
+                      <td className="calendar-cell" key={day}>
+                        {available ? (
+                          <button type="button" className="calendar-day" data-selected={day === selected}
+                            aria-expanded={expanded && day === selected}
+                            aria-current={day === today ? "date" : undefined}
+                            aria-label={`${dayFormat.format(civilDate(day))}, ${count} ${count === 1 ? "entry" : "entries"}`}
+                            onClick={() => selectDay(day, day !== selected || !expanded)}>
+                            <span className="calendar-day-number">
+                              {Number(day.slice(8))}
+                              {count > 0 && <span className="calendar-count">{count}</span>}
+                            </span>
+                            {count > 0 && (
+                              <span className="calendar-cell-entries">
+                                {entries.slice(0, visibleEntryLimit).map((entry, index) => (
+                                  <span className="calendar-cell-entry" key={index}>
+                                    <strong>{entry.label}</strong>
+                                    <span>{entryTime(entry, day)}</span>
+                                  </span>
+                                ))}
+                                {count > visibleEntryLimit && <span className="calendar-more">+{count - visibleEntryLimit} more</span>}
+                              </span>
+                            )}
+                          </button>
+                        ) : <span className="calendar-inactive-day">{Number(day.slice(8))}</span>}
+                      </td>
+                    );
+                  })}
+                </tr>
+                {showAgenda && (
+                  <tr>
+                    <td className="calendar-agenda" colSpan={7}>
+                      <h3>{dayFormat.format(civilDate(selected))}</h3>
+                      {days[selected]?.length ? (
+                        <ul>{days[selected].map((entry, index) => (
+                          <li key={index}><strong>{entry.label}</strong><span>{entryTime(entry, selected)}</span></li>
+                        ))}</ul>
+                      ) : <p>No availability entries for this date.</p>}
+                    </td>
+                  </tr>
+                )}
+              </Fragment>
+            );
+          })}
         </tbody>
       </table>
-      <div className="calendar-agenda" aria-live="polite">
-        <h3>{dayFormat.format(civilDate(selected))}</h3>
-        {selectedEntries.length ? (
-          <ul>{selectedEntries.map((entry, index) => (
-            <li key={index}><strong>{entry.label}</strong><span>{entryTime(entry, selected)}</span></li>
-          ))}</ul>
-        ) : <p>No availability entries for this date.</p>}
-      </div>
       <p className="small muted">Last synced {updatedFormat.format(new Date(updatedAt))} ET.</p>
     </div>
   );
@@ -121,12 +152,13 @@ export default function AvailabilityCalendar() {
   const snapshot = useResource("/data/outlook-availability.json", parseSnapshot);
   return (
     <section className="embed-panel">
-      <Icon name="calendar" size={36} />
-      <h2 tabIndex={-1}>See what’s on my calendar.</h2>
-      <p>Published Outlook availability, in Eastern Time.</p>
-      <ExternalLink className="button" href={integrations.calendar}>
-        Open in Outlook <Icon name="external" size={18} />
-      </ExternalLink>
+      <header className="calendar-panel-header">
+        <Icon name="calendar" size={36} />
+        <h2 tabIndex={-1}>My Calendar</h2>
+        <ExternalLink className="button" href={integrations.calendar}>
+          View in Outlook <Icon name="external" size={18} />
+        </ExternalLink>
+      </header>
       <LoadState resource={snapshot} message="The availability calendar is temporarily unavailable. You can still open Outlook.">
         {(data) => <CalendarMonth snapshot={data} />}
       </LoadState>
