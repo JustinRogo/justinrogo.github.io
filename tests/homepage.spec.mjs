@@ -36,8 +36,7 @@ test('the primary homepage and V2 bookmarks share the same app and link to the o
     await expect(mainTabs(page).getByRole('tab')).toHaveCount(5);
   }
   await page.goto('/#/tools?panel=request');
-  const legacyForm = page.getByRole('link', { name: 'Open the live site’s request tools' });
-  await expect(legacyForm).toHaveAttribute('href', '../original.html#widget-tabs-root');
+  await expect(page.locator('.request-panel form')).toHaveAttribute('action', /formsubmit\.co/);
 });
 
 async function assertIndicator(page) {
@@ -130,7 +129,7 @@ test('main tabs support roving focus, arrows, Home/End and persistent lazy frame
 });
 
 test('request form retains input, native validation, Trello subject and redirect state', async ({ page }) => {
-  await open(page, '/?sent=1&keep=yes#profile');
+  await open(page, '/original.html?sent=1&keep=yes#profile');
   await expect(page.locator('#tbtn-req')).toHaveAttribute('aria-selected', 'true');
   await expect(page.locator('#requestSent')).toBeVisible();
   await expect(page).toHaveURL(/\?keep=yes#profile$/);
@@ -149,7 +148,7 @@ test('request form retains input, native validation, Trello subject and redirect
   await expect(form.locator('[name="_subject"]')).toHaveValue('Local request title');
   await expect(form).toHaveAttribute('method', 'POST');
   await expect(form).toHaveAttribute('action', /formsubmit\.co\/justinrogowski1/);
-  await expect(form.locator('[name="_next"]')).toHaveValue('https://justinrogo.github.io/?sent=1');
+  await expect(form.locator('[name="_next"]')).toHaveValue('https://justinrogo.github.io/original.html?sent=1#widget-tabs-root');
 });
 
 test('profile control, strength disclosures, filters and nested catalog tabs still work', async ({ page }) => {

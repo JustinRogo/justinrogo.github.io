@@ -3,6 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildSanitizer } from './build-sanitizer.mjs';
 import { refreshPocketPart } from './update-pocket-part.mjs';
+import { refreshOutlookAvailability } from './update-outlook-availability.mjs';
 import { buildHomepage } from './build-homepage.mjs';
 import { buildV2 } from '../v2/build.mjs';
 
@@ -23,7 +24,9 @@ export async function vendorUpdates() {
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   // Local/reproducible builds can retain the existing feed without modifying it.
-  if (!process.argv.includes('--skip-feed')) await refreshPocketPart();
+  if (!process.argv.includes('--skip-feed')) {
+    await Promise.all([refreshPocketPart(), refreshOutlookAvailability()]);
+  }
   await buildHomepage();
   await buildV2();
   await buildSanitizer();

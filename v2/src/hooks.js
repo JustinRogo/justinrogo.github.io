@@ -80,9 +80,14 @@ export function useClock() {
 export function useRoute() {
   const read = () => {
     const [path, query] = location.hash.slice(1).split("?");
+    const view = path?.replace(/^\//, "") || "home";
+    const params = new URLSearchParams(query);
+    if (view === "tools" && params.get("panel") === "resources") {
+      return { view: "more", params: new URLSearchParams() };
+    }
     return {
-      view: path?.replace(/^\//, "") || "home",
-      params: new URLSearchParams(query),
+      view,
+      params,
     };
   };
   const [route, setRoute] = useState(read);

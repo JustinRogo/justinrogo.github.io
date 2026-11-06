@@ -27,20 +27,27 @@ jobs:
       - name: Install build dependencies
         run: npm ci
 
-      - name: Restore last successful Pocket Part feed
+      - name: Restore last successful feed snapshots
         uses: actions/cache/restore@v4
         with:
-          path: data/pocket-part.json
+          path: |
+            data/pocket-part.json
+            data/outlook-availability.json
           key: pocket-part-${{ github.run_id }}-${{ github.run_attempt }}
           restore-keys: pocket-part-
 
       - name: Refresh Pocket Part feed
         run: node scripts/update-pocket-part.mjs
 
-      - name: Save Pocket Part feed for future builds
+      - name: Refresh Outlook availability
+        run: node scripts/update-outlook-availability.mjs
+
+      - name: Save feed snapshots for future builds
         uses: actions/cache/save@v4
         with:
-          path: data/pocket-part.json
+          path: |
+            data/pocket-part.json
+            data/outlook-availability.json
           key: pocket-part-${{ github.run_id }}-${{ github.run_attempt }}
 
       - name: Refresh UCPEA Union Wire feed

@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { catalogUrl, integrations, resources } from "../content.js";
+import { requestEndpoint } from "../../../src/request-form.js";
+import { catalogUrl, integrations } from "../content.js";
+import AvailabilityCalendar from "../components/AvailabilityCalendar.jsx";
 import Icon from "../components/Icon.jsx";
-import { Dialog, ExternalLink, LinkRow } from "../components/UI.jsx";
+import { ExternalLink } from "../components/UI.jsx";
 
 export function Catalog() {
   const [type, setType] = useState("Books & more");
@@ -77,25 +79,16 @@ export function Catalog() {
     </section>
   );
 }
-function EmbedPanel({ type }) {
+function BookingPanel() {
   const [loaded, setLoaded] = useState(false);
-  const booking = type === "booking";
-  const title = booking ? "Book a meeting" : "My calendar";
-  const url = integrations[type];
   return (
     <section className="embed-panel">
       <Icon name="calendar" size={36} />
-      <h2 tabIndex={-1}>
-        {booking ? "Let’s find a time." : "See what’s on my calendar."}
-      </h2>
-      <p>
-        {booking
-          ? "Use Microsoft Bookings to find an available time to meet."
-          : "My published Outlook calendar, in Eastern Time."}
-      </p>
+      <h2 tabIndex={-1}>Let’s find a time.</h2>
+      <p>Use Microsoft Bookings to find an available time to meet.</p>
       <div className="button-row">
-        <ExternalLink className="button primary" href={url}>
-          {title} <Icon name="external" size={18} />
+        <ExternalLink className="button primary" href={integrations.booking}>
+          Book a meeting <Icon name="external" size={18} />
         </ExternalLink>
         <button
           className="button"
@@ -107,8 +100,8 @@ function EmbedPanel({ type }) {
       </div>
       {loaded && (
         <iframe
-          src={url}
-          title={title}
+          src={integrations.booking}
+          title="Book a meeting"
           className="service-frame"
           loading="lazy"
           referrerPolicy="strict-origin-when-cross-origin"
@@ -117,30 +110,31 @@ function EmbedPanel({ type }) {
     </section>
   );
 }
-function RequestPanel({ active }) {
-  const [draft, setDraft] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    details: "",
-  });
-  const [preview, setPreview] = useState(false);
+function RequestPanel() {
+  const [sent] = useState(() => new URLSearchParams(location.search).get("sent") === "1");
   useEffect(() => {
-    if (!active) setPreview(false);
-  }, [active]);
+    if (!sent) return;
+    const url = new URL(location.href);
+    url.searchParams.delete("sent");
+    history.replaceState(history.state, "", url);
+  }, [sent]);
   return (
     <section className="request-panel">
       <h2 tabIndex={-1}>Something I can help with?</h2>
       <p>
-        Sketch out a request here. This prototype previews your draft locally;
-        nothing is sent.
+        FormSubmit sends your request to my Trello board. The information you enter may appear on the public board.
       </p>
+      {sent && <p className="request-confirmation" role="status">Thanks! Your request was submitted.</p>}
       <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          setPreview(true);
+        action={requestEndpoint}
+        method="POST"
+        onSubmit={({ currentTarget: form }) => {
+          form.elements._subject.value = form.elements.subject.value.trim() || "Website request";
         }}
       >
+        <input type="hidden" name="_next" value="https://justinrogo.github.io/?sent=1#/tools?panel=request" />
+        <input type="hidden" name="_subject" defaultValue="Website request" />
+        <input type="text" name="_honey" hidden tabIndex={-1} autoComplete="off" />
         <div className="form-grid">
           {[
             ["name", "Your name"],
@@ -151,75 +145,41 @@ function RequestPanel({ active }) {
               {label}
               <input
                 required
+                name={key}
                 type={key === "email" ? "email" : "text"}
                 autoComplete={key === "subject" ? "off" : key}
-                value={draft[key]}
-                onChange={(e) => setDraft({ ...draft, [key]: e.target.value })}
               />
             </label>
           ))}
           <label className="full">
             What are you thinking?
-            <textarea
-              required
-              rows={5}
-              value={draft.details}
-              onChange={(e) => setDraft({ ...draft, details: e.target.value })}
-            />
+            <textarea name="details" required rows={5} />
           </label>
         </div>
         <button className="button primary" type="submit">
-          Preview request <Icon name="arrow" size={18} />
+          Send request <Icon name="arrow" size={18} />
         </button>
       </form>
       <div className="request-live">
-        <p>
-          Ready to send a real request? Open the original site and choose
-          “Submit a Request.” Your draft stays here for reference.
-        </p>
-        <ExternalLink href="../original.html#widget-tabs-root" className="text-link">
-          Open the live site’s request tools <Icon name="external" size={16} />
-        </ExternalLink>
         <ExternalLink href={integrations.board} className="text-link">
           View the public request board <Icon name="external" size={16} />
         </ExternalLink>
       </div>
-      {active && preview && (
-        <Dialog title="Your request preview" onClose={() => setPreview(false)}>
-          <p className="preview-notice">
-            <Icon name="check" />
-            Local preview · Nothing has been sent
-          </p>
-          <dl className="draft-preview">
-            {Object.entries(draft).map(([key, value]) => (
-              <div key={key}>
-                <dt>{key}</dt>
-                <dd>{value}</dd>
-              </div>
-            ))}
-          </dl>
-          <button className="button" onClick={() => setPreview(false)}>
-            Keep editing
-          </button>
-        </Dialog>
-      )}
     </section>
   );
 }
-export default function Tools({ params, isActive = true }) {
+export default function Tools({ params }) {
   const requested = params.get("panel") || "catalog";
   const panels = [
     ["catalog", "Library search"],
     ["calendar", "Calendar"],
     ["booking", "Book a meeting"],
     ["request", "Request"],
-    ["resources", "Quick links"],
   ];
   const active = panels.some((p) => p[0] === requested) ? requested : "catalog";
   // Remember visited panels, preserving form drafts and deliberately loaded frames.
   const [visited, setVisited] = useState(new Set([active]));
   if (!visited.has(active)) setVisited(new Set([...visited, active]));
-  const [linkQuery, setLinkQuery] = useState("");
   const content = useRef(null);
   const previousPanel = useRef(active);
   useEffect(() => {
@@ -235,7 +195,6 @@ export default function Tools({ params, isActive = true }) {
         <h1 tabIndex={-1}>
           A few useful tools<span className="title-dot">.</span>
         </h1>
-        <p>Find a resource, make a plan, or get something moving.</p>
       </div>
       <nav className="tool-nav" aria-label="Tools">
         {panels.map(([id, label]) => (
@@ -253,36 +212,12 @@ export default function Tools({ params, isActive = true }) {
           <div key={id} hidden={active !== id}>
             {id === "catalog" ? (
               <Catalog />
-            ) : ["calendar", "booking"].includes(id) ? (
-              <EmbedPanel type={id} />
-            ) : id === "request" ? (
-              <RequestPanel active={isActive && active === id} />
+            ) : id === "calendar" ? (
+              <AvailabilityCalendar />
+            ) : id === "booking" ? (
+              <BookingPanel />
             ) : (
-              <section>
-                <h2 tabIndex={-1}>Good things to have handy.</h2>
-                <label className="search-field resource-search">
-                  <Icon name="search" />
-                  <span className="sr-only">Filter quick links</span>
-                  <input
-                    type="search"
-                    placeholder="Find a resource…"
-                    value={linkQuery}
-                    onChange={(e) => setLinkQuery(e.target.value)}
-                  />
-                </label>
-                {resources
-                  .filter(([title]) =>
-                    title.toLowerCase().includes(linkQuery.toLowerCase()),
-                  )
-                  .map(([title, href]) => (
-                    <LinkRow key={title} title={title} href={href} />
-                  ))}
-                {!resources.some(([title]) =>
-                  title.toLowerCase().includes(linkQuery.toLowerCase()),
-                ) && (
-                  <p role="status">No matching links. Try a broader search.</p>
-                )}
-              </section>
+              <RequestPanel />
             )}
           </div>
         ))}

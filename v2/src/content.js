@@ -32,6 +32,8 @@ export const integrations = {
   weather:
     "https://api.open-meteo.com/v1/forecast?latitude=41.76&longitude=-72.67&current=temperature_2m,apparent_temperature,weather_code&temperature_unit=fahrenheit&timezone=America%2FNew_York",
 };
+export const donationUrl =
+  "https://giving.uconn.edu/campaigns/60852/donations/new?designation=LawLibraryEndowmentFund";
 export const resources = [
   ["UConn Law Library", "https://library.law.uconn.edu/"],
   ["Library hours", "https://library.law.uconn.edu/about/hours-and-location/"],
@@ -49,10 +51,7 @@ export const resources = [
   ["Confluence", "https://uconn.atlassian.net/wiki/x/IgHzNwY"],
   ["UConn Phonebook", "https://directory.uconn.edu/"],
   ["UCPEA", "https://ucpea.ct.aft.org/"],
-  [
-    "Support the Law Library",
-    "https://giving.uconn.edu/campaigns/60852/donations/new?designation=LawLibraryEndowmentFund",
-  ],
+  ["Support the Law Library", donationUrl],
 ];
 export const experience = [
   [

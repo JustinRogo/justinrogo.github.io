@@ -22,7 +22,7 @@ The events section opens with a visible “UConn Law Events” heading and has n
 
 The former “Have a good problem?” contact block is replaced by The Pocket Part blog feed using React Bits Scroll Stack. Four saved posts become native links with a 50/50 featured-image and date/title split: side by side on desktop, alternating image left/right with each post, and image above text on phones. Without a working image, text uses the full card. The feed refresh now reads each article’s featured-image metadata, preferring it to inline RSS images, and preserves saved images if article retrieval fails. The browser loads the same local snapshot used by More, without cross-origin article requests. Calm/reduced-motion/high-contrast modes show an ordinary list of cards. Empty/error states keep the full-blog link and errors offer retry.
 
-The portrait has calendar, email, Teams chat, and telephone links. Its shared four-color strengths bar opens and focuses the full CliftonStrengths section at `#/about?section=strengths`. On phones, contact buttons sit beside the photo and the strengths bar sits beneath it. Calendar and booking keep direct links and opt-in embeds without the former cookie/sign-in disclaimer.
+The portrait has calendar, email, Teams chat, and telephone links. Its shared four-color strengths bar opens and focuses the full CliftonStrengths section at `#/about?section=strengths`. On phones, contact buttons sit beside the photo and the strengths bar sits beneath it. The Calendar panel shows Outlook availability and links to Outlook. Booking keeps its opt-in embed.
 
 About’s introduction includes LinkedIn and GitHub buttons using the existing profile URLs. The sidebar’s “Let’s connect” opens and focuses “Say hello” at `#/about?section=contact`; the sidebar no longer includes the original-site link or prototype label. The original site remains accessible from the page footer.
 
@@ -38,7 +38,7 @@ All 15 project cards and the three featured Home project cards share the same co
 | --- | --- |
 | Home | Profile, introduction, featured projects, UConn Law events, Pocket Part blog stack |
 | Projects | All 15 manifest projects, search, category filters, saved projects |
-| Tools | Five catalog searches, calendar, booking, local request preview, searchable quick links |
+| Tools | Five catalog searches, Outlook availability, booking, and live requests |
 | About | Biography, experience, leadership, education, skills, interests, all 34 strengths, contacts |
 | More | Trello snapshot, Hartford weather, Pocket Part posts, three GitHub repositories, UConn events, settings |
 
@@ -62,7 +62,7 @@ npm run build -- --skip-feed
 npm run preview
 ```
 
-Open **http://127.0.0.1:4391/**. The preview also serves the original homepage at `/original.html` and existing project pages. `--skip-feed` preserves the checked-in blog snapshot. The normal build refreshes the feed.
+Open **http://127.0.0.1:4391/**. The preview also serves the original homepage at `/original.html` and existing project pages. The normal build refreshes the blog and Outlook snapshots. Run `node scripts/update-outlook-availability.mjs` to refresh the calendar for a source-tree preview. GitHub Pages refreshes it during its scheduled builds.
 
 ## Homepage assembly
 
@@ -93,11 +93,11 @@ React Bits is copyright David Haz, under MIT + Commons Clause. The build include
 | --- | --- |
 | Name, photo, role, biography, experience, leadership, education, skills, interests | Reorganized into Home and About, grounded in V1 copy |
 | Project directory | Same `data/pages.json`, same destinations, added search/filter/save |
-| Calendar / Book a Meeting | Same Outlook/Bookings URLs; open directly or explicitly load an embed |
-| Submit a Request | Validated local preview; deliberate link to V1’s live form and existing public board |
+| Calendar / Book a Meeting | React month and agenda views from published Outlook availability, plus the existing Bookings link and optional embed |
+| Submit a Request | Native form submission through FormSubmit to the existing Trello board |
 | CliftonStrengths | All 34 ranks/descriptions and both best/overextended passages extracted from V1 at build time; original four domain colors, rank-weighted color bar/percentage legend, reflection Flip Card, rank filters and compact expanding domain cards |
 | Library catalog | Same Primo and LibGuides destinations, all five query builders rebuilt in React |
-| Professional resources and contact links | Tools quick links and About contacts; all existing resource links retained |
+| Professional resources and contact links | Sidebar and More quick links, About contacts, and the top-bar donation link |
 | Clock / Hartford weather | Eastern Time clock and the existing Open-Meteo endpoint |
 | To-do / current activity | Existing Trello snapshot and original current-activity text in Home/More |
 | UConn Law events | Same live RSS feed, explicit unavailable/empty states and source link |

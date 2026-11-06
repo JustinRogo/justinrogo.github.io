@@ -400,6 +400,7 @@ svg {
   height: 86px;
   display: flex;
   align-items: center;
+  container: topbar / inline-size;
   gap: 24px;
   padding: 0 48px;
   border-bottom: 1px solid var(--line);
@@ -431,6 +432,31 @@ svg {
 .topbar-weather {
   border-left: 1px solid var(--line);
   padding-left: 12px;
+}
+.topbar-donate {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  flex: none;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 5.5px;
+  color: var(--orange);
+  font-weight: 550;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.topbar-donate:hover {
+  background: var(--nav);
+}
+@container topbar (max-width: 600px) {
+  .topbar-donate { min-width: 44px; }
+  .topbar-donate > span { display: none; }
+}
+@media (max-width: 380px) {
+  .topbar-location { display: none; }
 }
 .mobile-wordmark {
   display: none;
@@ -1024,31 +1050,12 @@ textarea {
   width: fit-content;
   margin-top: 10px;
 }
-.preview-notice {
+.request-confirmation {
   background: var(--tint);
+  margin-top: 18px;
   padding: 14px;
   border-radius: 4px;
   font-size: 0.85rem;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.draft-preview > div {
-  padding: 12px 0;
-  border-bottom: 1px solid var(--line);
-}
-.draft-preview dt {
-  text-transform: capitalize;
-  color: var(--muted);
-  font-size: 0.8rem;
-}
-.draft-preview dd {
-  margin: 5px 0;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-.resource-search {
-  margin-top: 26px;
 }
 /* About gives professional history room to be read. */
 .about-intro {

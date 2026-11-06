@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { mountCliftonStrengths, mountULSW } from './legacy-widgets.js';
 import { useTabIndicator } from './effects.js';
 import { GlassMaterial } from './GlassMaterial.jsx';
+import { requestEndpoint } from '../request-form.js';
 
 const TABS = [
   { id: 'cal', label: 'My Calendar', title: "Today's Schedule", src: 'https://outlook.office365.com/calendar/published/3ca52ff81f8a440699723f09efe5d298@uconn.edu/66bd7da89640440591f449ae5ce4fcc514733372329545515702/calendar.html' },
@@ -26,13 +27,13 @@ function RequestPanel({ tab, loaded, sent }) {
       <div className="card surface request-form-card">
         <h3>Submit a Request</h3>
         <p className="request-form__sent" id="requestSent" role="status" hidden={!sent}>Thanks! Your request was sent.</p>
-        <form action="https://formsubmit.co/justinrogowski1+vnowu7qczgm6cw6e96zn@boards.trello.com" method="POST" id="requestForm" onSubmit={event => {
+        <form action={requestEndpoint} method="POST" id="requestForm" onSubmit={event => {
           const form = event.currentTarget;
           const subject = form.elements.subject.value.trim();
           if (subject) form.elements._subject.value = subject;
         }}>
           <input type="hidden" name="_captcha" value="false" />
-          <input type="hidden" name="_next" value="https://justinrogo.github.io/?sent=1" />
+          <input type="hidden" name="_next" value="https://justinrogo.github.io/original.html?sent=1#widget-tabs-root" />
           <input type="hidden" name="_subject" defaultValue="Website request" />
           <input type="text" name="_honey" className="request-form__honey" tabIndex={-1} autoComplete="off" aria-hidden="true" />
           <label>Name<input name="name" autoComplete="name" required /></label>

@@ -1,0 +1,95 @@
+.availability-calendar {
+  margin-top: 24px;
+}
+.calendar-toolbar,
+.calendar-controls,
+.calendar-agenda li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.calendar-toolbar {
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.calendar-controls .button {
+  padding-inline: 12px;
+}
+.availability-calendar table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+.availability-calendar th {
+  padding: 6px 0;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 550;
+}
+.availability-calendar td {
+  padding: 0;
+  border: 1px solid var(--line);
+  text-align: center;
+}
+.availability-calendar td button,
+.calendar-inactive-day {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  width: 100%;
+  min-height: 44px;
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+.availability-calendar td button:hover {
+  background: var(--nav);
+}
+.availability-calendar td button[aria-pressed="true"] {
+  background: var(--tint);
+  color: var(--blue);
+  font-weight: 650;
+}
+.availability-calendar td button:focus-visible {
+  outline-offset: -3px;
+}
+.calendar-inactive-day {
+  color: var(--muted);
+}
+.calendar-count {
+  padding: 0 4px;
+  border-radius: 3px;
+  background: var(--nav);
+  color: var(--ink);
+  font-size: 0.7rem;
+}
+.calendar-agenda {
+  margin: 20px 0 12px;
+}
+.calendar-agenda ul {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.calendar-agenda li {
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding-block: 8px;
+  border-bottom: 1px solid var(--line);
+}
+.calendar-agenda p,
+.calendar-agenda li span {
+  color: var(--muted);
+}
+@media (max-width: 420px) {
+  .availability-calendar td button {
+    flex-direction: column;
+    gap: 0;
+  }
+}

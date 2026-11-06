@@ -7,7 +7,7 @@ import {
   useRoute,
   useStored,
 } from "./hooks.js";
-import { integrations, profile } from "./content.js";
+import { donationUrl, integrations, profile } from "./content.js";
 import Home from "./views/Home.jsx";
 import Projects from "./views/Projects.jsx";
 import Tools from "./views/Tools.jsx";
@@ -172,7 +172,6 @@ function App() {
       tools: (
         <Tools
           params={active === "tools" ? route.params : new URLSearchParams()}
-          isActive={active === "tools"}
         />
       ),
       about: <About effects={effects && active === "about"} fine={fine} />,
@@ -320,7 +319,7 @@ function App() {
             </a>
             <div className="local-time">
               <span className="live-dot" />
-              <span>Hartford, CT</span>
+              <span className="topbar-location">Hartford, CT</span>
               <time dateTime={time.toISOString()}>
                 {time.toLocaleTimeString("en-US", {
                   hour: "numeric",
@@ -334,6 +333,12 @@ function App() {
                 </span>
               )}
             </div>
+            <a className="topbar-donate" href={donationUrl} target="_blank"
+              rel="noopener noreferrer" aria-label="Donate to the Law Library"
+              title="Donate to the Law Library">
+              <Icon name="heart" size={16} />
+              <span>Donate to the Law Library</span>
+            </a>
             <ReplayAssembly />
             <button
               type="button"

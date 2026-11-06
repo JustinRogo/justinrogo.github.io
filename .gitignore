@@ -9,6 +9,8 @@ __pycache__/
 /.impeccable
 /node_modules/
 /dist/
+/data/outlook-availability.json
+/data/outlook-availability.json.tmp
 /.env.local
 /Pages/Updates/vendor/
 /lib/generated/

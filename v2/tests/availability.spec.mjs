@@ -1,0 +1,70 @@
+import { expect, test } from "@playwright/test";
+import { parseOutlookAvailability } from "../../scripts/update-outlook-availability.mjs";
+
+const snapshot = parseOutlookAvailability(`BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Test//Availability//EN
+BEGIN:VEVENT
+UID:weekly
+DTSTAMP:20261105T000000Z
+DTSTART;TZID=Eastern Standard Time:20261029T090000
+DTEND;TZID=Eastern Standard Time:20261029T103000
+RRULE:FREQ=WEEKLY;COUNT=4
+EXDATE;TZID=Eastern Standard Time:20261112T090000
+X-MICROSOFT-CDO-BUSYSTATUS:BUSY
+SUMMARY:Private meeting title
+DESCRIPTION:Private meeting details
+END:VEVENT
+BEGIN:VEVENT
+UID:away
+DTSTAMP:20261105T000000Z
+DTSTART;VALUE=DATE:20261106
+DTEND;VALUE=DATE:20261108
+X-MICROSOFT-CDO-BUSYSTATUS:OOF
+END:VEVENT
+END:VCALENDAR`, new Date("2026-11-05T15:00:00Z"));
+
+test("Outlook import retains availability only and handles recurrence, DST and all-day ranges", () => {
+  expect(snapshot.days["2026-10-29"]).toEqual([
+    { label: "Busy", start: "2026-10-29T13:00:00.000Z", end: "2026-10-29T14:30:00.000Z" },
+  ]);
+  expect(snapshot.days["2026-11-05"]).toEqual([
+    { label: "Busy", start: "2026-11-05T14:00:00.000Z", end: "2026-11-05T15:30:00.000Z" },
+  ]);
+  expect(snapshot.days["2026-11-12"]).toBeUndefined();
+  for (const day of ["2026-11-06", "2026-11-07"]) {
+    expect(snapshot.days[day]).toEqual([{ label: "Away", start: null, end: null }]);
+  }
+  expect(snapshot.days["2026-11-08"]).toBeUndefined();
+  expect(JSON.stringify(snapshot)).not.toContain("Private");
+});
+
+test("Tools displays the native calendar, keeps the donation link and moves old quick links to More", async ({ page }) => {
+  await page.route("https://**/*", (route) => route.abort());
+  await page.route("**/data/outlook-availability.json", (route) => route.fulfill({ json: snapshot }));
+  await page.clock.setFixedTime(new Date("2026-11-05T15:00:00Z"));
+  await page.setViewportSize({ width: 320, height: 900 });
+  await page.goto("/#/tools?panel=calendar");
+  await expect(page.getByRole("table", { name: "November 2026 availability" })).toBeVisible();
+  await expect(page.locator(".calendar-agenda")).toContainText("9:00 AM – 10:30 AM");
+  await page.getByRole("button", { name: /Friday, November 6, 2026/ }).click();
+  await expect(page.locator(".calendar-agenda")).toContainText("All day");
+  await page.getByRole("button", { name: "Next month" }).click();
+  await expect(page.getByRole("table", { name: "December 2026 availability" })).toBeVisible();
+  await expect(page.locator("iframe")).toHaveCount(0);
+  const donation = page.getByRole("link", { name: "Donate to the Law Library" });
+  await expect(donation).toBeVisible();
+  await expect(donation).toHaveAttribute("href", /giving\.uconn\.edu.*LawLibraryEndowmentFund/);
+  await expect(page.locator(".tool-nav").getByRole("link", { name: "Quick links" })).toHaveCount(0);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(320);
+  await page.goto("/#/tools?panel=resources");
+  await expect(page.getByRole("heading", { name: /A little more to explore/ })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Quick links", exact: true })).toBeVisible();
+
+  await page.setViewportSize({ width: 801, height: 900 });
+  await page.goto("/?intro=0#/home");
+  const topbar = page.locator(".topbar");
+  const rim = await topbar.boundingBox();
+  const themeButton = await topbar.getByRole("button", { name: /switch to/i }).boundingBox();
+  expect(themeButton.x + themeButton.width).toBeLessThanOrEqual(rim.x + rim.width);
+});

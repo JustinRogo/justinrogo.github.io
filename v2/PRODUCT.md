@@ -8,7 +8,7 @@ The user delegates design selection and requests an intentional app experience o
 
 - `#/home`: identity, introduction, selected projects, interactive Tech Text name and Magic Bento featured work, contact actions.
 - `#/projects`: searchable index, All/Work/Library/For Fun filters, direct project links, saved projects.
-- `#/tools?panel=catalog|calendar|booking|request|resources`: library search, scheduling, request draft preview, quick links.
+- `#/tools?panel=catalog|calendar|booking|request`: library search, calendar availability, scheduling, and live requests. Old `resources` links open More.
 - `#/about`: professional practice, selected experience, leadership, education, tools, interests, all 34 CliftonStrengths themes, contact links.
 - `#/more`: task snapshot, weather, library blog, GitHub commits, UConn Law events, appearance settings.
 
@@ -22,9 +22,9 @@ V2 is the root homepage, with `/v2/` retained for existing links. V1’s origina
 
 ## State and safety
 
-URL hashes own destinations and project search/filter state so static hosting refreshes and browser history work. Saved projects and theme/motion/background preferences persist under V2-specific localStorage keys. Visited views and tool panels preserve in-memory drafts and loaded embeds. Request previews dismiss on route or panel changes; drafts persist until reload, without being written to localStorage.
+URL hashes own destinations and project search/filter state so static hosting refreshes and browser history work. Saved projects and theme/motion/background preferences persist under V2-specific localStorage keys. Visited tool panels preserve unsent form inputs and the loaded booking embed within the current document.
 
-V2 request forms have no external submission endpoint. “Preview request” validates and displays a local draft. Sending a real request requires deliberately opening V1 and selecting its request form. Booking and calendar embeds load only after explicit interaction. Automated tests intercept third-party traffic and block writes; the optional live smoke check uses GET only.
+The Request panel posts through the original FormSubmit integration to the public Trello board. The Calendar panel renders a same-origin availability snapshot from the published Outlook ICS feed. The build exports dates, times, and fixed availability labels and keeps event metadata out of the snapshot. The Bookings embed loads on demand. Automated tests intercept form submissions.
 
 ## Accessibility and performance
 
@@ -38,7 +38,7 @@ Desktop branches live in the sidebar below the main destinations, with Projects,
 
 UCPEA Member Dashboard is first in its branch, with Current Contract, Contract History, and Contract Comparison nested beneath its direct link. The shortened contract names are V2-only labels over the same manifest destinations. The hierarchy uses semantic nested lists and preserves normal link and keyboard behavior on desktop and mobile.
 
-The desktop sidebar defaults to 240px and supports saved pointer/keyboard resizing between 200px and a viewport-limited 360px. Compact navigation remains fixed in size. Box corner radii are halved throughout V2; circular portraits and orbit geometry remain circular. Four portrait controls open calendar, email, Teams chat, and telephone destinations. The four-color strengths bar below the photo opens `#/about?section=strengths` and focuses the destination heading. Calendar/booking embeds remain opt-in; the former cookie/sign-in UI disclaimer is removed.
+The desktop sidebar defaults to 240px and supports saved pointer/keyboard resizing between 200px and a viewport-limited 360px. Compact navigation remains fixed in size. Box corner radii are halved throughout V2; circular portraits and orbit geometry remain circular. Four portrait controls open calendar, email, Teams chat, and telephone destinations. The four-color strengths bar below the photo opens `#/about?section=strengths` and focuses the destination heading.
 
 About’s introduction adds LinkedIn/GitHub buttons using existing contact URLs. “Let’s connect” in the sidebar opens and focuses “Say hello” at `#/about?section=contact`; the sidebar original-site link and prototype label are removed. The footer retains original-site access.
 

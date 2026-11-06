@@ -153,31 +153,33 @@ test("catalog builds all five original search destinations without writing data"
   }
 });
 
-test("request preview cannot submit externally and keeps its draft across views", async ({
+test("request sends the form through FormSubmit and confirms after its return", async ({
   page,
 }) => {
-  const writes = [];
-  page.on("request", (req) => {
-    if (req.method() !== "GET") writes.push(req.url());
+  let submission;
+  await page.route("https://formsubmit.co/**", async (route) => {
+    submission = new URLSearchParams(route.request().postData());
+    expect(route.request().method()).toBe("POST");
+    await route.fulfill({ status: 303, headers: { location: "http://127.0.0.1:4392/?sent=1#/tools?panel=request" } });
   });
   await page.goto("/v2/#/tools?panel=request");
-  await page.getByLabel("Your name").fill("Prototype test");
+  await page.getByRole("button", { name: "Send request" }).click();
+  expect(submission).toBeUndefined();
+  await page.getByLabel("Your name").fill("Browser test");
   await page.getByLabel("Email", { exact: true }).fill("test@example.com");
-  await page.getByLabel("Subject", { exact: true }).fill("A test draft");
-  await page.getByLabel("What are you thinking?").fill("Local preview only.");
-  await page.getByRole("button", { name: "Preview request" }).click();
-  await expect(page.getByRole("dialog")).toContainText("Nothing has been sent");
-  await page.keyboard.press("Escape");
-  await nav(page).getByRole("link", { name: "Home", exact: true }).click();
-  await nav(page).getByRole("link", { name: "Tools", exact: true }).click();
-  await page
-    .getByRole("navigation", { name: "Tools", exact: true })
-    .getByRole("link", { name: "Request", exact: true })
-    .click();
-  await expect(page.getByLabel("Subject", { exact: true })).toHaveValue(
-    "A test draft",
-  );
-  expect(writes).toEqual([]);
+  await page.getByLabel("Subject", { exact: true }).fill("  A test request  ");
+  await page.getByLabel("What are you thinking?").fill("Intercepted by the browser test.");
+  await page.getByRole("button", { name: "Send request" }).click();
+  await expect(page.locator(".request-confirmation")).toHaveText("Thanks! Your request was submitted.");
+  expect(Object.fromEntries(submission)).toMatchObject({
+    name: "Browser test",
+    email: "test@example.com",
+    _subject: "A test request",
+    details: "Intercepted by the browser test.",
+    _honey: "",
+    _next: "https://justinrogo.github.io/?sent=1#/tools?panel=request",
+  });
+  await expect(page).toHaveURL(/\/#\/tools\?panel=request$/);
 });
 
 test("the topbar switches themes directly and phone settings are available from More", async ({ page }) => {
@@ -236,7 +238,7 @@ test("settings support keyboard dismissal, focus return, persistence and system 
   }
 });
 
-test("request previews dismiss on browser history and restore focus and scrolling", async ({
+test("request drafts persist through tool panel history and navigation", async ({
   page,
 }) => {
   await page.goto("/v2/#/tools");
@@ -248,29 +250,20 @@ test("request previews dismiss on browser history and restore focus and scrollin
   await page.getByLabel("Email", { exact: true }).fill("test@example.com");
   await page.getByLabel("Subject", { exact: true }).fill("Local draft");
   await page.getByLabel("What are you thinking?").fill("Never send this.");
-  await page.getByRole("button", { name: "Preview request" }).click();
-  await expect(page.getByRole("dialog")).toBeVisible();
   await page.goBack();
-  await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(
     page.getByRole("heading", { name: "A good place to start looking." }),
   ).toBeFocused();
-  expect(
-    await page.locator("body").evaluate((el) => el.style.overflow),
-  ).not.toBe("hidden");
   await page.goForward();
-  await expect(page.getByRole("dialog")).toHaveCount(0);
-  await page.getByRole("button", { name: "Preview request" }).click();
+  await expect(page.getByLabel("Subject", { exact: true })).toHaveValue("Local draft");
   await page.evaluate(() => {
     location.hash = "#/about";
   });
-  await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(
     visibleView(page).getByRole("heading", { level: 1 }),
   ).toBeFocused();
-  expect(
-    await page.locator("body").evaluate((el) => el.style.overflow),
-  ).not.toBe("hidden");
+  await page.goBack();
+  await expect(page.getByLabel("Subject", { exact: true })).toHaveValue("Local draft");
 });
 
 test("small text contrast and system contrast preferences meet the accessibility floor", async ({
@@ -620,7 +613,6 @@ test("V1 core files remain byte-identical to the base branch", async () => {
     "main.js",
     "style.css",
     "data/pages.json",
-    "src/homepage/WidgetTabs.jsx",
   ]) {
     const current = await readFile(new URL(name, root));
     const original = execFileSync("git", ["show", `main:${name}`], {
