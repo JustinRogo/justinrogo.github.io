@@ -226,25 +226,30 @@ export default function Home({ projects, effects, theme, fine }) {
           </AssembleReveal>
         </section>
       </AssembleReveal>
-      <AssembleReveal id="help">
-        <section className="home-help glass-host" aria-labelledby="home-help-title">
-          <GlassLayer />
-          <h2 id="home-help-title">How can I help?</h2>
-          <ul>
-            {helpLinks.map(([label, note, href, icon]) => (
-              <li key={href}>
-                <a href={href}>
-                  <Icon name={icon} size={22} />
-                  <span>
-                    <strong>{label}</strong>
-                    <small>{note}</small>
-                  </span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </section>
-      </AssembleReveal>
+      <div className="home-help-row">
+        <AssembleReveal id="help">
+          <section className="home-help glass-host" aria-labelledby="home-help-title">
+            <GlassLayer />
+            <h2 id="home-help-title">How can I help?</h2>
+            <ul>
+              {helpLinks.map(([label, note, href, icon]) => (
+                <li key={href}>
+                  <a href={href}>
+                    <Icon name={icon} size={22} />
+                    <span>
+                      <strong>{label}</strong>
+                      <small>{note}</small>
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </AssembleReveal>
+        <AssembleReveal id="my-day">
+          <div className="home-my-day"><MyDay /></div>
+        </AssembleReveal>
+      </div>
       <AssembleReveal id="featured-heading">
         <SectionTitle
           glass
@@ -273,7 +278,6 @@ export default function Home({ projects, effects, theme, fine }) {
             ref={eventsColumn}
             className={`home-events-column${eventsFit ? " fits-viewport" : ""}`}
           >
-            <MyDay />
             <LawEvents effects={effects} theme={theme} />
           </div>
         </AssembleReveal>

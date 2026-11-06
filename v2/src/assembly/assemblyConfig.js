@@ -33,6 +33,7 @@ export const assemblyTasks = [
   { id: "topbar", cursor: 1, at: 0.6, duration: 0.04, effect: "surface" },
   { id: "hero-role", cursor: 2, at: 0.63, duration: 0.05, effect: "text" },
   { id: "help", cursor: 2, at: 0.61, duration: 0.02, effect: "place" },
+  { id: "my-day", cursor: 3, at: 0.63, duration: 0.02, effect: "place" },
   {
     id: "featured-heading",
     cursor: 4,
