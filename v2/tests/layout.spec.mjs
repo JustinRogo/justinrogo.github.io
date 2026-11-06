@@ -14,6 +14,39 @@ test.beforeEach(async ({ page }) => {
   );
 });
 
+test("the topbar stays in view on desktop only and clears anything scrolled to", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/v2/?intro=0#/about");
+  const topbar = page.locator(".topbar");
+  await expect(topbar).toHaveCSS("position", "sticky");
+  await page.evaluate(() => window.scrollTo({ top: 1500, behavior: "instant" }));
+  const stuck = await topbar.boundingBox();
+  expect(stuck.y).toBe(0);
+  // It paints over page content, and a card lifted on hover doesn't rise above it.
+  expect(
+    await page.evaluate(({ x, y }) => Boolean(document.elementFromPoint(x, y).closest(".topbar")), {
+      x: stuck.x + stuck.width / 2,
+      y: stuck.y + stuck.height / 2,
+    }),
+  ).toBe(true);
+  await page.goto("/v2/?intro=0#/about?section=contact");
+  await expect(page.locator("#say-hello-heading")).toBeFocused();
+  const heading = await page.locator("#say-hello-heading").boundingBox();
+  const bar = await topbar.boundingBox();
+  expect(heading.y).toBeGreaterThanOrEqual(bar.y + bar.height);
+  // Stays reachable with the keyboard, and the rail still sits beside it.
+  await expect(topbar.getByRole("link", { name: "Donate to the Law Library" })).toBeInViewport();
+  expect(bar.x).toBeGreaterThanOrEqual((await page.locator(".sidebar").boundingBox()).width);
+
+  await page.setViewportSize({ width: 800, height: 900 });
+  await expect(topbar).toHaveCSS("position", "relative");
+  await page.setViewportSize({ width: 375, height: 800 });
+  await expect(topbar).toHaveCSS("position", "relative");
+  await page.evaluate(() => window.scrollTo({ top: 1500, behavior: "instant" }));
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
+  expect((await topbar.boundingBox()).y).toBeLessThan(0);
+});
+
 test("topbar follows the content edges across viewport and sidebar widths", async ({
   page,
 }) => {
@@ -83,22 +116,32 @@ test("portrait contacts and shared strengths preview work on desktop and phone",
       name: "View my CliftonStrengths",
       exact: true,
     });
-    expect(
-      await preview
-        .locator(".strength-domain-bar span")
-        .evaluateAll((nodes) =>
-          nodes.map((node) => Number(node.style.flexGrow)),
-        ),
-    ).toEqual([206, 170, 114, 105]);
+    // The preview is a small strand: both outlines and all 34 bars in rank order and domain color.
+    const miniHelix = preview.locator(".strength-helix-mini");
+    await expect(miniHelix).toHaveAttribute("aria-label", /all 34 themes in rank order/);
+    await expect(miniHelix.locator(".strength-helix-outline")).toHaveCount(2);
+    const miniBars = miniHelix.locator(".strength-helix-mark");
+    await expect(miniBars).toHaveCount(34);
+    await expect(miniBars.nth(0)).toHaveCSS("fill", "rgb(16, 185, 129)");
+    await expect(miniBars.nth(3)).toHaveCSS("fill", "rgb(124, 58, 237)");
+    await expect(miniBars.nth(5)).toHaveCSS("fill", "rgb(0, 102, 255)");
+    await expect(miniBars.nth(14)).toHaveCSS("fill", "rgb(255, 126, 95)");
     const image = await portrait.locator("img").boundingBox(),
-      bar = await preview.locator(".strength-domain-bar").boundingBox();
+      bar = await miniHelix.boundingBox();
     expect(bar.y).toBeGreaterThan(image.y + image.height);
     await preview.click();
     await expect(page).toHaveURL(/#\/about\?section=strengths$/);
     await expect(page.locator("#cliftonstrengths-heading")).toBeFocused();
-    expect(
-      (await page.locator("#cliftonstrengths-heading").boundingBox()).y,
-    ).toBeLessThan(60);
+    // Below the desktop topbar when it is stuck; at the top of the screen otherwise.
+    const headingTop = (await page.locator("#cliftonstrengths-heading").boundingBox()).y;
+    const topbarPosition = await page.locator(".topbar").evaluate((bar) => getComputedStyle(bar).position);
+    if (topbarPosition === "sticky") {
+      const bar = await page.locator(".topbar").boundingBox();
+      expect(headingTop).toBeGreaterThanOrEqual(bar.y + bar.height);
+      expect(headingTop).toBeLessThan(140);
+    } else {
+      expect(headingTop).toBeLessThan(60);
+    }
     await page.reload();
     await expect(page.locator("#cliftonstrengths-heading")).toBeFocused();
     await page.goBack();

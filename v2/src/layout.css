@@ -481,3 +481,18 @@ html:has(.sidebar-resize[data-dragging]) {
     opacity: 0;
   }
 }
+/* The desktop topbar stays in view; anything scrolled to or kept sticky clears it. */
+@media (min-width: 801px) {
+  :root {
+    --topbar-clearance: 77px; /* 65px bar + 12px gap; TOPBAR_CLEARANCE in Home.jsx matches. */
+  }
+  html {
+    scroll-padding-top: var(--topbar-clearance);
+  }
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: color-mix(in srgb, var(--surface) 86%, transparent);
+  }
+}

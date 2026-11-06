@@ -6,7 +6,7 @@
   .home-lower.home-feeds { grid-template-columns: 340px minmax(0, 1fr); gap: 32px; }
 }
 @media (min-width: 1200px) {
-  .home-events-column.fits-viewport { position: sticky; top: 24px; }
+  .home-events-column.fits-viewport { position: sticky; top: var(--topbar-clearance, 24px); }
 }
 .home-help { display: grid; gap: 12px; margin-top: 16px; padding: 14px; }
 .home-help h2 { font-size: 1.3rem; padding-left: 2px; }

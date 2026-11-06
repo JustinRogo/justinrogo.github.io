@@ -137,8 +137,11 @@ function FeaturedBento({ projects, effects, theme, fine }) {
   );
 }
 
+const TOPBAR_CLEARANCE = 77; // Matches --topbar-clearance in layout.css.
+const BELOW_EVENTS = 24;
+
 export default function Home({ projects, effects, theme, fine }) {
-  const [eventsColumn, eventsFit] = useFitsViewport(24);
+  const [eventsColumn, eventsFit] = useFitsViewport(TOPBAR_CLEARANCE + BELOW_EVENTS);
   return (
     <>
       <AssembleReveal id="hero-frame">

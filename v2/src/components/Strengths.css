@@ -31,10 +31,14 @@
   font-size: 0.74rem;
   padding: 4px 0;
 }
-.strengths-preview .strength-domain-bar {
-  margin: 0 0 9px;
-  height: 8px;
+.strength-helix-mini {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0 0 7px;
+  --helix-outline: color-mix(in srgb, var(--muted) 55%, transparent);
 }
+.strength-helix-mini .strength-helix-outline { stroke-width: 1.5; }
 .strengths-preview > span {
   display: flex;
   align-items: center;
@@ -242,4 +246,148 @@
     color: CanvasText;
     border: 1px solid CanvasText; /* taste-skill-ignore: forced-colors accessibility boundary. */
   }
+}
+
+/* Rank strand: all 34 themes in order, above the view controls. */
+.strength-helix {
+  position: relative;
+  height: 80px;
+  margin-top: 16px;
+  --helix-outline: color-mix(in srgb, var(--muted) 55%, transparent);
+}
+.strength-helix > svg { display: block; overflow: visible; }
+.strength-helix-outline {
+  fill: var(--glass-fill);
+  stroke: var(--helix-outline);
+  stroke-width: 4;
+  stroke-linejoin: round;
+}
+.strength-helix-bar { cursor: pointer; outline: none; }
+.strength-helix-hit { fill: transparent; }
+.strength-helix-mark {
+  fill: var(--strength-color);
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: fill 0.15s ease;
+}
+.strength-helix-bar:focus-visible .strength-helix-hit {
+  stroke: var(--ink);
+  stroke-width: 2;
+  rx: 3px;
+}
+.strength-helix:has([data-linked]) .strength-helix-bar:not([data-linked]) .strength-helix-mark { fill: var(--helix-outline); }
+.strength-helix-tip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  z-index: 3;
+  transform: translateX(-50%);
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow), 0 0 0 1px var(--line);
+  font-size: 0.78rem;
+  font-weight: 550;
+  line-height: 1.3;
+  white-space: nowrap;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .strength-helix[data-reveal="waiting"] .strength-helix-mark { transform: scaleY(0); }
+  .strength-helix[data-reveal="running"] .strength-helix-mark {
+    animation: strength-helix-grow 0.38s cubic-bezier(0.22, 1, 0.36, 1) var(--bar-delay) both;
+  }
+}
+@keyframes strength-helix-grow {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+
+/* By domain board */
+.strength-board-frame {
+  container: strength-board / inline-size;
+  margin-top: 14px;
+  padding: 24px;
+  border-radius: 11px;
+  background: var(--glass-fill);
+  box-shadow: var(--glass-rim);
+}
+.strength-board { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px 20px; }
+.strength-board-column { min-width: 0; }
+.strength-board-column > h3 {
+  margin: 0 0 12px;
+  padding-bottom: 8px;
+  border-bottom: 5px solid var(--strength-color);
+  color: var(--ink);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.strength-board-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-flow: row dense; gap: 8px; }
+.strength-tile { aspect-ratio: 1; }
+.strength-tile .strength.flip-card { display: block; }
+.strength-cell .strength.flip-card { transition: transform 0.15s ease, box-shadow 0.15s ease; }
+.strength-tile-front {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 100%;
+  padding: 6px 4px;
+  text-align: center;
+}
+.strength-tile-rank { font-size: 1.5rem; font-weight: 300; line-height: 1; font-variant-numeric: tabular-nums; }
+.strength-tile-name { max-width: 100%; font-size: 0.82rem; font-weight: 550; line-height: 1.2; overflow-wrap: anywhere; }
+.strength-tile[data-tier="high"] .strength-tile-name { font-size: 0.74rem; }
+.strength-tile[data-tier="rest"] .flip-card__face--front {
+  background: color-mix(in srgb, var(--strength-color) 15%, var(--surface));
+  color: var(--muted);
+}
+.strength-tile[data-tier="rest"] .strength-tile-rank { font-size: 0.82rem; font-weight: 500; }
+.strength-tile[data-tier="rest"] .strength-tile-name { font-size: 0.7rem; font-weight: 500; }
+/* A hovered card, or the card for a hovered strand bar, rises and shows its full color. */
+.strength-cell[data-linked] { position: relative; z-index: 2; }
+.strength-cell[data-linked] .strength.flip-card { box-shadow: var(--shadow); }
+.strength-cell[data-linked] .strength.flip-card:not(:focus-visible) { outline: 1px solid var(--strength-color); outline-offset: 2px; }
+.strength-cell:not(.is-expanded)[data-linked] .flip-card[data-motion="moving"] { transform: translateY(-2px) scale(1.06); }
+.strength-cell.is-expanded[data-linked] .flip-card[data-motion="moving"] { transform: translateY(-2px); }
+.strength-cell .flip-card__face { transition: background-color 0.15s ease, color 0.15s ease; }
+.strength-tile[data-tier="rest"][data-linked] .flip-card__face--front { background: var(--fc-bg); color: var(--fc-ink); }
+.strength-tile .strength.flip-card:focus-visible { outline-width: 2px; outline-offset: 2px; box-shadow: 0 0 0 2px var(--strength-color); }
+/* While a strand bar is hovered or focused, every card except its partner turns gray. A bar
+   with no card in the current view grays nothing, and hovering a card doesn't trigger this. */
+.strengths:has(.strength-helix-bar[data-linked]:is(:hover, :focus-visible)):has(.strength-cell[data-linked]) .strength-cell:not([data-linked]) .flip-card__face {
+  background: color-mix(in srgb, var(--muted) 18%, var(--surface));
+  color: var(--muted);
+}
+.strengths:has(.strength-helix-bar[data-linked]:is(:hover, :focus-visible)):has(.strength-cell[data-linked]) .strength-cell:not([data-linked]) .strength-rank {
+  background: transparent;
+  color: inherit;
+}
+/* An open card takes the column's full width and grows to fit its description. */
+.strengths .strength-tile.is-expanded { grid-column: 1 / -1; grid-row: auto; aspect-ratio: auto; }
+.strengths .strength-tile.is-expanded .strength.flip-card { height: auto; }
+.strengths .strength-tile.is-expanded .strength .flip-card__rotor { position: relative; display: grid; height: auto; }
+.strengths .strength-tile.is-expanded .strength .flip-card__face { position: relative; grid-area: 1 / 1; }
+.strength-tile .strength-card-back { gap: 8px; padding: 14px; }
+.strength-tile .strength-card-back .strength-name { font-size: 1.1rem; }
+.strength-tile .strength-card-back > p { font-size: 0.85rem; line-height: 1.45; }
+/* Where a strand click lands: mouse users get no focus ring, so mark the target briefly. */
+.strengths [data-located] { outline: 3px solid var(--ink); outline-offset: 3px; }
+.strength-cell[data-located] { border-radius: 12px; }
+@container strength-board (min-width: 480px) {
+  .strength-board { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@container strength-board (min-width: 900px) {
+  .strength-board { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  .strength-board-frame { padding: 18px; }
+}
+@media (forced-colors: active) {
+  .strength-helix-mark { fill: CanvasText; }
+  .strength-helix-outline { stroke: CanvasText; fill: none; }
 }

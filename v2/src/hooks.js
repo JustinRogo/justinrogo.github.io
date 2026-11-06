@@ -68,13 +68,13 @@ export function useResource(url, transform) {
   };
 }
 // Sticky content taller than the screen would keep its lower part out of reach.
-export function useFitsViewport(margin = 0) {
+export function useFitsViewport(reserved = 0) {
   const ref = useRef(null);
   const [fits, setFits] = useState(false);
   useEffect(() => {
     const node = ref.current;
     if (!node) return;
-    const update = () => setFits(node.offsetHeight + margin * 2 <= innerHeight);
+    const update = () => setFits(node.offsetHeight + reserved <= innerHeight);
     const observer = new ResizeObserver(update);
     observer.observe(node);
     window.addEventListener("resize", update);
@@ -83,7 +83,7 @@ export function useFitsViewport(margin = 0) {
       observer.disconnect();
       window.removeEventListener("resize", update);
     };
-  }, [margin]);
+  }, [reserved]);
   return [ref, fits];
 }
 export function useClock() {

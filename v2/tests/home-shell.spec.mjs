@@ -51,10 +51,11 @@ test("the events column only sticks when all of it fits on screen", async ({ pag
   await page.setViewportSize({ width: 1366, height: 2000 });
   await page.goto("/?intro=0#/home");
   await expect(column).toHaveCSS("position", "sticky");
-  const { height } = await column.boundingBox();
-  await page.setViewportSize({ width: 1366, height: Math.ceil(height) + 47 });
+  // The app compares offsetHeight, which rounds; a fractional boundingBox height would be off by one.
+  const height = await column.evaluate((node) => node.offsetHeight);
+  await page.setViewportSize({ width: 1366, height: height + 100 });
   await expect(column).toHaveCSS("position", "static");
-  await page.setViewportSize({ width: 1366, height: Math.ceil(height) + 48 });
+  await page.setViewportSize({ width: 1366, height: height + 101 });
   await expect(column).toHaveCSS("position", "sticky");
 });
 

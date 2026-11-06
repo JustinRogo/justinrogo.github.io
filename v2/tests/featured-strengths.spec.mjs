@@ -41,6 +41,7 @@ test("strength cards preserve rankings, domains, descriptions, all filters, and 
   page.on("pageerror", error => errors.push(error.message));
   await page.goto("/v2/?intro=0#/about?section=strengths");
   const cards = page.locator(".strength.flip-card");
+  await page.getByRole("button", { name: "Top 5", exact: true }).click();
   await expect(cards).toHaveCount(5);
   const card = cards.first();
   await expect(card.locator(".strength-card-front .strength-rank")).toHaveText("1");
@@ -91,6 +92,7 @@ test("strength faces remain readable on narrow screens and flip instantly in Cal
   for (const width of [1440, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto(`/v2/?intro=0&strengthWidth=${width}#/about`);
+    await page.getByRole("button", { name: "Top 5", exact: true }).click();
     const card = page.locator(".strength.flip-card").first();
     await card.scrollIntoViewIfNeeded();
     await expect(card).toHaveCSS("height", "180px");
