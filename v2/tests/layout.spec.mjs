@@ -47,6 +47,70 @@ test("the topbar stays in view on desktop only and clears anything scrolled to",
   expect((await topbar.boundingBox()).y).toBeLessThan(0);
 });
 
+test("the scrolled topbar fills the workspace without moving its controls", async ({ page }) => {
+  for (const width of [2560, 1440, 1150, 801]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto(`/v2/?intro=0&topbar=${width}#/home`);
+    const topbar = page.locator(".topbar");
+    const donate = topbar.getByRole("link", { name: "Donate to the Law Library" });
+    const hero = await page.locator(".glass-hero").boundingBox();
+    const atTop = await topbar.boundingBox();
+    expect(atTop.x).toBeCloseTo(hero.x);
+    expect(atTop.width).toBeCloseTo(hero.width);
+    await expect(topbar).toHaveCSS("border-radius", "6px");
+    const donateAtTop = await donate.boundingBox();
+
+    await page.evaluate(() => window.scrollTo({ top: 400, behavior: "instant" }));
+    await expect(topbar).toHaveCSS("border-radius", "0px");
+    const docked = await topbar.boundingBox();
+    expect(docked.y).toBe(0);
+    expect(docked.x).toBeCloseTo((await page.locator(".sidebar").boundingBox()).width);
+    expect(docked.x + docked.width).toBeCloseTo(await page.evaluate(() => document.documentElement.clientWidth));
+    expect((await donate.boundingBox()).x).toBeCloseTo(donateAtTop.x);
+
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+    await expect(topbar).toHaveCSS("border-radius", "6px");
+    expect((await topbar.boundingBox()).width).toBeCloseTo(hero.width);
+  }
+});
+
+test("the topbar eases out when motion is allowed", async ({ page }) => {
+  await page.addInitScript(() =>
+    localStorage.setItem(
+      "jr-v2-preferences",
+      JSON.stringify({ theme: "dark", calm: false, atmosphere: false }),
+    ),
+  );
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/v2/?intro=0#/home");
+  const running = await page.evaluate(() => {
+    window.scrollTo({ top: 400, behavior: "instant" });
+    window.dispatchEvent(new Event("scroll"));
+    return document.querySelector(".topbar").getAnimations().map((a) => a.transitionProperty);
+  });
+  expect(running).toContain("width");
+});
+
+test("My Day sits beside How can I help until the two no longer fit", async ({ page }) => {
+  const overlaps = (a, b) => a.y < b.y + b.height && b.y < a.y + a.height;
+  for (const [width, sideBySide] of [[2560, true], [1440, true], [1150, true], [930, false], [801, false], [768, false], [375, false], [320, false]]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto(`/v2/?intro=0&row=${width}#/home`);
+    const help = await page.locator(".home-help").boundingBox();
+    const myDay = await page.getByRole("region", { name: "My Day" }).boundingBox();
+    if (sideBySide) {
+      expect(myDay.x).toBeGreaterThanOrEqual(help.x + help.width);
+      expect(myDay.y).toBeCloseTo(help.y);
+      expect(myDay.height).toBeCloseTo(help.height);
+    } else {
+      expect(overlaps(help, myDay)).toBe(false);
+      expect(myDay.y).toBeGreaterThan(help.y);
+      expect(myDay.width).toBeCloseTo(help.width);
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
+  }
+});
+
 test("topbar follows the content edges across viewport and sidebar widths", async ({
   page,
 }) => {

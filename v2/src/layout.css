@@ -490,9 +490,29 @@ html:has(.sidebar-resize[data-dragging]) {
     scroll-padding-top: var(--topbar-clearance);
   }
   .topbar {
+    --topbar-pad: 24px;
+    --topbar-inset: calc((100% - min(100%, var(--page-max-width))) / 2 + var(--page-gutter));
     position: sticky;
     top: 0;
     z-index: 5;
+    width: calc(100% - 2 * var(--topbar-inset));
+    margin-left: var(--topbar-inset);
+    padding-inline: var(--topbar-pad);
     background: color-mix(in srgb, var(--surface) 86%, transparent);
+    transition-property: width, margin-left, padding-inline, border-radius;
+    transition-duration: 450ms;
+    transition-timing-function: var(--ease);
+  }
+  /* Once scrolled, the surface fills the workspace while padding holds the controls in place. */
+  :root[data-scrolled] .topbar {
+    width: 100%;
+    margin-left: 0;
+    padding-inline: calc(var(--topbar-pad) + var(--topbar-inset));
+    border-radius: 0;
+  }
+}
+@media (min-width: 801px) and (max-width: 1150px) {
+  .topbar {
+    --topbar-pad: 20px;
   }
 }

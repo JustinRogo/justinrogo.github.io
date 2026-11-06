@@ -86,6 +86,19 @@ export function useFitsViewport(reserved = 0) {
   }, [reserved]);
   return [ref, fits];
 }
+// Marks the page as scrolled for CSS, without re-rendering the app on every scroll.
+export function useScrolledFlag(threshold = 0) {
+  useEffect(() => {
+    const root = document.documentElement;
+    const update = () => root.toggleAttribute("data-scrolled", scrollY > threshold);
+    window.addEventListener("scroll", update, { passive: true });
+    update();
+    return () => {
+      window.removeEventListener("scroll", update);
+      root.removeAttribute("data-scrolled");
+    };
+  }, [threshold]);
+}
 export function useClock() {
   const [date, setDate] = useState(() => new Date());
   useEffect(() => {

@@ -5,6 +5,7 @@ import {
   useMedia,
   useResource,
   useRoute,
+  useScrolledFlag,
   useStored,
 } from "./hooks.js";
 import { donationUrl, integrations, profile } from "./content.js";
@@ -41,6 +42,8 @@ const viewTitle = (view) =>
   view === "home"
     ? "Justin Rogowski · UConn Law Library"
     : `${destinations.find(([id]) => id === view)?.[1] || "Page not found"} · Justin Rogowski`;
+const TOPBAR_DOCK_SCROLL = 12; // Roughly where the desktop bar reaches the top of the screen.
+
 function App() {
   const sidebar = useSidebarWidth();
   const route = useRoute();
@@ -79,6 +82,7 @@ function App() {
     update();
     return () => document.removeEventListener("visibilitychange", update);
   }, []);
+  useScrolledFlag(TOPBAR_DOCK_SCROLL);
   const systemDark = useMedia("(prefers-color-scheme: dark)");
   const reduced = useMedia("(prefers-reduced-motion: reduce)");
   const fine = useMedia("(hover: hover) and (pointer: fine)");
