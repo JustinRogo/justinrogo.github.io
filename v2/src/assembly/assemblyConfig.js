@@ -8,6 +8,7 @@ export const assemblyConfig = Object.freeze({
   crewEntry: 0.35,
   intensity: 0.7,
   oncePerLoad: true,
+  oncePerBrowser: true,
   colors: ["#ff9d5c", "#6bafff", "#5de1c5", "#bf9aff", "#ff90bc", "#ead777"],
   labels: ["Layout", "Theme", "Content", "Details", "Projects", "Connect"],
 });
@@ -31,6 +32,7 @@ export const assemblyTasks = [
   { id: "portrait", cursor: 3, at: 0.56, duration: 0.06, effect: "place" },
   { id: "topbar", cursor: 1, at: 0.6, duration: 0.04, effect: "surface" },
   { id: "hero-role", cursor: 2, at: 0.63, duration: 0.05, effect: "text" },
+  { id: "help", cursor: 2, at: 0.61, duration: 0.02, effect: "place" },
   {
     id: "featured-heading",
     cursor: 4,

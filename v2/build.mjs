@@ -17,7 +17,7 @@ export async function buildV2({ watch = false } = {}) {
     ["node_modules/motion-dom/LICENSE.md", "motion-dom-LICENSE.txt"],
     ["node_modules/motion-utils/LICENSE.md", "motion-utils-LICENSE.txt"],
     ["node_modules/vgpu/LICENSE", "vgpu-LICENSE.txt"],
-    ["Pages/For Fun/Wave-Function-Collapse/fonts/OFL.txt", "Geist-OFL.txt"],
+    ["v2/assets/fonts/Geist-OFL.txt", "Geist-OFL.txt"],
   ])
     await copyFile(
       path.join(root, source),

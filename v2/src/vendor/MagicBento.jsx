@@ -1,7 +1,7 @@
 /*! React Bits — Copyright (c) 2026 David Haz. MIT + Commons Clause; see assets/react-bits-LICENSE.txt.
  * Source revision e12c22192ac7b4b452c5e2feb9b586d74765d696.
  * Local changes: remove demo data/art/icon dependencies; recreate motion engine on live preference changes;
- * accept item-level cell classes for responsive site layouts.
+ * accept item-level cell classes for responsive site layouts; pick the column count before first paint.
  */
 "use client";
 
@@ -65,6 +65,11 @@ const THEMES = {
 const INK = { dark: [244, 244, 245], light: [24, 24, 27] };
 const MIN_CELL = 150;
 const MIN_PAIR = 200;
+const fitColumns = (width, { columns, gap }) => {
+  const cell = (count) => (width - gap * (count - 1)) / count;
+  if (cell(columns) >= MIN_CELL) return columns;
+  return columns >= 2 && cell(2) >= MIN_PAIR ? 2 : 1;
+};
 const STAGGER = 80;
 const TILT = 6;
 const MAGNET = 6;
@@ -182,6 +187,12 @@ const MagicBento = ({
   };
   const settingsRef = useRef(settings);
   settingsRef.current = settings;
+
+  // Before first paint, so narrow screens never flash the full-width grid.
+  useIsomorphicLayoutEffect(() => {
+    if (rootRef.current)
+      setCols(fitColumns(rootRef.current.clientWidth, settingsRef.current));
+  }, []);
 
   useIsomorphicLayoutEffect(() => {
     const root = rootRef.current;
@@ -594,16 +605,7 @@ const MagicBento = ({
     };
 
     const resizeObserver = new ResizeObserver(() => {
-      const s = settingsRef.current;
-      const width = root.clientWidth;
-      const cell = (count) => (width - s.gap * (count - 1)) / count;
-      const next =
-        cell(s.columns) >= MIN_CELL
-          ? s.columns
-          : s.columns >= 2 && cell(2) >= MIN_PAIR
-            ? 2
-            : 1;
-      setCols(next);
+      setCols(fitColumns(root.clientWidth, settingsRef.current));
       dirty = true;
       wake();
     });
@@ -866,6 +868,7 @@ const MagicBento = ({
                 href={entry.href}
                 target={entry.target}
                 rel={entry.rel}
+                aria-describedby={entry.describedBy}
               >
                 {body}
               </a>

@@ -65,10 +65,11 @@ test("Pocket Part remains readable on phones, in both themes, and with Calm or r
     const section = page.locator(".home-pocket-part");
     const root = section.locator(".scroll-stack");
     const events = page.locator(".law-events");
-    const [eventBox, blogBox] = await Promise.all([events.boundingBox(), section.boundingBox()]);
+    const column = page.locator(".home-events-column");
+    const [eventBox, columnBox, blogBox] = await Promise.all([events.boundingBox(), column.boundingBox(), section.boundingBox()]);
     if (width >= 1200) {
       expect(blogBox.x).toBeGreaterThan(eventBox.x + eventBox.width);
-      expect(Math.abs(blogBox.y - eventBox.y)).toBeLessThan(1);
+      expect(Math.abs(blogBox.y - columnBox.y)).toBeLessThan(1);
     } else expect(blogBox.y).toBeGreaterThan(eventBox.y + eventBox.height);
     await root.scrollIntoViewIfNeeded();
     const origin = await root.evaluate(el => el.getBoundingClientRect().top + scrollY);

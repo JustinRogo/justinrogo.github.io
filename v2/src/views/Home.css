@@ -5,8 +5,19 @@
 @media (min-width: 1200px) {
   .home-lower.home-feeds { grid-template-columns: 340px minmax(0, 1fr); gap: 32px; }
 }
-@media (min-width: 1200px) and (min-height: 650px) {
-  .home-events-column { position: sticky; top: 24px; }
+@media (min-width: 1200px) {
+  .home-events-column.fits-viewport { position: sticky; top: 24px; }
+}
+.home-help { display: grid; gap: 12px; margin-top: 16px; padding: 14px; }
+.home-help h2 { font-size: 1.3rem; padding-left: 2px; }
+.home-help ul { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.home-help a { display: flex; align-items: center; gap: 12px; height: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 5px; color: var(--ink); text-decoration: none; transition: background 160ms var(--ease), border-color 160ms var(--ease); }
+.home-help a:hover { background: var(--tint); border-color: var(--blue); }
+.home-help a > svg { flex: none; color: var(--orange); }
+.home-help strong { display: block; font-size: 0.92rem; font-weight: 600; line-height: 1.3; }
+.home-help small { display: block; color: var(--muted); font-size: 0.78rem; line-height: 1.35; }
+@media (min-width: 760px) {
+  .home-help ul { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 .selected-bento .bento-project { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.65fr); grid-template-rows: 1fr auto; gap: 10px 16px; padding: 20px; }
 .selected-bento .bento-project .bento-copy { grid-column: 1; grid-row: 1; min-width: 0; padding-top: 0; }
@@ -22,8 +33,14 @@
 .selected-bento .bento-project-0 .bento-open { grid-row: 3; }
 .selected-bento :is(.bento-project-2, .bento-project-3) .bento-copy p,
 .selected-bento .bento-project-3 .project-category { display: none; }
-.selected-bento :is(.bento-project-2, .bento-project-3) { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr); }
+.selected-bento :is(.bento-project-2, .bento-project-3) { grid-template-columns: minmax(min-content, 0.8fr) minmax(0, 1fr); }
 .selected-bento :is(.bento-project-2, .bento-project-3) .bento-copy h3 { font-size: 1.05rem; }
+/* The small cards are too narrow here to fit the title beside a useful thumbnail. */
+@media (min-width: 680px) and (max-width: 800px) {
+  .selected-bento :is(.bento-project-2, .bento-project-3) { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto 1fr; }
+  .selected-bento :is(.bento-project-2, .bento-project-3) .featured-project-preview { grid-column: 1; grid-row: 2; }
+  .selected-bento :is(.bento-project-2, .bento-project-3) .bento-open { grid-row: 3; align-self: end; }
+}
 @media (max-width: 600px) {
   .selected-bento .magic-bento__cell:first-child { min-height: 340px; }
   .selected-bento .bento-project { gap: 12px; }

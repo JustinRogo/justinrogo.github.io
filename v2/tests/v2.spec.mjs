@@ -2,10 +2,11 @@ import { test, expect } from "@playwright/test";
 import { readFile, mkdir } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
-import { resources } from "../src/content.js";
+import { projectTitles, resources } from "../src/content.js";
 const manifest = JSON.parse(
   await readFile(new URL("../../data/pages.json", import.meta.url), "utf8"),
 );
+for (const page of manifest.pages) page.title = projectTitles[page.path] || page.title;
 const root = new URL("../../", import.meta.url);
 const nav = (page) =>
   page.getByRole("navigation", { name: "Primary navigation", exact: true });
@@ -447,6 +448,10 @@ test("branched shortcuts use normal links and collapsed groups leave keyboard or
     await expect(link).toHaveAttribute("href", href);
     await expect(link).toHaveAttribute("target", "_blank");
   }
+  // Short screens like this one start with every group closed.
+  await shortcuts
+    .getByRole("button", { name: "Projects", exact: true })
+    .click();
   await shortcuts
     .getByRole("link", { name: "Library projects", exact: true })
     .click();

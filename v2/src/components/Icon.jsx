@@ -29,6 +29,7 @@ const paths = {
     "M20 7v5h-5 M4 17v-5h5 M5 7a8 8 0 0 1 14-1l1 6 M4 12l1 6a8 8 0 0 0 14-1",
   check: "m5 12 4 4L19 6",
   heart: "M20 5c-3-3-7-1-8 1-1-2-5-4-8-1-5 5 8 15 8 15S25 10 20 5Z",
+  bookmark: "M6 3h12v18l-6-4.5L6 21Z",
 };
 export default function Icon({ name, size = 20, ...props }) {
   return (

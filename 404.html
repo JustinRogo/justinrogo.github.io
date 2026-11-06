@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#e6efff" />
+    <title>Page not found · Justin Rogowski</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script>
+      try {
+        const p = JSON.parse(localStorage.getItem("jr-v2-preferences") || "{}");
+        const dark =
+          p.theme === "dark" ||
+          (p.theme !== "light" &&
+            matchMedia("(prefers-color-scheme: dark)").matches);
+        document.documentElement.dataset.theme = dark ? "dark" : "light";
+        document.querySelector('meta[name="theme-color"]').content = dark
+          ? "#060f23"
+          : "#e6efff";
+      } catch {}
+    </script>
+    <style>
+      /* Served at any depth, so every URL here starts at the site root. */
+      @font-face {
+        font-family: Geist;
+        src: url("/v2/assets/fonts/Geist.woff2") format("woff2");
+        font-weight: 100 900;
+        font-display: swap;
+      }
+      :root {
+        --bg: #e6efff;
+        --ink: #112847;
+        --muted: #425875;
+        --link: #125cd4;
+      }
+      :root[data-theme="dark"] {
+        --bg: #060f23;
+        --ink: #eef5ff;
+        --muted: #b4c9e5;
+        --link: #75b4ff;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: Geist, system-ui, sans-serif;
+        line-height: 1.55;
+      }
+      main {
+        max-width: 36rem;
+        padding: 32px 24px;
+      }
+      .wordmark {
+        color: inherit;
+        font-size: 3rem;
+        font-weight: 650;
+        letter-spacing: -0.04em;
+        line-height: 1;
+        text-decoration: none;
+      }
+      h1 {
+        margin: 32px 0 12px;
+        font-size: clamp(2.5rem, 8vw, 4rem);
+        font-weight: 550;
+        letter-spacing: -0.035em;
+        line-height: 1.12;
+      }
+      p {
+        margin: 0;
+        color: var(--muted);
+      }
+      p a {
+        color: var(--link);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <a class="wordmark" href="/#/home" aria-label="Justin Rogowski home">jr</a>
+      <h1>A little off the map.</h1>
+      <p>
+        This page doesn’t exist. <a href="/#/home">Head home</a> or
+        <a href="/#/projects">browse the projects</a>.
+      </p>
+    </main>
+  </body>
+</html>

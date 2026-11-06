@@ -1,13 +1,26 @@
 import { useEffect, useRef } from "react";
 import { GlassLayer } from "./Glass.jsx";
 import Icon from "./Icon.jsx";
+// Rendered once by App. A description, so links keep their exact names.
+export const newTabNote = "opens-new-tab";
+export const newTabLink = {
+  target: "_blank",
+  rel: "noopener noreferrer",
+  describedBy: newTabNote,
+};
 export function ExternalLink({ href, children, className = "", ...props }) {
   const external = /^(https?:|\.\.\/)/.test(href);
   return (
     <a
       href={href}
       className={className}
-      {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+      {...(external
+        ? {
+            target: newTabLink.target,
+            rel: newTabLink.rel,
+            "aria-describedby": newTabNote,
+          }
+        : {})}
       {...props}
     >
       {children}

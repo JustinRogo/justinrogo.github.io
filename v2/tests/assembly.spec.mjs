@@ -287,11 +287,6 @@ test("page-load autoplay, forced replay, repeated replay, resize and keyboard in
   await primary(page).getByRole("link", { name: "Home", exact: true }).click();
   await expect(layer(page)).toHaveAttribute("data-assembly-state", "complete");
   await page.reload();
-  await expect(layer(page)).toHaveAttribute(
-    "data-assembly-state",
-    /preparing|assembling/,
-  );
-  await page.keyboard.press("Escape");
   await expect(layer(page)).toHaveAttribute("data-assembly-state", "complete");
   await page.getByRole("button", { name: "Replay animation" }).click();
   await expect(layer(page)).toHaveAttribute(
@@ -322,25 +317,50 @@ test("page-load autoplay, forced replay, repeated replay, resize and keyboard in
 });
 
 for (const width of [1440, 375]) {
-  test(`automatic intro survives a reload and a legacy session flag at ${width}px`, async ({ page }) => {
+  test(`the intro autoplays on a first visit, not for returning visitors, at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 1000 });
-    await page.addInitScript(() => {
-      // Existing visitors keep this marker from the old once-per-tab policy.
-      sessionStorage.setItem("jr-v2-assembly-seen-v1", "1");
-    });
     await page.goto("/v2/");
-    for (let load = 0; load < 2; load++) {
-      if (load) await page.reload();
-      await expect(layer(page)).toHaveAttribute("data-assembly-state", "assembling");
-      await page.waitForTimeout(1000);
-      await expect(layer(page)).toHaveAttribute("data-assembly-state", "assembling");
-      await expect(page.locator(".agent-cursor").first()).toBeVisible();
-      await page.keyboard.press("Escape");
+    await expect(layer(page)).toHaveAttribute("data-assembly-state", "assembling");
+    await page.waitForTimeout(1000);
+    await expect(layer(page)).toHaveAttribute("data-assembly-state", "assembling");
+    await expect(page.locator(".agent-cursor").first()).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(layer(page)).toHaveAttribute("data-assembly-state", "complete");
+    for (const visit of [() => page.reload(), () => page.goto("/v2/?returning=1#/home")]) {
+      await visit();
       await expect(layer(page)).toHaveAttribute("data-assembly-state", "complete");
+      await expect(page.getByRole("button", { name: "Skip intro" })).toHaveCount(0);
+      await expect(page.locator(".glass-hero")).toHaveCSS("opacity", "1");
       await expect(page.locator(".hero-actions a").first()).toHaveCSS("opacity", "1");
     }
+    await page.getByRole("button", { name: "Replay animation" }).click();
+    await expect(layer(page)).toHaveAttribute("data-assembly-state", /preparing|assembling/);
+    await page.keyboard.press("Escape");
+    await page.goto("/v2/?replayIntro=1#/home");
+    await expect(layer(page)).toHaveAttribute("data-assembly-state", /preparing|assembling/);
   });
 }
+
+test("blocked storage falls back to one intro per page load", async ({ page }) => {
+  const errors = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.addInitScript(() => {
+    for (const method of ["getItem", "setItem"]) {
+      const original = Storage.prototype[method];
+      Storage.prototype[method] = function (key, ...rest) {
+        if (key === "jr-v2-assembly-seen") throw new DOMException("Blocked", "SecurityError");
+        return original.call(this, key, ...rest);
+      };
+    }
+  });
+  for (let load = 0; load < 2; load++) {
+    await (load ? page.reload() : page.goto("/v2/"));
+    await expect(layer(page)).toHaveAttribute("data-assembly-state", /preparing|assembling/);
+    await page.keyboard.press("Escape");
+    await expect(layer(page)).toHaveAttribute("data-assembly-state", "complete");
+  }
+  expect(errors).toEqual([]);
+});
 
 test("the first Home visit from a deep link tolerates router focus and preserves navigation", async ({
   page,

@@ -103,7 +103,8 @@ export const featuredPaths = [
   "Pages/Updates/index.html",
   "Pages/For Fun/Tarot/index.html",
 ];
-export const featuredTitles = {
+// V2 display names. data/pages.json is shared with V1 and stays unchanged.
+export const projectTitles = {
   "Pages/Updates/index.html": "AI Corner Updates",
   "Pages/For Fun/Tarot/index.html": "Midnight Tarot",
 };

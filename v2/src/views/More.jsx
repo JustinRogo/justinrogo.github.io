@@ -1,5 +1,5 @@
 import { useResource } from "../hooks.js";
-import { integrations } from "../content.js";
+import { integrations, projectTitles } from "../content.js";
 import {
   ExternalLink,
   LinkRow,
@@ -27,7 +27,13 @@ export function parseManifest(text) {
     )
   )
     throw new Error("Invalid project index");
-  return value;
+  return {
+    ...value,
+    pages: value.pages.map((page) => ({
+      ...page,
+      title: projectTitles[page.path] || page.title,
+    })),
+  };
 }
 const safeUrl = (value) => {
   try {

@@ -39,8 +39,8 @@ test("project previews and varied cards fit desktop, tablet, phone, filters, and
   await expect.poll(() => page.locator(".project-bento").evaluate(el => getComputedStyle(el).gridTemplateColumns.split(" ").length)).toBe(2);
   await page.getByRole("searchbox", { name: "Search projects" }).fill("Tarot");
   await expect(page.locator(".project-card")).toHaveCount(1);
-  await expect(page.locator(".project-preview img")).toHaveAttribute("alt", "Screenshot of Tarot Reading");
-  await page.getByRole("button", { name: "Save Tarot Reading", exact: true }).click();
+  await expect(page.locator(".project-preview img")).toHaveAttribute("alt", "Screenshot of Midnight Tarot");
+  await page.getByRole("button", { name: "Save Midnight Tarot", exact: true }).click();
   await page.getByRole("button", { name: /^Saved/ }).click();
   await expect(page.locator(".project-card")).toHaveCount(1);
 });

@@ -14,12 +14,13 @@ test("featured cards reuse the project screenshots, keep their destinations, and
     const grid = page.locator(".selected-bento");
     await grid.scrollIntoViewIfNeeded();
     const previews = grid.locator(".featured-project-preview img");
-    await expect(previews).toHaveCount(3);
+    await expect(previews).toHaveCount(4);
     for (const image of await previews.all()) await expect.poll(() => image.evaluate(el => el.complete && el.naturalWidth > 0)).toBe(true);
     await expect(grid.locator(".bento-statutes-art")).toHaveText("§§");
     await expect(grid.locator(".bento-statutes-art")).toHaveCSS("height", "36px");
     for (const card of await grid.locator(".bento-project").all()) {
       expect(await card.evaluate(el => el.scrollHeight <= el.clientHeight + 1)).toBe(true);
+      expect(await card.locator("h3").evaluate(el => el.scrollWidth <= el.clientWidth + 1)).toBe(true);
       const [copy, open] = await Promise.all([card.locator(".bento-copy").boundingBox(), card.locator(".bento-open").boundingBox()]);
       expect(copy.y + copy.height).toBeLessThanOrEqual(open.y + 1);
       const preview = await card.locator(".featured-project-preview").boundingBox();

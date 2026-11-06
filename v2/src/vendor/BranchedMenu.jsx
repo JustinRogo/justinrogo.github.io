@@ -43,6 +43,7 @@ function BranchLinks({ items, active, isOpen, select, depth = 0, label }) {
             href={kid.href || `#/${kid.value}`}
             target={kid.target}
             rel={kid.rel}
+            aria-describedby={kid.describedBy}
             aria-current={kid.value === active ? "page" : undefined}
             data-active={kid.value === active ? "" : undefined}
             tabIndex={isOpen ? 0 : -1}

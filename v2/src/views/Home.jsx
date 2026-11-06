@@ -1,15 +1,15 @@
 import { useMemo } from "react";
+import { useFitsViewport } from "../hooks.js";
 import TechText from "../vendor/TechText.jsx";
 import MagicBento from "../vendor/MagicBento.jsx";
 import {
   profile,
   featuredPaths,
-  featuredTitles,
   projectHref,
 } from "../content.js";
 import Icon from "../components/Icon.jsx";
 import { GlassLayer } from "../components/Glass.jsx";
-import { ExternalLink, LoadState, SectionTitle } from "../components/UI.jsx";
+import { ExternalLink, LoadState, SectionTitle, newTabLink } from "../components/UI.jsx";
 import { AssembleReveal } from "../assembly/HomepageAssembly.jsx";
 import { StrengthsPreview } from "../components/Strengths.jsx";
 import { MyDay } from "../components/AvailabilityCalendar.jsx";
@@ -18,6 +18,12 @@ import PocketPart from "../components/PocketPart.jsx";
 import { ProjectPreview } from "../components/Project.jsx";
 import "./Home.css";
 
+const helpLinks = [
+  ["Book a meeting", "Find a time that works for both of us.", "#/tools?panel=booking", "calendar"],
+  ["Start a request", "Send something to my task board.", "#/tools?panel=request", "mail"],
+  ["Search the library", "Books, journals, databases, and guides.", "#/tools?panel=catalog", "search"],
+];
+
 function Name({ effects }) {
   return (
     <AssembleReveal id="hero-title">
@@ -25,9 +31,9 @@ function Name({ effects }) {
         {effects ? (
           <>
             <span className="sr-only">Justin Rogowski</span>
-            <div className="tech-name" aria-hidden="true">
+            <span className="tech-name" aria-hidden="true">
               {["Justin", "Rogowski"].map((word, index) => (
-                <div className={`tech-line tech-line-${index}`} key={word}>
+                <span className={`tech-line tech-line-${index}`} key={word}>
                   <TechText
                     text={word}
                     fontFamily="Geist"
@@ -50,9 +56,9 @@ function Name({ effects }) {
                     clickKick={true}
                     intro="none"
                   />
-                </div>
+                </span>
               ))}
-            </div>
+            </span>
           </>
         ) : (
           <>
@@ -75,8 +81,7 @@ function FeaturedBento({ projects, effects, theme, fine }) {
       .map((project, index) => ({
         id: project.path,
         href: projectHref(project),
-        target: "_blank",
-        rel: "noopener noreferrer",
+        ...newTabLink,
         colSpan: index < 2 ? 2 : 1,
         rowSpan: index === 0 ? 2 : 1,
         content: (
@@ -92,9 +97,9 @@ function FeaturedBento({ projects, effects, theme, fine }) {
                     <span>§§</span>
                   </div>
                 ) : null}
-                <ProjectPreview project={project} className="featured-project-preview" />
+                <ProjectPreview project={project} className="featured-project-preview" decorative sizes="270px" />
                 <div className="bento-copy">
-                  <h3>{featuredTitles[project.path] || project.title}</h3>
+                  <h3>{project.title}</h3>
                   <span className="project-category">{project.category}</span>
                   <p>{project.description}</p>
                 </div>
@@ -113,6 +118,7 @@ function FeaturedBento({ projects, effects, theme, fine }) {
       items={items}
       columns={4}
       rowHeight={170}
+      style={{ gridAutoRows: "minmax(170px, auto)" }}
       gap={16}
       radius={6}
       theme={theme}
@@ -132,6 +138,7 @@ function FeaturedBento({ projects, effects, theme, fine }) {
 }
 
 export default function Home({ projects, effects, theme, fine }) {
+  const [eventsColumn, eventsFit] = useFitsViewport(24);
   return (
     <>
       <AssembleReveal id="hero-frame">
@@ -166,7 +173,7 @@ export default function Home({ projects, effects, theme, fine }) {
                 <div className="portrait-orbit orbit-two" />
                 <div className="portrait-photo">
                   <img
-                    src="/v2/assets/justin.png"
+                    src="/v2/assets/justin.webp"
                     alt="Justin Rogowski"
                     width="240"
                     height="240"
@@ -181,6 +188,7 @@ export default function Home({ projects, effects, theme, fine }) {
                   title="Book a meeting"
                 >
                   <Icon name="calendar" size={23} />
+                  <span className="orbit-label">Book</span>
                 </a>
                 <a
                   href="mailto:justin.rogowski@uconn.edu"
@@ -189,6 +197,7 @@ export default function Home({ projects, effects, theme, fine }) {
                   title="Email Justin"
                 >
                   <Icon name="mail" size={23} />
+                  <span className="orbit-label">Email</span>
                 </a>
                 <ExternalLink
                   href="https://teams.microsoft.com/l/chat/0/0?users=justin.rogowski@uconn.edu"
@@ -197,6 +206,7 @@ export default function Home({ projects, effects, theme, fine }) {
                   title="Start a Teams chat"
                 >
                   <Icon name="chat" size={23} />
+                  <span className="orbit-label">Teams</span>
                 </ExternalLink>
                 <a
                   href="tel:+18605705109"
@@ -205,11 +215,31 @@ export default function Home({ projects, effects, theme, fine }) {
                   title="Call Justin"
                 >
                   <Icon name="phone" size={23} />
+                  <span className="orbit-label">Call</span>
                 </a>
               </div>
               <StrengthsPreview />
             </div>
           </AssembleReveal>
+        </section>
+      </AssembleReveal>
+      <AssembleReveal id="help">
+        <section className="home-help glass-host" aria-labelledby="home-help-title">
+          <GlassLayer />
+          <h2 id="home-help-title">How can I help?</h2>
+          <ul>
+            {helpLinks.map(([label, note, href, icon]) => (
+              <li key={href}>
+                <a href={href}>
+                  <Icon name={icon} size={22} />
+                  <span>
+                    <strong>{label}</strong>
+                    <small>{note}</small>
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
         </section>
       </AssembleReveal>
       <AssembleReveal id="featured-heading">
@@ -236,7 +266,10 @@ export default function Home({ projects, effects, theme, fine }) {
       </LoadState>
       <div className="home-lower home-feeds">
         <AssembleReveal id="notes">
-          <div className="home-events-column">
+          <div
+            ref={eventsColumn}
+            className={`home-events-column${eventsFit ? " fits-viewport" : ""}`}
+          >
             <MyDay />
             <LawEvents effects={effects} theme={theme} />
           </div>

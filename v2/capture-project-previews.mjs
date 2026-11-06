@@ -3,6 +3,7 @@
 import { chromium } from "@playwright/test";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
+import { resizeImages } from "./resize-images.mjs";
 
 const origin = process.env.PREVIEW_ORIGIN || "http://127.0.0.1:4392";
 const output = new URL("./assets/project-previews/", import.meta.url);
@@ -39,6 +40,7 @@ try {
     }
   }
   await writeFile(new URL("sources.json", output), JSON.stringify(sources, null, 2) + "\n");
+  await resizeImages();
 } finally {
   await browser.close();
 }

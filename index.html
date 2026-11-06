@@ -6,17 +6,34 @@
       name="viewport"
       content="width=device-width, initial-scale=1, viewport-fit=cover"
     />
-    <meta name="theme-color" content="#efeee8" />
+    <meta name="theme-color" content="#e6efff" />
     <meta
       name="description"
       content="Justin Rogowski — library information, useful tools, and projects at UConn School of Law and beyond."
     />
     <link rel="canonical" href="https://justinrogo.github.io/" />
-    <title>Justin Rogowski · A space for possibility</title>
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Justin Rogowski" />
+    <meta property="og:url" content="https://justinrogo.github.io/" />
+    <meta property="og:title" content="Justin Rogowski · Library Information Coordinator" />
+    <meta
+      property="og:description"
+      content="Library information, useful tools, and projects at UConn School of Law and beyond."
+    />
+    <meta property="og:image" content="https://justinrogo.github.io/v2/assets/social-card.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Justin Rogowski, Library Information Coordinator at UConn School of Law, with his portrait."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <title>Justin Rogowski · UConn Law Library</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link
       rel="preload"
-      href="/Pages/For%20Fun/Wave-Function-Collapse/fonts/Geist.woff2"
+      href="/v2/assets/fonts/Geist.woff2"
       as="font"
       type="font/woff2"
       crossorigin
@@ -24,24 +41,45 @@
     <script>
       try {
         const p = JSON.parse(localStorage.getItem("jr-v2-preferences") || "{}");
-        document.documentElement.dataset.theme =
+        const dark =
           p.theme === "dark" ||
           (p.theme !== "light" &&
-            matchMedia("(prefers-color-scheme: dark)").matches)
-            ? "dark"
-            : "light";
+            matchMedia("(prefers-color-scheme: dark)").matches);
+        document.documentElement.dataset.theme = dark ? "dark" : "light";
+        document.querySelector('meta[name="theme-color"]').content = dark
+          ? "#060f23"
+          : "#e6efff";
       } catch {}
     </script>
-    <link rel="stylesheet" href="/v2/assets/app.css?v=midnight-tarot" />
+    <link rel="stylesheet" href="/v2/assets/app.css?v=home-help-row" />
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <main class="static-hero">
+        <h1>Justin Rogowski</h1>
+        <p class="static-hero-role">
+          Library Information Coordinator
+          <span>UConn School of Law</span>
+        </p>
+        <p>
+          I build dashboards, organize information, and make tools for everyday
+          work. Usually because I found myself thinking, “There really should be
+          an easier way to do this.”
+        </p>
+        <ul>
+          <li><a href="mailto:justin.rogowski@uconn.edu">Email</a></li>
+          <li><a href="https://www.linkedin.com/in/justin-rogowski/">LinkedIn</a></li>
+          <li><a href="https://github.com/JustinRogo">GitHub</a></li>
+          <li><a href="/original.html">Original website</a></li>
+        </ul>
+      </main>
+    </div>
     <noscript
       ><p>
         This site needs JavaScript.
         <a href="/original.html">Visit the original website</a>.
       </p></noscript
     >
-    <script type="module" src="/v2/assets/app.js?v=midnight-tarot"></script>
+    <script type="module" src="/v2/assets/app.js?v=home-help-row"></script>
   </body>
 </html>

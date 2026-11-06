@@ -4,9 +4,10 @@ Run `npm run dev:v2` from the repository root. Open:
 
 - Normal visit: `http://127.0.0.1:4392/v2/`
 - Force a replay on document load: `http://127.0.0.1:4392/v2/?replayIntro=1#/home`
+- See a first visit again: remove `jr-v2-assembly-seen` from localStorage, or use a private window
 - Disable the intro for a visit: `http://127.0.0.1:4392/v2/?intro=0#/home`
 
-The intro plays once per document load, including reloads. Returning to Home through the site's navigation keeps the page ready to use. Home's header has a **Replay intro** control (a refresh icon on phones). Settings includes **Homepage assembly**, alongside Calm mode. Reduced motion, increased contrast, forced colors, hidden-document state, and Calm mode override autoplay and replay. The replay parameter bypasses the current document's playback flag, not accessibility preferences.
+The intro autoplays on a browser's first visit, remembered under the `jr-v2-assembly-seen` localStorage key once it starts or is interrupted. Reloads, later visits, and returning to Home through the site's navigation keep the page ready to use. If storage is blocked, it falls back to once per document load. Home's header has a **Replay intro** control (a refresh icon on phones). Settings includes **Homepage assembly**, alongside Calm mode. Reduced motion, increased contrast, forced colors, hidden-document state, and Calm mode override autoplay and replay. The replay parameter bypasses the current document's playback flag, not accessibility preferences.
 
 ## Architecture
 
@@ -16,7 +17,7 @@ The intro plays once per document load, including reloads. Returning to Home thr
 
 There is one homepage DOM tree throughout. The heading, portrait, links, cards, navigation, and shell are the normal React components. The overlay contains only decorative pointers, guides, and alignment dots. It has no pointer events, accessible content, or keyboard stops. Nothing submits a form or activates an external integration.
 
-The V2 HTML entry starts with an empty React root instead of boot-time loading copy; the existing no-JavaScript link to V1 remains available.
+The V2 HTML entry puts static page text in the React root for crawlers, readers without JavaScript, and slow connections. It appears only after a 0.4-second delay, and React replaces it on mount, so fast loads go straight to the intro. The existing no-JavaScript link to V1 remains available.
 
 The initial layout is reserved by the actual components. GSAP temporarily owns presentation styles inside lifecycle contexts; it never replaces text, inserts interface copies, or changes layout-driving dimensions. Preparation's temporary opacity styles have their own context, which is restored after the playback context at completion or interruption. This keeps equal-time tween cleanup ordering from leaving content invisible in Firefox. No homepage remount, overlay-to-page crossfade, or final component swap occurs.
 
@@ -32,7 +33,8 @@ Edit `src/assembly/assemblyConfig.js`:
 | `crewEntry` | 0.35 of the timeline; Layout works alone for about 2 seconds on desktop / 1.7 on phones |
 | `colors` / `labels` | Six presets; the first five accents/job labels are used by default |
 | `intensity` | 0.7; guide/pulse strength and placement distance/scale, range 0–1 |
-| `oncePerLoad` | `true`; repeats after a reload, but not when navigating back to Home; set false to repeat on Home activation |
+| `oncePerLoad` | `true`; does not repeat when navigating back to Home; set false to repeat on Home activation |
+| `oncePerBrowser` | `true`; autoplay only on a browser's first visit; set false to repeat after every reload |
 
 The same file defines `layoutTasks` for the persistent structural guides and `assemblyTasks` for the real component reveals. Both specify target ID, cursor, effect, start fraction, and duration fraction. Anchors derive from the effect and the target's visible bounding box. A cursor's travel is scheduled around its previous job. Phones use their actual dock/layout measurements and four agents; content work goes to Details so Layout can keep its structural role. Offscreen targets stay ordinarily rendered. These outlines contain no mock content or replacement interface.
 
@@ -54,7 +56,7 @@ The sequence is finite. It has no per-frame React state updates or layout-measur
 
 ## Verification
 
-`npm run test:v2` includes `tests/assembly.spec.mjs`. It checks the solo Layout stage, crew exclusion during that stage, persistent outlines with the real hero still hidden, real-node identity, layout invariance, measured cursor arrivals, style restoration, page-load and forced replay, repeated replay, resizing, keyboard and route interruption, motion preferences, settings, slow data, scrolling, and external-write prevention. Desktop and phone regression tests verify automatic playback on initial load and reload even when the old sessionStorage marker is present. Initial/wireframe/construction/completed screenshots are saved at 375px and 1440px under the ignored `.impeccable/review/` directory. Additional read-only review covered 430px, 768px, and 1024px, both themes, and touch emulation.
+`npm run test:v2` includes `tests/assembly.spec.mjs`. It checks the solo Layout stage, crew exclusion during that stage, persistent outlines with the real hero still hidden, real-node identity, layout invariance, measured cursor arrivals, style restoration, page-load and forced replay, repeated replay, resizing, keyboard and route interruption, motion preferences, settings, slow data, scrolling, and external-write prevention. Desktop and phone regression tests verify automatic playback on a first visit, none on reloads or later visits, and that replay still works. Initial/wireframe/construction/completed screenshots are saved at 375px and 1440px under the ignored `.impeccable/review/` directory. Additional read-only review covered 430px, 768px, and 1024px, both themes, and touch emulation.
 
 All implementation changes are V2-owned. Production V1, project destinations, shared integrations, deployment configuration, and npm dependencies are unchanged.
 

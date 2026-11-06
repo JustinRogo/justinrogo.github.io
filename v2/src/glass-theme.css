@@ -303,17 +303,19 @@ main {
   margin: 0 -4.5% 15px;
   width: 109%;
 }
-.tech-heading > span:not(.sr-only) {
+.tech-heading > span:not(.sr-only, .tech-name) {
   display: block;
   padding-left: 5%;
 }
-.tech-heading > span:last-child {
+.tech-heading > span:last-child:not(.tech-name) {
   color: var(--orange);
 }
 .tech-name {
+  display: block;
   height: 100%;
 }
 .tech-line {
+  display: block;
   height: 100px;
   width: 100%;
 }

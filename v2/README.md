@@ -30,7 +30,7 @@ Settings offers Shape Waves, Antigravity, Fractal, Aurora, Orbits, and None. Dev
 
 Projects uses wide, tall, and compact Magic Bento cards. Container queries respond to the actual available width, including sidebar resizing: three columns above 1000px, two above 560px, and one below. Tablet cards use a separate full-width/pair arrangement, and phone cards grow naturally with their content. Search, filters, and saved projects retain their original behavior.
 
-All 15 project cards and the three featured Home project cards share the same committed JPEG screenshots of their destinations, loaded lazily without live embeds or a screenshot service. The Front Desk Planner preview shows its public sign-in page. To refresh previews, start the local V2 server and run `node v2/capture-project-previews.mjs`; this permits only GET/HEAD requests. `v2/assets/project-previews/sources.json` records the captured destinations and dates. Build/deployment copies these assets normally; it does not recapture pages.
+All 15 project cards and the four featured Home project cards share the same committed screenshots of their destinations, loaded lazily without live embeds or a screenshot service. Each 1200px JPEG has 480px and 800px WebP copies, and browsers pick the smallest that fits. The Front Desk Planner preview shows its public sign-in page. To refresh previews, start the local V2 server and run `node v2/capture-project-previews.mjs`, which also regenerates the WebP copies; this permits only GET/HEAD requests. After replacing `assets/justin.png`, run `node v2/resize-images.mjs`. `v2/assets/project-previews/sources.json` records the captured destinations and dates. Build/deployment copies these assets normally; it does not recapture pages.
 
 ## Navigation
 
@@ -66,7 +66,7 @@ Open **http://127.0.0.1:4391/**. The preview also serves the original homepage a
 
 ## Homepage assembly
 
-Home can be assembled by five colored cursors (four on phones), using the actual components and the existing GSAP dependency. Layout first draws a persistent wireframe; the other agents then add glass, content, and details over roughly six seconds (five on phones). It plays once per page load, including reloads, supports replay from the header, and has a persistent Homepage assembly setting. Returning to Home through navigation does not replay it. Reduced motion and Calm mode bypass it. Try `http://127.0.0.1:4392/v2/?replayIntro=1#/home`, or disable it with `?intro=0`. Configuration, component API, cancellation behavior, screenshots, and performance limits are documented in [ASSEMBLY.md](ASSEMBLY.md).
+Home can be assembled by five colored cursors (four on phones), using the actual components and the existing GSAP dependency. Layout first draws a persistent wireframe; the other agents then add glass, content, and details over roughly six seconds (five on phones). It autoplays on a browser’s first visit only, supports replay from the header, and has a persistent Homepage assembly setting. Reloads, later visits, and returning to Home through navigation do not replay it. Reduced motion and Calm mode bypass it. Try `http://127.0.0.1:4392/v2/?replayIntro=1#/home`, or disable it with `?intro=0`. Configuration, component API, cancellation behavior, screenshots, and performance limits are documented in [ASSEMBLY.md](ASSEMBLY.md).
 
 ## React Bits and attribution
 
@@ -85,7 +85,7 @@ The original implementations are pinned to revision `e12c22192ac7b4b452c5e2feb9b
 - Shape Waves and Antigravity reuse the existing V1 React Bits renderers, presets, static fallbacks, pixel budgets, and cleanup. Shape Waves uses the existing VGPU dependency/WebGPU; Antigravity uses WebGL. Aurora and Fractal reuse the existing site components. A V2 build adapter exposes these without V1’s settings/body observer or host CSS. V2 owns selection and styles; V1 sources stay unchanged. `vgpu-LICENSE.txt` accompanies the existing notices.
 - [Dock](https://reactbits.dev/components/dock) informed the compact persistent navigation, but the navigation is custom React and CSS, with fixed touch targets. It is not represented as the upstream Dock implementation.
 
-React Bits is copyright David Haz, under MIT + Commons Clause. The build includes the full existing license, upstream notices, React/React DOM/scheduler licenses, GSAP and Motion-family notices, and the Geist OFL. The Settings panel links to the React Bits license. Shared source files are never modified. The portrait is Justin’s existing public UConn photo; `assets/justin.png.json` records its origin.
+React Bits is copyright David Haz, under MIT + Commons Clause. The build includes the full existing license, upstream notices, React/React DOM/scheduler licenses, GSAP and Motion-family notices, and the Geist OFL. The Settings panel links to the React Bits license. Shared source files are never modified. The portrait is Justin’s existing public UConn photo; `assets/justin.png.json` records its origin. Bad URLs get the standalone `/404.html`, which uses root-relative links because hosts serve it at any depth.
 
 ## Existing functionality inventory
 

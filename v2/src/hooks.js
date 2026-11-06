@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 export function useStored(key, initial, validate = () => true) {
   const [value, setValue] = useState(() => {
     try {
@@ -66,6 +66,25 @@ export function useResource(url, transform) {
       setAttempt((n) => n + 1);
     },
   };
+}
+// Sticky content taller than the screen would keep its lower part out of reach.
+export function useFitsViewport(margin = 0) {
+  const ref = useRef(null);
+  const [fits, setFits] = useState(false);
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+    const update = () => setFits(node.offsetHeight + margin * 2 <= innerHeight);
+    const observer = new ResizeObserver(update);
+    observer.observe(node);
+    window.addEventListener("resize", update);
+    update();
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", update);
+    };
+  }, [margin]);
+  return [ref, fits];
 }
 export function useClock() {
   const [date, setDate] = useState(() => new Date());

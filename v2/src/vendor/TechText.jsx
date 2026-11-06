@@ -1137,7 +1137,7 @@ const TechText = ({
   }, []);
 
   return (
-    <div
+    <span
       ref={containerRef}
       className={`tech-text ${className}`.trim()}
       style={style}
@@ -1145,7 +1145,7 @@ const TechText = ({
       aria-label={text}
     >
       <canvas ref={canvasRef} className="tech-text-canvas" />
-    </div>
+    </span>
   );
 };
 

@@ -238,6 +238,15 @@
     margin-left: var(--sidebar-width);
   }
 }
+/* Home’s hero shows the name, so the rail keeps the space without repeating it. Short screens need the room for navigation. */
+.sidebar-identity[data-concealed] {
+  visibility: hidden;
+}
+@media (min-width: 801px) and (max-height: 859px) {
+  .sidebar-identity {
+    display: none;
+  }
+}
 .sidebar > .sidebar-resize[role="separator"] {
   position: absolute;
   top: 12px;
@@ -408,5 +417,67 @@ html:has(.sidebar-resize[data-dragging]) {
       grid-column: 1;
       grid-row: auto;
     }
+  }
+}
+
+/* Touch screens have no tooltips, so the contact icons need visible names. */
+.orbit-label {
+  display: none;
+}
+@media (max-width: 600px), (hover: none) {
+  .portrait-contact-actions .orbit-action {
+    height: auto;
+    min-height: 56px;
+    padding: 6px 2px;
+    align-content: center;
+    gap: 4px;
+  }
+  .orbit-label {
+    display: block;
+    color: var(--ink);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    line-height: 1;
+  }
+}
+
+/* Static page text in index.html, replaced when React mounts. Readers without
+   JavaScript and slow connections see it; the delay keeps fast loads from flashing it. */
+.static-hero {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: clamp(48px, 14vh, 140px) 24px 32px;
+  color: var(--ink);
+  animation: static-hero-wait 0.4s step-end;
+}
+.static-hero h1 {
+  margin: 0 0 20px;
+  font-size: clamp(3rem, 11vw, 5rem);
+  font-weight: 550;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+.static-hero p {
+  margin: 0 0 20px;
+  line-height: 1.6;
+}
+.static-hero-role span {
+  display: block;
+}
+.static-hero ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.static-hero a {
+  color: inherit;
+}
+/* Visible by default, so cancelling this animation can never hide the text. */
+@keyframes static-hero-wait {
+  from {
+    opacity: 0;
   }
 }

@@ -1,6 +1,6 @@
 @font-face {
   font-family: Geist;
-  src: url("../../Pages/For%20Fun/Wave-Function-Collapse/fonts/Geist.woff2")
+  src: url("../assets/fonts/Geist.woff2")
     format("woff2");
   font-style: normal;
   font-weight: 100 900;
@@ -453,6 +453,9 @@ svg {
 }
 @container topbar (max-width: 600px) {
   .topbar-donate { min-width: 44px; }
+  .topbar-donate-more { display: none; }
+}
+@container topbar (max-width: 304px) {
   .topbar-donate > span { display: none; }
 }
 @media (max-width: 380px) {

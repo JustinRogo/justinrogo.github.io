@@ -1,9 +1,11 @@
 import { useMemo } from "react";
 import BranchedMenu from "../vendor/BranchedMenu.jsx";
 import Icon from "./Icon.jsx";
+import { newTabLink } from "./UI.jsx";
 import { resources, projectHref } from "../content.js";
 
 const EMPTY_PAGES = [];
+const SHORT_SCREEN = 900;
 const UCPEA_ROOT = "Pages/Work/UCPEA/";
 const contractLabels = [
   ["UCPEAContract.html", "Current Contract"],
@@ -16,8 +18,7 @@ function ucpeaLinks(pages) {
     value: `page:${page.path}`,
     label,
     href: projectHref(page),
-    target: "_blank",
-    rel: "noopener noreferrer",
+    ...newTabLink,
   });
   const dashboard = scoped.find(
     (page) => page.path === `${UCPEA_ROOT}index.html`,
@@ -51,6 +52,7 @@ export default function ExploreMenu({
   effects = true,
   onSelect,
   pages = EMPTY_PAGES,
+  collapseOnShortScreens = false,
 }) {
   const items = useMemo(
     () => [
@@ -79,7 +81,7 @@ export default function ExploreMenu({
             value: "saved",
             label: "Saved projects",
             href: "#/projects?saved=1",
-            icon: <Icon name="heart" size={16} />,
+            icon: <Icon name="bookmark" size={16} />,
           },
         ],
       },
@@ -97,8 +99,7 @@ export default function ExploreMenu({
             value: `page:${page.path}`,
             label: page.title,
             href: projectHref(page),
-            target: "_blank",
-            rel: "noopener noreferrer",
+            ...newTabLink,
             icon: <Icon name="code" size={16} />,
           })),
       },
@@ -117,8 +118,7 @@ export default function ExploreMenu({
             value: `page:${page.path}`,
             label: page.title,
             href: projectHref(page),
-            target: "_blank",
-            rel: "noopener noreferrer",
+            ...newTabLink,
             icon: <Icon name="projects" size={16} />,
           })),
       },
@@ -151,8 +151,7 @@ export default function ExploreMenu({
           value: `resource-${index}`,
           label,
           href,
-          target: "_blank",
-          rel: "noopener noreferrer",
+          ...newTabLink,
           icon: <Icon name="external" size={16} />,
         })),
       },
@@ -167,10 +166,15 @@ export default function ExploreMenu({
         : { Work: "work", Library: "library", "For Fun": "fun" }[
             route?.params.get("group")
           ] || "";
+  // BranchedMenu reads this once, so later resizes never fold a group someone opened.
+  const startClosed =
+    collapseOnShortScreens &&
+    innerHeight < SHORT_SCREEN &&
+    !["work", "library", "fun", "saved"].includes(selected);
   return (
     <BranchedMenu
       items={items}
-      defaultOpen={[0]}
+      defaultOpen={startClosed ? [] : [0]}
       activeValue={selected}
       onSelect={onSelect}
       color="var(--ink)"

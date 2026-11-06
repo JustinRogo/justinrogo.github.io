@@ -1,4 +1,4 @@
-import { Dialog } from "./UI.jsx";
+import { Dialog, newTabNote } from "./UI.jsx";
 import { backgroundOptions } from "./PageBackground.jsx";
 export default function Settings({
   preferences,
@@ -92,6 +92,7 @@ export default function Settings({
       <a
         href="/v2/assets/react-bits-LICENSE.txt"
         target="_blank"
+        aria-describedby={newTabNote}
         rel="noopener noreferrer"
         className="text-link"
       >

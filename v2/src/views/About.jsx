@@ -17,7 +17,7 @@ export default function About({ effects, fine }) {
       </div>
       <div className="about-intro">
         <img
-          src="/v2/assets/justin.png"
+          src="/v2/assets/justin.webp"
           width="240"
           height="240"
           alt="Justin Rogowski"

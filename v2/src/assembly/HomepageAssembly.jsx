@@ -16,6 +16,21 @@ import Icon from "../components/Icon.jsx";
 import "./assembly.css";
 
 const AssemblyContext = createContext(null);
+const seenKey = "jr-v2-assembly-seen";
+
+// Storage can be blocked. Those visitors fall back to once per document load.
+function introSeen() {
+  try {
+    return localStorage.getItem(seenKey) === "1";
+  } catch {
+    return false;
+  }
+}
+function rememberIntro() {
+  try {
+    localStorage.setItem(seenKey, "1");
+  } catch {}
+}
 
 function viewportDimensions() {
   const viewport = window.visualViewport;
@@ -109,9 +124,12 @@ export default function HomepageAssembly({
       return;
     }
     const force = replayCount > handledReplay.current || queryReplay.current;
-    // Remember playback only for this document. A reload should play the intro
-    // again, while navigating back to Home should keep the page ready to use.
-    if (attempted.current && !force && config.oncePerLoad) {
+    // Autoplay is for a browser's first visit. Returning visitors get the ready
+    // page immediately; the Replay control and ?replayIntro=1 still play it.
+    const alreadyPlayed =
+      (config.oncePerLoad && attempted.current) ||
+      (config.oncePerBrowser && introSeen());
+    if (alreadyPlayed && !force) {
       setPhase("complete");
       return;
     }
@@ -126,6 +144,7 @@ export default function HomepageAssembly({
     let timeline;
     const rememberAttempt = () => {
       attempted.current = true;
+      rememberIntro();
       handledReplay.current = replayCount;
       queryReplay.current = false;
     };
@@ -292,7 +311,7 @@ export default function HomepageAssembly({
             }}
             style={{ color: config.colors[0] }}
           >
-            <rect pathLength="1" />
+            <rect x="0" y="0" width="0" height="0" rx="0" pathLength="1" />
             <path />
           </svg>
         ))}
@@ -305,7 +324,7 @@ export default function HomepageAssembly({
             }}
             style={{ color: config.colors[i % config.colors.length] }}
           >
-            <rect pathLength="1" />
+            <rect x="0" y="0" width="0" height="0" rx="0" pathLength="1" />
             <path />
           </svg>
         ))}

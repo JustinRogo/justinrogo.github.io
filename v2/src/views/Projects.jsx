@@ -69,7 +69,7 @@ export default function Projects({
             setProjectParams(params, { saved: onlySaved ? "" : "1" })
           }
         >
-          <Icon name="heart" size={17} />
+          <Icon name="bookmark" size={17} />
           Saved <span>{saved.length}</span>
         </button>
       </div>
@@ -109,6 +109,7 @@ export default function Projects({
                   <ProjectCard
                     project={project}
                     tall={tileSize(project) === "tall"}
+                    wide={tileSize(project) === "wide"}
                     saved={saved.includes(project.path)}
                     onSave={onSave}
                   />
@@ -141,7 +142,7 @@ export default function Projects({
               </h2>
               <p>
                 {onlySaved
-                  ? "Save a project with the heart button to come back to it."
+                  ? "Save a project with the bookmark button to come back to it."
                   : "Try a different word or browse the full index."}
               </p>
               <button

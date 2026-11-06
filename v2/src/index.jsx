@@ -16,6 +16,7 @@ import More, { parseManifest } from "./views/More.jsx";
 import Settings from "./components/Settings.jsx";
 import Icon from "./components/Icon.jsx";
 import { GlassLayer } from "./components/Glass.jsx";
+import { newTabNote } from "./components/UI.jsx";
 import PageBackground, {
   backgroundOptions,
 } from "./components/PageBackground.jsx";
@@ -36,6 +37,10 @@ const destinations = [
   ["about", "About"],
   ["more", "More"],
 ];
+const viewTitle = (view) =>
+  view === "home"
+    ? "Justin Rogowski · UConn Law Library"
+    : `${destinations.find(([id]) => id === view)?.[1] || "Page not found"} · Justin Rogowski`;
 function App() {
   const sidebar = useSidebarWidth();
   const route = useRoute();
@@ -98,7 +103,7 @@ function App() {
   const scrolls = useRef({});
   const aboutSection = active === "about" ? route.params.get("section") : null;
   useEffect(() => {
-    document.title = `${destinations.find(([id]) => id === active)?.[1] || "Page not found"} · Justin Rogowski`;
+    document.title = viewTitle(active);
   }, [active]);
   useEffect(() => {
     const el = document.documentElement;
@@ -123,7 +128,7 @@ function App() {
       .querySelector("[data-view]:not([hidden]) h1")
       ?.focus({ preventScroll: true });
     window.scrollTo({ top: scrolls.current[active] || 0, behavior: "instant" });
-    document.title = `${destinations.find(([id]) => id === active)?.[1] || "Page not found"} · Justin Rogowski`;
+    document.title = viewTitle(active);
   }, [active]);
   useLayoutEffect(() => {
     const id = { strengths: "cliftonstrengths", contact: "say-hello" }[
@@ -206,6 +211,9 @@ function App() {
         fine={fine}
         suppressed={highContrast || forcedColors}
       />
+      <span id={newTabNote} hidden>
+        Opens in a new tab
+      </span>
       <a
         href="#main"
         className="skip-link"
@@ -237,7 +245,8 @@ function App() {
           >
             <Icon name={sidebar.collapsed ? "expand" : "collapse"} />
           </button>
-          <div className="sidebar-identity">
+          {/* Home's hero already shows this. Hiding it keeps the navigation from jumping between views. */}
+          <div className="sidebar-identity" data-concealed={active === "home" || undefined}>
             Justin Rogowski
             <span>{profile.role}</span>
           </div>
@@ -263,6 +272,7 @@ function App() {
             <AssembleReveal id="branches">
               <div className="sidebar-branches">
                 <ExploreMenu
+                  collapseOnShortScreens
                   route={route}
                   effects={effects}
                   pages={projects.data?.pages}
@@ -319,9 +329,12 @@ function App() {
             </a>
             <a className="topbar-donate" href={donationUrl} target="_blank"
               rel="noopener noreferrer" aria-label="Donate to the Law Library"
+              aria-describedby={newTabNote}
               title="Donate to the Law Library">
               <Icon name="heart" size={16} />
-              <span>Donate to the Law Library</span>
+              <span>
+                Donate<span className="topbar-donate-more"> to the Law Library</span>
+              </span>
             </a>
             <div className="local-time">
               <span className="live-dot" />
