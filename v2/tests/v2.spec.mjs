@@ -310,6 +310,7 @@ test("small text contrast and system contrast preferences meet the accessibility
     await contrast(".tool-nav a:not([aria-current])", ".tool-nav"),
   ).toBeGreaterThanOrEqual(4.5);
   await nav(page).getByRole("link", { name: "About", exact: true }).click();
+  await page.getByRole("button", { name: "Top 5", exact: true }).click();
   expect(
     await contrast(
       ".strength-executing .strength-rank",
@@ -334,6 +335,8 @@ test("all 34 existing strengths are available and flip cards work by keyboard", 
   page,
 }) => {
   await page.goto("/v2/#/about");
+  await expect(page.locator(".strength")).toHaveCount(34);
+  await page.getByRole("button", { name: "Top 5", exact: true }).click();
   await expect(page.locator(".strength")).toHaveCount(5);
   await page.getByRole("button", { name: "All 34", exact: true }).click();
   await expect(page.locator(".strength")).toHaveCount(34);
