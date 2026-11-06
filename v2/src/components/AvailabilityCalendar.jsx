@@ -1,9 +1,10 @@
 import { Fragment, useState } from "react";
 import { calendarTimeZone, civilDate, easternDay, shiftDay } from "../calendarDates.js";
 import { integrations } from "../content.js";
-import { useResource } from "../hooks.js";
+import { useClock, useResource } from "../hooks.js";
+import { GlassLayer } from "./Glass.jsx";
 import Icon from "./Icon.jsx";
-import { ExternalLink, LoadState } from "./UI.jsx";
+import { ExternalLink, LoadState, SectionTitle } from "./UI.jsx";
 import "./AvailabilityCalendar.css";
 
 const monthFormat = new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric", timeZone: "UTC" });
@@ -27,6 +28,10 @@ function parseSnapshot(text) {
   return snapshot;
 }
 
+function useAvailability() {
+  return useResource("/data/outlook-availability.json", parseSnapshot);
+}
+
 function entryTime({ start, end }, day) {
   if (!start) return "All day";
   const begins = new Date(start);
@@ -34,6 +39,50 @@ function entryTime({ start, end }, day) {
   const from = easternDay(begins) === day ? timeFormat.format(begins) : "12:00 AM";
   const to = easternDay(ends) === day ? timeFormat.format(ends) : "midnight";
   return start === end ? from : `${from} – ${to}`;
+}
+
+function AvailabilityEntry({ entry, day, compact = false }) {
+  const Element = compact ? "span" : "li";
+  const label = entry.label === "Away" ? "Out of Office" : entry.label;
+  return (
+    <Element className={compact ? "calendar-cell-entry" : undefined} data-status={label}>
+      <strong>{label}</strong>
+      <span>{entryTime(entry, day)}</span>
+    </Element>
+  );
+}
+
+function AvailabilityEntries({ entries, day }) {
+  if (!entries?.length) return <p className="muted">No availability entries for this date.</p>;
+  return (
+    <ul className="calendar-entries">
+      {entries.map((entry, index) => <AvailabilityEntry entry={entry} day={day} key={index} />)}
+    </ul>
+  );
+}
+
+export function MyDay() {
+  const snapshot = useAvailability();
+  const today = easternDay(useClock());
+  return (
+    <section className="my-day glass-host" aria-labelledby="my-day-title">
+      <GlassLayer />
+      <SectionTitle
+        headingProps={{ id: "my-day-title" }}
+        action={<a className="text-link" href="#/tools?panel=calendar">Full calendar <Icon name="next" size={16} /></a>}
+      >
+        My Day
+      </SectionTitle>
+      <div className="my-day-schedule">
+        <p className="my-day-date muted"><time dateTime={today}>{dayFormat.format(civilDate(today))}</time> · ET</p>
+        <LoadState resource={snapshot} message="Calendar availability is temporarily unavailable.">
+          {({ firstDay, lastDay, days }) => today < firstDay || today > lastDay
+            ? <p className="muted">The saved calendar does not cover today.</p>
+            : <AvailabilityEntries day={today} entries={days[today]} />}
+        </LoadState>
+      </div>
+    </section>
+  );
 }
 
 function CalendarMonth({ snapshot }) {
@@ -112,10 +161,7 @@ function CalendarMonth({ snapshot }) {
                             {count > 0 && (
                               <span className="calendar-cell-entries">
                                 {entries.slice(0, visibleEntryLimit).map((entry, index) => (
-                                  <span className="calendar-cell-entry" key={index}>
-                                    <strong>{entry.label}</strong>
-                                    <span>{entryTime(entry, day)}</span>
-                                  </span>
+                                  <AvailabilityEntry entry={entry} day={day} compact key={index} />
                                 ))}
                                 {count > visibleEntryLimit && <span className="calendar-more">+{count - visibleEntryLimit} more</span>}
                               </span>
@@ -130,11 +176,7 @@ function CalendarMonth({ snapshot }) {
                   <tr>
                     <td className="calendar-agenda" colSpan={7}>
                       <h3>{dayFormat.format(civilDate(selected))}</h3>
-                      {days[selected]?.length ? (
-                        <ul>{days[selected].map((entry, index) => (
-                          <li key={index}><strong>{entry.label}</strong><span>{entryTime(entry, selected)}</span></li>
-                        ))}</ul>
-                      ) : <p>No availability entries for this date.</p>}
+                      <AvailabilityEntries day={selected} entries={days[selected]} />
                     </td>
                   </tr>
                 )}
@@ -149,7 +191,7 @@ function CalendarMonth({ snapshot }) {
 }
 
 export default function AvailabilityCalendar() {
-  const snapshot = useResource("/data/outlook-availability.json", parseSnapshot);
+  const snapshot = useAvailability();
   return (
     <section className="embed-panel">
       <header className="calendar-panel-header">

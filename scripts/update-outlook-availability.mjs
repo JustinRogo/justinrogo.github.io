@@ -10,7 +10,8 @@ const source = integrations.calendar.replace("/calendar/published/", "/owa/calen
 const output = fileURLToPath(new URL("../data/outlook-availability.json", import.meta.url));
 const labels = new Map([
   ["FREE", "Free"], ["BUSY", "Busy"], ["TENTATIVE", "Tentative"],
-  ["AWAY", "Away"], ["OOF", "Away"], ["WORKING ELSEWHERE", "Working elsewhere"],
+  ["AWAY", "Out of Office"], ["OOF", "Out of Office"], ["OUT OF OFFICE", "Out of Office"],
+  ["WORKING ELSEWHERE", "Working elsewhere"],
 ]);
 
 // node-ical expands DATE-only values as local civil dates, independent of UTC offsets.

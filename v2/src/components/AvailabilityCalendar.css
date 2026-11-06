@@ -21,7 +21,7 @@
 }
 .calendar-toolbar,
 .calendar-controls,
-.calendar-agenda li {
+.calendar-entries > li {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -103,20 +103,37 @@
   background: var(--surface);
   text-align: left;
 }
-.calendar-agenda ul {
+.calendar-entries {
   margin: 8px 0 0;
   padding: 0;
   list-style: none;
 }
-.calendar-agenda li {
+.calendar-entries > li {
   justify-content: space-between;
   flex-wrap: wrap;
-  padding-block: 8px;
+  padding: 8px;
   border-bottom: 1px solid var(--line);
 }
-.calendar-agenda p,
-.calendar-agenda li span {
+.calendar-entries > li span {
   color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.my-day {
+  margin-top: 32px;
+  padding: 16px;
+}
+.my-day .section-title {
+  margin: 0;
+}
+.my-day-schedule {
+  margin-top: 12px;
+}
+.my-day-date {
+  font-size: 0.875rem;
+  margin: 0 0 12px;
+}
+.my-day .calendar-entries > li:first-child {
+  border-top: 1px solid var(--line);
 }
 .availability-calendar > .small {
   margin-top: 12px;
@@ -143,7 +160,7 @@
     padding: 3px 5px;
     border-inline-start: 1px solid var(--blue);
     border-radius: 3px;
-    background: var(--surface);
+    background-color: var(--surface);
     color: var(--ink);
     font-size: 0.75rem;
     font-weight: 400;
@@ -160,6 +177,16 @@
     font-size: 0.75rem;
     font-weight: 550;
   }
+}
+.calendar-cell-entry[data-status="Out of Office"],
+.calendar-entries > [data-status="Out of Office"] {
+  --calendar-check: color-mix(in srgb, var(--blue) 11%, var(--surface));
+  background-color: var(--surface);
+  background-image: conic-gradient(
+    var(--calendar-check) 0 25%, transparent 25% 50%,
+    var(--calendar-check) 50% 75%, transparent 75%
+  );
+  background-size: 8px 8px;
 }
 @container availability (max-width: 320px) {
   .calendar-day-number {

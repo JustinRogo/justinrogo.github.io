@@ -33,7 +33,7 @@ test("Outlook import retains availability only and handles recurrence, DST and a
   ]);
   expect(snapshot.days["2026-11-12"]).toBeUndefined();
   for (const day of ["2026-11-06", "2026-11-07"]) {
-    expect(snapshot.days[day]).toEqual([{ label: "Away", start: null, end: null }]);
+    expect(snapshot.days[day]).toEqual([{ label: "Out of Office", start: null, end: null }]);
   }
   expect(snapshot.days["2026-11-08"]).toBeUndefined();
   expect(JSON.stringify(snapshot)).not.toContain("Private");
@@ -73,6 +73,7 @@ test("Tools displays the native calendar, keeps the donation link and moves old 
   await expect(agenda).toContainText("9:00 AM – 10:30 AM");
   await page.getByRole("button", { name: /Friday, November 6, 2026/ }).click();
   await expect(agenda).toContainText("All day");
+  await expect(agenda.getByText("Out of Office")).toBeVisible();
   await page.getByRole("button", { name: "Next month" }).click();
   await expect(page.getByRole("table", { name: "December 2026 availability" })).toBeVisible();
   await expect(page.locator(".calendar-agenda")).toHaveCount(0);
@@ -95,4 +96,37 @@ test("Tools displays the native calendar, keeps the donation link and moves old 
   const themeButton = await topbar.getByRole("button", { name: /switch to/i }).boundingBox();
   expect(donateButton.x + donateButton.width).toBeLessThanOrEqual(weather.x);
   expect(themeButton.x + themeButton.width).toBeLessThanOrEqual(rim.x + rim.width);
+});
+
+test("My Day shares the Eastern Time calendar and styles older Away entries", async ({ page }) => {
+  await page.route("https://**/*", (route) => route.abort());
+  await page.route("**/data/outlook-availability.json", (route) => route.fulfill({
+    json: {
+      ...snapshot,
+      days: {
+        ...snapshot.days,
+        "2026-11-06": [
+          { label: "Away", start: null, end: null },
+          { label: "Busy", start: "2026-11-06T19:00:00Z", end: "2026-11-06T19:30:00Z" },
+        ],
+      },
+    },
+  }));
+  await page.clock.setFixedTime(new Date("2026-11-07T02:00:00Z"));
+  await page.setViewportSize({ width: 320, height: 900 });
+  await page.goto("/?intro=0#/home");
+  const myDay = page.getByRole("region", { name: "My Day" });
+  await expect(myDay).toContainText("Friday, November 6, 2026");
+  const away = myDay.getByRole("listitem").filter({ hasText: "Out of Office" });
+  await expect(away).toContainText("All day");
+  await expect(away).toHaveCSS("background-image", /conic-gradient/);
+  await expect(myDay.getByText("2:00 PM – 2:30 PM")).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(320);
+
+  await page.setViewportSize({ width: 1247, height: 1244 });
+  await myDay.getByRole("link", { name: "Full calendar" }).click();
+  const day = page.getByRole("button", { name: /Friday, November 6, 2026/ });
+  const entry = day.locator(".calendar-cell-entry").filter({ hasText: "Out of Office" });
+  await expect(entry).toHaveCSS("background-image", /conic-gradient/);
+  await expect(day.getByText("2:00 PM – 2:30 PM")).toBeVisible();
 });

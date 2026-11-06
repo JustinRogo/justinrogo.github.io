@@ -12,6 +12,7 @@ import { GlassLayer } from "../components/Glass.jsx";
 import { ExternalLink, LoadState, SectionTitle } from "../components/UI.jsx";
 import { AssembleReveal } from "../assembly/HomepageAssembly.jsx";
 import { StrengthsPreview } from "../components/Strengths.jsx";
+import { MyDay } from "../components/AvailabilityCalendar.jsx";
 import LawEvents from "../components/LawEvents.jsx";
 import PocketPart from "../components/PocketPart.jsx";
 import { ProjectPreview } from "../components/Project.jsx";
@@ -262,7 +263,10 @@ export default function Home({ projects, effects, theme, fine }) {
       </LoadState>
       <div className="home-lower home-feeds">
         <AssembleReveal id="notes">
-          <div className="home-events-column"><LawEvents effects={effects} theme={theme} /></div>
+          <div className="home-events-column">
+            <LawEvents effects={effects} theme={theme} />
+            <MyDay />
+          </div>
         </AssembleReveal>
         <AssembleReveal id="pocket-part">
           <div className="home-blog-column"><PocketPart effects={effects} /></div>
