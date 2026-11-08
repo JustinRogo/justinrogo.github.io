@@ -7,6 +7,7 @@ import {
 import { useMedia } from "../hooks.js";
 import { useAssemblyBusy } from "../assembly/HomepageAssembly.jsx";
 import { Atmosphere } from "./Glass.jsx";
+import BotanicalBackground from "../botanical/BotanicalBackground.jsx";
 import "./PageBackground.css";
 
 export const backgroundOptions = [
@@ -48,6 +49,7 @@ export const backgroundOptions = [
 ];
 
 export default function PageBackground({
+  siteStyle,
   preferences,
   moving,
   theme,
@@ -68,6 +70,22 @@ export default function PageBackground({
   // Reduced transparency controls glass surfaces, not the chosen page artwork.
   const animated = moving && !busy && !suppressed;
   const light = theme === "light";
+  if (siteStyle === "botanical") {
+    // Botanical keeps its own choice, so the Original selection is untouched.
+    const variant = preferences.botanicalBackground || "conservatory";
+    return (
+      <div
+        className="page-background page-background-botanical"
+        data-background={`botanical-${variant}`}
+        data-theme={theme}
+        data-motion={animated ? "moving" : "still"}
+        aria-hidden="true"
+        inert
+      >
+        {!suppressed && <BotanicalBackground variant={variant} />}
+      </div>
+    );
+  }
   return (
     <div
       className="page-background"

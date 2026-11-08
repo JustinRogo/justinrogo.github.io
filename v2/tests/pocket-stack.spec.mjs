@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./original-style.mjs";
 import { mkdir } from "node:fs/promises";
 
 const snapshot = { items: [

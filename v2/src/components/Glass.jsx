@@ -1,5 +1,6 @@
 import GlassSurface from "../../../src/homepage/vendor/GlassSurface.jsx";
 import { useMedia } from "../hooks.js";
+import { useBotanical } from "../botanical/siteStyle.js";
 
 // Refraction belongs behind the controls, never around their rendered content.
 export function GlassLayer({ className = "" }) {
@@ -8,6 +9,7 @@ export function GlassLayer({ className = "" }) {
   const transparency = useMedia("(prefers-reduced-transparency: reduce)");
   const contrast = useMedia("(prefers-contrast: more)");
   const forced = useMedia("(forced-colors: active)");
+  const botanical = useBotanical();
   const opaque = transparency || contrast || forced;
   return (
     <div
@@ -15,7 +17,8 @@ export function GlassLayer({ className = "" }) {
       aria-hidden="true"
       inert
     >
-      {!opaque && (
+      {/* Botanical surfaces are matte paper: no refraction layer at all. */}
+      {!opaque && !botanical && (
         <GlassSurface
           width="100%"
           height="100%"

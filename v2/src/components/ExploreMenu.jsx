@@ -3,6 +3,7 @@ import BranchedMenu from "../vendor/BranchedMenu.jsx";
 import Icon from "./Icon.jsx";
 import { newTabLink } from "./UI.jsx";
 import { resources, projectHref } from "../content.js";
+import { useBotanical } from "../botanical/siteStyle.js";
 
 const EMPTY_PAGES = [];
 const SHORT_SCREEN = 900;
@@ -54,6 +55,7 @@ export default function ExploreMenu({
   pages = EMPTY_PAGES,
   collapseOnShortScreens = false,
 }) {
+  const botanical = useBotanical();
   const items = useMemo(
     () => [
       {
@@ -188,6 +190,7 @@ export default function ExploreMenu({
       radius={8}
       drawDuration={effects ? 420 : 0}
       foldDuration={effects ? 300 : 0}
+      leaves={botanical}
     />
   );
 }

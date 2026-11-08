@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./original-style.mjs";
 import { mkdir } from "node:fs/promises";
 
 test.beforeEach(async ({ page }) => {
@@ -129,12 +129,15 @@ test("backgrounds respect Calm, reduced motion, contrast, storage failure, and V
     };
   });
   await page.reload();
+  // Without storage, nothing pins Original, so the default Botanical style
+  // applies; its background choices must still work.
+  await expect(page.locator("html")).toHaveAttribute("data-style", "botanical");
   await openSettings(page);
   await page
     .getByRole("dialog")
-    .getByRole("radio", { name: "Aurora", exact: true })
+    .getByRole("radio", { name: "Herbarium", exact: true })
     .check();
-  await expect(host).toHaveAttribute("data-background", "aurora");
+  await expect(host).toHaveAttribute("data-background", "botanical-herbarium");
 });
 
 test("social profile buttons and the sidebar contact shortcut preserve native destinations and anchored focus", async ({

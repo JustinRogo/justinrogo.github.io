@@ -107,6 +107,18 @@ React Bits is copyright David Haz, under MIT + Commons Clause. The build include
 | Share and companion | Remain available in V1 |
 | Individual projects and Updates backend | Preserved as existing destinations; not rebuilt or modified |
 
+## Botanical style
+
+**Botanical**, a conservatory/field-journal identity, is the default site style. Settings → **Site style** also offers **Original**, the blue/orange glass design, unchanged. Saved preferences without a `style` (including those from before Botanical existed) open in Botanical; only an explicit `style: "original"` keeps Original. Switching needs no reload; with motion allowed, the new style grows out of a leaf-shaped window opened at the chosen option (View Transitions API; browsers without it switch instantly). The pre-paint script in `index.html` applies the style before first render.
+
+- **Architecture.** `:root[data-style="botanical"]` scopes everything. `src/botanical/botanical.css` remaps the shared tokens (`--bg`, `--surface`, `--ink`, `--blue`, `--orange`, `--glass-*`…) for Sunlit (light) and Moonlit (dark), then restyles components: matte grained paper instead of glass, Fraunces serif headings over Geist body text, pill controls, leaf-cornered cards, and a deep-green rail that re-scopes its own tokens. Glass refraction is not mounted in Botanical.
+- **Illustrations.** `src/botanical/Flora.jsx` draws a monstera (slits cut through an SVG mask), sword fern, golden pothos, laurel wreath, sprigs, and a loading seedling procedurally, so they're small and crisp. They're placed deliberately: a plant corner in the hero, a wreath around the portrait, a flourish beside full-width section headings, a fern that unfurls after each page title, and a seedling in loading states.
+- **Pip.** `src/botanical/LivingPothos.jsx` is a pothos in the desktop rail (in the footer on compact screens). Its vine lengthens with scroll progress through a CSS custom property, without React re-renders. Clicking the pot waters it, adding up to five leaves that persist in `jr-v2-pip`.
+- **Backgrounds.** Botanical has its own choices: Conservatory (layered foliage swaying in a breeze, dappled sun by day, fireflies by night), Herbarium (pressed specimens on parchment), Canopy light, and None. They're stored separately as `botanicalBackground`, so the Original background choice is kept. Each foliage layer is its own small SVG, swayed as a composited layer with light scroll parallax.
+- **Motion and access.** One-time flourishes run only when `data-flourish="on"` (not Calm mode, reduced motion, or contrast modes), so they don't replay when the tab is hidden and shown. Ambient background motion follows the existing moving/still policy. High contrast and forced colors drop the decoration and use plain surfaces.
+- **Fonts.** Fraunces loads from Google Fonts (with preconnect hints) while Botanical is in use. Visitors who choose Original make no font requests to Google. Fallbacks are Iowan Old Style, Palatino, and Georgia.
+- **Tests.** `tests/botanical.spec.mjs` covers the default, switching, Pip, reduced motion, and overflow at three widths in both themes. The other specs import `tests/original-style.mjs`, which pins preferences without a style to Original, so they keep guarding the Original design.
+
 ## Architecture
 
 - `src/index.jsx`: application shell, routes, view ownership, focus/scroll, preferences.
@@ -116,6 +128,7 @@ React Bits is copyright David Haz, under MIT + Commons Clause. The build include
 - `src/strengths.js` / `src/components/Strengths.jsx`: source-derived themes/reflections, all-34 domain weighting, overview, reflection Flip Card, and compact domain-colored Flip Cards with expanding descriptions.
 - `src/views/`: five destinations; `src/components/`: shared controls, dialogs, icons, project rows and sketch.
 - `src/styles.css`: V2 layout and controls; `src/glass-theme.css`: the requested glass materials, blue/orange tokens, responsive hero and atmospheric motion.
+- `src/botanical/`: the Botanical site style: tokens and component styles, illustrations, Pip, backgrounds, and the style transition.
 - `src/components/PageBackground.jsx` / `.css`: selected background host, device defaults, motion policy, and scoped host/settings styles.
 - `build.mjs`: independent esbuild pipeline, read-only strength extraction, and exposure of existing background components without V1’s application controller.
 - `serve.mjs`: local static preview with watch support.

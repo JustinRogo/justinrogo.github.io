@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./original-style.mjs";
 import { readFile } from "node:fs/promises";
 
 const manifest = JSON.parse(

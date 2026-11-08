@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./original-style.mjs";
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem("jr-v2-assembly-seen", "1"));

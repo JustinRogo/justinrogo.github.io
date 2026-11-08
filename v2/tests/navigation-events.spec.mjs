@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./original-style.mjs";
 import { mkdir } from "node:fs/promises";
 
 const feed = `<?xml version="1.0"?><rss xmlns:livewhale="http://www.livewhale.com/" xmlns:georss="http://www.georss.org/georss"><channel>
@@ -8,7 +8,7 @@ ${["Connect in the Café", "Law and public service", "Library research workshop"
 </channel></rss>`;
 test.beforeEach(async ({ page, context }) => {
   await page.addInitScript(() => {
-    if (!localStorage.getItem("jr-v2-preferences")) localStorage.setItem("jr-v2-preferences", JSON.stringify({ theme: "dark", calm: false, atmosphere: false, intro: false }));
+    if (!window.__savedPreferences()) localStorage.setItem("jr-v2-preferences", JSON.stringify({ theme: "dark", calm: false, atmosphere: false, intro: false }));
   });
   await context.route("https://**/*", route => {
     const url = route.request().url();

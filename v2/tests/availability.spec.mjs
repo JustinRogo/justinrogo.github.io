@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./original-style.mjs";
 import { parseOutlookAvailability } from "../../scripts/update-outlook-availability.mjs";
 
 const snapshot = parseOutlookAvailability(`BEGIN:VCALENDAR
