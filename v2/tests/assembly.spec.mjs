@@ -341,6 +341,17 @@ for (const width of [1440, 375]) {
   });
 }
 
+test("a font that finishes loading after the intro starts does not end it", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto("/v2/");
+  await expect(layer(page)).toHaveAttribute("data-assembly-state", "assembling");
+  // A late face that changes no measured geometry used to cancel the whole intro.
+  await page.evaluate(() => document.fonts.dispatchEvent(new Event("loadingdone")));
+  await page.waitForTimeout(500);
+  await expect(layer(page)).toHaveAttribute("data-assembly-state", "assembling");
+  await expect(layer(page)).toHaveAttribute("data-assembly-state", "complete", { timeout: 8000 });
+});
+
 test("blocked storage falls back to one intro per page load", async ({ page }) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));

@@ -37,6 +37,32 @@ function viewportDimensions() {
   return [innerWidth, innerHeight, viewport?.width, viewport?.height, viewport?.scale];
 }
 
+// `document.fonts.ready` only covers faces already requested. Right after React
+// commits, the injected display-font stylesheet may still be loading and the new
+// DOM has not been laid out, so `ready` resolves before any face is queued and the
+// intro would start just before the fonts swap in. Wait for the stylesheet, lay
+// out the page, and ask for the faces the hero uses before trusting `ready`.
+async function fontsSettled(registry) {
+  if (!document.fonts) return;
+  const sheet = document.getElementById("botanical-fonts");
+  if (sheet && !sheet.sheet)
+    await new Promise((resolve) => {
+      sheet.addEventListener("load", resolve, { once: true });
+      sheet.addEventListener("error", resolve, { once: true });
+    });
+  await new Promise((resolve) => requestAnimationFrame(resolve));
+  const fonts = new Set(
+    ["hero-title", "hero-role", "hero-description", "navigation"]
+      .map((id) => registry.get(id))
+      .filter(Boolean)
+      .map((element) => getComputedStyle(element).font),
+  );
+  await Promise.all(
+    [...fonts].map((font) => document.fonts.load(font).catch(() => {})),
+  );
+  await document.fonts.ready;
+}
+
 export function useAssemblyBusy() {
   return useContext(AssemblyContext)?.busy || false;
 }
@@ -222,9 +248,6 @@ export default function HomepageAssembly({
       listen(document, "visibilitychange", () => {
         if (document.hidden) finish();
       });
-      listen(document.fonts, "loadingdone", () => {
-        if (started) finish();
-      });
       const start = () => {
         if (finished || started) return;
         if (document.hidden) {
@@ -245,7 +268,8 @@ export default function HomepageAssembly({
         setPhase("assembling");
         watchdog = setTimeout(() => finish(), timeline.duration + 1900);
         // Responsive/font geometry changes hand off immediately rather than chase moving targets.
-        const measured = ["hero-frame", "navigation"]
+        // A late font that reflows the page shows up here; one that changes nothing does not end the intro.
+        const measured = ["hero-frame", "hero-title", "navigation"]
           .map((id) => registry.current.get(id))
           .filter(Boolean);
         const sizes = new Map(
@@ -268,7 +292,7 @@ export default function HomepageAssembly({
       // Cold-load fonts can change geometry and cancel an already running intro.
       // Give them time to settle without delaying playback on a warm load.
       startTimer = setTimeout(start, 4000);
-      Promise.resolve(document.fonts?.ready).then(() => {
+      fontsSettled(registry.current).then(() => {
         if (!finished && !started) {
           clearTimeout(startTimer);
           startTimer = setTimeout(start, 160);
