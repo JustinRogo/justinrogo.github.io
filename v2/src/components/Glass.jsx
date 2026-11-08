@@ -1,11 +1,22 @@
-import GlassSurface from "../../../src/homepage/vendor/GlassSurface.jsx";
+import "../../../src/homepage/vendor/GlassSurface.css";
 import { useMedia } from "../hooks.js";
 import { useBotanical } from "../botanical/siteStyle.js";
 
-// Refraction belongs behind the controls, never around their rendered content.
+// The frosted glass behind V2's panels, kept behind the controls and never
+// around their content. This is Glass Surface's own frosted mode, rendered as
+// static markup with its stylesheet. Its SVG refraction mode re-filtered every
+// surface on every frame the backdrop moved (the animated background, any
+// scroll): about 10 fps with 13 panels on Home. Safari, Firefox and touch
+// devices already used this frosted mode.
+const frost = {
+  width: "100%",
+  height: "100%",
+  borderRadius: 6,
+  "--glass-frost": 0.2,
+  "--glass-saturation": 1,
+};
+
 export function GlassLayer({ className = "" }) {
-  const fine = useMedia("(hover: hover) and (pointer: fine)");
-  const reduced = useMedia("(prefers-reduced-motion: reduce)");
   const transparency = useMedia("(prefers-reduced-transparency: reduce)");
   const contrast = useMedia("(prefers-contrast: more)");
   const forced = useMedia("(forced-colors: active)");
@@ -17,21 +28,12 @@ export function GlassLayer({ className = "" }) {
       aria-hidden="true"
       inert
     >
-      {/* Botanical surfaces are matte paper: no refraction layer at all. */}
+      {/* Botanical surfaces are matte paper, so they skip the glass. */}
       {!opaque && !botanical && (
-        <GlassSurface
-          width="100%"
-          height="100%"
-          borderRadius={6}
-          borderWidth={0.05}
-          brightness={42}
-          opacity={0.51}
-          distortionScale={-110}
-          redOffset={5}
-          backgroundOpacity={0.2}
-          renderer="svg"
-          refraction={fine && !reduced}
-        />
+        <div className="glass-surface glass-surface--fallback" style={frost}>
+          {/* V2 draws its own rim (--glass-rim), so the surface's is omitted. */}
+          <span className="glass-surface__sheen" />
+        </div>
       )}
     </div>
   );
