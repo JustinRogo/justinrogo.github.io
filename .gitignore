@@ -29,3 +29,6 @@ __pycache__/
 /assets/gsap-react-LICENSE.txt
 /test-results/
 /playwright-report/
+
+# Plaintext for the password-protected section (only the encrypted Pages/Private/ is committed)
+/private/

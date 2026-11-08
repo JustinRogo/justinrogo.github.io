@@ -291,6 +291,15 @@ Typical edits:
 
 When a folder contains an `index.html` entry in the manifest, the homepage automatically renders that page as the parent of the folder's other listed pages.
 
+### Password-protected section
+
+`/Pages/Private/` holds pages encrypted with a single shared password (AES-GCM, key from PBKDF2-SHA256 at 600,000 iterations), decrypted in the visitor's browser.
+
+- Write content as HTML in the git-ignored `private/` folder. Fragments are wrapped in a site-styled page, while full `<html>` documents are used as-is. Relative `<img>` files are embedded and encrypted, and other assets are not.
+- Run `npm run private` to encrypt. The password comes from `PRIVATE_PASSWORD` in the environment or `.env.local`, or a prompt. Commit `Pages/Private/` and never `private/`.
+- Re-running with the same password keeps the salt, so visitors who chose "Remember me" stay unlocked. Run `npm run private -- --change-password` to switch passwords and sign everyone out.
+- These pages are deliberately left out of `data/pages.json` and the sitemap.
+
 ## Data and external services
 
 The site references several external services and APIs, including:

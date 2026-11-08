@@ -1,0 +1,8 @@
+{
+  "salt": "ZwrbvRPm3kGkAQt5vtYnvg==",
+  "iterations": 600000,
+  "check": {
+    "iv": "QFkr+DlmhXLP1ECw",
+    "ct": "9ZV7KO3u6Ya5Lgcf7sOveGg9ZEzbgYPuLDS4AjYaWbg="
+  }
+}
