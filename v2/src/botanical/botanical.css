@@ -1216,35 +1216,6 @@
   transition: none;
 }
 
-/* The style switch: the new world grows out of a leaf-shaped window. */
-html[data-style-transition]::view-transition-old(root) {
-  animation: 0.9s ease both botanical-recede;
-}
-html[data-style-transition]::view-transition-new(root) {
-  animation: 1.15s cubic-bezier(0.55, 0.06, 0.2, 1) both botanical-leaf-reveal;
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 99C14 84 2 46 22 20 30 10 40 4 50 0c10 4 20 10 28 20 20 26 8 64-28 79Z'/%3E%3C/svg%3E") no-repeat;
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 99C14 84 2 46 22 20 30 10 40 4 50 0c10 4 20 10 28 20 20 26 8 64-28 79Z'/%3E%3C/svg%3E") no-repeat;
-}
-@keyframes botanical-leaf-reveal {
-  from {
-    -webkit-mask-size: 0 0;
-    mask-size: 0 0;
-    -webkit-mask-position: var(--vt-x) var(--vt-y);
-    mask-position: var(--vt-x) var(--vt-y);
-  }
-  to {
-    -webkit-mask-size: 360vmax 360vmax;
-    mask-size: 360vmax 360vmax;
-    -webkit-mask-position: calc(var(--vt-x) - 180vmax) calc(var(--vt-y) - 200vmax);
-    mask-position: calc(var(--vt-x) - 180vmax) calc(var(--vt-y) - 200vmax);
-  }
-}
-@keyframes botanical-recede {
-  to {
-    transform: scale(0.985);
-    filter: brightness(0.9);
-  }
-}
 
 /* Motion: only when motion is welcome (not Calm, reduced motion, or contrast modes). */
 @media (prefers-reduced-motion: no-preference) {

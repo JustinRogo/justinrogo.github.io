@@ -34,6 +34,7 @@ import {
   themeColors,
 } from "./botanical/siteStyle.js";
 import { transitionStyle } from "./botanical/styleTransition.js";
+import { centerOf, reveal } from "./botanical/reveal.js";
 import LivingPothos from "./botanical/LivingPothos.jsx";
 import { LeafGlyph, WordmarkSprig } from "./botanical/Flora.jsx";
 import "./styles.css";
@@ -402,8 +403,18 @@ function App() {
               className="icon-button"
               aria-label={themeAction}
               title={themeAction}
-              onClick={() =>
-                setPreferences((current) => ({ ...current, theme: nextTheme }))
+              onClick={(event) =>
+                // The new theme radiates out from this button.
+                reveal(
+                  () =>
+                    setPreferences((current) => ({ ...current, theme: nextTheme })),
+                  {
+                    animate: effects,
+                    origin: centerOf(event.currentTarget),
+                    shape: botanical ? "leaf" : "circle",
+                    duration: botanical ? "0.9s" : "0.7s",
+                  },
+                )
               }
             >
               <Icon name={nextTheme === "light" ? "sun" : "moon"} size={19} />
