@@ -34,6 +34,7 @@ export const assemblyTasks = [
   { id: "hero-role", cursor: 2, at: 0.63, duration: 0.05, effect: "text" },
   { id: "help", cursor: 2, at: 0.61, duration: 0.02, effect: "place" },
   { id: "my-day", cursor: 3, at: 0.63, duration: 0.02, effect: "place" },
+  { id: "ai-corner", cursor: 1, at: 0.65, duration: 0.02, effect: "place" },
   {
     id: "featured-heading",
     cursor: 4,

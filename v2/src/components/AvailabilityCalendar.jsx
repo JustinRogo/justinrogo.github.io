@@ -52,8 +52,8 @@ function AvailabilityEntry({ entry, day, compact = false }) {
   );
 }
 
-function AvailabilityEntries({ entries, day }) {
-  if (!entries?.length) return <p className="muted">No availability entries for this date.</p>;
+function AvailabilityEntries({ entries, day, empty = "No availability entries for this date." }) {
+  if (!entries?.length) return <p className="muted">{empty}</p>;
   return (
     <ul className="calendar-entries">
       {entries.map((entry, index) => <AvailabilityEntry entry={entry} day={day} key={index} />)}
@@ -78,7 +78,7 @@ export function MyDay() {
         <LoadState resource={snapshot} message="Calendar availability is temporarily unavailable.">
           {({ firstDay, lastDay, days }) => today < firstDay || today > lastDay
             ? <p className="muted">The saved calendar does not cover today.</p>
-            : <AvailabilityEntries day={today} entries={days[today]} />}
+            : <AvailabilityEntries day={today} entries={days[today]} empty="Nothing is scheduled today." />}
         </LoadState>
       </div>
     </section>

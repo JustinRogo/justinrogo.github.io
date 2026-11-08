@@ -6,7 +6,7 @@ The user delegates design selection and requests an intentional app experience o
 
 ## Routes and tasks
 
-- `#/home`: identity, introduction, a “How can I help?” panel (booking, requests, library search) with My Day beside it, selected projects, interactive Tech Text name and Magic Bento featured work, contact actions.
+- `#/home`: identity, introduction, a “How can I help?” panel (booking, requests, library search) with My Day and AI Corner (the three newest posts from the Updates feed) beside it, selected projects, interactive Tech Text name and Magic Bento featured work, contact actions.
 - `#/projects`: searchable index, All/Work/Library/For Fun filters, direct project links, saved projects.
 - `#/tools?panel=catalog|calendar|booking|request`: library search, calendar availability, scheduling, and live requests. Old `resources` links open More.
 - `#/about`: professional practice, selected experience, leadership, education, tools, interests, all 34 CliftonStrengths themes, contact links.

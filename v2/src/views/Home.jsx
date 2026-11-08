@@ -13,6 +13,7 @@ import { ExternalLink, LoadState, SectionTitle, newTabLink } from "../components
 import { AssembleReveal } from "../assembly/HomepageAssembly.jsx";
 import { StrengthsPreview } from "../components/Strengths.jsx";
 import { MyDay } from "../components/AvailabilityCalendar.jsx";
+import AiCorner from "../components/AiCorner.jsx";
 import LawEvents from "../components/LawEvents.jsx";
 import PocketPart from "../components/PocketPart.jsx";
 import { ProjectPreview } from "../components/Project.jsx";
@@ -256,6 +257,9 @@ export default function Home({ projects, effects, theme, fine }) {
         </AssembleReveal>
         <AssembleReveal id="my-day">
           <div className="home-my-day"><MyDay /></div>
+        </AssembleReveal>
+        <AssembleReveal id="ai-corner">
+          <div className="home-ai-corner"><AiCorner /></div>
         </AssembleReveal>
       </div>
       <AssembleReveal id="featured-heading">

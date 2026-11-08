@@ -6,7 +6,7 @@ const SOURCE_URL = 'https://library.law.uconn.edu/category/blog/feed/';
 const OUTPUT = fileURLToPath(new URL('../data/pocket-part.json', import.meta.url));
 const ITEM_LIMIT = 4;
 
-function decodeXml(value) {
+export function decodeXml(value) {
   const named = { amp: '&', apos: "'", gt: '>', lt: '<', quot: '"' };
   return value.replace(/&(#x[\da-f]+|#\d+|amp|apos|gt|lt|quot);/gi, (entity, name) => {
     if (!name.startsWith('#')) return named[name.toLowerCase()];
@@ -17,7 +17,7 @@ function decodeXml(value) {
 
 // Read the fields in WordPress RSS items, keeping CDATA HTML intact for the
 // widget's existing text/excerpt handling. CDATA is masked before reading tags.
-function field(item, name) {
+export function field(item, name) {
   const cdata = [];
   const masked = item.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, (_, value) => `\0${cdata.push(value) - 1}\0`);
   const value = masked.match(new RegExp(`<${name}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${name}\\s*>`, 'i'))?.[1] || '';

@@ -36,7 +36,7 @@ All 15 project cards and the four featured Home project cards share the same com
 
 | Destination | Contents |
 | --- | --- |
-| Home | Profile, introduction, featured projects, UConn Law events, Pocket Part blog stack |
+| Home | Profile, introduction, How can I help, My Day, AI Corner, featured projects, UConn Law events, Pocket Part blog stack |
 | Projects | All 15 manifest projects, search, category filters, saved projects |
 | Tools | Five catalog searches, Outlook availability, booking, and live requests |
 | About | Biography, experience, leadership, education, skills, interests, all 34 strengths, contacts |

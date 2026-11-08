@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-11-08T17:14:49.905Z",
+  "sourceUrl": "https://justinrogo.vercel.app/updates/feed.xml",
+  "items": [
+    {
+      "title": "Can developers legally use generative AI to recreate commercial software without copying its source code?",
+      "link": "https://justinrogo.vercel.app/updates?post=28451768-4049-4de0-894c-ce68a307f610",
+      "pubDate": "2026-10-29T20:56:36.000Z",
+      "summary": "ArtCraft, a collection of free, open-source applications developed with assistance from Claude to replicate the functionality and familiar interfaces of Adobe Creative Cloud products, including Photoshop, Illustrator, and Premiere Pro. This video explores whet"
+    },
+    {
+      "title": "The Future of Legal AI from ClioCon",
+      "link": "https://justinrogo.vercel.app/updates?post=d29e74b7-78d7-4733-8d50-fbe21c985cfb",
+      "pubDate": "2026-10-29T16:03:50.000Z",
+      "summary": "A central theme throughout the conference was that AI is already changing how legal services are delivered, and that legal professionals have an opportunity to shape its implementation to improve efficiency, expand access to legal services, and better serve cl"
+    },
+    {
+      "title": "AI is changing how lawyers work — and putting the billable hour under pressure",
+      "link": "https://justinrogo.vercel.app/updates?post=b1e0d5a1-dd16-4d58-99c3-5ea39a637cde",
+      "pubDate": "2026-10-23T22:26:25.000Z",
+      "summary": "Nearly 90% of legal professionals in the U.K. and Ireland report using AI, according to Clio's 2026 Legal Insights Report. Among firms using AI, almost 80% say they can handle more"
+    }
+  ]
+}

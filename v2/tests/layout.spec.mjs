@@ -91,7 +91,7 @@ test("the topbar eases out when motion is allowed", async ({ page }) => {
   expect(running).toContain("width");
 });
 
-test("My Day sits beside How can I help until the two no longer fit", async ({ page }) => {
+test("My Day and AI Corner sit beside How can I help until they no longer fit", async ({ page }) => {
   const overlaps = (a, b) => a.y < b.y + b.height && b.y < a.y + a.height;
   for (const [width, sideBySide] of [[2560, true], [1440, true], [1150, true], [930, false], [801, false], [768, false], [375, false], [320, false]]) {
     await page.setViewportSize({ width, height: 900 });
@@ -106,6 +106,15 @@ test("My Day sits beside How can I help until the two no longer fit", async ({ p
       expect(overlaps(help, myDay)).toBe(false);
       expect(myDay.y).toBeGreaterThan(help.y);
       expect(myDay.width).toBeCloseTo(help.width);
+    }
+    // AI Corner joins the row when all three fit and otherwise wraps below.
+    const aiCorner = await page.getByRole("region", { name: "AI Corner" }).boundingBox();
+    if (width >= 1440) {
+      expect(aiCorner.x).toBeGreaterThanOrEqual(myDay.x + myDay.width);
+      expect(aiCorner.y).toBeCloseTo(myDay.y);
+    } else {
+      expect(overlaps(myDay, aiCorner)).toBe(false);
+      expect(aiCorner.y).toBeGreaterThan(myDay.y);
     }
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
   }
