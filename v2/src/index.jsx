@@ -27,9 +27,20 @@ import HomepageAssembly, {
   AssembleReveal,
   ReplayAssembly,
 } from "./assembly/HomepageAssembly.jsx";
+import {
+  SiteStyleContext,
+  botanicalBackgrounds,
+  loadBotanicalFonts,
+  themeColors,
+} from "./botanical/siteStyle.js";
+import { transitionStyle } from "./botanical/styleTransition.js";
+import { centerOf, reveal } from "./botanical/reveal.js";
+import LivingPothos from "./botanical/LivingPothos.jsx";
+import { LeafGlyph, WordmarkSprig } from "./botanical/Flora.jsx";
 import "./styles.css";
 import "./glass-theme.css";
 import "./layout.css";
+import "./botanical/botanical.css";
 
 const destinations = [
   ["home", "Home"],
@@ -59,6 +70,8 @@ function App() {
       atmosphere: true,
       intro: true,
       background: "auto",
+      style: "botanical",
+      botanicalBackground: "conservatory",
     },
     (p) =>
       p &&
@@ -67,8 +80,14 @@ function App() {
       typeof p.atmosphere === "boolean" &&
       (p.intro === undefined || typeof p.intro === "boolean") &&
       (p.background === undefined ||
-        backgroundOptions.some(({ id }) => id === p.background)),
+        backgroundOptions.some(({ id }) => id === p.background)) &&
+      (p.style === undefined || ["original", "botanical"].includes(p.style)) &&
+      (p.botanicalBackground === undefined ||
+        botanicalBackgrounds.some(({ id }) => id === p.botanicalBackground)),
   );
+  // Botanical is the default; Original applies only to visitors who chose it.
+  const siteStyle = preferences.style === "original" ? "original" : "botanical";
+  const botanical = siteStyle === "botanical";
   const [saved, setSaved] = useStored(
     "jr-v2-saved",
     [],
@@ -87,6 +106,7 @@ function App() {
   const reduced = useMedia("(prefers-reduced-motion: reduce)");
   const fine = useMedia("(hover: hover) and (pointer: fine)");
   const highContrast = useMedia("(prefers-contrast: more)");
+  const compact = useMedia("(max-width: 800px)");
   const forcedColors = useMedia("(forced-colors: active)");
   const theme =
     preferences.theme === "system"
@@ -109,14 +129,30 @@ function App() {
   useEffect(() => {
     document.title = viewTitle(active);
   }, [active]);
-  useEffect(() => {
+  // Layout effect: a style switch inside a view transition must land in the
+  // same commit as the React update.
+  useLayoutEffect(() => {
     const el = document.documentElement;
     el.dataset.theme = theme;
+    el.dataset.style = siteStyle;
     el.dataset.calm = String(!effects);
+    // Botanical's one-time flourishes follow motion preferences only, so they
+    // don't replay whenever the tab is hidden and shown again.
+    el.dataset.flourish =
+      !reduced && !preferences.calm && !highContrast && !forcedColors ? "on" : "off";
     el.dataset.atmosphere = String(preferences.atmosphere);
     document.querySelector('meta[name="theme-color"]').content =
-      theme === "dark" ? "#060f23" : "#e6efff";
-  }, [theme, effects, preferences.atmosphere]);
+      themeColors[siteStyle][theme === "dark" ? "dark" : "light"];
+  }, [theme, siteStyle, effects, preferences.atmosphere, preferences.calm, reduced, highContrast, forcedColors]);
+  useEffect(() => {
+    if (botanical) loadBotanicalFonts();
+  }, [botanical]);
+  const changeStyle = (style, origin) =>
+    transitionStyle(
+      style,
+      () => setPreferences((current) => ({ ...current, style })),
+      { animate: effects, origin },
+    );
   useEffect(() => {
     if (!Array.isArray(saved)) setSaved([]);
   }, [saved]);
@@ -204,11 +240,13 @@ function App() {
       ),
     })[view];
   return (
+    <SiteStyleContext.Provider value={siteStyle}>
     <HomepageAssembly
       active={active === "home"}
       enabled={effects && preferences.intro !== false && !settings}
     >
       <PageBackground
+        siteStyle={siteStyle}
         preferences={preferences}
         moving={effects}
         theme={theme}
@@ -237,7 +275,7 @@ function App() {
             aria-label="Justin Rogowski home"
           >
             jr
-            <Icon name="external" size={28} />
+            {botanical ? <WordmarkSprig /> : <Icon name="external" size={28} />}
           </a>
           <button
             className="icon-button sidebar-toggle"
@@ -284,6 +322,9 @@ function App() {
               </div>
             </AssembleReveal>
           </div>
+          {botanical && !compact && (
+            <LivingPothos placement="sidebar" moving={effects} />
+          )}
           <div className="sidebar-bottom">
             <a
               href="#/about?section=contact"
@@ -329,7 +370,7 @@ function App() {
             <GlassLayer />
             <a className="mobile-wordmark" href="#/home">
               jr
-              <Icon name="external" size={28} />
+              {botanical ? <WordmarkSprig /> : <Icon name="external" size={28} />}
             </a>
             <a className="topbar-donate" href={donationUrl} target="_blank"
               rel="noopener noreferrer" aria-label="Donate to the Law Library"
@@ -362,8 +403,18 @@ function App() {
               className="icon-button"
               aria-label={themeAction}
               title={themeAction}
-              onClick={() =>
-                setPreferences((current) => ({ ...current, theme: nextTheme }))
+              onClick={(event) =>
+                // The new theme radiates out from this button.
+                reveal(
+                  () =>
+                    setPreferences((current) => ({ ...current, theme: nextTheme })),
+                  {
+                    animate: effects,
+                    origin: centerOf(event.currentTarget),
+                    shape: botanical ? "leaf" : "circle",
+                    duration: botanical ? "0.9s" : "0.7s",
+                  },
+                )
               }
             >
               <Icon name={nextTheme === "light" ? "sun" : "moon"} size={19} />
@@ -384,7 +435,18 @@ function App() {
         </main>
         <AssembleReveal id="footer">
           <footer className="app-footer">
-            <span>Built with ✨ by Justin</span>
+            {botanical && compact && (
+              <LivingPothos placement="footer" moving={effects} />
+            )}
+            {botanical ? (
+              <span>
+                Grown with{" "}
+                <LeafGlyph size={13} className="footer-leaf" />
+                <span className="sr-only">care</span> by Justin
+              </span>
+            ) : (
+              <span>Built with ✨ by Justin</span>
+            )}
             <a href="/original.html">
               Original site <Icon name="external" size={14} />
             </a>
@@ -395,11 +457,13 @@ function App() {
         <Settings
           preferences={preferences}
           setPreferences={setPreferences}
+          onStyle={changeStyle}
           reduced={reduced}
           onClose={() => setSettings(false)}
         />
       )}
     </HomepageAssembly>
+    </SiteStyleContext.Provider>
   );
 }
 class Boundary extends Component {

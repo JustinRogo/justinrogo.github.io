@@ -1,6 +1,6 @@
 /*! React Bits — Copyright (c) 2026 David Haz. MIT + Commons Clause; see assets/react-bits-LICENSE.txt.
  * Source revision e12c22192ac7b4b452c5e2feb9b586d74765d696.
- * Local changes: native nested child anchors/lists, controlled selection, accessible collapsed branches, shared site icons, per-section row heights.
+ * Local changes: native nested child anchors/lists, controlled selection, accessible collapsed branches, shared site icons, per-section row heights, optional leaves along the branches.
  */
 "use client";
 
@@ -17,6 +17,8 @@ const DEFAULT_ITEMS = [];
 const PAD = 6;
 const MARK = 16;
 const DEPTH_INDENT = 32;
+// A small leaf with its base at 0,0, pointing up (used when `leaves` is on).
+const LEAF = "M0 0C3.4 -2 3.6 -6.6 0 -9.5C-3.6 -6.6 -3.4 -2 0 0Z";
 
 const renderIcon = (icon) => (isValidElement(icon) ? icon : null);
 const toSet = (open) =>
@@ -92,6 +94,7 @@ export default function BranchedMenu({
   fontSize = 14,
   drawDuration = 400,
   foldDuration = 300,
+  leaves = false,
   className = "",
 }) {
   const [open, setOpen] = useState(() => toSet(defaultOpen));
@@ -283,6 +286,24 @@ export default function BranchedMenu({
                           d={branch(k, sectionHeight, kid.depth)}
                         />
                       ))}
+                      {leaves &&
+                        rows.map((kid, k) => {
+                          const side = k % 2 ? -1 : 1;
+                          const x = trunk + kid.depth * DEPTH_INDENT;
+                          const y = rowY(k, sectionHeight) - r - sectionHeight * 0.32;
+                          return (
+                            <g
+                              key={`leaf-${kid.value}`}
+                              transform={`translate(${x} ${y}) rotate(${side * 42})`}
+                            >
+                              <path
+                                className="branched-menu__leaf"
+                                style={{ "--i": k }}
+                                d={LEAF}
+                              />
+                            </g>
+                          );
+                        })}
                       {rows.map((kid, k) => (
                         <path
                           key={kid.value}

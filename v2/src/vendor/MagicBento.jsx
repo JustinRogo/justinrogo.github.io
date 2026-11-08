@@ -1,7 +1,9 @@
 /*! React Bits — Copyright (c) 2026 David Haz. MIT + Commons Clause; see assets/react-bits-LICENSE.txt.
  * Source revision e12c22192ac7b4b452c5e2feb9b586d74765d696.
  * Local changes: remove demo data/art/icon dependencies; recreate motion engine on live preference changes;
- * accept item-level cell classes for responsive site layouts; pick the column count before first paint.
+ * accept item-level cell classes for responsive site layouts; pick the column count before first paint;
+ * skip light-position writes for cards the light can't reach, and rest pointer effects while the page
+ * scrolls, so scrolling doesn't repaint every card.
  */
 "use client";
 
@@ -215,6 +217,9 @@ const MagicBento = ({
     let rects = [];
     let bounds = null;
     let dirty = true;
+    // Cards slide under a still pointer while scrolling; chasing them with the
+    // spotlight, glow and tilt repaints every frame, so they rest until it stops.
+    let scrollingUntil = 0;
     let raf = 0;
     let last = 0;
     let visible = true;
@@ -365,10 +370,13 @@ const MagicBento = ({
       if (dirty) measure();
       const s = settingsRef.current;
       const cards = cardRefs.current;
-      let busy = false;
+      const scrolling = now < scrollingUntil;
+      // Keep ticking through the scroll so effects resume once it settles.
+      let busy = scrolling;
 
       const margin = s.spotlightRadius * 0.5;
       const near =
+        !scrolling &&
         pointer.inside &&
         bounds &&
         pointer.x > bounds.left - margin &&
@@ -385,7 +393,8 @@ const MagicBento = ({
       const follow = 1 - Math.exp(-dt / 0.05);
       light.x += (pointer.x - light.x) * follow;
       light.y += (pointer.y - light.y) * follow;
-      const fade = 1 - Math.exp(-dt / (near > light.near ? 0.12 : 0.4));
+      const fade =
+        1 - Math.exp(-dt / (near > light.near ? 0.12 : scrolling ? 0.05 : 0.4));
       light.near += (near - light.near) * fade;
       if (Math.abs(near - light.near) < 0.002) light.near = near;
       else busy = true;
@@ -414,6 +423,7 @@ const MagicBento = ({
         const px = pointer.x - rect.left;
         const py = pointer.y - rect.top;
         const inside =
+          !scrolling &&
           pointer.inside &&
           entered &&
           px >= 0 &&
@@ -438,7 +448,10 @@ const MagicBento = ({
         const hotTarget = inside && s.enableSpotlight ? 1 : 0;
         state.hot +=
           (hotTarget - state.hot) *
-          (1 - Math.exp(-dt / (hotTarget > state.hot ? 0.14 : 0.32)));
+          (1 -
+            Math.exp(
+              -dt / (hotTarget > state.hot ? 0.14 : scrolling ? 0.05 : 0.32),
+            ));
         if (Math.abs(hotTarget - state.hot) < 0.002) state.hot = hotTarget;
         else busy = true;
 
@@ -489,13 +502,21 @@ const MagicBento = ({
           state.vpress = 0;
         } else busy = true;
 
-        write(card, state, "--mb-x", `${lx.toFixed(1)}px`);
-        write(card, state, "--mb-y", `${ly.toFixed(1)}px`);
+        // Both lights are fixed-radius gradients. Beyond that radius a card
+        // shows nothing, so park its light instead of rewriting (and
+        // repainting) every card on every scroll frame.
+        const dx = Math.max(rect.left - light.x, 0, light.x - rect.right);
+        const dy = Math.max(rect.top - light.y, 0, light.y - rect.bottom);
+        const lit =
+          (light.near > 0 || state.hot > 0) &&
+          dx * dx + dy * dy <= s.spotlightRadius * s.spotlightRadius;
+        write(card, state, "--mb-x", lit ? `${lx.toFixed(1)}px` : "-999px");
+        write(card, state, "--mb-y", lit ? `${ly.toFixed(1)}px` : "-999px");
         write(
           card,
           state,
           "--mb-near",
-          (s.enableBorderGlow ? light.near : 0).toFixed(3),
+          (s.enableBorderGlow && lit ? light.near : 0).toFixed(3),
         );
         write(card, state, "--mb-hot", state.hot.toFixed(3));
         write(card, state, "--mb-rx", `${state.rx.toFixed(3)}deg`);
@@ -503,8 +524,9 @@ const MagicBento = ({
         write(card, state, "--mb-tx", `${state.tx.toFixed(2)}px`);
         write(card, state, "--mb-ty", `${state.ty.toFixed(2)}px`);
         write(card, state, "--mb-press", state.press.toFixed(4));
-        write(card, state, "--mb-wx", `${(wave.x - rect.left).toFixed(1)}px`);
-        write(card, state, "--mb-wy", `${(wave.y - rect.top).toFixed(1)}px`);
+        const waving = waveAlpha > 0;
+        write(card, state, "--mb-wx", waving ? `${(wave.x - rect.left).toFixed(1)}px` : "-999px");
+        write(card, state, "--mb-wy", waving ? `${(wave.y - rect.top).toFixed(1)}px` : "-999px");
         write(card, state, "--mb-wr", `${waveRadius.toFixed(1)}px`);
         write(card, state, "--mb-wa", waveAlpha.toFixed(3));
 
@@ -600,6 +622,7 @@ const MagicBento = ({
     };
 
     const onScroll = () => {
+      scrollingUntil = performance.now() + 160;
       dirty = true;
       wake();
     };

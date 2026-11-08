@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./original-style.mjs";
 
 test.beforeEach(async ({ page }) => {
   await page.route("https://**/*", (route) => {

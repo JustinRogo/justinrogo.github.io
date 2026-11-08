@@ -16,6 +16,8 @@ import { MyDay } from "../components/AvailabilityCalendar.jsx";
 import LawEvents from "../components/LawEvents.jsx";
 import PocketPart from "../components/PocketPart.jsx";
 import { ProjectPreview } from "../components/Project.jsx";
+import { useBotanical } from "../botanical/siteStyle.js";
+import { HeroFlora, PortraitWreath } from "../botanical/Flora.jsx";
 import "./Home.css";
 
 const helpLinks = [
@@ -25,10 +27,12 @@ const helpLinks = [
 ];
 
 function Name({ effects }) {
+  // Botanical sets the name in a serif, so the canvas text effect stays off.
+  const botanical = useBotanical();
   return (
     <AssembleReveal id="hero-title">
       <h1 tabIndex={-1} className="tech-heading">
-        {effects ? (
+        {effects && !botanical ? (
           <>
             <span className="sr-only">Justin Rogowski</span>
             <span className="tech-name" aria-hidden="true">
@@ -72,6 +76,7 @@ function Name({ effects }) {
 }
 
 function FeaturedBento({ projects, effects, theme, fine }) {
+  const botanical = useBotanical();
   const items = useMemo(() => {
     const pages = projects.data?.pages || [];
     const featured = featuredPaths
@@ -98,7 +103,7 @@ function FeaturedBento({ projects, effects, theme, fine }) {
                   </div>
                 ) : null}
                 <ProjectPreview project={project} className="featured-project-preview" decorative sizes="270px" />
-                <div className="bento-copy">
+                <div className="bento-copy" data-specimen={String(index + 1).padStart(2, "0")}>
                   <h3>{project.title}</h3>
                   <span className="project-category">{project.category}</span>
                   <p>{project.description}</p>
@@ -122,7 +127,7 @@ function FeaturedBento({ projects, effects, theme, fine }) {
       gap={16}
       radius={6}
       theme={theme}
-      glowColor="#ff8a36"
+      glowColor={botanical ? "#c5a46d" : "#ff8a36"}
       textAutoHide={false}
       enableBorderGlow={effects}
       enableSpotlight={effects && fine}
@@ -142,11 +147,13 @@ const BELOW_EVENTS = 24;
 
 export default function Home({ projects, effects, theme, fine }) {
   const [eventsColumn, eventsFit] = useFitsViewport(TOPBAR_CLEARANCE + BELOW_EVENTS);
+  const botanical = useBotanical();
   return (
     <>
       <AssembleReveal id="hero-frame">
         <section className="glass-hero glass-host">
           <GlassLayer />
+          {botanical && <HeroFlora />}
           <div className="hero-copy">
             <Name effects={effects} />
             <AssembleReveal id="hero-role">
@@ -174,6 +181,7 @@ export default function Home({ projects, effects, theme, fine }) {
               <div className="portrait-stage">
                 <div className="portrait-orbit orbit-one" />
                 <div className="portrait-orbit orbit-two" />
+                {botanical && <PortraitWreath />}
                 <div className="portrait-photo">
                   <img
                     src="/v2/assets/justin.webp"

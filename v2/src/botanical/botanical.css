@@ -1,0 +1,1477 @@
+/* =====================================================================
+   Botanical — the conservatory style.
+   Everything below is scoped to :root[data-style="botanical"], except the
+   shared Site style picker, so the Original design is untouched.
+   1. Tokens (Sunlit / Moonlit)      6. Hero
+   2. Base & typography              7. Home, projects, tools, about, more
+   3. Paper surfaces                 8. Illustrations
+   4. Rail, top bar, footer          9. Backgrounds
+   5. Controls                      10. Pip, transitions, motion & a11y
+   ===================================================================== */
+
+/* ---------- Shared: the Site style picker (both styles) ---------- */
+.style-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.style-options > label {
+  position: relative;
+  display: grid;
+  gap: 10px;
+  padding: 10px 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.style-options > label:hover {
+  background: var(--nav);
+}
+.style-options > label:has(input:checked) {
+  border-color: var(--blue);
+  background: var(--nav);
+  box-shadow: inset 0 0 0 1px var(--blue);
+}
+.style-options > label:has(input:focus-visible) {
+  outline: 3px solid var(--blue);
+  outline-offset: 3px;
+}
+.style-options input {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  z-index: 1;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--blue);
+}
+.style-copy strong {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+.style-copy small {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+.style-preview {
+  position: relative;
+  display: block;
+  height: 74px;
+  overflow: hidden;
+  border-radius: 5px;
+}
+.style-preview i {
+  position: absolute;
+  display: block;
+}
+.style-preview-original {
+  background: radial-gradient(circle at 78% 18%, #1767ff70, transparent 55%),
+    radial-gradient(circle at 18% 95%, #f16c2455, transparent 50%), #060f23;
+}
+.style-preview-original i:nth-child(1) {
+  inset: 18px -30px -40px 34%;
+  border: 1px solid #4996ff90;
+  border-radius: 50%;
+  transform: rotate(-24deg);
+}
+.style-preview-original i:nth-child(2) {
+  right: 14px;
+  bottom: 12px;
+  width: 44px;
+  height: 14px;
+  border-radius: 4px;
+  background: #f88436;
+}
+.style-preview-original i:nth-child(3) {
+  left: 44px;
+  bottom: 14px;
+  width: 64px;
+  height: 22px;
+  border-radius: 4px;
+  background: rgba(235, 244, 255, 0.16);
+  box-shadow: inset 0 0 0 1px rgba(160, 200, 255, 0.35);
+}
+.style-preview-botanical {
+  background: radial-gradient(circle at 80% 10%, #fff6dc, transparent 55%), #ece4d3;
+}
+.style-preview-botanical i:nth-child(1),
+.style-preview-botanical i:nth-child(2) {
+  width: 46px;
+  height: 64px;
+  border-radius: 0 100% 0 100%;
+  background: linear-gradient(135deg, #3d7553, #18392b);
+}
+.style-preview-botanical i:nth-child(1) {
+  right: -6px;
+  top: -14px;
+  transform: rotate(-12deg);
+}
+.style-preview-botanical i:nth-child(2) {
+  right: 30px;
+  top: 26px;
+  width: 30px;
+  height: 44px;
+  background: linear-gradient(135deg, #8aa275, #6b8055);
+  transform: rotate(34deg);
+}
+.style-preview-botanical i:nth-child(3) {
+  left: 44px;
+  bottom: 12px;
+  width: 70px;
+  height: 24px;
+  border-radius: 12px 3px 12px 3px;
+  background: #f8f4ea;
+  box-shadow: 0 0 0 1px #d3c7ae, 0 6px 10px -6px #3c2c1290;
+}
+.background-note {
+  margin-top: 10px;
+}
+@media (max-width: 420px) {
+  .style-options {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =====================================================================
+   1. Tokens
+   ===================================================================== */
+:root[data-style="botanical"] {
+  color-scheme: light;
+  --font-display: "Fraunces", "Iowan Old Style", "Palatino Linotype", Palatino,
+    "Book Antiqua", Georgia, serif;
+  --b-forest: #18392b;
+  --b-green: #2f6045;
+  --b-moss: #6b8055;
+  --b-sage: #a8b89a;
+  --b-ivory: #f5f0e6;
+  --b-parchment: #eae1d0;
+  --b-terracotta: #b86f50;
+  --b-ochre: #c5a46d;
+
+  /* Shared site tokens, remapped. */
+  --bg: #ece4d3;
+  --surface: #f8f4ea;
+  --ink: #1b3125;
+  --muted: #4f5d48;
+  --line: #d3c7ae;
+  --blue: #2f6045;
+  --blue-hover: #18392b;
+  --orange: #9b5233;
+  --tint: #e2e5cf;
+  --nav: #e7ddc7;
+  --branch-line: #8a9d74;
+  --branch-leaf: var(--leaf-light);
+  --wash: transparent;
+  --shadow: 0 24px 60px -28px rgba(54, 40, 16, 0.45);
+  --glass-fill: #f7f2e7;
+  --glass-edge: rgba(92, 74, 40, 0.2);
+  --glass-inner-shadow: transparent;
+  --glass-rim: inset 0 0 0 1px var(--glass-edge);
+  --glass-radius: 14px;
+  --panel-shadow: 0 1px 1px rgba(70, 52, 22, 0.06),
+    0 16px 34px -24px rgba(60, 44, 18, 0.42);
+
+  /* Botanical-only tokens. */
+  --paper: #f8f3e8;
+  --paper-top: #fbf8f0;
+  --plate-rule: rgba(92, 74, 40, 0.17);
+  --accent-fill: #2f6045;
+  --accent-fill-hover: #234d37;
+  --accent-ink: #f8f3e8;
+  --leaf: #2f6045;
+  --leaf-deep: #1f4733;
+  --leaf-light: #4e7d5a;
+  --leaf-pale: #8aa275;
+  --leaf-vein: rgba(240, 233, 205, 0.5);
+  --variegation: rgba(232, 214, 150, 0.75);
+  --stem: #55703f;
+  --berry: #b86f50;
+  --pot: #b86f50;
+  --pot-deep: #93553a;
+  --soil: #4d3b29;
+  --leaf-radius: 22px 6px 22px 6px;
+  --leaf-radius-sm: 12px 3px 12px 3px;
+  --sway: 1;
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .36 0 0 0 0 .27 0 0 0 0 .12 0 0 0 .075 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  /* The rail: a deep green cover, like a field journal's binding. */
+  --rail-bg: #18392b;
+  --rail-ink: #f3ecdb;
+  --rail-muted: #b9c4a8;
+  --rail-line: rgba(197, 164, 109, 0.28);
+  --rail-hover: rgba(243, 236, 219, 0.08);
+  --rail-active: rgba(197, 164, 109, 0.18);
+  --rail-accent: #e2c48c;
+  /* Background art. */
+  --bg-leaf-back: rgba(70, 92, 58, 0.12);
+  --bg-leaf-mid: rgba(56, 82, 50, 0.17);
+  --bg-leaf-front: rgba(47, 96, 69, 0.3);
+  --bg-light: rgba(255, 246, 214, 0.75);
+  --specimen-ink: rgba(80, 66, 38, 0.38);
+  font-family: Geist, system-ui, sans-serif;
+}
+:root[data-style="botanical"][data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0c1b14;
+  --surface: #15291f;
+  --ink: #efe8d6;
+  --muted: #b4bfa5;
+  --line: #2d4737;
+  --blue: #a9cc98;
+  --blue-hover: #c9e2b9;
+  --orange: #e5a982;
+  --tint: #1c3a2a;
+  --nav: #1c3428;
+  --branch-line: #4f7358;
+  --branch-leaf: #5f8a68;
+  --shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.75);
+  --glass-fill: #13261c;
+  --glass-edge: rgba(197, 164, 109, 0.2);
+  --panel-shadow: 0 1px 0 rgba(197, 164, 109, 0.06) inset,
+    0 18px 40px -24px rgba(0, 0, 0, 0.75);
+  --paper: #13261c;
+  --paper-top: #172d22;
+  --plate-rule: rgba(197, 164, 109, 0.16);
+  --accent-fill: #d2b47c;
+  --accent-fill-hover: #e2c58f;
+  --accent-ink: #12251b;
+  --leaf: #2c5a40;
+  --leaf-deep: #1d4030;
+  --leaf-light: #477a58;
+  --leaf-pale: #6f8f62;
+  --leaf-vein: rgba(197, 164, 109, 0.4);
+  --variegation: rgba(197, 164, 109, 0.5);
+  --stem: #4b6a40;
+  --berry: #d29070;
+  --pot: #a56247;
+  --pot-deep: #7f4732;
+  --soil: #2b2016;
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .9 0 0 0 0 .85 0 0 0 0 .7 0 0 0 .045 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --rail-bg: #0a1711;
+  --rail-line: rgba(197, 164, 109, 0.22);
+  --bg-leaf-back: rgba(34, 70, 50, 0.32);
+  --bg-leaf-mid: rgba(28, 62, 44, 0.55);
+  --bg-leaf-front: rgba(36, 78, 55, 0.62);
+  --bg-light: rgba(232, 214, 150, 0.9);
+  --specimen-ink: rgba(197, 164, 109, 0.3);
+}
+
+/* =====================================================================
+   2. Base & typography
+   ===================================================================== */
+:root[data-style="botanical"] body {
+  background: var(--bg);
+}
+:root[data-style="botanical"] ::selection {
+  background: var(--b-sage);
+  color: var(--b-forest);
+}
+:root[data-style="botanical"] :is(h1, h2, h3, legend, .wordmark, .mobile-wordmark) {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  font-variation-settings: "SOFT" 50, "WONK" 0;
+  letter-spacing: -0.012em;
+}
+:root[data-style="botanical"] h1 {
+  font-weight: 420;
+}
+:root[data-style="botanical"] :is(h2, h3) {
+  font-weight: 480;
+}
+:root[data-style="botanical"] .sheet legend {
+  font-size: 1.02rem;
+  font-weight: 500;
+}
+:root[data-style="botanical"] .title-dot {
+  color: var(--b-terracotta);
+}
+:root[data-style="botanical"] .project-category,
+:root[data-style="botanical"] .hero-role {
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* =====================================================================
+   3. Paper surfaces
+   ===================================================================== */
+:root[data-style="botanical"] .glass-layer,
+:root[data-style="botanical"] .glass-layer-opaque {
+  background: var(--grain),
+    linear-gradient(180deg, var(--paper-top), var(--paper) 60%);
+  box-shadow: var(--glass-rim);
+}
+:root[data-style="botanical"] .glass-host,
+:root[data-style="botanical"] .topbar,
+:root[data-style="botanical"] .selected-bento .magic-bento__card {
+  box-shadow: var(--panel-shadow);
+}
+/* Panels that were frosted glass become matte paper. */
+:root[data-style="botanical"] :is(.project-list, .tool-content, .about-intro, .about-columns, .activity-note, .weather-note, .search-field, .tool-nav) {
+  background: var(--grain), var(--paper);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+:root[data-style="botanical"] :is(.project-list, .tool-content, .about-intro, .activity-note, .weather-note) {
+  border-radius: var(--glass-radius);
+  box-shadow: var(--panel-shadow), var(--glass-rim);
+}
+/* A printed plate's inner rule on the most important pages. */
+:root[data-style="botanical"] .glass-hero > .glass-layer::after {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border: 1px solid var(--plate-rule);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* =====================================================================
+   4. Rail, top bar, footer
+   ===================================================================== */
+:root[data-style="botanical"] .sidebar {
+  --ink: var(--rail-ink);
+  --muted: var(--rail-muted);
+  --line: var(--rail-line);
+  --nav: var(--rail-hover);
+  --orange: var(--rail-accent);
+  --blue: var(--rail-accent);
+  --branch-line: rgba(168, 184, 154, 0.5);
+  --branch-leaf: rgba(168, 184, 154, 0.85);
+  color: var(--rail-ink);
+  box-shadow: 0 22px 46px -26px rgba(12, 30, 20, 0.7);
+}
+:root[data-style="botanical"] .sidebar > .glass-layer {
+  background: var(--grain),
+    radial-gradient(120% 60% at 0% 0%, rgba(197, 164, 109, 0.12), transparent 60%),
+    linear-gradient(180deg, #1d4433, var(--rail-bg));
+  box-shadow: inset 0 0 0 1px rgba(197, 164, 109, 0.22);
+}
+:root[data-style="botanical"][data-theme="dark"] .sidebar > .glass-layer {
+  background: var(--grain),
+    radial-gradient(120% 60% at 0% 0%, rgba(197, 164, 109, 0.08), transparent 60%),
+    linear-gradient(180deg, #102419, var(--rail-bg));
+}
+:root[data-style="botanical"] .sidebar :focus-visible {
+  outline-color: var(--rail-accent);
+}
+:root[data-style="botanical"] :is(.wordmark, .mobile-wordmark) {
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+:root[data-style="botanical"] :is(.wordmark, .mobile-wordmark) > svg {
+  color: var(--b-ochre);
+}
+/* On the Sunlit paper top bar, ochre is too faint; use moss instead. */
+:root[data-style="botanical"][data-theme="light"] .mobile-wordmark > svg {
+  color: var(--b-moss);
+}
+:root[data-style="botanical"] .primary-nav > a {
+  border-radius: var(--leaf-radius-sm);
+}
+:root[data-style="botanical"] .primary-nav > a:hover {
+  background: var(--rail-hover);
+  color: var(--rail-ink);
+}
+:root[data-style="botanical"] .primary-nav > a[aria-current="page"] {
+  background: var(--rail-active);
+  color: var(--rail-accent);
+  box-shadow: inset 0 0 0 1px rgba(197, 164, 109, 0.25);
+}
+/* The active marker becomes a small leaf. */
+:root[data-style="botanical"] .nav-active-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 0 80% 0 80%;
+  background: linear-gradient(135deg, #a8b89a, #6b8055);
+  transform: rotate(-8deg) scale(0.4);
+  transition: transform 0.5s cubic-bezier(0.34, 1.5, 0.64, 1), opacity 0.2s;
+}
+:root[data-style="botanical"] .primary-nav > a[aria-current] .nav-active-dot {
+  transform: rotate(-8deg) scale(1);
+}
+:root[data-style="botanical"] .topbar > .glass-layer {
+  background: var(--grain), var(--paper);
+}
+:root[data-style="botanical"] .topbar-donate {
+  border-radius: 999px;
+  color: var(--orange);
+}
+:root[data-style="botanical"] .live-dot {
+  background: var(--b-moss);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--b-moss) 25%, transparent);
+}
+:root[data-style="botanical"] .app-footer {
+  flex-wrap: wrap;
+  align-items: center;
+  border-top: 1px solid var(--line);
+  padding-top: 22px;
+}
+:root[data-style="botanical"] .footer-leaf {
+  color: var(--b-moss);
+  vertical-align: -1px;
+}
+
+/* =====================================================================
+   5. Controls
+   ===================================================================== */
+:root[data-style="botanical"] .button {
+  border-radius: 999px;
+  background: var(--paper);
+  border-color: var(--line);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 1px 0 rgba(70, 52, 22, 0.06);
+  transition: background 0.2s, color 0.2s, transform 0.25s var(--ease),
+    box-shadow 0.25s;
+}
+:root[data-style="botanical"][data-theme="dark"] .button {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+:root[data-style="botanical"] .button:not(.primary):hover {
+  background: var(--nav);
+}
+:root[data-style="botanical"] .button.primary {
+  background: var(--accent-fill);
+  color: var(--accent-ink);
+  border: 0;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.16),
+    0 8px 18px -10px color-mix(in srgb, var(--accent-fill) 80%, black);
+}
+:root[data-style="botanical"] .button.primary:hover {
+  background: var(--accent-fill-hover);
+  color: var(--accent-ink);
+}
+:root[data-style="botanical"] .button:active {
+  transform: translateY(1px);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.18);
+}
+:root[data-style="botanical"] .button > svg {
+  transition: transform 0.35s var(--ease);
+}
+:root[data-style="botanical"] .button:hover > svg {
+  transform: translateX(2px) rotate(-6deg);
+}
+:root[data-style="botanical"] .icon-button {
+  border-radius: 999px;
+}
+:root[data-style="botanical"] .text-link:hover,
+:root[data-style="botanical"] .text-button:hover {
+  color: var(--orange);
+}
+:root[data-style="botanical"] .search-field {
+  border-radius: 999px;
+  box-shadow: inset 0 1px 2px rgba(60, 44, 18, 0.08);
+}
+:root[data-style="botanical"] .filter-row > button {
+  border-radius: 999px;
+}
+:root[data-style="botanical"] .filter-row > button[aria-pressed="true"] {
+  background: var(--accent-fill);
+  color: var(--accent-ink);
+}
+:root[data-style="botanical"] .tool-nav {
+  border-radius: 999px;
+  box-shadow: var(--glass-rim);
+}
+:root[data-style="botanical"] .tool-nav > a {
+  border-radius: 999px;
+}
+:root[data-style="botanical"] .tool-nav > a[aria-current] {
+  background: var(--accent-fill);
+  color: var(--accent-ink);
+}
+:root[data-style="botanical"] .technology-list > span {
+  border-radius: 999px;
+  background: var(--paper);
+}
+:root[data-style="botanical"] .strength-rank {
+  color: var(--orange);
+}
+:root[data-style="botanical"] .sheet {
+  background: var(--grain), var(--paper);
+  border-radius: 18px;
+  box-shadow: var(--shadow), inset 0 0 0 1px var(--glass-edge),
+    inset 0 0 0 7px var(--paper), inset 0 0 0 8px var(--plate-rule);
+}
+:root[data-style="botanical"] .sheet::backdrop {
+  background: rgba(16, 38, 28, 0.42);
+  backdrop-filter: blur(3px);
+}
+:root[data-style="botanical"] .sheet-fern {
+  position: absolute;
+  top: 8px;
+  right: 58px;
+  width: 54px;
+  height: 100px;
+  opacity: 0.5;
+  z-index: -1;
+  pointer-events: none;
+}
+:root[data-style="botanical"] .preview-light {
+  background: #ece4d3;
+}
+:root[data-style="botanical"] .preview-dark {
+  background: #0c1b14;
+}
+:root[data-style="botanical"] .preview-system {
+  background: linear-gradient(120deg, #ece4d3 50%, #0c1b14 50%);
+}
+:root[data-style="botanical"] .background-options > label {
+  border-radius: var(--leaf-radius-sm);
+}
+:root[data-style="botanical"] .switch-row input[role="switch"] {
+  accent-color: var(--blue);
+}
+
+/* =====================================================================
+   6. Hero
+   ===================================================================== */
+:root[data-style="botanical"] .glass-hero {
+  border-radius: 30px 10px 30px 10px;
+}
+:root[data-style="botanical"] .tech-heading {
+  font-weight: 380;
+  letter-spacing: -0.025em;
+  font-variation-settings: "SOFT" 100, "WONK" 1;
+}
+:root[data-style="botanical"] .tech-heading > span:not(.sr-only, .tech-name) {
+  padding-left: 4.4%;
+}
+:root[data-style="botanical"] .tech-heading > span:last-child:not(.tech-name) {
+  font-style: italic;
+  font-weight: 340;
+  color: var(--orange);
+  padding-left: 9%;
+}
+:root[data-style="botanical"] .hero-role {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--blue);
+}
+:root[data-style="botanical"] .hero-role > span {
+  letter-spacing: 0.02em;
+  text-transform: none;
+  font-size: 0.82rem;
+  font-family: var(--font-display);
+  font-style: italic;
+}
+:root[data-style="botanical"] .hero-description {
+  font-size: 0.92rem;
+}
+:root[data-style="botanical"] .portrait-orbit {
+  display: none;
+}
+:root[data-style="botanical"] .portrait-photo {
+  background: var(--paper);
+  padding: 5px;
+  box-shadow: 0 0 0 1px var(--line), 0 18px 34px -20px rgba(30, 24, 10, 0.7);
+}
+:root[data-style="botanical"] .portrait-photo img {
+  filter: saturate(0.85) sepia(0.06);
+}
+:root[data-style="botanical"] .orbit-action {
+  border-radius: 50%;
+  background: var(--grain), var(--paper);
+  color: var(--blue);
+  box-shadow: 0 0 0 1px var(--line), 0 10px 22px -14px rgba(40, 30, 10, 0.6);
+  border: 0;
+}
+:root[data-style="botanical"] .orbit-action:hover {
+  background: var(--nav);
+  transform: translateY(-4px) rotate(-6deg);
+}
+
+/* =====================================================================
+   7. Home, projects, tools, about, more
+   ===================================================================== */
+/* Section titles become editorial headings with a drawn flourish. */
+:root[data-style="botanical"] .section-title {
+  justify-content: flex-start;
+}
+:root[data-style="botanical"] .section-title > :last-child:not(h2, .section-flourish) {
+  margin-left: auto;
+}
+:root[data-style="botanical"] .section-title.glass-host {
+  box-shadow: none;
+  padding-inline: 4px;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+}
+:root[data-style="botanical"] .section-title.glass-host > .glass-layer {
+  display: none;
+}
+.section-flourish {
+  display: none;
+}
+:root[data-style="botanical"] .section-flourish {
+  display: block;
+  flex: none;
+  width: 92px;
+  height: 26px;
+  margin-left: 4px;
+}
+/* Narrow columns keep their headings on one line instead. */
+:root[data-style="botanical"] :is(.home-feeds, .my-day, .tool-content) .section-flourish {
+  display: none;
+}
+/* The Branched Menu grows as a vine: a leafy trunk, green stems, leaves that
+   unfurl when a group opens, and a small leaf marking the current group. */
+:root[data-style="botanical"] .branched-menu {
+  --bm-line-w: 1.7 !important;
+}
+:root[data-style="botanical"] .branched-menu::before {
+  left: -6px;
+  width: 14px;
+  border-radius: 0;
+  background: var(--bm-line);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 56'%3E%3Cpath d='M7 0C10 9.3 10 18.7 7 28C4 37.3 4 46.7 7 56' fill='none' stroke='%23000' stroke-width='1.7'/%3E%3Cpath transform='translate(9.2 14) rotate(42)' d='M0 0C3 -1.8 3.2 -5.8 0 -8.4C-3.2 -5.8 -3 -1.8 0 0Z'/%3E%3Cpath transform='translate(4.8 42) rotate(-42)' d='M0 0C3 -1.8 3.2 -5.8 0 -8.4C-3.2 -5.8 -3 -1.8 0 0Z'/%3E%3C/svg%3E") 0 0 / 14px 56px repeat-y, linear-gradient(#000 55%, transparent);
+  -webkit-mask-composite: source-in;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 56'%3E%3Cpath d='M7 0C10 9.3 10 18.7 7 28C4 37.3 4 46.7 7 56' fill='none' stroke='%23000' stroke-width='1.7'/%3E%3Cpath transform='translate(9.2 14) rotate(42)' d='M0 0C3 -1.8 3.2 -5.8 0 -8.4C-3.2 -5.8 -3 -1.8 0 0Z'/%3E%3Cpath transform='translate(4.8 42) rotate(-42)' d='M0 0C3 -1.8 3.2 -5.8 0 -8.4C-3.2 -5.8 -3 -1.8 0 0Z'/%3E%3C/svg%3E") 0 0 / 14px 56px repeat-y, linear-gradient(#000 55%, transparent);
+  mask-composite: intersect;
+}
+:root[data-style="botanical"] .branched-menu__marker {
+  left: -4px;
+  width: 10px;
+  height: 10px;
+  margin-top: 3px;
+  border-radius: 0 80% 0 80%;
+  rotate: -45deg;
+}
+.branched-menu__leaf {
+  fill: var(--branch-leaf, var(--bm-line));
+}
+
+/* Featured projects: mounted specimens. */
+:root[data-style="botanical"] .selected-bento {
+  --mb-radius: 14px !important;
+}
+:root[data-style="botanical"] .selected-bento .magic-bento__card {
+  border-radius: 14px;
+}
+:root[data-style="botanical"] .bento-copy::before {
+  content: "Specimen No. " attr(data-specimen) / "";
+  display: block;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+:root[data-style="botanical"] .bento-project h3,
+:root[data-style="botanical"] .bento-project-0 .bento-copy h3 {
+  font-weight: 450;
+  letter-spacing: -0.015em;
+}
+:root[data-style="botanical"] .bento-statutes-art > span {
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--b-ochre);
+}
+:root[data-style="botanical"] .project-preview {
+  border-radius: 8px;
+  box-shadow: 0 0 0 1px var(--line), 0 0 0 5px var(--paper), 0 0 0 6px var(--line);
+}
+:root[data-style="botanical"] .project-preview img {
+  filter: sepia(0.1) saturate(0.92);
+}
+:root[data-style="botanical"] .home-help ul a {
+  border-radius: var(--leaf-radius-sm);
+}
+:root[data-style="botanical"] .home-help ul a > svg {
+  color: var(--blue);
+}
+/* Pocket Part stack and events carousel. */
+:root[data-style="botanical"] .scroll-stack-card {
+  background: var(--grain), var(--paper);
+  color: var(--ink);
+  border-radius: 16px;
+  box-shadow: 0 0 0 1px var(--glass-edge), 0 -10px 30px -18px rgba(40, 28, 10, 0.3),
+    0 22px 40px -26px rgba(40, 28, 10, 0.45);
+}
+:root[data-style="botanical"] .law-events .carousel-container {
+  --carousel-frame: var(--paper) !important;
+  --carousel-tile: var(--paper) !important;
+  --carousel-ink: var(--ink) !important;
+  --carousel-muted: var(--muted) !important;
+  --carousel-faint: var(--line) !important;
+  --carousel-soft: var(--b-moss) !important;
+  --carousel-badge: var(--nav) !important;
+}
+:root[data-style="botanical"] .law-events :is(.carousel-arrow, .event-playback) {
+  background: var(--paper);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+:root[data-style="botanical"] .law-events .carousel-card img {
+  border-radius: 10px;
+}
+/* Page headings on other views: a fern unfurls each time the view opens. */
+:root[data-style="botanical"] .page-heading > h1 {
+  font-size: clamp(2.6rem, 4.2vw, 4.2rem);
+}
+:root[data-style="botanical"] .page-heading > h1::after {
+  content: "" / "";
+  display: inline-block;
+  width: 0.6em;
+  height: 1em;
+  margin-left: 0.14em;
+  vertical-align: -0.06em;
+  background: linear-gradient(170deg, var(--leaf-light), var(--leaf-deep));
+  -webkit-mask: var(--fern-mask) center / contain no-repeat;
+  mask: var(--fern-mask) center / contain no-repeat;
+  transform-origin: 40% 96%;
+  pointer-events: none;
+}
+:root[data-style="botanical"][data-theme="dark"] .page-heading > h1::after {
+  background: linear-gradient(170deg, #a8c39a, var(--leaf-light));
+}
+:root[data-style="botanical"] {
+  --fern-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-26 -104 64 108'%3E%3Cpath d='M0 0Q3.9 -60 26 -100' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round'/%3E%3Cg fill='%23000'%3E%3Cpath transform='translate(0.8 -10.4) rotate(-54.6)' d='M0 0C2.3 -3 1.3 -9.7 -1.3 -13.4C-2.6 -9.7 -2.3 -3 0 0Z'/%3E%3Cpath transform='translate(0.6 -8.3) rotate(65)' d='M0 0C2.3 -3 2.6 -9.7 1.3 -13.4C-1.3 -9.7 -2.3 -3 0 0Z'/%3E%3Cpath transform='translate(1.8 -19.8) rotate(-53)' d='M0 0C3.3 -4.3 1.8 -14 -1.9 -19.4C-3.8 -14 -3.3 -4.3 0 0Z'/%3E%3Cpath transform='translate(1.6 -17.8) rotate(66.7)' d='M0 0C3.3 -4.3 3.8 -14 1.9 -19.4C-1.8 -14 -3.3 -4.3 0 0Z'/%3E%3Cpath transform='translate(3.1 -28.9) rotate(-51.2)' d='M0 0C3.4 -4.5 1.9 -14.6 -2 -20.3C-3.9 -14.6 -3.4 -4.5 0 0Z'/%3E%3Cpath transform='translate(2.8 -26.9) rotate(68.4)' d='M0 0C3.4 -4.5 3.9 -14.6 2 -20.3C-1.9 -14.6 -3.4 -4.5 0 0Z'/%3E%3Cpath transform='translate(4.6 -37.8) rotate(-49.4)' d='M0 0C3.2 -4.2 1.8 -13.6 -1.9 -18.9C-3.7 -13.6 -3.2 -4.2 0 0Z'/%3E%3Cpath transform='translate(4.3 -35.9) rotate(70.2)' d='M0 0C3.2 -4.2 3.7 -13.6 1.9 -18.9C-1.8 -13.6 -3.2 -4.2 0 0Z'/%3E%3Cpath transform='translate(6.4 -46.4) rotate(-47.5)' d='M0 0C3 -3.8 1.6 -12.6 -1.7 -17.4C-3.4 -12.6 -3 -3.8 0 0Z'/%3E%3Cpath transform='translate(6 -44.5) rotate(72.1)' d='M0 0C3 -3.8 3.4 -12.6 1.7 -17.4C-1.6 -12.6 -3 -3.8 0 0Z'/%3E%3Cpath transform='translate(8.4 -54.7) rotate(-45.5)' d='M0 0C2.7 -3.5 1.5 -11.5 -1.6 -15.9C-3.1 -11.5 -2.7 -3.5 0 0Z'/%3E%3Cpath transform='translate(7.9 -52.9) rotate(74.1)' d='M0 0C2.7 -3.5 3.1 -11.5 1.6 -15.9C-1.5 -11.5 -2.7 -3.5 0 0Z'/%3E%3Cpath transform='translate(10.6 -62.8) rotate(-43.4)' d='M0 0C2.4 -3.2 1.4 -10.3 -1.4 -14.4C-2.8 -10.3 -2.4 -3.2 0 0Z'/%3E%3Cpath transform='translate(10.1 -61) rotate(76.1)' d='M0 0C2.4 -3.2 2.8 -10.3 1.4 -14.4C-1.4 -10.3 -2.4 -3.2 0 0Z'/%3E%3Cpath transform='translate(13.1 -70.6) rotate(-41.2)' d='M0 0C2.2 -2.8 1.2 -9.1 -1.3 -12.7C-2.5 -9.1 -2.2 -2.8 0 0Z'/%3E%3Cpath transform='translate(12.5 -68.9) rotate(78.3)' d='M0 0C2.2 -2.8 2.5 -9.1 1.3 -12.7C-1.2 -9.1 -2.2 -2.8 0 0Z'/%3E%3Cpath transform='translate(15.8 -78.1) rotate(-38.9)' d='M0 0C1.9 -2.4 1 -7.9 -1.1 -10.9C-2.1 -7.9 -1.9 -2.4 0 0Z'/%3E%3Cpath transform='translate(15.2 -76.4) rotate(80.6)' d='M0 0C1.9 -2.4 2.1 -7.9 1.1 -10.9C-1 -7.9 -1.9 -2.4 0 0Z'/%3E%3Cpath transform='translate(18.8 -85.3) rotate(-36.5)' d='M0 0C1.5 -2 0.8 -6.5 -0.9 -9C-1.7 -6.5 -1.5 -2 0 0Z'/%3E%3Cpath transform='translate(18.1 -83.8) rotate(82.9)' d='M0 0C1.5 -2 1.7 -6.5 0.9 -9C-0.8 -6.5 -1.5 -2 0 0Z'/%3E%3Cpath transform='translate(22 -92.3) rotate(-34)' d='M0 0C1.5 -1.5 0.9 -4.9 -0.7 -6.7C-1.6 -4.9 -1.5 -1.5 0 0Z'/%3E%3Cpath transform='translate(21.3 -90.8) rotate(85.4)' d='M0 0C1.5 -1.5 1.6 -4.9 0.7 -6.7C-0.9 -4.9 -1.5 -1.5 0 0Z'/%3E%3Cpath transform='translate(25.5 -99) rotate(-31.5)' d='M0 0C1.5 -0.9 1.1 -2.8 -0.4 -3.9C-1.5 -2.8 -1.5 -0.9 0 0Z'/%3E%3Cpath transform='translate(24.7 -97.6) rotate(88)' d='M0 0C1.5 -0.9 1.5 -2.8 0.4 -3.9C-1.1 -2.8 -1.5 -0.9 0 0Z'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* =====================================================================
+   8. Illustrations
+   ===================================================================== */
+:root[data-style="botanical"] .fern-rachis,
+.botanical-background .fern-rachis {
+  fill: none;
+  stroke: var(--stem);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.fern-pinna {
+  fill: var(--leaf);
+}
+.fern-pinna.is-light {
+  fill: var(--leaf-light);
+}
+.monstera-blade {
+  fill: var(--leaf);
+}
+.monstera-ribs,
+.monstera-midrib {
+  fill: none;
+  stroke: var(--leaf-vein);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+.monstera-midrib {
+  stroke-width: 2.4;
+}
+.monstera-petiole {
+  fill: none;
+  stroke: var(--stem);
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+.pothos-stem,
+.pothos-petiole,
+.sprig-stem,
+.wreath-stem {
+  fill: none;
+  stroke: var(--stem);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+.pothos-blade.tone-0 {
+  fill: var(--leaf);
+}
+.pothos-blade.tone-1 {
+  fill: var(--leaf-light);
+}
+.pothos-blade.tone-2 {
+  fill: var(--leaf-deep);
+}
+.pothos-variegation {
+  fill: none;
+  stroke: var(--variegation);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+}
+.sprig-leaf,
+.wreath-leaf.tone-0 {
+  fill: var(--leaf-light);
+}
+.wreath-leaf.tone-1 {
+  fill: var(--leaf);
+}
+.wreath-leaf.tone-2 {
+  fill: var(--leaf-pale);
+}
+.sprig-berry,
+.wreath-berry {
+  fill: var(--berry);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+/* Hero plant corner. Out of the grid flow, behind the hero's content. */
+.glass-host > .hero-flora {
+  position: absolute;
+  z-index: 0;
+  top: -6%;
+  right: -3%;
+  height: 112%;
+  width: auto;
+  aspect-ratio: 420 / 520;
+  pointer-events: none;
+  overflow: visible;
+}
+.hero-flora-fern-back .fern-pinna {
+  fill: var(--leaf-pale);
+  opacity: 0.55;
+}
+.hero-flora .sway,
+.hero-flora .sway-late,
+.hero-flora .sway-slow,
+.bb-leaf {
+  transform-box: view-box;
+}
+:root[data-style="botanical"] .hero-portrait {
+  position: relative;
+}
+.portrait-wreath {
+  position: absolute;
+  width: 84%;
+  aspect-ratio: 1;
+  overflow: visible;
+  pointer-events: none;
+}
+.hero-portrait .portrait-wreath {
+  z-index: 0;
+}
+.flourish {
+  overflow: visible;
+}
+.flourish .sprig-stem {
+  stroke-dasharray: 1 2;
+}
+.sprout {
+  width: 30px;
+  height: 30px;
+  flex: none;
+}
+.sprout-soil {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+.sprout-stem {
+  fill: none;
+  stroke: var(--stem);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 1 2;
+}
+.sprout-leaf {
+  fill: var(--leaf-light);
+}
+:root[data-style="botanical"] .load-state {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.leaf-glyph {
+  display: inline-block;
+}
+
+/* =====================================================================
+   9. Backgrounds
+   ===================================================================== */
+.botanical-background,
+.botanical-background > *,
+.bb-foliage,
+.bb-light,
+.bb-herbarium {
+  position: absolute;
+  inset: 0;
+}
+.bb-wash {
+  background: radial-gradient(70% 55% at 88% 0%, rgba(255, 244, 210, 0.85), transparent 70%),
+    radial-gradient(60% 50% at 0% 100%, rgba(168, 184, 154, 0.3), transparent 70%),
+    var(--bg);
+}
+[data-theme="dark"] .bb-wash {
+  background: radial-gradient(60% 50% at 10% 0%, rgba(150, 190, 170, 0.12), transparent 70%),
+    radial-gradient(70% 60% at 100% 100%, rgba(47, 96, 69, 0.35), transparent 70%),
+    var(--bg);
+}
+.bb-grain {
+  background: var(--grain);
+  opacity: 0.9;
+}
+.bb-leaf {
+  position: absolute;
+  overflow: visible;
+  translate: 0 calc(var(--scroll, 0) * var(--depth, 0) * -1px);
+  will-change: transform;
+}
+.bb-leaf :is(.monstera-blade, .fern-pinna, .pothos-blade) {
+  fill: currentColor;
+}
+.bb-leaf :is(.fern-rachis, .monstera-petiole, .pothos-stem, .pothos-petiole) {
+  stroke: currentColor;
+}
+.bb-leaf .pothos-variegation {
+  display: none;
+}
+.bb-back {
+  --depth: 0.03;
+  color: var(--bg-leaf-back);
+  filter: blur(5px);
+}
+.bb-mid {
+  --depth: 0.06;
+  color: var(--bg-leaf-mid);
+  filter: blur(1.5px);
+}
+.bb-front {
+  --depth: 0.1;
+  color: var(--bg-leaf-front);
+}
+.bb-tl {
+  top: -12vmin;
+  left: -14vmin;
+  width: min(58vmin, 620px);
+  transform-origin: 20% 10%;
+}
+.bb-tr {
+  top: -16vmin;
+  right: -10vmin;
+  width: min(54vmin, 560px);
+  transform-origin: 80% 0%;
+}
+.bb-br {
+  right: -8vmin;
+  bottom: -8vmin;
+  width: min(50vmin, 520px);
+  transform-origin: 70% 100%;
+}
+.bb-bl {
+  left: -6vmin;
+  bottom: -10vmin;
+  width: min(52vmin, 560px);
+  transform-origin: 15% 100%;
+}
+.bb-top {
+  top: 0;
+  left: 38%;
+  width: min(42vmin, 440px);
+  transform-origin: 0% 0%;
+}
+/* Light: dappled sun by day, fireflies by night. */
+.bb-sunbeam {
+  position: absolute;
+  inset: -20% -10% auto auto;
+  width: 70vw;
+  height: 140vh;
+  background: linear-gradient(105deg, transparent 30%, rgba(255, 240, 200, 0.28) 45%, transparent 60%),
+    linear-gradient(105deg, transparent 55%, rgba(255, 240, 200, 0.18) 64%, transparent 72%);
+  transform: rotate(8deg);
+  mix-blend-mode: soft-light;
+}
+.bb-dapple {
+  position: absolute;
+  width: var(--s, 22vmin);
+  aspect-ratio: 1.3;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--bg-light), transparent);
+  mix-blend-mode: soft-light;
+  opacity: 0.8;
+}
+.bb-dapple-0 { top: 8%; left: 58%; --s: 26vmin; }
+.bb-dapple-1 { top: 24%; left: 76%; --s: 16vmin; }
+.bb-dapple-2 { top: 52%; left: 64%; --s: 22vmin; }
+.bb-dapple-3 { top: 70%; left: 30%; --s: 18vmin; }
+.bb-dapple-4 { top: 14%; left: 30%; --s: 14vmin; }
+.bb-dapple-5 { top: 40%; left: 44%; --s: 12vmin; }
+.bb-dapple-6 { top: 82%; left: 72%; --s: 20vmin; }
+.bb-firefly {
+  display: none;
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #f2dc9a;
+  box-shadow: 0 0 6px 2px rgba(242, 220, 154, 0.7), 0 0 18px 6px rgba(242, 220, 154, 0.22);
+  opacity: 0.2;
+}
+[data-theme="dark"] .bb-firefly {
+  display: block;
+}
+[data-theme="dark"] .bb-dapple,
+[data-theme="dark"] .bb-sunbeam {
+  display: none;
+}
+.bb-firefly-0 { top: 18%; left: 22%; }
+.bb-firefly-1 { top: 32%; left: 68%; }
+.bb-firefly-2 { top: 64%; left: 14%; }
+.bb-firefly-3 { top: 78%; left: 52%; }
+.bb-firefly-4 { top: 44%; left: 86%; }
+.bb-firefly-5 { top: 12%; left: 54%; }
+.bb-firefly-6 { top: 56%; left: 40%; }
+.bb-firefly-7 { top: 86%; left: 82%; }
+.bb-firefly-8 { top: 26%; left: 92%; }
+.bb-firefly-9 { top: 70%; left: 66%; }
+.bb-firefly-10 { top: 38%; left: 30%; }
+.bb-firefly-11 { top: 90%; left: 26%; }
+.bb-firefly-12 { top: 8%; left: 78%; }
+.bb-firefly-13 { top: 50%; left: 60%; }
+/* Herbarium: pressed specimens on a journal page. */
+.bb-rule {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: max(18px, 3vw);
+  width: 1px;
+  background: color-mix(in srgb, var(--b-terracotta) 30%, transparent);
+}
+.bb-specimen {
+  position: absolute;
+  overflow: visible;
+  color: var(--specimen-ink);
+}
+.bb-specimen :is(.fern-pinna, .monstera-blade, .sprig-leaf) {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.1;
+}
+.bb-specimen :is(.fern-rachis, .monstera-petiole, .monstera-ribs, .monstera-midrib, .sprig-stem) {
+  stroke: currentColor;
+  stroke-width: 1.1;
+}
+.bb-specimen .sprig-berry {
+  fill: none;
+  stroke: currentColor;
+}
+.bb-tape {
+  fill: color-mix(in srgb, var(--b-parchment) 70%, transparent);
+  stroke: var(--specimen-ink);
+  stroke-width: 0.6;
+}
+[data-theme="dark"] .bb-tape {
+  fill: rgba(197, 164, 109, 0.12);
+}
+.bb-specimen-fern {
+  right: 4vw;
+  bottom: 6vh;
+  height: min(62vh, 560px);
+  transform: rotate(-8deg);
+}
+.bb-specimen-monstera {
+  left: 30%;
+  top: -4vh;
+  height: min(40vh, 380px);
+  transform: rotate(168deg);
+}
+.bb-specimen-sprig {
+  left: max(36px, 5vw);
+  bottom: 12vh;
+  width: min(30vw, 260px);
+  transform: rotate(-24deg);
+}
+/* Compact screens: a smaller plant corner and a forest-green dock. */
+@media (max-width: 800px) {
+  .glass-host > .hero-flora {
+    top: -40px;
+    right: -60px;
+    width: min(56%, 320px);
+    height: auto;
+  }
+}
+@media (max-width: 600px) {
+  .glass-host > .hero-flora {
+    top: -34px;
+    right: -54px;
+    width: 200px;
+    opacity: 0.7;
+  }
+  :root[data-style="botanical"] .primary-nav > .dock-glass,
+  :root[data-style="botanical"] .primary-nav > .dock-glass:not(.glass-layer-opaque) {
+    background: var(--grain), linear-gradient(180deg, #1d4433, var(--rail-bg));
+    box-shadow: inset 0 0 0 1px rgba(197, 164, 109, 0.24);
+  }
+  :root[data-style="botanical"][data-theme="dark"] .primary-nav > .dock-glass {
+    background: var(--grain), linear-gradient(180deg, #102419, var(--rail-bg));
+  }
+  :root[data-style="botanical"] .sidebar {
+    box-shadow: 0 12px 34px -12px rgba(12, 30, 20, 0.6);
+  }
+  :root[data-style="botanical"] .primary-nav > a[aria-current="page"] {
+    color: var(--rail-accent);
+    background: var(--rail-active);
+  }
+}
+@media (max-width: 800px) {
+  .bb-back,
+  .bb-top,
+  .bb-sunbeam,
+  .bb-dapple:nth-child(n + 5),
+  .bb-specimen-monstera {
+    display: none;
+  }
+}
+
+/* =====================================================================
+   10. Pip, transitions, motion & accessibility
+   ===================================================================== */
+@property --grow {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 1;
+}
+@property --water {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+.living-pothos {
+  --grow: 1;
+  --grow-floor: 0;
+  transition: --grow 0.7s cubic-bezier(0.22, 1, 0.36, 1), --water 0.9s ease;
+}
+.living-pothos-sidebar {
+  margin: 8px -6px -14px;
+}
+:root[data-sidebar="compact"] .living-pothos-sidebar {
+  display: none;
+}
+.living-pothos-footer {
+  order: -1;
+  flex-basis: 100%;
+  max-width: 220px;
+  margin-bottom: -8px;
+}
+.living-pothos-button {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: inherit;
+}
+.living-pothos-button svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.living-pothos-button:focus-visible {
+  outline: 2px solid var(--rail-accent, var(--blue));
+  outline-offset: 2px;
+}
+.pip-pot-body {
+  fill: var(--pot);
+}
+.pip-pot-rim {
+  fill: var(--pot-deep);
+}
+.pip-pot-shine {
+  fill: none;
+  stroke: rgba(255, 230, 205, 0.35);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+.pip-soil {
+  fill: var(--soil);
+}
+.living-pothos .pothos-leaf {
+  --size: clamp(0, calc((var(--grow) - var(--at)) * 7), 1);
+}
+.living-pothos .pothos-grow {
+  scale: var(--size);
+}
+/* The upright shoot is always there; the trailing vine does the growing. */
+.living-pothos .pip-vine-up {
+  --grow: 1;
+}
+.living-pothos .pothos-stem {
+  stroke-dasharray: 1 2;
+  stroke-dashoffset: calc(1 - var(--grow));
+}
+.living-pothos .pip-vine-bonus .pothos-grow {
+  scale: clamp(0, calc(var(--water) - var(--i)), 1);
+}
+.living-pothos .pip-vine-bonus .pothos-stem {
+  stroke-dashoffset: calc(1 - min(1, calc(var(--water) / var(--water-max) * 1.15)));
+}
+.living-pothos .pothos-petiole {
+  opacity: var(--size);
+}
+.living-pothos .pip-vine-bonus .pothos-petiole {
+  opacity: clamp(0, calc(var(--water) - var(--i)), 1);
+}
+.pip-droplets {
+  fill: #9cc4d6;
+  opacity: 0;
+}
+:root[data-flourish="off"] :is(.living-pothos, .living-pothos .pothos-grow) {
+  transition: none;
+}
+
+
+/* Motion: only when motion is welcome (not Calm, reduced motion, or contrast modes). */
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-style="botanical"][data-flourish="on"] {
+    /* Name settles in like ink. */
+    & .tech-heading > span:not(.sr-only) {
+      animation: botanical-ink 1.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    & .tech-heading > span:last-child:not(.sr-only) {
+      animation-delay: 0.18s;
+    }
+    /* Hero plants grow in, then sway; leaves respond to hover. */
+    & .hero-flora .fern-pinna {
+      animation: botanical-unfurl 0.9s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+      animation-delay: calc(0.35s + var(--i) * 55ms);
+    }
+    & .hero-flora .fern-rachis {
+      stroke-dasharray: 1 2;
+      animation: botanical-draw 1.2s ease-out 0.2s both;
+    }
+    & .hero-flora .hero-flora-fern {
+      animation: botanical-curl 1.8s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both,
+        botanical-sway 11s ease-in-out 2s infinite alternate;
+    }
+    & .hero-flora .hero-flora-fern-back {
+      animation: botanical-curl 2s cubic-bezier(0.22, 1, 0.36, 1) both,
+        botanical-sway 15s ease-in-out 2s infinite alternate-reverse;
+    }
+    & .hero-flora .hero-flora-monstera {
+      animation: botanical-lean-in 1.6s cubic-bezier(0.22, 1, 0.36, 1) both,
+        botanical-sway 13s ease-in-out 1.6s infinite alternate;
+    }
+    & .glass-hero:hover .hero-flora :is(.sway, .sway-late, .sway-slow) {
+      --sway: 2.4;
+    }
+    & .portrait-wreath .wreath-stem {
+      stroke-dasharray: 1 2;
+      animation: botanical-draw 1.4s ease-out 0.3s both;
+    }
+    & .portrait-wreath :is(.wreath-leaf, .wreath-berry) {
+      animation: botanical-unfurl 0.7s cubic-bezier(0.34, 1.5, 0.64, 1) both;
+      animation-delay: calc(0.4s + var(--i) * 70ms);
+    }
+    & .hero-portrait:hover .wreath-leaf {
+      animation: botanical-rustle 0.9s ease-in-out;
+      animation-delay: calc(var(--i) * 25ms);
+    }
+    /* Flourishes draw once in view. */
+    & .flourish:not([data-grown]) :is(.sprig-leaf, .sprig-berry) {
+      scale: 0;
+    }
+    & .flourish:not([data-grown]) .sprig-stem {
+      stroke-dashoffset: 1;
+    }
+    & .flourish[data-grown] .sprig-stem {
+      animation: botanical-draw 1s ease-out both;
+    }
+    & .flourish[data-grown] :is(.sprig-leaf, .sprig-berry) {
+      animation: botanical-unfurl 0.6s cubic-bezier(0.34, 1.5, 0.64, 1) both;
+      animation-delay: calc(0.2s + var(--i, 8) * 80ms);
+    }
+    /* Each view's heading fern unfurls when the view opens. */
+    & .view:not([hidden]) .page-heading > h1::after {
+      animation: botanical-fern-open 1.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    /* Loading seedling. */
+    & .sprout-stem {
+      animation: botanical-sprout-stem 2.4s ease-in-out infinite;
+    }
+    & .sprout-leaf {
+      animation: botanical-sprout-leaf 2.4s ease-in-out infinite;
+    }
+    /* Pip rustles on hover and drinks when watered. */
+    & .living-pothos-button:hover .pip-foliage,
+    & .living-pothos[data-watering] .pip-foliage {
+      transform-origin: 30px 54px;
+      animation: botanical-rustle 1s ease-in-out;
+    }
+    & .living-pothos[data-watering] .pip-droplets {
+      animation: botanical-drip 1.2s ease-in both;
+    }
+    & .living-pothos[data-watering] .pip-droplets path:nth-child(2) {
+      animation: botanical-drip-delay 1.2s ease-in both;
+    }
+    & .nav-active-dot {
+      transition-duration: 0.5s;
+    }
+    /* Branch leaves unfurl from base to tip each time a group opens. */
+    & .branched-menu__section[data-open] .branched-menu__leaf {
+      animation: botanical-unfurl 0.55s cubic-bezier(0.34, 1.5, 0.64, 1) both;
+      animation-delay: calc(0.12s + var(--i) * 60ms);
+    }
+    & :is(.wordmark, .mobile-wordmark):hover :is(.wordmark-sprig-leaf, .wordmark-sprig-bud) {
+      animation: botanical-rustle 0.9s ease-in-out;
+    }
+  }
+  /* Ambient background motion follows the background's own moving flag. */
+  .page-background-botanical[data-motion="moving"] {
+    & .bb-tl { animation: botanical-breeze 19s ease-in-out infinite alternate; }
+    & .bb-tr { animation: botanical-breeze 23s ease-in-out -6s infinite alternate-reverse; }
+    & .bb-br { animation: botanical-breeze 17s ease-in-out -3s infinite alternate; }
+    & .bb-bl { animation: botanical-breeze 21s ease-in-out -9s infinite alternate-reverse; }
+    & .bb-top { animation: botanical-dangle 13s ease-in-out infinite alternate; }
+    & .bb-dapple { animation: botanical-dapple 14s ease-in-out infinite alternate; }
+    & .bb-dapple:nth-child(2n) { animation-duration: 19s; animation-delay: -7s; }
+    & .bb-dapple:nth-child(3n) { animation-duration: 23s; animation-delay: -4s; }
+    & .bb-firefly { animation: botanical-firefly 9s ease-in-out infinite alternate, botanical-glow 3.2s ease-in-out infinite; }
+    & .bb-firefly:nth-child(2n) { animation-duration: 13s, 4.1s; animation-delay: -5s, -1s; }
+    & .bb-firefly:nth-child(3n) { animation-duration: 11s, 2.7s; animation-delay: -2s, -2s; animation-direction: alternate-reverse, normal; }
+    & .bb-sunbeam { animation: botanical-beam 16s ease-in-out infinite alternate; }
+  }
+}
+.page-background-botanical[data-motion="still"] .bb-leaf {
+  translate: none;
+}
+.hero-flora :is(.sway, .sway-late, .sway-slow) {
+  --sway: 1;
+}
+@keyframes botanical-ink {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+    transform: translateY(10px);
+  }
+}
+@keyframes botanical-unfurl {
+  from {
+    scale: 0;
+    rotate: -24deg;
+  }
+}
+@keyframes botanical-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes botanical-curl {
+  from {
+    rotate: -38deg;
+    scale: 0.55;
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+}
+@keyframes botanical-lean-in {
+  from {
+    rotate: 22deg;
+    opacity: 0;
+  }
+}
+@keyframes botanical-sway {
+  from {
+    rotate: calc(-1.2deg * var(--sway));
+  }
+  to {
+    rotate: calc(1.4deg * var(--sway));
+  }
+}
+@keyframes botanical-rustle {
+  0%, 100% { rotate: 0deg; }
+  25% { rotate: -3deg; }
+  60% { rotate: 2deg; }
+}
+@keyframes botanical-fern-open {
+  from {
+    rotate: -75deg;
+    scale: 0.3;
+    opacity: 0;
+  }
+  45% {
+    opacity: 0.8;
+  }
+}
+@keyframes botanical-sprout-stem {
+  0% { stroke-dashoffset: 1; }
+  40%, 85% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+@keyframes botanical-sprout-leaf {
+  0%, 30% { scale: 0; }
+  55%, 85% { scale: 1; }
+  100% { scale: 1; opacity: 0; }
+}
+@keyframes botanical-drip {
+  0% { opacity: 0; transform: translateY(-6px); }
+  15% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(42px); }
+}
+@keyframes botanical-drip-delay {
+  0%, 20% { opacity: 0; transform: translateY(-6px); }
+  35% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(44px); }
+}
+@keyframes botanical-breeze {
+  from { rotate: -1.4deg; }
+  to { rotate: 1.8deg; }
+}
+@keyframes botanical-dangle {
+  from { rotate: -2.4deg; }
+  to { rotate: 2deg; }
+}
+@keyframes botanical-dapple {
+  from { transform: translate(0, 0) scale(1); opacity: 0.45; }
+  to { transform: translate(3vmin, 2vmin) scale(1.12); opacity: 0.9; }
+}
+@keyframes botanical-beam {
+  from { opacity: 0.6; }
+  to { opacity: 1; }
+}
+@keyframes botanical-firefly {
+  from { transform: translate(0, 0); }
+  50% { transform: translate(4vmin, -3vmin); }
+  to { transform: translate(-2vmin, -6vmin); }
+}
+@keyframes botanical-glow {
+  0%, 100% { opacity: 0.15; }
+  45% { opacity: 1; }
+}
+
+/* High contrast and forced colors: plain surfaces, no decoration. */
+@media (prefers-contrast: more) {
+  :root[data-style="botanical"] {
+    --muted: #36432f;
+    --line: #6f6650;
+    --glass-edge: #6f6650;
+  }
+  :root[data-style="botanical"][data-theme="dark"] {
+    --muted: #d6dfc8;
+    --line: #8ea08a;
+    --glass-edge: #8ea08a;
+  }
+}
+@media (prefers-contrast: more), (forced-colors: active) {
+  :root[data-style="botanical"] :is(.hero-flora, .portrait-wreath, .section-flourish, .sheet-fern, .living-pothos, .load-sprout) {
+    display: none;
+  }
+  :root[data-style="botanical"] .page-heading > h1::after {
+    display: none;
+  }
+  :root[data-style="botanical"] .glass-layer {
+    background: var(--surface);
+  }
+}
+@media (forced-colors: active) {
+  :root[data-style="botanical"] .glass-layer,
+  :root[data-style="botanical"] .sidebar > .glass-layer {
+    background: Canvas;
+  }
+  :root[data-style="botanical"] .sidebar {
+    --ink: CanvasText;
+    --muted: CanvasText;
+  }
+}

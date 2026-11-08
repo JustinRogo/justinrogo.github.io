@@ -1,0 +1,42 @@
+/* Reveals for the site style switch and the light/dark toggle. The new view
+   grows out of the control that changed it: a leaf in Botanical, a circle in
+   Original. Set by reveal.js; only runs when motion is allowed. */
+html[data-reveal]::view-transition-old(root) {
+  animation: calc(var(--vt-duration, 1.15s) * 0.8) ease both reveal-recede;
+}
+html[data-reveal="leaf"]::view-transition-new(root) {
+  animation: var(--vt-duration, 1.15s) cubic-bezier(0.55, 0.06, 0.2, 1) both reveal-leaf;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 99C14 84 2 46 22 20 30 10 40 4 50 0c10 4 20 10 28 20 20 26 8 64-28 79Z'/%3E%3C/svg%3E") no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 99C14 84 2 46 22 20 30 10 40 4 50 0c10 4 20 10 28 20 20 26 8 64-28 79Z'/%3E%3C/svg%3E") no-repeat;
+}
+html[data-reveal="circle"]::view-transition-new(root) {
+  animation: var(--vt-duration, 0.8s) cubic-bezier(0.55, 0.06, 0.2, 1) both reveal-circle;
+}
+@keyframes reveal-leaf {
+  from {
+    -webkit-mask-size: 0 0;
+    mask-size: 0 0;
+    -webkit-mask-position: var(--vt-x) var(--vt-y);
+    mask-position: var(--vt-x) var(--vt-y);
+  }
+  to {
+    -webkit-mask-size: 360vmax 360vmax;
+    mask-size: 360vmax 360vmax;
+    -webkit-mask-position: calc(var(--vt-x) - 180vmax) calc(var(--vt-y) - 200vmax);
+    mask-position: calc(var(--vt-x) - 180vmax) calc(var(--vt-y) - 200vmax);
+  }
+}
+@keyframes reveal-circle {
+  from {
+    clip-path: circle(0 at var(--vt-x) var(--vt-y));
+  }
+  to {
+    clip-path: circle(var(--vt-r) at var(--vt-x) var(--vt-y));
+  }
+}
+@keyframes reveal-recede {
+  to {
+    transform: scale(0.985);
+    filter: brightness(0.9);
+  }
+}

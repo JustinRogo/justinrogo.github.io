@@ -1,6 +1,8 @@
 import { useEffect, useRef } from "react";
 import { GlassLayer } from "./Glass.jsx";
 import Icon from "./Icon.jsx";
+import { useBotanical } from "../botanical/siteStyle.js";
+import { Flourish, Sprout } from "../botanical/Flora.jsx";
 // Rendered once by App. A description, so links keep their exact names.
 export const newTabNote = "opens-new-tab";
 export const newTabLink = {
@@ -46,10 +48,12 @@ export function SectionTitle({
   glass = false,
   ...props
 }) {
+  const botanical = useBotanical();
   return (
     <div className={glass ? "section-title glass-host" : "section-title"} {...props}>
       {glass && <GlassLayer />}
       <h2 {...headingProps}>{children}</h2>
+      {botanical && <Flourish className="section-flourish" />}
       {description}
       {action}
     </div>
@@ -60,9 +64,11 @@ export function LoadState({
   children,
   message = "This source is unavailable right now.",
 }) {
+  const botanical = useBotanical();
   if (resource.loading)
     return (
       <p className="load-state" role="status">
+        {botanical && <Sprout className="load-sprout" />}
         Loading…
       </p>
     );

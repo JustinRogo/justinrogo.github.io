@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./original-style.mjs";
 
 const url = "/v2/?intro=0#/about?section=strengths";
 const luminance = ([r, g, b]) => {

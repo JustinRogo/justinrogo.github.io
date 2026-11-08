@@ -1,11 +1,11 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./original-style.mjs";
 import { createHash } from "node:crypto";
 import { mkdir } from "node:fs/promises";
 
 test.beforeEach(async ({ page }) => {
   await page.route("https://**/*", route => route.abort());
   await page.addInitScript(() => {
-    if (!localStorage.getItem("jr-v2-preferences")) localStorage.setItem("jr-v2-preferences", JSON.stringify({ theme: "dark", calm: true, atmosphere: true, background: "aurora" }));
+    if (!window.__savedPreferences()) localStorage.setItem("jr-v2-preferences", JSON.stringify({ theme: "dark", calm: true, atmosphere: true, background: "aurora" }));
   });
 });
 
