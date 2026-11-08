@@ -5,76 +5,91 @@ import AvailabilityCalendar from "../components/AvailabilityCalendar.jsx";
 import Icon from "../components/Icon.jsx";
 import { ExternalLink } from "../components/UI.jsx";
 
+// Matches the original site's library search: one scope tab per destination.
+const catalogTabs = [
+  ["Books & more", "Books & More", "Search Library Catalog"],
+  ["Journals", "Journals", "Search the Library’s E-Journals"],
+  ["Databases", "Databases", "Search the Library’s Databases"],
+  ["Course reserves", "Reserves", "Search Course Reserves"],
+  ["Research guides", "Research", "Search LibGuides"],
+];
+
 export function Catalog() {
-  const [type, setType] = useState("Books & more");
+  const [type, setType] = useState(catalogTabs[0][0]);
   const [query, setQuery] = useState("");
+  const tabs = useRef([]);
+  const current = catalogTabs.findIndex(([value]) => value === type);
+  function moveTab(event, index) {
+    const last = catalogTabs.length - 1;
+    const next = { ArrowRight: index === last ? 0 : index + 1, ArrowLeft: index ? index - 1 : last, Home: 0, End: last }[event.key];
+    if (next === undefined) return;
+    event.preventDefault();
+    setType(catalogTabs[next][0]);
+    tabs.current[next]?.focus();
+  }
   return (
     <section className="catalog-panel">
       <Icon name="book" size={36} />
       <h2 tabIndex={-1}>A good place to start looking.</h2>
       <p>Search the UConn Law Library’s collections and research resources.</p>
-      <form
-        action={
-          type === "Research guides"
-            ? "https://libguides.law.uconn.edu/srch.php"
-            : "https://uconn-law.primo.exlibrisgroup.com/discovery/search"
-        }
-        method="get"
-        target="_blank"
-        rel="noopener noreferrer"
-        onSubmit={(e) => {
-          e.preventDefault();
-          window.open(
-            catalogUrl(type, query.trim()),
-            "_blank",
-            "noopener,noreferrer",
-          );
-        }}
-      >
-        <label>
-          Search in
-          <select value={type} onChange={(e) => setType(e.target.value)}>
-            {[
-              "Books & more",
-              "Journals",
-              "Databases",
-              "Course reserves",
-              "Research guides",
-            ].map((t) => (
-              <option key={t}>{t}</option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Your search
-          <div className="catalog-query">
-            <input
-              required
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="A title, topic, author, or idea…"
-              aria-label="Library search query"
-            />
-            <button className="button primary" type="submit">
-              Search <Icon name="external" size={18} />
+      <div className="catalog-search">
+        <div className="catalog-tabs" role="tablist" aria-label="Search types">
+          {catalogTabs.map(([value, label], index) => (
+            <button
+              key={value}
+              ref={(el) => { tabs.current[index] = el; }}
+              type="button"
+              role="tab"
+              id={`catalog-tab-${index}`}
+              aria-controls="catalog-tabpanel"
+              aria-selected={value === type}
+              tabIndex={value === type ? 0 : -1}
+              onClick={() => setType(value)}
+              onKeyDown={(e) => moveTab(e, index)}
+            >
+              {label}
             </button>
-          </div>
-        </label>
-      </form>
-      <div className="button-row">
-        <ExternalLink
-          href="https://uconn-law.primo.exlibrisgroup.com/discovery/search?mode=advanced&vid=01UCT_LAW:01UCT_LAW"
-          className="text-link"
+          ))}
+        </div>
+        <form
+          id="catalog-tabpanel"
+          role="tabpanel"
+          aria-labelledby={`catalog-tab-${current}`}
+          className="catalog-query"
+          action={
+            type === "Research guides"
+              ? "https://libguides.law.uconn.edu/srch.php"
+              : "https://uconn-law.primo.exlibrisgroup.com/discovery/search"
+          }
+          method="get"
+          target="_blank"
+          rel="noopener noreferrer"
+          onSubmit={(e) => {
+            e.preventDefault();
+            window.open(catalogUrl(type, query.trim()), "_blank", "noopener,noreferrer");
+          }}
         >
-          Advanced search <Icon name="external" size={15} />
-        </ExternalLink>
-        <ExternalLink
-          href="https://uconn-law.primo.exlibrisgroup.com/discovery/account?vid=01UCT_LAW:01UCT_LAW"
-          className="text-link"
-        >
-          My library account <Icon name="external" size={15} />
-        </ExternalLink>
+          <input
+            required
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={catalogTabs[current][2]}
+            aria-label="Library search query"
+          />
+          <button className="button primary" type="submit">
+            Search <Icon name="external" size={18} />
+          </button>
+        </form>
+        <p className="catalog-links">
+          <ExternalLink href="https://uconn-law.primo.exlibrisgroup.com/discovery/search?mode=advanced&vid=01UCT_LAW:01UCT_LAW">
+            Advanced Keyword Search
+          </ExternalLink>
+          <span aria-hidden="true"> · </span>
+          <ExternalLink href="https://uconn-law.primo.exlibrisgroup.com/discovery/account?vid=01UCT_LAW:01UCT_LAW">
+            My Library Account
+          </ExternalLink>
+        </p>
       </div>
     </section>
   );

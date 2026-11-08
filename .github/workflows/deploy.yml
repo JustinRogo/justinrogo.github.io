@@ -32,12 +32,16 @@ jobs:
         with:
           path: |
             data/pocket-part.json
+            data/ai-corner.json
             data/outlook-availability.json
           key: pocket-part-${{ github.run_id }}-${{ github.run_attempt }}
           restore-keys: pocket-part-
 
       - name: Refresh Pocket Part feed
         run: node scripts/update-pocket-part.mjs
+
+      - name: Refresh AI Corner feed
+        run: node scripts/update-ai-corner.mjs
 
       - name: Refresh Outlook availability
         run: node scripts/update-outlook-availability.mjs
@@ -47,6 +51,7 @@ jobs:
         with:
           path: |
             data/pocket-part.json
+            data/ai-corner.json
             data/outlook-availability.json
           key: pocket-part-${{ github.run_id }}-${{ github.run_attempt }}
 

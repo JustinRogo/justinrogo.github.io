@@ -126,13 +126,14 @@ test("catalog builds all five original search destinations without writing data"
 }) => {
   await page.goto("/v2/#/tools");
   for (const [type, scope] of [
-    ["Books & more", "MyInst_and_CI"],
+    ["Books & More", "MyInst_and_CI"],
     ["Journals", "EJOURNALS"],
     ["Databases", "DATABASES"],
-    ["Course reserves", "CourseReserves"],
-    ["Research guides", null],
+    ["Reserves", "CourseReserves"],
+    ["Research", null],
   ]) {
-    await page.getByLabel("Search in").selectOption(type);
+    await page.getByRole("tab", { name: type, exact: true }).click();
+    await expect(page.getByRole("tab", { name: type, exact: true })).toHaveAttribute("aria-selected", "true");
     await page
       .getByRole("searchbox", { name: "Library search query" })
       .fill("law, policy & history");

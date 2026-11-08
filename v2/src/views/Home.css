@@ -10,7 +10,7 @@
 }
 /* Side by side when both fit at their base widths; Help takes the spare width, and each fills its own line once wrapped. */
 .home-help-row { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 16px; }
-.home-my-day { display: grid; flex: 1 1 340px; min-width: 0; }
+.home-my-day, .home-ai-corner { display: grid; flex: 1 1 340px; min-width: 0; }
 .home-help { display: grid; grid-template-rows: auto 1fr; flex: 999 1 320px; min-width: 0; gap: 12px; padding: 14px; }
 .home-help h2 { font-size: 1.3rem; padding-left: 2px; }
 .home-help ul { display: grid; grid-auto-rows: 1fr; gap: 8px; margin: 0; padding: 0; list-style: none; }

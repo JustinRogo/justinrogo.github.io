@@ -999,22 +999,61 @@ textarea::placeholder {
   padding: 12px 0;
   font-size: 0.9rem;
 }
-.catalog-panel form {
-  margin: 26px 0;
+/* The original site's search box: scope tabs over one search row. */
+.catalog-search {
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--bg) 35%, transparent);
+  overflow: clip;
 }
-.catalog-panel select {
-  width: 250px;
-  margin-bottom: 20px;
+.catalog-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px;
+  border-bottom: 1px solid var(--line);
+}
+.catalog-tabs [role="tab"] {
+  padding: 8px 13px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 160ms var(--ease), border-color 160ms var(--ease), color 160ms var(--ease);
+}
+.catalog-tabs [role="tab"]:hover {
+  border-color: var(--blue);
+  color: var(--ink);
+}
+.catalog-tabs [role="tab"][aria-selected="true"] {
+  background: var(--tint);
+  border-color: var(--blue);
+  color: var(--ink);
 }
 .catalog-query {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 10px;
+  padding: 16px;
 }
-.catalog-query input {
-  flex: 1;
+.catalog-links {
+  max-width: none;
+  margin: 0;
+  padding: 0 16px 14px;
+  color: var(--muted);
+  font-size: 0.85rem;
+  text-align: right;
 }
-.catalog-panel .button-row {
-  gap: 24px;
+.catalog-links a {
+  color: var(--ink);
+  text-underline-offset: 3px;
+}
+.catalog-links a:hover {
+  color: var(--blue);
 }
 .embed-panel .small {
   margin-top: 22px;
@@ -2024,24 +2063,18 @@ textarea {
     height: 30px;
     margin-bottom: 23px;
   }
-  .catalog-panel select {
-    width: 100%;
-    margin-bottom: 18px;
+  .catalog-tabs [role="tab"] {
+    padding: 7px 10px;
+    font-size: 0.78rem;
   }
+  /* The field takes the full width so every scope placeholder stays readable. */
   .catalog-query {
-    flex-direction: column;
-    gap: 12px;
+    grid-template-columns: minmax(0, 1fr);
+    padding: 12px;
   }
-  .catalog-query .button {
-    align-self: flex-start;
-  }
-  .catalog-panel .button-row {
-    gap: 9px;
-    align-items: flex-start;
-    flex-direction: column;
-  }
-  .catalog-panel .text-link {
-    font-size: 0.77rem;
+  .catalog-links {
+    padding-inline: 12px;
+    font-size: 0.78rem;
   }
   .form-grid {
     grid-template-columns: 1fr;
