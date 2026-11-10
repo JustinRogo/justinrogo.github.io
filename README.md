@@ -42,16 +42,9 @@ The site includes:
         ├── Library/
         │   ├── heatmap.html
         │   └── Timeline_LawLib.html
-        ├── UCPEA/
-        │   ├── index.html
-        │   └── UCPEAContract.html
-        └── cgs/
+        └── UCPEA/
             ├── index.html
-            ├── app.js
-            ├── styles.css
-            ├── sw.js
-            ├── README.md
-            └── data/
+            └── UCPEAContract.html
 ```
 
 ## Main site features
@@ -186,24 +179,7 @@ Run `npm ci` and `npm run dev`, then visit `/updates?preview=1` for a labeled lo
 
 Live site: `https://uconn-law-library.github.io/CGS/#/`
 
-A static, installable web app for browsing and searching the Connecticut General Statutes, subject index, and infractions schedule. The former `Pages/Work/cgs/` entry point redirects to the project's new repository site.
-
-Features include:
-
-- Browse statutes by title, chapter, and section
-- Search statute metadata and full text
-- Browse the official subject index
-- Browse infractions schedule data
-- Bookmark sections locally
-- Theme, text-size, and density controls
-- Progressive Web App support
-- Offline caching through a service worker
-
-See the dedicated project documentation:
-
-```text
-Pages/Work/cgs/README.md
-```
+A static, installable web app for browsing and searching the Connecticut General Statutes, subject index, and infractions schedule. It lives in its own repository (`UConn-Law-Library/CGS`); this site only links to it.
 
 ### Occupancy Heatmap Dashboard
 
@@ -296,6 +272,7 @@ When a folder contains an `index.html` entry in the manifest, the homepage autom
 `/Pages/Private/` holds pages encrypted with a single shared password (AES-GCM, key from PBKDF2-SHA256 at 600,000 iterations), decrypted in the visitor's browser.
 
 - Write content as HTML in the git-ignored `private/` folder. Fragments are wrapped in a site-styled page, while full `<html>` documents are used as-is. Relative `<img>` files are embedded and encrypted, and other assets are not.
+- Put `<!-- private-pages -->` in a page (as `private/index.html` does) to get a generated list of links to every other private page, titled from each page's `<title>` or `<h1>`.
 - Run `npm run private` to encrypt. The password comes from `PRIVATE_PASSWORD` in the environment or `.env.local`, or a prompt. Commit `Pages/Private/` and never `private/`.
 - Re-running with the same password keeps the salt, so visitors who chose "Remember me" stay unlocked. Run `npm run private -- --change-password` to switch passwords and sign everyone out.
 - These pages are deliberately left out of `data/pages.json` and the sitemap.
@@ -327,8 +304,7 @@ When updating the site:
 6. Confirm major project links still resolve.
 7. Review mobile layout.
 8. Check console errors in browser developer tools.
-9. If editing the CGS project, review its dedicated README first.
-10. After deployment, test the live GitHub Pages site.
+9. After deployment, test the live GitHub Pages site.
 
 ## Accessibility notes
 

@@ -110,6 +110,21 @@ async function inlineImages(html, fileDir) {
   return result + html.slice(last);
 }
 
+const pageTitle = (html, file) =>
+  (html.match(/<title\b[^>]*>([\s\S]*?)<\/title>/i) ?? html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i))?.[1].replace(/<[^>]+>/g, '').trim()
+  || path.basename(file, path.extname(file)).replace(/[-_]+/g, ' ');
+
+// <!-- private-pages --> in a page becomes a list of links to every other private page.
+function listPages(html, file, pages) {
+  return html.replace(/<!--\s*private-pages\s*-->/gi, () => {
+    const items = pages.filter(page => page.file !== file).map(page => {
+      const href = path.relative(path.dirname(file), page.file).split(path.sep).map(encodeURIComponent).join('/');
+      return `  <li><a href="${escapeHtml(href)}">${escapeHtml(page.title)}</a></li>`;
+    });
+    return items.length ? `<ul class="private-pages">\n${items.join('\n')}\n</ul>` : '<p>No other pages yet.</p>';
+  });
+}
+
 function wrapFragment(body, depth) {
   const title = body.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)?.[1].replace(/<[^>]+>/g, '').trim() || 'Private';
   const home = '../'.repeat(depth + 2);
@@ -253,6 +268,8 @@ function lockPage(payload) {
 const starter = `<h1>Private notes</h1>
 <p>This is the private section. Edit <code>private/index.html</code>, then run <code>npm run private</code> to re-encrypt it.</p>
 <p>Add more <code>.html</code> files to the <code>private/</code> folder to add more pages, and link between them with relative links like <code>&lt;a href="other.html"&gt;</code>. Images next to these files are embedded and encrypted too.</p>
+<h2>Pages</h2>
+<!-- private-pages -->
 `;
 
 if (!existsSync(sourceDir)) {
@@ -291,8 +308,12 @@ if (isNew) {
 
 await mkdir(outputDir, { recursive: true });
 const written = new Set(['vault.json']);
+const sources = new Map();
+for (const file of files) sources.set(file, await readFile(path.join(sourceDir, file), 'utf8'));
+const pages = files.map(file => ({ file, title: pageTitle(sources.get(file), file) }))
+  .sort((a, b) => a.title.localeCompare(b.title));
 for (const file of files) {
-  const source = await readFile(path.join(sourceDir, file), 'utf8');
+  const source = listPages(sources.get(file), file, pages);
   const depth = file.split(path.sep).length - 1;
   const inlined = await inlineImages(source, path.dirname(path.join(sourceDir, file)));
   const doc = /<html[\s>]/i.test(inlined) ? inlined : wrapFragment(inlined, depth);

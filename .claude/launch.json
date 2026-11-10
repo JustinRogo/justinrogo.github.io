@@ -4,19 +4,20 @@
     {
       "name": "site",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8766"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8766"
+      ],
       "port": 8766
-    },
-    {
-      "name": "cgs",
-      "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8765", "--directory", "Pages/Work/cgs"],
-      "port": 8765
     },
     {
       "name": "v2",
       "runtimeExecutable": "node",
-      "runtimeArgs": ["v2/serve.mjs", "--watch"],
+      "runtimeArgs": [
+        "v2/serve.mjs",
+        "--watch"
+      ],
       "port": 4392
     }
   ]
