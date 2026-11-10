@@ -155,33 +155,50 @@ test("catalog builds all five original search destinations without writing data"
   }
 });
 
-test("request sends the form through FormSubmit and confirms after its return", async ({
+test("request saves through the requests API with success and error states", async ({
   page,
 }) => {
-  let submission;
-  await page.route("https://formsubmit.co/**", async (route) => {
-    submission = new URLSearchParams(route.request().postData());
-    expect(route.request().method()).toBe("POST");
-    await route.fulfill({ status: 303, headers: { location: "http://127.0.0.1:4392/?sent=1#/tools?panel=request" } });
+  const submissions = [];
+  let reply = { status: 503, body: { error: "Requests are not available right now. Please email me instead." } };
+  await page.route("**/api/requests", async (route) => {
+    submissions.push({ method: route.request().method(), body: route.request().postDataJSON() });
+    await route.fulfill({
+      status: reply.status,
+      contentType: "application/json",
+      headers: { "access-control-allow-origin": "*" },
+      body: JSON.stringify(reply.body),
+    });
   });
   await page.goto("/v2/#/tools?panel=request");
+  const panel = page.locator(".request-panel");
+  await expect(panel).not.toContainText(/Trello|FormSubmit|public board/i);
+  await expect(panel.getByRole("link")).toHaveCount(0);
   await page.getByRole("button", { name: "Send request" }).click();
-  expect(submission).toBeUndefined();
+  expect(submissions).toHaveLength(0);
   await page.getByLabel("Your name").fill("Browser test");
   await page.getByLabel("Email", { exact: true }).fill("test@example.com");
   await page.getByLabel("Subject", { exact: true }).fill("  A test request  ");
   await page.getByLabel("What are you thinking?").fill("Intercepted by the browser test.");
   await page.getByRole("button", { name: "Send request" }).click();
-  await expect(page.locator(".request-confirmation")).toHaveText("Thanks! Your request was submitted.");
-  expect(Object.fromEntries(submission)).toMatchObject({
-    name: "Browser test",
-    email: "test@example.com",
-    _subject: "A test request",
-    details: "Intercepted by the browser test.",
-    _honey: "",
-    _next: "https://justinrogo.github.io/?sent=1#/tools?panel=request",
+  await expect(panel.getByRole("alert")).toHaveText("Requests are not available right now. Please email me instead.");
+  await expect(page.getByLabel("Your name")).toHaveValue("Browser test");
+  reply = { status: 201, body: { ok: true } };
+  await page.getByRole("button", { name: "Send request" }).click();
+  await expect(panel.getByRole("status")).toHaveText("Thanks! Your request was sent. I’ll reply by email.");
+  await expect(panel.getByRole("alert")).toHaveCount(0);
+  await expect(page.getByLabel("Your name")).toHaveValue("");
+  expect(submissions).toHaveLength(2);
+  expect(submissions[1]).toMatchObject({
+    method: "POST",
+    body: {
+      name: "Browser test",
+      email: "test@example.com",
+      subject: "  A test request  ",
+      details: "Intercepted by the browser test.",
+      website: "",
+    },
   });
-  await expect(page).toHaveURL(/\/#\/tools\?panel=request$/);
+  expect(submissions[1].body.elapsed).toBeGreaterThan(0);
 });
 
 test("the topbar switches themes directly and phone settings are available from More", async ({ page }) => {

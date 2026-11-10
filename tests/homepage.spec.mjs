@@ -36,7 +36,7 @@ test('the primary homepage and V2 bookmarks share the same app and link to the o
     await expect(mainTabs(page).getByRole('tab')).toHaveCount(5);
   }
   await page.goto('/#/tools?panel=request');
-  await expect(page.locator('.request-panel form')).toHaveAttribute('action', /formsubmit\.co/);
+  await expect(page.locator('.request-panel form')).not.toHaveAttribute('action', /./);
 });
 
 async function assertIndicator(page) {
@@ -128,11 +128,15 @@ test('main tabs support roving focus, arrows, Home/End and persistent lazy frame
   expect(errors).toEqual([]);
 });
 
-test('request form retains input, native validation, Trello subject and redirect state', async ({ page }) => {
-  await open(page, '/original.html?sent=1&keep=yes#profile');
-  await expect(page.locator('#tbtn-req')).toHaveAttribute('aria-selected', 'true');
-  await expect(page.locator('#requestSent')).toBeVisible();
-  await expect(page).toHaveURL(/\?keep=yes#profile$/);
+test('request form retains input, validates natively and posts JSON to the requests API', async ({ page }) => {
+  let submission;
+  await page.route('**/api/requests', async route => {
+    submission = { method: route.request().method(), body: route.request().postDataJSON() };
+    await route.fulfill({ status: 201, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: '{"ok":true}' });
+  });
+  await open(page, '/original.html#profile');
+  await page.locator('#tbtn-req').click();
+  await expect(page.locator('#tab-req iframe')).toHaveCount(0);
   const form = page.locator('#requestForm');
   expect(await form.evaluate(element => element.checkValidity())).toBe(false);
   await form.getByLabel('Name', { exact: true }).fill('Local Test');
@@ -142,13 +146,12 @@ test('request form retains input, native validation, Trello subject and redirect
   await page.locator('#tbtn-cat').click();
   await page.locator('#tbtn-req').click();
   await expect(form.getByLabel('Subject', { exact: true })).toHaveValue('  Local request title  ');
-  // Prevent transmission; inspect the normal submit handler's result locally.
-  await form.evaluate(element => element.addEventListener('submit', event => event.preventDefault(), { once: true }));
+  await page.waitForTimeout(2000);
   await form.getByRole('button', { name: 'Send Request' }).click();
-  await expect(form.locator('[name="_subject"]')).toHaveValue('Local request title');
-  await expect(form).toHaveAttribute('method', 'POST');
-  await expect(form).toHaveAttribute('action', /formsubmit\.co\/justinrogowski1/);
-  await expect(form.locator('[name="_next"]')).toHaveValue('https://justinrogo.github.io/original.html?sent=1#widget-tabs-root');
+  await expect(page.locator('#requestSent')).toBeVisible();
+  expect(submission.method).toBe('POST');
+  expect(submission.body).toMatchObject({ name: 'Local Test', email: 'test@example.com', subject: '  Local request title  ', details: 'Local browser test only', website: '' });
+  await expect(form.getByLabel('Subject', { exact: true })).toHaveValue('');
 });
 
 test('profile control, strength disclosures, filters and nested catalog tabs still work', async ({ page }) => {
@@ -365,7 +368,6 @@ test('touch operates disclosures and tabs without a hover dependency', async ({ 
 
 test('an unavailable embedded service does not prevent tab navigation or the request form', async ({ page }) => {
   await page.route('https://outlook.**/*', route => route.abort());
-  await page.route('https://trello.com/**', route => route.abort());
   await open(page);
   await page.locator('#tbtn-cal').click();
   await expect(page.locator('#tab-cal iframe')).toHaveAttribute('src', /outlook/);
@@ -380,7 +382,9 @@ test('production includes static assets and preserves standalone paths and Updat
     expect((await request.get(file)).ok(), file).toBe(true);
   }
   for (const entry of manifest.pages) {
-    expect((await request.get('/' + entry.path)).ok(), entry.path).toBe(true);
+    // Pages with an href live elsewhere (e.g. the CGS Explorer's own repository); their path is only an ID.
+    if (entry.href) expect(entry.href, entry.path).toMatch(/^https:\/\//);
+    else expect((await request.get('/' + entry.path)).ok(), entry.path).toBe(true);
   }
   expect((await request.get('/updates')).ok()).toBe(true);
   expect((await request.get('/updates/embed')).ok()).toBe(true);

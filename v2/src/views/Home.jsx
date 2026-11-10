@@ -23,7 +23,7 @@ import "./Home.css";
 
 const helpLinks = [
   ["Book a meeting", "Find a time that works for both of us.", "#/tools?panel=booking", "calendar"],
-  ["Start a request", "Send something to my task board.", "#/tools?panel=request", "mail"],
+  ["Start a request", "Send me a question or project idea.", "#/tools?panel=request", "mail"],
   ["Search the library", "Books, journals, databases, and guides.", "#/tools?panel=catalog", "search"],
 ];
 

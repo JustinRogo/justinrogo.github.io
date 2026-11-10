@@ -53,17 +53,24 @@ function GithubFeed() {
   const cgs = useResource(
     "https://api.github.com/repos/UConn-Law-Library/CGS/commits?per_page=3",
   );
+  const readingRoom = useResource(
+    "https://api.github.com/repos/UConn-Law-Library/CGS/commits?sha=codex%2Fcgs-reading-room-prototype&per_page=3",
+  );
   const sources = [
     [site, "This site"],
     [library, "Law Library"],
     [cgs, "CGS Explorer"],
+    [readingRoom, "CGS Reading Room"],
   ];
+  const seen = new Set();
   const commits = sources
     .flatMap(([resource, label]) =>
       Array.isArray(resource.data)
         ? resource.data.map((c) => ({ ...c, label }))
         : [],
     )
+    // The prototype branch shares history with CGS's main branch; show each commit once.
+    .filter((c) => !seen.has(c.sha) && seen.add(c.sha))
     .sort(
       (a, b) =>
         new Date(b.commit?.author?.date) - new Date(a.commit?.author?.date),
@@ -73,7 +80,7 @@ function GithubFeed() {
     <section className="more-feed-panel glass-host" aria-labelledby="workbench-title">
       <GlassLayer />
       <SectionTitle headingProps={{ id: "workbench-title" }}>From the workbench</SectionTitle>
-      <p className="muted">Recent public commits across three repositories.</p>
+      <p className="muted">Recent public commits across my repositories.</p>
       {sources.some(([s]) => s.loading) && (
         <p role="status">Checking GitHub…</p>
       )}
@@ -121,7 +128,6 @@ export default function More({
   projectPages,
 }) {
   const blog = useResource("../data/pocket-part.json", parsePocketPart);
-  const counts = useResource("../data/cards_count.json");
   const events = useResource(integrations.events, parseEvents);
   return (
     <>
@@ -140,21 +146,9 @@ export default function More({
         <section className="activity-note">
           <h2>In the mix</h2>
           <p>Tending plants · Power BI · Other duties as assigned</p>
-          <LoadState resource={counts}>
-            {(data) => (
-              <p className="task-count">
-                <strong>{data.completed_count}</strong> completed{" "}
-                <span>of {data.total_count} requests</span>
-              </p>
-            )}
-          </LoadState>
-          <ExternalLink href={integrations.board} className="text-link">
-            Open the request board <Icon name="external" size={16} />
-          </ExternalLink>
-          <p className="muted small">
-            Counts from the site’s saved Trello snapshot; not a live task
-            editor.
-          </p>
+          <a href="#/tools?panel=request" className="text-link">
+            Send me a request <Icon name="arrow" size={16} />
+          </a>
         </section>
         <section className="weather-note">
           <h2>Hartford, Connecticut</h2>

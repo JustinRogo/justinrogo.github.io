@@ -1080,17 +1080,12 @@ textarea {
   resize: vertical;
   min-height: 140px;
 }
-.request-live {
-  border-top: 1px solid var(--line);
-  margin-top: 32px;
-  padding-top: 24px;
-  font-size: 0.83rem;
-  color: var(--muted);
-}
-.request-live > a {
-  display: flex;
-  width: fit-content;
-  margin-top: 10px;
+.request-honeypot {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
 }
 .request-confirmation {
   background: var(--tint);
@@ -1098,6 +1093,12 @@ textarea {
   padding: 14px;
   border-radius: 4px;
   font-size: 0.85rem;
+}
+.request-error {
+  border-left: 3px solid var(--orange);
+}
+.request-panel form[aria-busy="true"] .button {
+  cursor: progress;
 }
 /* About gives professional history room to be read. */
 .about-intro {
@@ -1269,22 +1270,10 @@ textarea {
   font-size: 0.85rem;
   margin-top: 15px;
 }
-.task-count strong {
-  font-size: 2.2rem;
-  letter-spacing: -0.04em;
-  line-height: 1.1;
-  font-weight: 550;
-  margin-right: 5px;
-}
-.task-count span {
-  display: block;
-  color: var(--muted);
-  font-size: 0.78rem;
-  margin: 8px 0 18px;
-}
-.activity-note > .small {
-  font-size: 0.72rem;
-  color: var(--muted);
+.activity-note > .text-link {
+  display: flex;
+  width: fit-content;
+  margin-top: 18px;
 }
 .weather-note {
   padding: 28px;
@@ -2082,12 +2071,6 @@ textarea {
   }
   .form-grid .full {
     grid-column: auto;
-  }
-  .request-live {
-    font-size: 0.8rem;
-  }
-  .request-live .text-link {
-    font-size: 0.75rem;
   }
   .service-frame {
     height: 540px;

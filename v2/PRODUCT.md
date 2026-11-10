@@ -18,13 +18,13 @@ V2 is the root homepage, with `/v2/` retained for existing links. V1’s origina
 
 `data/pages.json` remains the project source of truth. Professional copy and strengths come from the existing homepage and source; no credentials or accomplishments are invented. The build extracts all 34 strengths and both best/overextended reflection passages from V1’s source without invoking its DOM initializer. About includes the four original domain colors and a rank-weighted overview of all 34 themes, using 35 − rank points; the By domain (default) and Top 5/10/34 controls do not change that overview. A rank-ordered strand of all 34 themes sits below those controls and links to each theme. The existing portrait is downloaded unchanged with provenance recorded alongside it; the site loads a WebP copy generated from it.
 
-`data/pocket-part.json` and `data/cards_count.json` are existing snapshots. The blog displays its generation date; task counts are explicitly labeled as a saved snapshot. Weather, GitHub commits and events make read-only browser requests with timeouts, failure messages and direct source access. API results cache for the current app session and refresh on reload. External services may fail, require cookies, restrict embedding, or rate-limit requests.
+`data/pocket-part.json` is an existing snapshot. The blog displays its generation date. Weather, GitHub commits and events make read-only browser requests with timeouts, failure messages and direct source access. API results cache for the current app session and refresh on reload. External services may fail, require cookies, restrict embedding, or rate-limit requests.
 
 ## State and safety
 
 URL hashes own destinations and project search/filter state so static hosting refreshes and browser history work. Saved projects and theme/motion/background preferences persist under V2-specific localStorage keys. Visited tool panels preserve unsent form inputs and the loaded booking embed within the current document.
 
-The Request panel posts through the original FormSubmit integration to the public Trello board. The Calendar panel renders a same-origin availability snapshot from the published Outlook ICS feed. The build exports dates, times, and fixed availability labels and keeps event metadata out of the snapshot. The Bookings embed loads on demand. Automated tests intercept form submissions.
+The Request panel saves submissions to Supabase through the Vercel `/api/requests` route without sign-in; only the site owner can read them (`docs/requests-setup.md`). The Calendar panel renders a same-origin availability snapshot from the published Outlook ICS feed. The build exports dates, times, and fixed availability labels and keeps event metadata out of the snapshot. The Bookings embed loads on demand. Automated tests intercept form submissions.
 
 ## Accessibility and performance
 

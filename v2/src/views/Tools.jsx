@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { requestEndpoint } from "../../../src/request-form.js";
+import { requestLimits, submitRequest } from "../../../src/request-form.js";
 import { catalogUrl, integrations } from "../content.js";
 import AvailabilityCalendar from "../components/AvailabilityCalendar.jsx";
 import Icon from "../components/Icon.jsx";
@@ -125,61 +125,78 @@ function BookingPanel() {
     </section>
   );
 }
+const requestFields = [
+  ["name", "Your name", "name"],
+  ["email", "Email", "email"],
+  ["subject", "Subject", "off"],
+];
 function RequestPanel() {
-  const [sent] = useState(() => new URLSearchParams(location.search).get("sent") === "1");
+  // idle | sending | sent | error
+  const [state, setState] = useState("idle");
+  const [error, setError] = useState("");
+  const startedAt = useRef(performance.now());
+  const status = useRef(null);
   useEffect(() => {
-    if (!sent) return;
-    const url = new URL(location.href);
-    url.searchParams.delete("sent");
-    history.replaceState(history.state, "", url);
-  }, [sent]);
+    if (state === "sent" || state === "error") status.current?.focus();
+  }, [state]);
+  async function send(event) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    setState("sending");
+    try {
+      await submitRequest(form, startedAt.current);
+      form.reset();
+      startedAt.current = performance.now();
+      setState("sent");
+    } catch (failure) {
+      setError(failure.message);
+      setState("error");
+    }
+  }
   return (
     <section className="request-panel">
       <h2 tabIndex={-1}>Something I can help with?</h2>
-      <p>
-        FormSubmit sends your request to my Trello board. The information you enter may appear on the public board.
-      </p>
-      {sent && <p className="request-confirmation" role="status">Thanks! Your request was submitted.</p>}
-      <form
-        action={requestEndpoint}
-        method="POST"
-        onSubmit={({ currentTarget: form }) => {
-          form.elements._subject.value = form.elements.subject.value.trim() || "Website request";
-        }}
-      >
-        <input type="hidden" name="_next" value="https://justinrogo.github.io/?sent=1#/tools?panel=request" />
-        <input type="hidden" name="_subject" defaultValue="Website request" />
-        <input type="text" name="_honey" hidden tabIndex={-1} autoComplete="off" />
+      <p>Send me a question, idea, request, or just a note!</p>
+      {state === "sent" && (
+        <p className="request-confirmation" role="status" tabIndex={-1} ref={status}>
+          Thanks! Your request was sent. I’ll reply by email.
+        </p>
+      )}
+      {state === "error" && (
+        <p className="request-confirmation request-error" role="alert" tabIndex={-1} ref={status}>
+          {error}
+        </p>
+      )}
+      <form onSubmit={send} aria-busy={state === "sending"}>
+        {/* Honeypot: hidden from people and assistive technology; bots tend to fill it. */}
+        <div className="request-honeypot" aria-hidden="true">
+          <label>
+            Website
+            <input type="text" name="website" tabIndex={-1} autoComplete="off" />
+          </label>
+        </div>
         <div className="form-grid">
-          {[
-            ["name", "Your name"],
-            ["email", "Email"],
-            ["subject", "Subject"],
-          ].map(([key, label]) => (
+          {requestFields.map(([key, label, autoComplete]) => (
             <label key={key} className={key === "subject" ? "full" : ""}>
               {label}
               <input
                 required
                 name={key}
                 type={key === "email" ? "email" : "text"}
-                autoComplete={key === "subject" ? "off" : key}
+                autoComplete={autoComplete}
+                maxLength={requestLimits[key]}
               />
             </label>
           ))}
           <label className="full">
             What are you thinking?
-            <textarea name="details" required rows={5} />
+            <textarea name="details" required rows={5} maxLength={requestLimits.details} />
           </label>
         </div>
-        <button className="button primary" type="submit">
-          Send request <Icon name="arrow" size={18} />
+        <button className="button primary" type="submit" disabled={state === "sending"}>
+          {state === "sending" ? "Sending…" : "Send request"} <Icon name="arrow" size={18} />
         </button>
       </form>
-      <div className="request-live">
-        <ExternalLink href={integrations.board} className="text-link">
-          View the public request board <Icon name="external" size={16} />
-        </ExternalLink>
-      </div>
     </section>
   );
 }

@@ -10,11 +10,11 @@ await page.goto("http://127.0.0.1:4392/v2/#/more", {
 const urls = [
   "../data/pages.json",
   "../data/pocket-part.json",
-  "../data/cards_count.json",
   "https://api.open-meteo.com/v1/forecast?latitude=41.76&longitude=-72.67&current=temperature_2m,apparent_temperature,weather_code&temperature_unit=fahrenheit&timezone=America%2FNew_York",
   "https://api.github.com/repos/JustinRogo/justinrogo.github.io/commits?per_page=3",
   "https://api.github.com/repos/UConn-Law-Library/uconn-law-library.github.io/commits?per_page=3",
   "https://api.github.com/repos/UConn-Law-Library/CGS/commits?per_page=3",
+  "https://api.github.com/repos/UConn-Law-Library/CGS/commits?sha=codex%2Fcgs-reading-room-prototype&per_page=3",
   "https://events.uconn.edu/live/rss/events/group/Law%20School/categories_campus/UConn%20Law/header/All%20Events",
 ];
 const results = await page.evaluate(

@@ -31,7 +31,6 @@ The site includes:
 ├── style.css
 ├── main.js
 ├── data/
-│   ├── cards_count.json
 │   └── pages.json
 └── Pages/
     ├── For Fun/
@@ -59,7 +58,7 @@ Key homepage areas include:
 - Share button
 - Light/dark theme toggle
 - Law Library donation link
-- Trello/request status
+- Request form (saved to Supabase; see `docs/requests-setup.md`)
 - Hartford time and weather
 - UConn Law events
 - Calendar, booking, request, CliftonStrengths, and catalog tabs
@@ -288,7 +287,7 @@ The site references several external services and APIs, including:
 - UConn Law events RSS feed
 - Open-Meteo weather API
 - Microsoft Outlook calendar and Bookings embeds
-- Trello board/request workflow
+- Supabase request form through the Vercel `/api/requests` route
 
 Some widgets may fail gracefully if a third-party service blocks embedding, changes its API, or is temporarily unavailable.
 

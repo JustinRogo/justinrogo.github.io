@@ -1,5 +1,7 @@
 # Updates: Vercel + a separate Supabase project
 
+The website request form uses this same project and Vercel variables; see [requests-setup.md](requests-setup.md).
+
 The implementation adds a public rich text channel, author-only publishing, authenticated comments that publish immediately, public image uploads by the author, an RSS feed, and a small read-only iframe for **https://uconn.atlassian.net**.
 
 It does not use the Front Desk Planner's Supabase project. No posts or user accounts are created by the repository code. The preview uses explicitly labeled example posts and never writes to Supabase.
@@ -97,4 +99,4 @@ npm.cmd run build
 
 Before using it with readers, verify with two real accounts: only the allowlisted author can publish/moderate; a reader's new comment appears immediately to a signed-out visitor; readers cannot change comments or delete other readers' comments; the comment throttle and closed-comment restrictions still apply; signed-out visitors cannot read drafts or older pending comments; images upload; the production RSS is valid; and the live widget appears in Confluence. Database policies and mail delivery require verification against the configured project.
 
-GitHub Pages continues serving the existing site. It cannot run the new API; the navigation entry points to the Vercel channel. The existing GitHub Actions feed/Trello refreshes are independent of Vercel and are not replaced by this feature.
+GitHub Pages continues serving the existing site. It cannot run the new API; the navigation entry points to the Vercel channel. The existing GitHub Actions feed refreshes are independent of Vercel and are not replaced by this feature.

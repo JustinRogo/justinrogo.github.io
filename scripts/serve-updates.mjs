@@ -11,6 +11,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 try { process.loadEnvFile(path.join(root, '.env.local')); } catch (error) { if (error.code !== 'ENOENT') throw error; }
 await buildSanitizer();
 const { default: handler } = await import('../api/updates.mjs');
+const { default: requestsHandler } = await import('../api/requests.mjs');
 await vendorUpdates();
 const watchers = await Promise.all([buildHomepage({ watch: true }), buildV2({ watch: true })]);
 const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.png': 'image/png', '.jpg': 'image/jpeg', '.gif': 'image/gif', '.woff2': 'font/woff2', '.webmanifest': 'application/manifest+json', '.pdf': 'application/pdf' };
@@ -26,7 +27,7 @@ const server = http.createServer(async (req, res) => {
       res.end(`<!doctype html><html><head><title>Updates responsive review</title><style>body{margin:0;background:#dce3ec}iframe{display:block;border:0;width:${width}px;height:${height}px}</style></head><body><iframe title="Updates at ${width} pixels" src="${target}"></iframe></body></html>`);
       return;
     }
-    if (['/api/updates', '/updates/feed.xml'].includes(url.pathname)) {
+    if (['/api/updates', '/api/requests', '/updates/feed.xml'].includes(url.pathname)) {
       let raw = '';
       for await (const chunk of req) {
         raw += chunk;
@@ -38,7 +39,7 @@ const server = http.createServer(async (req, res) => {
       res.status = code => { res.statusCode = code; return res; };
       res.json = body => { res.setHeader('Content-Type', 'application/json; charset=utf-8'); res.end(JSON.stringify(body)); return res; };
       res.send = body => { res.end(body); return res; };
-      await handler(req, res);
+      await (url.pathname === '/api/requests' ? requestsHandler : handler)(req, res);
       return;
     }
     if (!['GET', 'HEAD'].includes(req.method)) { res.writeHead(405); res.end(); return; }

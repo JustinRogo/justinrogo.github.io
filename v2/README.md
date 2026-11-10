@@ -38,9 +38,9 @@ All 15 project cards and the four featured Home project cards share the same com
 | --- | --- |
 | Home | Profile, introduction, How can I help, My Day, AI Corner, featured projects, UConn Law events, Pocket Part blog stack |
 | Projects | All 15 manifest projects, search, category filters, saved projects |
-| Tools | Five catalog searches, Outlook availability, booking, and live requests |
+| Tools | Five catalog searches, Outlook availability, booking, and a private request form |
 | About | Biography, experience, leadership, education, skills, interests, all 34 strengths, contacts |
-| More | Trello snapshot, Hartford weather, Pocket Part posts, three GitHub repositories, UConn events, settings |
+| More | Current activity, Hartford weather, Pocket Part posts, three GitHub repositories (plus the CGS Reading Room branch), UConn events, settings |
 
 Hash routes support direct links, refreshes, Back and Forward under GitHub Pages. Search replaces the current URL; filter changes create history entries. Visited panels preserve drafts and loaded embeds. Theme, Calm mode, atmosphere, and saved projects use separate V2 storage keys. Request drafts remain in memory only.
 
@@ -94,12 +94,12 @@ React Bits is copyright David Haz, under MIT + Commons Clause. The build include
 | Name, photo, role, biography, experience, leadership, education, skills, interests | Reorganized into Home and About, grounded in V1 copy |
 | Project directory | Same `data/pages.json`, same destinations, added search/filter/save |
 | Calendar / Book a Meeting | React month and agenda views from published Outlook availability, plus the existing Bookings link and optional embed |
-| Submit a Request | Native form submission through FormSubmit to the existing Trello board |
+| Submit a Request | Saved to Supabase through the Vercel `/api/requests` route; no sign-in (see `docs/requests-setup.md`) |
 | CliftonStrengths | All 34 ranks/descriptions and both best/overextended passages extracted from V1 at build time; original four domain colors, rank-weighted color bar/percentage legend, reflection Flip Card, rank filters and compact expanding domain cards |
 | Library catalog | Same Primo and LibGuides destinations, all five query builders rebuilt in React |
 | Professional resources and contact links | Sidebar and More quick links, About contacts, and the top-bar donation link |
 | Clock / Hartford weather | Eastern Time clock and the existing Open-Meteo endpoint |
-| To-do / current activity | Existing Trello snapshot and original current-activity text in Home/More |
+| To-do / current activity | Original current-activity text in Home/More, with a link to the request form |
 | UConn Law events | Same live RSS feed, explicit unavailable/empty states and source link |
 | GitHub activity | Same three repository sources, merged and sorted by date; no invented commits |
 | The Pocket Part | Existing local feed and freshness date; original blog links |

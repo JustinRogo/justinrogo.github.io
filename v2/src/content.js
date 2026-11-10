@@ -3,7 +3,7 @@ export const profile = {
   role: "Library Information Coordinator",
   organization: "UConn School of Law",
   intro:
-    "I build dashboards, organize information, and make tools for everyday work. Usually because I found myself thinking, “There really should be an easier way to do this.”",
+    "Hi! I’m Justin. I build dashboards, organize information, and make tools for everyday work. I’m drawn to complicated, repetitive, or mildly annoying problems that could use a better process. Outside of work, I’m usually experimenting with code, starting another side project, or tending to an entirely reasonable number of houseplants.",
   bio: "I’ve worked in academic libraries for more than a decade. My current role spans technology, data, communications, administration, and knowledge management, along with the unexpected problems that resist tidy categories.",
   approach:
     "I want the systems I build to make information easier to find, remove unnecessary work, and be straightforward for people to use and maintain.",
@@ -26,7 +26,6 @@ export const integrations = {
     "https://outlook.office365.com/calendar/published/3ca52ff81f8a440699723f09efe5d298@uconn.edu/66bd7da89640440591f449ae5ce4fcc514733372329545515702/calendar.html",
   booking:
     "https://outlook.office.com/bookwithme/user/3ca52ff81f8a440699723f09efe5d298%40uconn.edu?anonymous&ismsaljsauthenabled=true",
-  board: "https://trello.com/b/2Yp5IKYz.html",
   events:
     "https://events.uconn.edu/live/rss/events/group/Law%20School/categories_campus/UConn%20Law/header/All%20Events",
   weather:

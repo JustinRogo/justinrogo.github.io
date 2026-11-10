@@ -14,7 +14,7 @@
     "pretest:homepage": "node scripts/build-site.mjs --skip-feed",
     "preview": "node scripts/preview-site.mjs",
     "pretest:updates": "node scripts/build-sanitizer.mjs",
-    "test:updates": "node --test tests/updates.test.mjs tests/updates-permissions.test.mjs tests/link-previews.test.mjs"
+    "test:updates": "node --test tests/updates.test.mjs tests/updates-permissions.test.mjs tests/link-previews.test.mjs tests/requests.test.mjs"
   },
   "dependencies": {
     "@gsap/react": "2.1.2",
