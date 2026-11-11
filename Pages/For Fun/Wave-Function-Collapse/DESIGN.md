@@ -41,3 +41,7 @@ Saved drawings accept expanded palettes. Shared links retain the original compac
 The sample editor uses a 24 × 24 grid with a 576px canvas backing surface. Existing 12 × 12 saved drawings and shared links expand each source pixel into a 2 × 2 block. Colors, patch size, and rotation settings survive migration; new 24 × 24 links retain individual pixel edits. The storage key stays the same.
 
 Verified the current shared drawing's migration, bottom-right pixel painting, keyboard movement, undo, shared reloads, older local storage, custom fill, generation, example reset, and 768/390/320px layouts. All 23 engine and sample compatibility checks pass.
+
+## Texture and depth pass
+
+Added atmosphere without changing IDs, form order, palette, or behavior. A faint lime dot grid and soft forest glows sit behind the hero. A decorative 12 × 7 island mosaic beside the title animates tiles from blurred "superposition" into collapsed colors in random order; it is `aria-hidden` and static under reduced motion. The studio gained a deeper shadow, the transport buttons sit in a segmented tray, and the world canvas has a double-ring frame with lime registration marks (hidden below 1024px). The progress bar is 3px with a glow, the selected preset shows a lime edge, tiles in the library enlarge on hover, and the three "How it works" steps are cards with numbered badges.

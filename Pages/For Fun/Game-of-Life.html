@@ -12,41 +12,52 @@
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game of Life - Ultimate Cosmos</title>
+    <meta name="theme-color" content="#04040a">
+    <meta name="description" content="A two-faction Game of Life. Paint colonies, rewrite the rules, and watch Indigo and Cyan fight for the grid.">
+    <title>Game of Life · Ultimate Cosmos</title>
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
     <style>
+        /* Ultimate Cosmos: a deep-space observatory. Two factions (Indigo, Cyan) glow against
+           near-black; chrome is quiet glass so the colonies stay the brightest thing on screen. */
         :root {
-            --bg-base: #030305;
-            --bg-panel: rgba(10, 10, 15, 0.7);
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            
+            color-scheme: dark;
+            --bg-base: #04040a;
+            --bg-panel: rgba(12, 12, 22, 0.72);
+            --bg-raised: rgba(255, 255, 255, 0.035);
+            --text-primary: #f1f3fb;
+            --text-secondary: #9aa3bd;
+            --text-faint: #646d88;
+
             /* Faction 1: Indigo */
             --f1-base: #818cf8;
-            --f1-glow: rgba(129, 140, 248, 0.4);
-            
+            --f1-soft: rgba(129, 140, 248, 0.14);
+            --f1-glow: rgba(129, 140, 248, 0.45);
+
             /* Faction 2: Cyan */
             --f2-base: #22d3ee;
-            --f2-glow: rgba(34, 211, 238, 0.4);
-            
-            /* Glassmorphism */
-            --glass-bg: rgba(255, 255, 255, 0.02);
-            --glass-border: rgba(255, 255, 255, 0.06);
-            --glass-hover-bg: rgba(255, 255, 255, 0.04);
-            --glass-active-bg: rgba(255, 255, 255, 0.08);
-            
-            --radius-lg: 24px;
+            --f2-soft: rgba(34, 211, 238, 0.12);
+            --f2-glow: rgba(34, 211, 238, 0.45);
+
+            --glass-border: rgba(255, 255, 255, 0.07);
+            --glass-border-strong: rgba(255, 255, 255, 0.14);
+
+            --radius-lg: 20px;
             --radius-md: 12px;
-            --spacing-base: clamp(1rem, 2vw, 2rem);
-            
+            --radius-sm: 8px;
+            --gutter: clamp(12px, 1.6vw, 20px);
+
             --font-sans: 'Outfit', system-ui, sans-serif;
             --font-display: 'Space Grotesk', system-ui, sans-serif;
+            --font-mono: 'JetBrains Mono', ui-monospace, Consolas, monospace;
+            --ease: cubic-bezier(.2, .8, .25, 1);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        button, input { font: inherit; color: inherit; }
 
         body {
             background-color: var(--bg-base);
@@ -57,365 +68,535 @@
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
         }
+        :focus-visible { outline: 2px solid var(--f1-base); outline-offset: 3px; border-radius: 6px; }
 
         /* SVG Grain Overlay */
         .noise-overlay {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            pointer-events: none; z-index: 50; opacity: 0.03;
+            position: fixed; inset: 0; pointer-events: none; z-index: 50; opacity: 0.035;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
 
         /* Ambient Background */
         .aurora-container {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            overflow: hidden; z-index: -1; pointer-events: none; background: var(--bg-base);
+            position: fixed; inset: 0; overflow: hidden; z-index: -1; pointer-events: none; background: var(--bg-base);
         }
         .aurora-blob {
-            position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.4;
+            position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.55;
             animation: float 25s infinite alternate ease-in-out;
         }
-        .blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%); }
-        .blob-2 { bottom: -20%; right: -10%; width: 60vw; height: 60vw; background: radial-gradient(circle, rgba(34,211,238,0.1) 0%, transparent 70%); animation-delay: -5s; }
+        .blob-1 { top: -20%; left: -10%; width: 55vw; height: 55vw; background: radial-gradient(circle, rgba(99,102,241,0.22) 0%, transparent 70%); }
+        .blob-2 { bottom: -25%; right: -10%; width: 60vw; height: 60vw; background: radial-gradient(circle, rgba(34,211,238,0.14) 0%, transparent 70%); animation-delay: -5s; }
+        .starfield {
+            position: absolute; inset: 0; opacity: .5;
+            background-image:
+                radial-gradient(1px 1px at 8% 12%, #fff 50%, transparent 51%),
+                radial-gradient(1px 1px at 22% 78%, #fff 50%, transparent 51%),
+                radial-gradient(1px 1px at 37% 30%, #c7d2fe 50%, transparent 51%),
+                radial-gradient(1px 1px at 53% 8%, #fff 50%, transparent 51%),
+                radial-gradient(1px 1px at 61% 88%, #a5f3fc 50%, transparent 51%),
+                radial-gradient(1px 1px at 79% 22%, #fff 50%, transparent 51%),
+                radial-gradient(1px 1px at 91% 64%, #fff 50%, transparent 51%),
+                radial-gradient(1px 1px at 14% 52%, #fff 50%, transparent 51%);
+        }
 
         @keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(5%, 10%) scale(1.1); } }
-        @media (prefers-reduced-motion: reduce) { .aurora-blob { animation: none; opacity: 0.2; } * { transition-duration: 0.01ms !important; } }
+        @media (prefers-reduced-motion: reduce) { .aurora-blob { animation: none; opacity: 0.3; } *, *::before, *::after { transition-duration: 0.01ms !important; animation: none !important; } }
 
-        .container {
-            max-width: 1600px; margin: 0 auto; padding: var(--spacing-base);
-            display: flex; flex-direction: column; gap: var(--spacing-base); min-height: 100vh;
+        /* --- App shell --- */
+        .app {
+            height: 100vh; height: 100dvh;
+            display: grid; grid-template-rows: auto 1fr;
+            gap: var(--gutter); padding: var(--gutter);
+            max-width: 1800px; margin: 0 auto;
         }
 
-        header { margin-top: 1vh; margin-bottom: 1vh; display: flex; justify-content: space-between; align-items: flex-end;}
-        .header-content { flex: 1; }
+        .topbar {
+            display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+        }
+        .brand { display: flex; align-items: center; gap: 18px; min-width: 0; }
+        .back-link {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+            color: var(--text-secondary); text-decoration: none;
+            border: 1px solid var(--glass-border); background: var(--bg-panel);
+            transition: color .2s var(--ease), border-color .2s var(--ease), transform .2s var(--ease);
+        }
+        .back-link:hover { color: var(--text-primary); border-color: var(--glass-border-strong); transform: translateX(-2px); }
+        .back-link svg { width: 18px; height: 18px; }
         .overline {
-            font-family: var(--font-sans); text-transform: uppercase; letter-spacing: 0.15em;
-            font-size: 0.875rem; color: var(--f1-base); font-weight: 500; margin-bottom: 0.5rem; display: block;
+            display: block; font-size: 11px; letter-spacing: .2em; text-transform: uppercase;
+            color: var(--f1-base); font-weight: 500;
         }
         h1 {
-            font-family: var(--font-display); font-size: clamp(2rem, 5vw + 1rem, 4.5rem);
-            line-height: 1.1; font-weight: 700; letter-spacing: -0.02em;
-            background: linear-gradient(to right, #ffffff, #a5b4fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            font-family: var(--font-display); font-size: clamp(26px, 2.4vw, 34px);
+            line-height: 1.05; font-weight: 700; letter-spacing: -0.03em;
+            background: linear-gradient(100deg, #ffffff 30%, #c7d2fe 60%, #a5f3fc 100%);
+            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
         }
-        p.subtitle { color: var(--text-secondary); font-size: 1.1rem; max-width: 60ch; margin-top: 1rem; font-weight: 300; }
+        h1 span { font-weight: 500; opacity: .75; }
 
-        /* Faction Toolbar */
+        /* Faction picker */
         .faction-toolbar {
-            display: flex; gap: 0.5rem; background: var(--bg-panel); padding: 0.5rem;
-            border-radius: var(--radius-md); border: 1px solid var(--glass-border);
-            backdrop-filter: blur(10px);
+            display: flex; gap: 4px; padding: 4px;
+            background: var(--bg-panel); border-radius: 999px; border: 1px solid var(--glass-border);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
         }
+        .faction-label { align-self: center; padding: 0 10px 0 12px; color: var(--text-faint); font-size: 12px; }
         .faction-btn {
-            display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem;
-            border-radius: 8px; border: 1px solid transparent; background: transparent;
-            color: var(--text-secondary); font-weight: 600; cursor: pointer; transition: all 0.3s;
+            display: flex; align-items: center; gap: 8px; padding: 8px 16px;
+            border-radius: 999px; border: 1px solid transparent; background: transparent;
+            color: var(--text-secondary); font-weight: 500; font-size: 14px; cursor: pointer;
+            transition: all .25s var(--ease);
         }
-        .faction-btn.f1.active { background: rgba(129, 140, 248, 0.15); border-color: var(--f1-base); color: var(--f1-base); box-shadow: 0 0 15px var(--f1-glow); }
-        .faction-btn.f2.active { background: rgba(34, 211, 238, 0.15); border-color: var(--f2-base); color: var(--f2-base); box-shadow: 0 0 15px var(--f2-glow); }
-        .f-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
-        .faction-btn.f1 .f-dot { background: var(--f1-base); }
-        .faction-btn.f2 .f-dot { background: var(--f2-base); }
+        .faction-btn:hover { color: var(--text-primary); }
+        .faction-btn kbd { margin-left: 2px; }
+        .faction-btn.f1.active { background: var(--f1-soft); border-color: rgba(129,140,248,.5); color: #c7d2fe; box-shadow: 0 0 22px -4px var(--f1-glow), inset 0 0 12px rgba(129,140,248,.12); }
+        .faction-btn.f2.active { background: var(--f2-soft); border-color: rgba(34,211,238,.5); color: #a5f3fc; box-shadow: 0 0 22px -4px var(--f2-glow), inset 0 0 12px rgba(34,211,238,.1); }
+        .f-dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; transform: rotate(45deg); }
+        .faction-btn.f1 .f-dot { background: var(--f1-base); box-shadow: 0 0 8px var(--f1-glow); }
+        .faction-btn.f2 .f-dot { background: var(--f2-base); box-shadow: 0 0 8px var(--f2-glow); }
 
-        /* Grid Layout */
+        kbd {
+            font: 500 10.5px/1 var(--font-mono); padding: 3px 5px; border-radius: 4px;
+            border: 1px solid var(--glass-border-strong); color: var(--text-faint); background: rgba(255,255,255,.03);
+        }
+
+        /* --- Main layout --- */
         .bento-grid {
-            display: grid; grid-template-columns: repeat(12, 1fr);
-            gap: var(--spacing-base); flex-grow: 1; align-items: stretch;
+            display: grid; grid-template-columns: minmax(0, 1fr) 340px;
+            gap: var(--gutter); min-height: 0;
         }
         .glass-card {
             background: var(--bg-panel); border: 1px solid var(--glass-border);
             border-radius: var(--radius-lg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); padding: clamp(1.5rem, 2vw, 2.5rem);
-            position: relative; overflow: hidden;
-        }
-
-        .canvas-area {
-            grid-column: span 12; display: flex; flex-direction: column; min-height: 60vh; padding: 0;
+            box-shadow: 0 1px 0 rgba(255,255,255,.05) inset, 0 20px 50px -20px rgba(0, 0, 0, 0.6);
             position: relative;
-        }
-        .controls-area {
-            grid-column: span 12; display: flex; flex-direction: column; gap: 1.5rem;
-        }
-
-        @media (min-width: 1024px) {
-            header { flex-direction: row; }
-            .canvas-area { grid-column: span 9; min-height: 700px; }
-            .controls-area { 
-                grid-column: span 3; max-height: calc(100vh - 12rem); 
-                overflow-y: auto; padding-right: 1.5rem;
-            }
         }
 
         /* Canvas */
-        .canvas-wrapper { flex-grow: 1; width: 100%; height: 100%; position: relative; border-radius: var(--radius-lg); overflow: hidden; }
+        .canvas-area { overflow: hidden; min-height: 0; }
+        .canvas-area::after {
+            /* soft vignette so the grid edges melt into the frame */
+            content: ''; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+            box-shadow: inset 0 0 80px rgba(0,0,0,.55);
+        }
+        .canvas-wrapper { position: absolute; inset: 0; }
         canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
-        
-        .canvas-overlay-text {
-            position: absolute; bottom: 1rem; right: 1.5rem; pointer-events: none;
-            background: rgba(0,0,0,0.5); padding: 0.5rem 1rem; border-radius: 20px;
-            font-size: 0.85rem; color: rgba(255,255,255,0.6); backdrop-filter: blur(4px);
-            border: 1px solid rgba(255,255,255,0.05);
-        }
+        body.panning canvas { cursor: grabbing; }
 
-        /* Control Elements */
-        .control-group { display: flex; flex-direction: column; gap: 0.75rem; }
-        .control-group-title {
-            font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase;
-            letter-spacing: 0.1em; font-weight: 500; margin-bottom: 0.25rem;
+        .hud {
+            position: absolute; z-index: 2; pointer-events: none;
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 14px; border-radius: 999px;
+            background: rgba(4, 4, 10, .6); border: 1px solid var(--glass-border);
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            font: 400 12px/1 var(--font-mono); color: var(--text-secondary);
         }
-        .btn-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .hud-tl { top: 16px; left: 16px; }
+        .hud-tl strong { color: var(--text-primary); font-weight: 500; font-variant-numeric: tabular-nums; }
+        .hud-tl .sep { width: 1px; height: 12px; background: var(--glass-border-strong); }
+        .state-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-faint); }
+        body.playing .state-dot { background: #4ade80; box-shadow: 0 0 10px #4ade80; animation: blink 1.6s infinite; }
+        @keyframes blink { 50% { opacity: .35; } }
+        .canvas-overlay-text { top: 16px; right: 16px; font-family: var(--font-sans); font-size: 12px; color: var(--text-faint); }
+
+        /* Floating transport dock */
+        .dock {
+            position: absolute; z-index: 3; left: 50%; bottom: 18px; transform: translateX(-50%);
+            display: flex; align-items: center; gap: 6px; padding: 6px;
+            background: rgba(10, 10, 20, .78); border: 1px solid var(--glass-border-strong);
+            border-radius: 16px; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 18px 40px -12px rgba(0,0,0,.8), 0 1px 0 rgba(255,255,255,.06) inset;
+            max-width: calc(100% - 24px);
+        }
+        .dock .divider { width: 1px; align-self: stretch; margin: 6px 4px; background: var(--glass-border-strong); }
 
         button.tool-btn {
-            appearance: none; background: color-mix(in srgb, var(--glass-bg) 60%, transparent);
-            border: 1px solid var(--glass-border); color: var(--text-primary);
-            padding: 0.75rem 1rem; border-radius: var(--radius-md);
-            font-family: var(--font-sans); font-size: 0.95rem; font-weight: 500;
-            cursor: pointer; transition: all 0.2s; flex: 1; min-width: 80px;
-            display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+            appearance: none; background: transparent;
+            border: 1px solid transparent; color: var(--text-secondary);
+            height: 40px; padding: 0 12px; border-radius: 11px;
+            font-family: var(--font-sans); font-size: 14px; font-weight: 500;
+            cursor: pointer; transition: background .2s var(--ease), color .2s var(--ease), transform .15s var(--ease);
+            display: inline-flex; align-items: center; justify-content: center; gap: 7px; white-space: nowrap;
         }
-        button.tool-btn:hover { background: var(--glass-hover-bg); transform: translateY(-2px); }
-        button.tool-btn:active { transform: translateY(0); }
-        button.tool-btn.primary { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+        button.tool-btn svg { width: 17px; height: 17px; flex-shrink: 0; }
+        button.tool-btn:hover { background: rgba(255,255,255,.07); color: var(--text-primary); }
+        button.tool-btn:active { transform: scale(.96); }
+        button.tool-btn.primary {
+            min-width: 104px; color: #0b0b18; font-weight: 600;
+            background: linear-gradient(135deg, #c7d2fe, #a5f3fc);
+            box-shadow: 0 0 24px -6px rgba(165, 180, 252, .8);
+        }
+        button.tool-btn.primary:hover { background: linear-gradient(135deg, #e0e7ff, #cffafe); color: #0b0b18; }
+        button.tool-btn.primary.active { background: rgba(255,255,255,.1); color: var(--text-primary); box-shadow: inset 0 0 0 1px var(--glass-border-strong); }
+        button.tool-btn.danger:hover { color: #fda4af; background: rgba(244, 63, 94, .1); }
 
-        /* Custom Toggle */
-        .toggle-row {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0.5rem 0; border-bottom: 1px solid var(--glass-border);
+        .speed {
+            display: flex; align-items: center; gap: 10px; padding: 0 8px 0 4px;
+            color: var(--text-faint); font: 400 12px/1 var(--font-mono);
         }
-        .toggle-row:last-child { border-bottom: none; }
-        .toggle-label-group { display: flex; flex-direction: column; gap: 0.15rem; }
-        .toggle-title { font-size: 0.95rem; font-weight: 500; color: var(--text-primary); }
-        .toggle-desc { font-size: 0.75rem; color: var(--text-secondary); }
+        .speed output { min-width: 58px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+        .speed input { width: 110px; flex-shrink: 0; }
+        @media (max-width: 1500px) {
+            .dock button.tool-btn .label-optional { display: none; }
+            .dock button.tool-btn:not(.primary) { padding: 0 10px; }
+        }
 
-        .toggle-switch { position: relative; display: inline-block; width: 40px; height: 22px; flex-shrink: 0; }
-        .toggle-switch input { opacity: 0; width: 0; height: 0; }
-        .toggle-slider {
-            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(255,255,255,0.1); transition: .3s; border-radius: 22px;
-            border: 1px solid var(--glass-border);
+        /* Sidebar */
+        .controls-area {
+            display: flex; flex-direction: column; gap: 22px;
+            padding: 22px; overflow-y: auto; min-height: 0;
+            scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.14) transparent;
         }
-        .toggle-slider:before {
-            position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px;
-            background-color: white; transition: .3s; border-radius: 50%;
-        }
-        .toggle-switch input:checked + .toggle-slider { background-color: var(--f1-base); border-color: var(--f1-base); }
-        .toggle-switch input:checked + .toggle-slider:before { transform: translateX(18px); }
-        .toggle-switch.cyan input:checked + .toggle-slider { background-color: var(--f2-base); border-color: var(--f2-base); }
+        .controls-area::-webkit-scrollbar { width: 6px; }
+        .controls-area::-webkit-scrollbar-track { background: transparent; }
+        .controls-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.14); border-radius: 10px; }
 
-        /* Sliders */
-        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; height: 1.5rem; }
-        input[type=range]:focus { outline: none; }
-        input[type=range]::-webkit-slider-runnable-track {
-            width: 100%; height: 6px; cursor: pointer; background: rgba(255,255,255,0.1); border-radius: 3px;
-        }
-        input[type=range]::-webkit-slider-thumb {
-            height: 16px; width: 16px; border-radius: 50%; background: var(--text-primary); cursor: pointer;
-            -webkit-appearance: none; margin-top: -5px; border: 2px solid var(--bg-base);
+        .control-group { display: flex; flex-direction: column; gap: 4px; }
+        .control-group-title {
+            display: flex; align-items: center; justify-content: space-between; gap: 8px;
+            font-size: 11px; color: var(--text-faint); text-transform: uppercase;
+            letter-spacing: .16em; font-weight: 500; margin-bottom: 6px;
         }
 
         /* Stats */
-        .stats-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
-            padding-bottom: 1rem; border-bottom: 1px solid var(--glass-border); margin-bottom: 0.5rem;
-        }
-        .stat-box { display: flex; flex-direction: column; }
-        .stat-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em; }
-        .stat-value { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 12px; }
+        .stat-box { display: flex; flex-direction: column; gap: 2px; }
+        .stat-label { font-size: 11px; color: var(--text-faint); text-transform: uppercase; letter-spacing: .14em; }
+        .stat-value { font-family: var(--font-display); font-size: 30px; line-height: 1.1; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
         .stat-f1 { color: var(--f1-base); }
         .stat-f2 { color: var(--f2-base); }
+        .stat-box.f1 .stat-label, .stat-box.f2 .stat-label { display: flex; align-items: center; gap: 6px; }
+        .stat-box.f1 .stat-label::before, .stat-box.f2 .stat-label::before { content: ''; width: 7px; height: 7px; border-radius: 2px; transform: rotate(45deg); }
+        .stat-box.f1 .stat-label::before { background: var(--f1-base); }
+        .stat-box.f2 .stat-label::before { background: var(--f2-base); }
 
-        /* Scrollbar */
-        .controls-area::-webkit-scrollbar { width: 6px; }
-        .controls-area::-webkit-scrollbar-track { background: transparent; }
-        .controls-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
-        .controls-area::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
+        .balance { margin-top: 2px; }
+        .balance-bar {
+            position: relative; display: flex; height: 8px; border-radius: 8px; overflow: hidden;
+            background: rgba(255,255,255,.06);
+        }
+        .balance-bar i { display: block; height: 100%; transition: width .35s var(--ease); }
+        #balanceF1 { background: linear-gradient(90deg, #6366f1, var(--f1-base)); box-shadow: 0 0 12px var(--f1-glow); }
+        #balanceF2 { background: linear-gradient(90deg, var(--f2-base), #0891b2); box-shadow: 0 0 12px var(--f2-glow); }
+        .balance-bar::after { content: ''; position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: rgba(255,255,255,.35); }
+        .balance-legend { display: flex; justify-content: space-between; margin-top: 6px; font: 400 11px/1 var(--font-mono); color: var(--text-faint); }
+        .balance-legend b { font-weight: 500; }
+        #balanceText { color: var(--text-secondary); font-family: var(--font-sans); font-size: 12px; }
 
+        /* Rule notation chip */
+        .rule-chip {
+            display: inline-flex; align-items: center; gap: 8px;
+            font: 500 11px/1 var(--font-mono); letter-spacing: .02em; text-transform: none;
+            color: var(--text-primary); padding: 5px 8px; border-radius: 6px;
+            background: var(--bg-raised); border: 1px solid var(--glass-border);
+        }
+        .rule-name { color: var(--text-faint); font-family: var(--font-sans); font-size: 12px; letter-spacing: 0; text-transform: none; margin: -2px 0 6px; }
+
+        /* Custom Toggle */
+        .toggle-row {
+            display: flex; align-items: center; justify-content: space-between; gap: 14px;
+            padding: 10px 12px; margin: 0 -12px; border-radius: 10px; cursor: pointer;
+            transition: background .2s var(--ease);
+        }
+        .toggle-row:hover { background: rgba(255,255,255,.035); }
+        .toggle-label-group { display: flex; flex-direction: column; gap: 1px; }
+        .toggle-title { font-size: 14.5px; font-weight: 500; color: var(--text-primary); }
+        .toggle-desc { font-size: 12.5px; color: var(--text-secondary); }
+
+        .toggle-switch { position: relative; display: inline-block; width: 38px; height: 22px; flex-shrink: 0; }
+        .toggle-switch input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; z-index: 1; }
+        .toggle-slider {
+            position: absolute; inset: 0; cursor: pointer;
+            background-color: rgba(255,255,255,0.08); transition: .3s var(--ease); border-radius: 22px;
+            border: 1px solid var(--glass-border-strong);
+        }
+        .toggle-slider:before {
+            position: absolute; content: ""; height: 14px; width: 14px; left: 3px; top: 3px;
+            background-color: #c3c9da; transition: .3s var(--ease); border-radius: 50%;
+        }
+        .toggle-switch input:focus-visible + .toggle-slider { outline: 2px solid var(--f1-base); outline-offset: 2px; }
+        .toggle-switch input:checked + .toggle-slider { background-color: var(--f1-base); border-color: var(--f1-base); box-shadow: 0 0 14px -2px var(--f1-glow); }
+        .toggle-switch input:checked + .toggle-slider:before { transform: translateX(16px); background: #fff; }
+        .toggle-switch.cyan input:checked + .toggle-slider { background-color: var(--f2-base); border-color: var(--f2-base); box-shadow: 0 0 14px -2px var(--f2-glow); }
+
+        /* Sliders */
+        input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; background: transparent; height: 20px; cursor: pointer; }
+        input[type=range]:focus { outline: none; }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px; cursor: pointer; border-radius: 4px;
+            background: linear-gradient(90deg, var(--f1-base), var(--f2-base) var(--fill, 40%), rgba(255,255,255,.1) var(--fill, 40%));
+        }
+        input[type=range]::-moz-range-track { height: 4px; border-radius: 4px; background: rgba(255,255,255,.1); }
+        input[type=range]::-moz-range-progress { height: 4px; border-radius: 4px; background: linear-gradient(90deg, var(--f1-base), var(--f2-base)); }
+        input[type=range]::-webkit-slider-thumb {
+            height: 14px; width: 14px; border-radius: 50%; background: #fff; cursor: pointer;
+            -webkit-appearance: none; margin-top: -5px; box-shadow: 0 0 0 3px rgba(4,4,10,.9), 0 0 12px rgba(165,243,252,.6);
+        }
+        input[type=range]::-moz-range-thumb { height: 12px; width: 12px; border: 0; border-radius: 50%; background: #fff; }
+        input[type=range]:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 3px rgba(4,4,10,.9), 0 0 0 5px var(--f1-base); }
+
+        .shortcuts { display: grid; grid-template-columns: auto 1fr; gap: 8px 12px; align-items: center; font-size: 12.5px; color: var(--text-secondary); }
+        .shortcuts kbd { justify-self: start; }
+
+        @media (max-width: 1023px) {
+            .app { height: auto; min-height: 100vh; }
+            .bento-grid { grid-template-columns: 1fr; }
+            .canvas-area { height: 68vh; min-height: 420px; }
+            .controls-area { overflow: visible; }
+        }
+        @media (max-width: 640px) {
+            .topbar { flex-direction: column; align-items: stretch; }
+            .faction-toolbar { justify-content: stretch; }
+            .faction-label { display: none; }
+            .faction-btn { flex: 1; justify-content: center; padding: 8px 10px; }
+            .faction-btn kbd { display: none; }
+            .canvas-overlay-text { display: none; }
+            .dock { left: 8px; right: 8px; transform: none; bottom: 8px; flex-wrap: wrap; justify-content: center; max-width: none; }
+            .dock .divider { display: none; }
+            button.tool-btn .label-optional, button.tool-btn .label-seed { display: none; }
+            button.tool-btn.primary { min-width: 92px; }
+            .speed { flex: 1 1 100%; justify-content: center; padding: 2px 0 4px; }
+            .speed input { flex: 1; width: auto; }
+            .shortcuts-group { display: none; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="noise-overlay"></div>
-    <div class="aurora-container">
+    <div class="noise-overlay" aria-hidden="true"></div>
+    <div class="aurora-container" aria-hidden="true">
+        <div class="starfield"></div>
         <div class="aurora-blob blob-1"></div>
         <div class="aurora-blob blob-2"></div>
     </div>
 
-    <main class="container">
-        <header>
-            <div class="header-content">
-                <span class="overline">Multi-Faction</span>
-                <h1>Game of Life</h1>
-                <p class="subtitle">Modify the universe's fundamental physics in real-time. Paint factions, dictate survival rules, and explore an infinite grid.</p>
+    <main class="app">
+        <header class="topbar">
+            <div class="brand">
+                <a class="back-link" href="../../index.html" aria-label="Back to Justin’s corner of the internet" title="Back home">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+                </a>
+                <div>
+                    <span class="overline">Multi-Faction · Ultimate Cosmos</span>
+                    <h1>Game of Life</h1>
+                </div>
             </div>
-            
-            <div class="faction-toolbar">
-                <button class="faction-btn f1 active" id="btnF1" data-faction="1">
-                    <span class="f-dot"></span> Indigo Empire
+
+            <div class="faction-toolbar" role="group" aria-label="Paint faction">
+                <span class="faction-label">Paint as</span>
+                <button class="faction-btn f1 active" id="btnF1" data-faction="1" aria-pressed="true">
+                    <span class="f-dot"></span> Indigo Empire <kbd>1</kbd>
                 </button>
-                <button class="faction-btn f2" id="btnF2" data-faction="2">
-                    <span class="f-dot"></span> Cyan Collective
+                <button class="faction-btn f2" id="btnF2" data-faction="2" aria-pressed="false">
+                    <span class="f-dot"></span> Cyan Collective <kbd>2</kbd>
                 </button>
             </div>
         </header>
 
         <div class="bento-grid">
             <!-- Canvas Area -->
-            <div class="glass-card canvas-area">
+            <section class="glass-card canvas-area" aria-label="Simulation">
                 <div class="canvas-wrapper" id="canvasWrapper">
-                    <canvas id="gridCanvas"></canvas>
-                    <div class="canvas-overlay-text">
-                        Scroll to Zoom • Right-Click & Drag to Pan
-                    </div>
+                    <canvas id="gridCanvas" aria-label="Game of Life grid. Click and drag to paint cells."></canvas>
                 </div>
-            </div>
+
+                <div class="hud hud-tl" aria-live="off">
+                    <span class="state-dot" aria-hidden="true"></span>
+                    <span>GEN <strong id="hudGen">0</strong></span>
+                    <span class="sep" aria-hidden="true"></span>
+                    <span><strong id="hudRule">B3/S23</strong></span>
+                </div>
+                <div class="hud canvas-overlay-text">
+                    Scroll to zoom · Right-drag to pan
+                </div>
+
+                <div class="dock" role="toolbar" aria-label="Simulation controls">
+                    <button id="btnPlay" class="tool-btn primary" title="Play / pause (Space)">
+                        <svg id="playIcon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L8.5 4.64A1 1 0 0 0 7 5.5z"/></svg>
+                        <span id="playLabel">Start</span>
+                    </button>
+                    <button id="btnStep" class="tool-btn" title="Advance one generation (→)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 5l8 7-8 7M18 5v14"/></svg>
+                        <span class="label-optional">Step</span>
+                    </button>
+                    <span class="divider" aria-hidden="true"></span>
+                    <button id="btnRandom" class="tool-btn" title="Seed both factions (R)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg>
+                        <span class="label-seed">Seed Both</span>
+                    </button>
+                    <button id="btnClear" class="tool-btn danger" title="Clear the grid (C)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>
+                        <span class="label-optional">Eradicate</span>
+                    </button>
+                    <button id="btnCenter" class="tool-btn" title="Recenter the camera (F)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>
+                        <span class="label-optional">Recenter</span>
+                    </button>
+                    <span class="divider" aria-hidden="true"></span>
+                    <label class="speed">
+                        <span>Speed</span>
+                        <input type="range" id="speedSlider" min="1" max="60" value="25" aria-label="Speed">
+                        <output id="speedLabel" for="speedSlider">25 gen/s</output>
+                    </label>
+                </div>
+            </section>
 
             <!-- Controls Area -->
-            <div class="glass-card controls-area">
-                
-                <div class="stats-grid">
-                    <div class="stat-box">
-                        <span class="stat-label">Generation</span>
-                        <span class="stat-value" id="genCount">0</span>
-                    </div>
-                    <div class="stat-box">
-                        <span class="stat-label">Total Pop</span>
-                        <span class="stat-value" id="popCount">0</span>
-                    </div>
-                    <div class="stat-box">
-                        <span class="stat-label stat-f1">Indigo Pop</span>
-                        <span class="stat-value stat-f1" id="popF1">0</span>
-                    </div>
-                    <div class="stat-box">
-                        <span class="stat-label stat-f2">Cyan Pop</span>
-                        <span class="stat-value stat-f2" id="popF2">0</span>
+            <aside class="glass-card controls-area" aria-label="Universe settings">
+
+                <div class="control-group">
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <span class="stat-label">Generation</span>
+                            <span class="stat-value" id="genCount">0</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-label">Total Pop</span>
+                            <span class="stat-value" id="popCount">0</span>
+                        </div>
+                        <div class="stat-box f1">
+                            <span class="stat-label stat-f1">Indigo</span>
+                            <span class="stat-value stat-f1" id="popF1">0</span>
+                        </div>
+                        <div class="stat-box f2">
+                            <span class="stat-label stat-f2">Cyan</span>
+                            <span class="stat-value stat-f2" id="popF2">0</span>
+                        </div>
                     </div>
                 </div>
 
-                <div class="control-group">
-                    <div class="btn-row">
-                        <button id="btnPlay" class="tool-btn primary">Start</button>
-                        <button id="btnStep" class="tool-btn">Step</button>
+                <div class="control-group balance">
+                    <div class="control-group-title">Balance of power <span id="balanceText">Even</span></div>
+                    <div class="balance-bar" role="img" aria-label="Indigo versus Cyan share of the population" id="balanceBar">
+                        <i id="balanceF1" style="width: 50%"></i><i id="balanceF2" style="width: 50%"></i>
                     </div>
-                    <div class="btn-row">
-                        <button id="btnRandom" class="tool-btn">Seed Both</button>
-                        <button id="btnClear" class="tool-btn">Eradicate</button>
-                        <button id="btnCenter" class="tool-btn">Recenter</button>
-                    </div>
-                </div>
-
-                <div class="control-group">
-                    <div class="control-group-title">Speed</div>
-                    <input type="range" id="speedSlider" min="1" max="60" value="25" aria-label="Speed">
+                    <div class="balance-legend"><b class="stat-f1" id="shareF1">50%</b><b class="stat-f2" id="shareF2">50%</b></div>
                 </div>
 
                 <!-- Core Physics Toggles -->
-                <div class="control-group" style="margin-top: 0.5rem;">
-                    <div class="control-group-title">Core Physics</div>
-                    
-                    <div class="toggle-row">
-                        <div class="toggle-label-group">
+                <div class="control-group">
+                    <div class="control-group-title">Core Physics <span class="rule-chip" id="ruleChip" title="Birth / Survival notation">B3/S23</span></div>
+                    <p class="rule-name" id="ruleName">Conway’s Life</p>
+
+                    <label class="toggle-row">
+                        <span class="toggle-label-group">
                             <span class="toggle-title">Underpopulation</span>
                             <span class="toggle-desc">&lt; 2 neighbors causes death</span>
-                        </div>
-                        <label class="toggle-switch">
+                        </span>
+                        <span class="toggle-switch">
                             <input type="checkbox" id="ruleUnderpop" checked>
                             <span class="toggle-slider"></span>
-                        </label>
-                    </div>
+                        </span>
+                    </label>
 
-                    <div class="toggle-row">
-                        <div class="toggle-label-group">
+                    <label class="toggle-row">
+                        <span class="toggle-label-group">
                             <span class="toggle-title">Survival</span>
                             <span class="toggle-desc">2 or 3 neighbors sustains life</span>
-                        </div>
-                        <label class="toggle-switch">
+                        </span>
+                        <span class="toggle-switch">
                             <input type="checkbox" id="ruleSurvival" checked>
                             <span class="toggle-slider"></span>
-                        </label>
-                    </div>
+                        </span>
+                    </label>
 
-                    <div class="toggle-row">
-                        <div class="toggle-label-group">
+                    <label class="toggle-row">
+                        <span class="toggle-label-group">
                             <span class="toggle-title">Overpopulation</span>
                             <span class="toggle-desc">&gt; 3 neighbors causes death</span>
-                        </div>
-                        <label class="toggle-switch">
+                        </span>
+                        <span class="toggle-switch">
                             <input type="checkbox" id="ruleOverpop" checked>
                             <span class="toggle-slider"></span>
-                        </label>
-                    </div>
+                        </span>
+                    </label>
 
-                    <div class="toggle-row">
-                        <div class="toggle-label-group">
+                    <label class="toggle-row">
+                        <span class="toggle-label-group">
                             <span class="toggle-title">Reproduction</span>
                             <span class="toggle-desc">Exactly 3 neighbors creates life</span>
-                        </div>
-                        <label class="toggle-switch">
+                        </span>
+                        <span class="toggle-switch">
                             <input type="checkbox" id="ruleReproduction" checked>
                             <span class="toggle-slider"></span>
-                        </label>
-                    </div>
+                        </span>
+                    </label>
                 </div>
 
                 <!-- Universe Traits & Mutations -->
-                <div class="control-group" style="margin-top: 0.5rem;">
-                    <div class="control-group-title" style="color: var(--f2-base);">Traits & Mutations</div>
-                    
-                    <div class="toggle-row">
-                        <div class="toggle-label-group">
+                <div class="control-group">
+                    <div class="control-group-title" style="color: var(--f2-base);">Traits &amp; Mutations</div>
+
+                    <label class="toggle-row">
+                        <span class="toggle-label-group">
                             <span class="toggle-title">Warfare Rules</span>
                             <span class="toggle-desc">Opposing factions steal births</span>
-                        </div>
-                        <label class="toggle-switch cyan">
+                        </span>
+                        <span class="toggle-switch cyan">
                             <input type="checkbox" id="ruleWarfare" checked>
                             <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    
-                    <div class="toggle-row">
-                        <div class="toggle-label-group">
+                        </span>
+                    </label>
+
+                    <label class="toggle-row">
+                        <span class="toggle-label-group">
                             <span class="toggle-title">Decay Trails</span>
                             <span class="toggle-desc">Cells leave glowing ghost trails</span>
-                        </div>
-                        <label class="toggle-switch cyan">
+                        </span>
+                        <span class="toggle-switch cyan">
                             <input type="checkbox" id="visDecay" checked>
                             <span class="toggle-slider"></span>
-                        </label>
-                    </div>
+                        </span>
+                    </label>
 
-                    <div class="toggle-row">
-                        <div class="toggle-label-group">
+                    <label class="toggle-row">
+                        <span class="toggle-label-group">
                             <span class="toggle-title">HighLife</span>
                             <span class="toggle-desc">6 neighbors also causes birth</span>
-                        </div>
-                        <label class="toggle-switch cyan">
+                        </span>
+                        <span class="toggle-switch cyan">
                             <input type="checkbox" id="mutHighLife">
                             <span class="toggle-slider"></span>
-                        </label>
-                    </div>
+                        </span>
+                    </label>
 
-                    <div class="toggle-row">
-                        <div class="toggle-label-group">
+                    <label class="toggle-row">
+                        <span class="toggle-label-group">
                             <span class="toggle-title">Mortality</span>
                             <span class="toggle-desc">Cells die of old age (30 gens)</span>
-                        </div>
-                        <label class="toggle-switch cyan">
+                        </span>
+                        <span class="toggle-switch cyan">
                             <input type="checkbox" id="mutMortality">
                             <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    
-                    <div class="toggle-row">
-                        <div class="toggle-label-group">
+                        </span>
+                    </label>
+
+                    <label class="toggle-row">
+                        <span class="toggle-label-group">
                             <span class="toggle-title">Quantum Noise</span>
                             <span class="toggle-desc">0.05% chance cells randomly flip</span>
-                        </div>
-                        <label class="toggle-switch cyan">
+                        </span>
+                        <span class="toggle-switch cyan">
                             <input type="checkbox" id="mutQuantum">
                             <span class="toggle-slider"></span>
-                        </label>
+                        </span>
+                    </label>
+                </div>
+
+                <div class="control-group shortcuts-group">
+                    <div class="control-group-title">Shortcuts</div>
+                    <div class="shortcuts">
+                        <kbd>Space</kbd><span>Play / pause</span>
+                        <kbd>→</kbd><span>Step one generation</span>
+                        <kbd>R</kbd><span>Seed both factions</span>
+                        <kbd>C</kbd><span>Eradicate everything</span>
+                        <kbd>F</kbd><span>Recenter the camera</span>
+                        <kbd>1</kbd><span>Paint Indigo · <kbd>2</kbd> Paint Cyan</span>
                     </div>
                 </div>
 
-            </div>
+            </aside>
         </div>
     </main>
 
@@ -642,9 +823,50 @@
                 updateStats();
             }
 
+            const hudGen = document.getElementById('hudGen');
+            const balanceF1 = document.getElementById('balanceF1');
+            const balanceF2 = document.getElementById('balanceF2');
+            const shareF1 = document.getElementById('shareF1');
+            const shareF2 = document.getElementById('shareF2');
+            const balanceText = document.getElementById('balanceText');
+            const fmt = new Intl.NumberFormat();
+
             function updateStats() {
-                els.gen.innerText = generation; els.pop.innerText = popF1 + popF2;
-                els.f1.innerText = popF1; els.f2.innerText = popF2;
+                els.gen.innerText = fmt.format(generation); els.pop.innerText = fmt.format(popF1 + popF2);
+                els.f1.innerText = fmt.format(popF1); els.f2.innerText = fmt.format(popF2);
+                hudGen.textContent = fmt.format(generation);
+
+                const total = popF1 + popF2;
+                const p1 = total ? popF1 / total * 100 : 50;
+                balanceF1.style.width = `${p1}%`;
+                balanceF2.style.width = `${100 - p1}%`;
+                shareF1.textContent = total ? `${Math.round(p1)}%` : '—';
+                shareF2.textContent = total ? `${100 - Math.round(p1)}%` : '—';
+                if (!total) balanceText.textContent = 'Empty universe';
+                else if (Math.abs(p1 - 50) < 4) balanceText.textContent = 'Stalemate';
+                else if (p1 > 50) balanceText.textContent = p1 > 80 ? 'Indigo dominates' : 'Indigo leads';
+                else balanceText.textContent = p1 < 20 ? 'Cyan dominates' : 'Cyan leads';
+            }
+
+            // Express the current toggles as Birth/Survival notation (e.g. B3/S23).
+            function updateRuleLabel() {
+                const birth = [];
+                if (ruleReproduction.checked) birth.push(3);
+                if (mutHighLife.checked) birth.push(6);
+                const survive = [];
+                if (!ruleUnderpop.checked) survive.push(0, 1);
+                if (ruleSurvival.checked) survive.push(2, 3);
+                if (!ruleOverpop.checked) survive.push(4, 5, 6, 7, 8);
+                const rule = `B${birth.join('')}/S${survive.join('')}`;
+                const names = { 'B3/S23': 'Conway’s Life', 'B36/S23': 'HighLife', 'B3/S012345678': 'Life without Death', 'B/S23': 'Static survivors', 'B3/S': 'Flash in the pan' };
+                let name = names[rule] || 'Custom universe';
+                const extras = [];
+                if (mutMortality.checked) extras.push('mortal');
+                if (mutQuantum.checked) extras.push('quantum');
+                if (extras.length) name += ` · ${extras.join(' + ')}`;
+                document.getElementById('ruleChip').textContent = rule;
+                document.getElementById('hudRule').textContent = rule;
+                document.getElementById('ruleName').textContent = name;
             }
 
             // ---------------------------------------------------------
@@ -760,7 +982,11 @@
 
             function togglePlay() {
                 isPlaying = !isPlaying;
-                btnPlay.innerText = isPlaying ? "Pause" : "Start";
+                document.getElementById('playLabel').textContent = isPlaying ? 'Pause' : 'Start';
+                document.getElementById('playIcon').innerHTML = isPlaying
+                    ? '<rect x="6" y="5" width="4" height="14" rx="1.2"/><rect x="14" y="5" width="4" height="14" rx="1.2"/>'
+                    : '<path d="M7 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L8.5 4.64A1 1 0 0 0 7 5.5z"/>';
+                document.body.classList.toggle('playing', isPlaying);
                 if (isPlaying) {
                     btnPlay.classList.add('active');
                     lastDrawTime = performance.now();
@@ -802,7 +1028,7 @@
                     paintMode = (ageGrid[idx] > 0 && facGrid[idx] === activePaintFaction) ? 0 : 1;
                     applyPaint(col, row); draw();
                 } else if (e.button === 1 || e.button === 2) { 
-                    e.preventDefault(); isDragging = true;
+                    e.preventDefault(); isDragging = true; document.body.classList.add('panning');
                 }
                 lastMouseX = e.clientX; lastMouseY = e.clientY;
             });
@@ -819,7 +1045,7 @@
 
             window.addEventListener('mouseup', (e) => {
                 if (e.button === 0) isPainting = false;
-                if (e.button === 1 || e.button === 2) isDragging = false;
+                if (e.button === 1 || e.button === 2) { isDragging = false; document.body.classList.remove('panning'); }
             });
             
             canvas.addEventListener('contextmenu', e => e.preventDefault());
@@ -909,11 +1135,36 @@
             // UI Listeners
             // ---------------------------------------------------------
 
-            btnF1.addEventListener('click', () => {
-                activePaintFaction = 1; btnF1.classList.add('active'); btnF2.classList.remove('active');
-            });
-            btnF2.addEventListener('click', () => {
-                activePaintFaction = 2; btnF2.classList.add('active'); btnF1.classList.remove('active');
+            function setFaction(faction) {
+                activePaintFaction = faction;
+                btnF1.classList.toggle('active', faction === 1); btnF1.setAttribute('aria-pressed', String(faction === 1));
+                btnF2.classList.toggle('active', faction === 2); btnF2.setAttribute('aria-pressed', String(faction === 2));
+            }
+            btnF1.addEventListener('click', () => setFaction(1));
+            btnF2.addEventListener('click', () => setFaction(2));
+
+            const speedLabel = document.getElementById('speedLabel');
+            function updateSpeed() {
+                const v = parseInt(speedSlider.value);
+                speedLabel.textContent = `${v} gen/s`;
+                speedSlider.style.setProperty('--fill', `${(v - 1) / 59 * 100}%`);
+            }
+            speedSlider.addEventListener('input', updateSpeed);
+            updateSpeed();
+
+            document.addEventListener('keydown', (e) => {
+                if (e.metaKey || e.ctrlKey || e.altKey) return;
+                const tag = e.target && e.target.tagName;
+                if (tag === 'INPUT' && e.target.type !== 'checkbox' && e.target.type !== 'range') return;
+                switch (e.key) {
+                    case ' ': if (tag === 'BUTTON' || tag === 'INPUT') return; e.preventDefault(); togglePlay(); break;
+                    case 'ArrowRight': if (tag === 'INPUT') return; e.preventDefault(); btnStep.click(); break;
+                    case 'r': case 'R': btnRandom.click(); break;
+                    case 'c': case 'C': btnClear.click(); break;
+                    case 'f': case 'F': btnCenter.click(); break;
+                    case '1': setFaction(1); break;
+                    case '2': setFaction(2); break;
+                }
             });
 
             btnPlay.addEventListener('click', togglePlay);
@@ -949,9 +1200,9 @@
 
             // Auto-redraw on toggle changes if paused
             const toggles = [ruleUnderpop, ruleSurvival, ruleOverpop, ruleReproduction, ruleWarfare, visDecay, mutHighLife, mutMortality, mutQuantum];
-            toggles.forEach(t => t.addEventListener('change', () => { if(!isPlaying) { computeNextGeneration(); draw(); }}));
+            toggles.forEach(t => t.addEventListener('change', () => { updateRuleLabel(); if(!isPlaying) { computeNextGeneration(); draw(); }}));
 
-            handleResize(); btnRandom.click(); 
+            handleResize(); updateRuleLabel(); btnRandom.click();
         });
     </script>
 </body>

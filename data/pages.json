@@ -16,9 +16,9 @@
     },
     {
       "path": "Pages/For Fun/Birds.html",
-      "title": "Evolutionary Flocking Ecosystem",
+      "title": "Murmuration",
       "category": "Simulation",
-      "description": "Experiment with evolving flocking behavior and ecosystem dynamics."
+      "description": "An evolving flocking ecosystem: predators and prey hunt, breed, and pass on their genes across a dusk sky."
     },
     {
       "path": "Pages/For Fun/Game-of-Life.html",

@@ -204,11 +204,11 @@ Path: `Pages/Work/UCPEA/UCPEAContract.html`
 
 A web version or reference page for UCPEA contract information.
 
-### Evolutionary Flocking Ecosystem
+### Murmuration
 
 Path: `Pages/For Fun/Birds.html`
 
-A browser-based canvas experiment simulating flocking behavior and ecosystem-style movement.
+An evolutionary flocking ecosystem on a canvas: prey flock, breed, and pass on mutated genes while predators hunt and starve. Includes a live population chart, average gene readouts, and paintable walls.
 
 ### Game of Life - Ultimate Cosmos
 

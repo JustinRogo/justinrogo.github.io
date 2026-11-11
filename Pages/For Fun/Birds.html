@@ -12,207 +12,447 @@
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Evolutionary Flocking Ecosystem</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="theme-color" content="#120f2b">
+    <meta name="description" content="An evolving predator and prey flock. Tune the ecosystem, paint walls, and watch the genes drift.">
+    <title>Murmuration · Evolutionary Flocking Ecosystem</title>
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
+        /* Murmuration: a dusk sky field station. Prey are coloured by their speed gene,
+           predators burn ember-red, and the UI reads like frosted glass over the horizon. */
+        :root {
+            color-scheme: dark;
+            --sky-top: #0a0c22;
+            --sky-mid: #1a1740;
+            --sky-low: #3a2352;
+            --horizon: #7a3d55;
+            --sun: #ffad7a;
+            --ink: #f6f0ff;
+            --muted: #bcb3dc;
+            --faint: #8d85b3;
+            --glass: rgba(20, 17, 44, 0.66);
+            --glass-strong: rgba(26, 22, 56, 0.86);
+            --line: rgba(222, 210, 255, 0.11);
+            --line-strong: rgba(222, 210, 255, 0.2);
+            --prey: #7cc8ff;
+            --pred: #ff6b5e;
+            --eco: #82e3b6;
+            --warn: #ffbf73;
+            --radius: 18px;
+            --serif: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+            --sans: 'Inter', -apple-system, 'Segoe UI', system-ui, sans-serif;
+            --ease: cubic-bezier(.2, .8, .25, 1);
+        }
+        * { box-sizing: border-box; }
         body, html {
             margin: 0;
-            padding: 0;
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background-color: #0f172a; /* Slate 900 */
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: var(--sky-top);
+            color: var(--ink);
+            font: 400 14px/1.5 var(--sans);
+            -webkit-font-smoothing: antialiased;
         }
-        canvas {
+        button, input { font: inherit; color: inherit; }
+
+        /* --- Sky --- */
+        .sky {
+            position: fixed; inset: 0; pointer-events: none;
+            background:
+                radial-gradient(120% 60% at 50% 118%, rgba(255, 173, 122, .55) 0%, rgba(255, 140, 120, .18) 30%, transparent 62%),
+                radial-gradient(60% 40% at 82% 8%, rgba(120, 110, 255, .16) 0%, transparent 70%),
+                linear-gradient(to bottom, var(--sky-top) 0%, var(--sky-mid) 42%, var(--sky-low) 78%, var(--horizon) 100%);
+        }
+        .stars {
+            position: fixed; inset: 0 0 45% 0; pointer-events: none; opacity: .55;
+            background-image:
+                radial-gradient(1px 1px at 12% 18%, #fff 50%, transparent 51%),
+                radial-gradient(1px 1px at 27% 42%, #fff 50%, transparent 51%),
+                radial-gradient(1.5px 1.5px at 41% 12%, #fff 50%, transparent 51%),
+                radial-gradient(1px 1px at 58% 30%, #fff 50%, transparent 51%),
+                radial-gradient(1px 1px at 66% 8%, #fff 50%, transparent 51%),
+                radial-gradient(1.5px 1.5px at 74% 52%, #fff 50%, transparent 51%),
+                radial-gradient(1px 1px at 88% 26%, #fff 50%, transparent 51%),
+                radial-gradient(1px 1px at 6% 60%, #fff 50%, transparent 51%),
+                radial-gradient(1px 1px at 35% 70%, #fff 50%, transparent 51%),
+                radial-gradient(1px 1px at 93% 64%, #fff 50%, transparent 51%);
+            mask-image: linear-gradient(to bottom, #000 30%, transparent);
+            -webkit-mask-image: linear-gradient(to bottom, #000 30%, transparent);
+        }
+        .horizon {
+            position: fixed; left: 0; right: 0; bottom: 0; height: 9vh; min-height: 48px; pointer-events: none;
+            background: linear-gradient(to top, rgba(10, 8, 24, .9), transparent);
+        }
+        canvas#simCanvas {
+            position: fixed; inset: 0;
             display: block;
             width: 100%;
             height: 100%;
+            cursor: crosshair;
         }
-        
-        /* Custom scrollbar for control panel */
-        .custom-scroll::-webkit-scrollbar {
-            width: 6px;
+        body.erasing canvas#simCanvas { cursor: cell; }
+
+        /* --- Glass primitives --- */
+        .glass {
+            background: var(--glass);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            backdrop-filter: blur(18px) saturate(150%);
+            -webkit-backdrop-filter: blur(18px) saturate(150%);
+            box-shadow: 0 1px 0 rgba(255, 255, 255, .06) inset, 0 24px 60px -20px rgba(4, 2, 20, .7);
         }
-        .custom-scroll::-webkit-scrollbar-track {
-            background: #1e293b;
+        .chip {
+            display: inline-flex; align-items: center; gap: .5rem;
+            min-height: 36px; padding: .4rem .85rem;
+            border-radius: 999px; border: 1px solid var(--line);
+            background: var(--glass); color: var(--muted);
+            backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+            font-size: 12.5px; text-decoration: none; cursor: pointer;
+            transition: color .2s var(--ease), border-color .2s var(--ease), background .2s var(--ease);
         }
-        .custom-scroll::-webkit-scrollbar-thumb {
-            background: #475569;
-            border-radius: 10px;
+        .chip:hover { color: var(--ink); border-color: var(--line-strong); }
+        .chip svg { width: 15px; height: 15px; flex-shrink: 0; }
+        :focus-visible { outline: 2px solid var(--sun); outline-offset: 3px; }
+
+        /* --- Title block --- */
+        .masthead {
+            position: fixed; top: 20px; left: 24px; z-index: 30;
+            display: flex; flex-direction: column; align-items: flex-start; gap: 14px;
+            pointer-events: none;
         }
-        
-        /* Range slider styling */
+        .masthead > * { pointer-events: auto; }
+        .title-block { pointer-events: none; text-shadow: 0 2px 24px rgba(5, 3, 20, .8); }
+        .kicker {
+            margin: 0 0 4px; color: var(--sun);
+            font-size: 11px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase;
+        }
+        .masthead h1 {
+            margin: 0; font: italic 500 clamp(40px, 5.2vw, 64px)/0.95 var(--serif);
+            letter-spacing: -.02em;
+            font-variation-settings: 'opsz' 144;
+        }
+        .subhead { margin: 8px 0 0; max-width: 34ch; color: var(--muted); font-size: 13px; line-height: 1.5; }
+
+        .dock {
+            position: fixed; left: 24px; bottom: 22px; z-index: 30;
+            display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+        }
+        .dock .chip.primary { color: var(--ink); }
+        .hint { color: var(--faint); font-size: 12px; padding-left: 4px; text-shadow: 0 1px 8px rgba(0,0,0,.6); }
+        kbd {
+            font: 500 11px/1 var(--sans); padding: 3px 6px; border-radius: 5px;
+            border: 1px solid var(--line-strong); color: var(--muted); background: rgba(255,255,255,.04);
+        }
+
+        /* --- Control panel --- */
+        .panel {
+            position: fixed; top: 16px; right: 16px; z-index: 40;
+            width: 316px; max-height: calc(100vh - 32px);
+            display: flex; flex-direction: column;
+            overflow: hidden;
+            transition: transform .45s var(--ease), opacity .3s var(--ease);
+        }
+        .panel-scroll { overflow-y: auto; padding: 18px 18px 20px; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.18) transparent; }
+        .panel-scroll::-webkit-scrollbar { width: 6px; }
+        .panel-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,.16); border-radius: 10px; }
+        .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+        .panel-head h2 { margin: 0; font: italic 500 22px/1.1 var(--serif); letter-spacing: -.01em; }
+        .live { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 11.5px; }
+        .live::before {
+            content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--eco);
+            box-shadow: 0 0 0 0 rgba(130, 227, 182, .6); animation: pulse 2.2s infinite;
+        }
+        body.paused .live::before { background: var(--warn); animation: none; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(130, 227, 182, .55); } 70%, 100% { box-shadow: 0 0 0 8px rgba(130, 227, 182, 0); } }
+        #closePanelBtn { display: none; }
+
+        /* Census */
+        .census {
+            border-radius: 14px; padding: 14px 14px 10px;
+            background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.015));
+            border: 1px solid var(--line);
+        }
+        .census-counts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .count-label { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 11.5px; font-weight: 500; }
+        .swatch { width: 8px; height: 8px; border-radius: 2px; transform: rotate(45deg); }
+        .swatch.prey { background: linear-gradient(135deg, #6f8cff, #73f0c4); }
+        .swatch.pred { background: var(--pred); box-shadow: 0 0 8px var(--pred); }
+        .count-value { font: 500 30px/1.15 var(--serif); font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+        .count-value.prey { color: var(--prey); }
+        .count-value.pred { color: var(--pred); }
+        #censusChart { display: block; width: 100%; height: 64px; margin-top: 8px; }
+        .chart-caption { display: flex; justify-content: space-between; color: var(--faint); font-size: 10.5px; margin-top: 2px; }
+
+        /* Genes */
+        .genes { margin-top: 14px; display: grid; gap: 10px; }
+        .gene-row { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; align-items: baseline; font-size: 12.5px; }
+        .gene-row span:first-child { color: var(--muted); }
+        .gene-row output { font-variant-numeric: tabular-nums; font-weight: 600; font-size: 12px; }
+        .gene-bar { grid-column: 1 / -1; height: 4px; border-radius: 4px; background: rgba(255,255,255,.07); overflow: hidden; }
+        .gene-bar i { display: block; height: 100%; width: 0; border-radius: inherit; transition: width .6s var(--ease); }
+        #geneSpeedBar { background: linear-gradient(90deg, #6f8cff, #73f0c4, #e6f27a); }
+        #geneFleeBar { background: linear-gradient(90deg, #6f8cff, #c48bff); }
+        .gene-note { margin: 0; color: var(--faint); font-size: 11px; line-height: 1.45; }
+
+        /* Tools */
+        .section-label {
+            display: flex; align-items: center; gap: 8px;
+            margin: 20px 0 10px; color: var(--faint);
+            font-size: 10.5px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase;
+        }
+        .section-label::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+        .segmented {
+            display: grid; grid-template-columns: 1fr 1fr; padding: 3px; gap: 3px;
+            border-radius: 11px; background: rgba(0, 0, 0, .25); border: 1px solid var(--line);
+        }
+        .segmented button {
+            appearance: none; border: 0; background: transparent; color: var(--muted);
+            min-height: 34px; border-radius: 8px; cursor: pointer; font-size: 12.5px; font-weight: 500;
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+            transition: background .2s var(--ease), color .2s var(--ease);
+        }
+        .segmented button:hover { color: var(--ink); }
+        .segmented button[aria-pressed="true"] { background: rgba(255,255,255,.11); color: var(--ink); box-shadow: 0 1px 0 rgba(255,255,255,.08) inset; }
+        .segmented button#brushErase[aria-pressed="true"] { background: rgba(255, 107, 94, .18); color: #ffd2cc; }
+        .segmented svg { width: 14px; height: 14px; }
+        .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+        .btn {
+            appearance: none; min-height: 38px; padding: 0 12px; border-radius: 10px; cursor: pointer;
+            border: 1px solid var(--line); background: rgba(255,255,255,.04); color: var(--ink);
+            font-size: 12.5px; font-weight: 600;
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+            transition: background .2s var(--ease), border-color .2s var(--ease), transform .15s var(--ease);
+        }
+        .btn:hover { background: rgba(255,255,255,.08); border-color: var(--line-strong); }
+        .btn:active { transform: scale(.97); }
+        .btn.prey { color: #cfe9ff; border-color: rgba(124, 200, 255, .35); background: rgba(124, 200, 255, .1); }
+        .btn.prey:hover { background: rgba(124, 200, 255, .18); }
+        .btn.pred { color: #ffd5d0; border-color: rgba(255, 107, 94, .4); background: rgba(255, 107, 94, .12); }
+        .btn.pred:hover { background: rgba(255, 107, 94, .2); box-shadow: 0 0 18px -4px rgba(255, 107, 94, .6); }
+        .btn.ghost { grid-column: 1 / -1; color: var(--muted); font-weight: 500; }
+
+        /* Parameter groups */
+        details.group { border-top: 1px solid var(--line); }
+        details.group:first-of-type { margin-top: 18px; }
+        details.group summary {
+            list-style: none; cursor: pointer; display: flex; align-items: center; gap: 10px;
+            padding: 13px 2px; font-size: 13px; font-weight: 600;
+        }
+        details.group summary::-webkit-details-marker { display: none; }
+        details.group summary .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+        details.group summary small { color: var(--faint); font-weight: 400; font-size: 11.5px; margin-left: auto; }
+        details.group summary::after {
+            content: ''; width: 7px; height: 7px; border-right: 1.5px solid var(--faint); border-bottom: 1.5px solid var(--faint);
+            transform: rotate(-45deg); transition: transform .25s var(--ease); margin: 0 4px 0 2px;
+        }
+        details.group[open] summary::after { transform: rotate(45deg); }
+        .group-body { display: grid; gap: 14px; padding: 2px 2px 16px; }
+        .eco { --accent: var(--eco); }
+        .genetics { --accent: var(--prey); }
+        .hunters { --accent: var(--pred); }
+
+        .slider-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; font-size: 12.5px; }
+        .slider-head label { color: var(--muted); }
+        .slider-head span { font-variant-numeric: tabular-nums; font-weight: 600; font-size: 12px; color: var(--accent); }
+
         input[type=range] {
-            -webkit-appearance: none;
-            width: 100%;
-            background: transparent;
-        }
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 16px;
-            width: 16px;
-            border-radius: 50%;
-            background: #3b82f6;
-            cursor: pointer;
-            margin-top: -6px;
-            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+            -webkit-appearance: none; appearance: none; display: block;
+            width: 100%; height: 18px; margin: 0; background: transparent; cursor: pointer;
+            --fill: 50%;
         }
         input[type=range]::-webkit-slider-runnable-track {
-            width: 100%;
-            height: 4px;
-            cursor: pointer;
-            background: #334155;
-            border-radius: 2px;
+            height: 4px; border-radius: 4px;
+            background: linear-gradient(90deg, var(--accent) 0 var(--fill), rgba(255,255,255,.1) var(--fill) 100%);
         }
-        input[type=range].pred-slider::-webkit-slider-thumb {
-            background: #ef4444;
-            box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+        input[type=range]::-moz-range-track { height: 4px; border-radius: 4px; background: rgba(255,255,255,.1); }
+        input[type=range]::-moz-range-progress { height: 4px; border-radius: 4px; background: var(--accent); }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 16px; height: 16px; margin-top: -6px; border-radius: 50%;
+            background: var(--ink); border: 3px solid var(--accent);
+            box-shadow: 0 0 0 4px rgba(255,255,255,0), 0 2px 8px rgba(0,0,0,.5);
+            transition: box-shadow .2s var(--ease), transform .2s var(--ease);
         }
-        input[type=range].eco-slider::-webkit-slider-thumb {
-            background: #10b981;
-            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+        input[type=range]::-moz-range-thumb {
+            width: 10px; height: 10px; border-radius: 50%; background: var(--ink); border: 3px solid var(--accent);
+        }
+        input[type=range]:hover::-webkit-slider-thumb { box-shadow: 0 0 0 5px rgba(255,255,255,.08), 0 2px 8px rgba(0,0,0,.5); }
+        input[type=range]:active::-webkit-slider-thumb { transform: scale(1.12); }
+        input[type=range]:focus-visible { outline: none; }
+        input[type=range]:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px rgba(255, 173, 122, .5); }
+
+        /* Mobile toggle */
+        #toggleBtn { display: none; }
+
+        @media (max-width: 767px) {
+            .masthead { top: 14px; left: 14px; gap: 10px; }
+            .masthead h1 { font-size: 36px; }
+            .subhead { display: none; }
+            .kicker { font-size: 10px; }
+            .dock { left: 14px; bottom: 14px; right: 80px; }
+            .hint { display: none; }
+            #toggleBtn {
+                display: inline-flex; position: fixed; right: 14px; bottom: 14px; z-index: 35;
+                color: var(--ink); min-height: 44px; padding: 0 16px;
+            }
+            .panel {
+                top: auto; left: 8px; right: 8px; bottom: 8px; width: auto; max-height: 72vh;
+                background: var(--glass-strong);
+                transform: translateY(calc(100% + 24px)); opacity: 0; pointer-events: none;
+            }
+            .panel.is-open { transform: none; opacity: 1; pointer-events: auto; }
+            .panel::before {
+                content: ''; display: block; width: 38px; height: 4px; border-radius: 4px;
+                background: rgba(255,255,255,.2); margin: 8px auto 0;
+            }
+            #closePanelBtn { display: inline-flex; min-height: 32px; padding: 0 12px; }
+            .panel-head .live { display: none; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation: none !important; transition: none !important; }
         }
     </style>
 </head>
-<body class="text-slate-200">
+<body>
+    <div class="sky" aria-hidden="true"></div>
+    <div class="stars" aria-hidden="true"></div>
+    <div class="horizon" aria-hidden="true"></div>
 
-    <canvas id="simCanvas"></canvas>
+    <canvas id="simCanvas" aria-label="Flocking simulation. Drag to paint walls the birds steer around."></canvas>
 
-    <!-- UI Toggle Button -->
-    <button id="toggleBtn" class="fixed top-4 right-4 z-50 bg-slate-800/80 hover:bg-slate-700 p-3 rounded-full backdrop-blur-sm transition-colors border border-slate-600 shadow-lg md:hidden">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="4" y1="21" x2="4" y2="14"></line>
-            <line x1="4" y1="10" x2="4" y2="3"></line>
-            <line x1="12" y1="21" x2="12" y2="12"></line>
-            <line x1="12" y1="8" x2="12" y2="3"></line>
-            <line x1="20" y1="21" x2="20" y2="16"></line>
-            <line x1="20" y1="12" x2="20" y2="3"></line>
-            <line x1="1" y1="14" x2="7" y2="14"></line>
-            <line x1="9" y1="8" x2="15" y2="8"></line>
-            <line x1="17" y1="16" x2="23" y2="16"></line>
-        </svg>
+    <header class="masthead">
+        <a class="chip" href="../../index.html">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+            Justin’s corner of the internet
+        </a>
+        <div class="title-block">
+            <p class="kicker">An evolving ecosystem</p>
+            <h1>Murmuration</h1>
+            <p class="subhead">Prey flock, breed, and evolve. Predators hunt, starve, and multiply.</p>
+        </div>
+    </header>
+
+    <div class="dock">
+        <button id="pauseBtn" class="chip primary" type="button" aria-pressed="false">
+            <svg id="pauseIcon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1.2"/><rect x="14" y="5" width="4" height="14" rx="1.2"/></svg>
+            <span id="pauseLabel">Pause</span>
+        </button>
+        <span class="hint">Drag across the sky to build walls · <kbd>Space</kbd> pause · <kbd>E</kbd> erase</span>
+    </div>
+
+    <!-- Mobile control toggle -->
+    <button id="toggleBtn" class="chip" type="button" aria-controls="controlPanel" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
+        Controls
     </button>
 
     <!-- Control Panel -->
-    <div id="controlPanel" class="fixed top-4 right-4 z-40 w-72 max-h-[90vh] bg-slate-800/90 backdrop-blur-md rounded-xl border border-slate-700 shadow-2xl overflow-y-auto custom-scroll transition-transform duration-300 transform translate-x-0 max-md:translate-x-[120%] max-md:top-auto max-md:bottom-4 max-md:right-4">
-        <div class="p-5 flex flex-col gap-4">
-            
-            <div>
-                <h2 class="text-xl font-bold text-white mb-1">Ecosystem Controls</h2>
-                <div class="text-[11px] text-slate-400 leading-tight">
-                    Prey reproduce naturally! <span class="text-emerald-400">Green flashes</span> = Births. <span class="text-red-400">Red flashes</span> = Eaten.
-                </div>
+    <aside id="controlPanel" class="panel glass" aria-label="Ecosystem controls">
+        <div class="panel-scroll">
+            <div class="panel-head">
+                <h2>Field notes</h2>
+                <span class="live" id="liveLabel">Live</span>
+                <button id="closePanelBtn" class="chip" type="button">Close</button>
             </div>
 
-            <!-- Ecosystem Dynamics -->
-            <div>
-                <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-2 border-b border-slate-700 pb-1">Ecosystem Rules</h3>
-                <div class="space-y-3">
+            <section class="census" aria-label="Population">
+                <div class="census-counts">
                     <div>
-                        <div class="flex justify-between mb-1">
-                            <label class="text-[13px] font-medium">Prey Breed Speed</label>
-                            <span id="reproVal" class="text-xs text-emerald-400">5.0</span>
-                        </div>
-                        <input type="range" id="breedSpeed" class="eco-slider" min="0" max="20" step="0.5" value="5.0">
+                        <div class="count-label"><span class="swatch prey"></span>Prey</div>
+                        <div class="count-value prey" id="preyCount">0</div>
                     </div>
-
                     <div>
-                        <div class="flex justify-between mb-1">
-                            <label class="text-[13px] font-medium">Population Limit (Cap)</label>
-                            <span id="maxPopVal" class="text-xs text-emerald-400">800</span>
-                        </div>
-                        <input type="range" id="maxPop" class="eco-slider" min="100" max="1500" step="50" value="800">
-                    </div>
-
-                    <div>
-                        <div class="flex justify-between mb-1">
-                            <label class="text-[13px] font-medium text-orange-300">Predator Starve Rate</label>
-                            <span id="metabolismVal" class="text-xs text-orange-300">0.8</span>
-                        </div>
-                        <input type="range" id="metabolism" class="eco-slider" min="0" max="3" step="0.1" value="0.8">
+                        <div class="count-label"><span class="swatch pred"></span>Predators</div>
+                        <div class="count-value pred" id="predCount">0</div>
                     </div>
                 </div>
+                <canvas id="censusChart" aria-hidden="true"></canvas>
+                <div class="chart-caption"><span>last 60 seconds</span><span id="chartCap">cap 800</span></div>
+            </section>
+
+            <section class="genes" aria-label="Average prey genes">
+                <div class="gene-row">
+                    <span>Avg. speed gene</span><output id="geneSpeed">–</output>
+                    <div class="gene-bar"><i id="geneSpeedBar"></i></div>
+                </div>
+                <div class="gene-row">
+                    <span>Avg. flee instinct</span><output id="geneFlee">–</output>
+                    <div class="gene-bar"><i id="geneFleeBar"></i></div>
+                </div>
+                <p class="gene-note">Newborns inherit a parent’s genes with small mutations. Faster birds are drawn greener; slower ones bluer. <span style="color: var(--eco)">Green rings</span> are births, <span style="color: var(--pred)">red rings</span> are meals.</p>
+            </section>
+
+            <div class="section-label">Brush</div>
+            <div class="segmented" role="group" aria-label="Brush">
+                <button id="brushDraw" type="button" aria-pressed="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l4-1 11-11-3-3L5 16z"/></svg>
+                    Draw walls
+                </button>
+                <button id="brushErase" type="button" aria-pressed="false">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 20h10M5 14l7-7 6 6-5 5H9z"/></svg>
+                    Erase
+                </button>
+            </div>
+            <div class="btn-row">
+                <button id="addPreyBtn" class="btn prey" type="button">+50 prey</button>
+                <button id="addPredBtn" class="btn pred" type="button">+1 predator</button>
+                <button id="clearObsBtn" class="btn ghost" type="button">Clear all walls</button>
             </div>
 
-            <!-- Prey / General Parameters -->
-            <div>
-                <h3 class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-2 border-b border-slate-700 pb-1 mt-1">Prey Genetics (Spawns)</h3>
-                <div class="space-y-3">
+            <details class="group eco" open>
+                <summary><span class="dot"></span>Ecosystem rules<small>births &amp; hunger</small></summary>
+                <div class="group-body">
                     <div>
-                        <div class="flex justify-between mb-1">
-                            <label class="text-[13px] font-medium">Separation</label>
-                            <span id="sepVal" class="text-xs text-blue-400">1.5</span>
-                        </div>
+                        <div class="slider-head"><label for="breedSpeed">Prey breed speed</label><span id="reproVal">5.0</span></div>
+                        <input type="range" id="breedSpeed" min="0" max="20" step="0.5" value="5.0">
+                    </div>
+                    <div>
+                        <div class="slider-head"><label for="maxPop">Population cap</label><span id="maxPopVal">800</span></div>
+                        <input type="range" id="maxPop" min="100" max="1500" step="50" value="800">
+                    </div>
+                    <div>
+                        <div class="slider-head"><label for="metabolism">Predator starve rate</label><span id="metabolismVal">0.8</span></div>
+                        <input type="range" id="metabolism" min="0" max="3" step="0.1" value="0.8">
+                    </div>
+                </div>
+            </details>
+
+            <details class="group genetics">
+                <summary><span class="dot"></span>Prey genetics<small>new spawns</small></summary>
+                <div class="group-body">
+                    <div>
+                        <div class="slider-head"><label for="separation">Separation</label><span id="sepVal">1.5</span></div>
                         <input type="range" id="separation" min="0" max="3" step="0.1" value="1.5">
                     </div>
-
                     <div>
-                        <div class="flex justify-between mb-1">
-                            <label class="text-[13px] font-medium">Base Max Speed</label>
-                            <span id="speedVal" class="text-xs text-blue-400">3.5</span>
-                        </div>
+                        <div class="slider-head"><label for="maxSpeed">Base max speed</label><span id="speedVal">3.5</span></div>
                         <input type="range" id="maxSpeed" min="1" max="10" step="0.5" value="3.5">
                     </div>
-
                     <div>
-                        <div class="flex justify-between mb-1">
-                            <label class="text-[13px] font-medium">Base Flee Panic</label>
-                            <span id="fleeVal" class="text-xs text-blue-400">4.5</span>
-                        </div>
+                        <div class="slider-head"><label for="fleeWeight">Base flee panic</label><span id="fleeVal">4.5</span></div>
                         <input type="range" id="fleeWeight" min="0" max="8" step="0.5" value="4.5">
                     </div>
                 </div>
-            </div>
+            </details>
 
-            <!-- Predator Parameters -->
-            <div>
-                <h3 class="text-xs font-bold text-red-400 uppercase tracking-wider mb-2 border-b border-slate-700 pb-1 mt-1">Predators</h3>
-                <div class="space-y-3">
+            <details class="group hunters">
+                <summary><span class="dot"></span>Predators<small>the hunt</small></summary>
+                <div class="group-body">
                     <div>
-                        <div class="flex justify-between mb-1">
-                            <label class="text-[13px] font-medium">Chase Force</label>
-                            <span id="chaseVal" class="text-xs text-red-400">2.5</span>
-                        </div>
-                        <input type="range" id="chaseWeight" class="pred-slider" min="0" max="8" step="0.5" value="2.5">
+                        <div class="slider-head"><label for="chaseWeight">Chase force</label><span id="chaseVal">2.5</span></div>
+                        <input type="range" id="chaseWeight" min="0" max="8" step="0.5" value="2.5">
                     </div>
-
                     <div>
-                        <div class="flex justify-between mb-1">
-                            <label class="text-[13px] font-medium">Base Speed</label>
-                            <span id="predSpeedVal" class="text-xs text-red-400">4.5</span>
-                        </div>
-                        <input type="range" id="predSpeed" class="pred-slider" min="2" max="12" step="0.5" value="4.5">
+                        <div class="slider-head"><label for="predSpeed">Base speed</label><span id="predSpeedVal">4.5</span></div>
+                        <input type="range" id="predSpeed" min="2" max="12" step="0.5" value="4.5">
                     </div>
                 </div>
-            </div>
-
-            <div class="h-px bg-slate-700 my-1"></div>
-
-            <!-- Action Buttons -->
-            <div class="flex flex-col gap-2">
-                <button id="toggleModeBtn" class="w-full bg-slate-600 hover:bg-slate-500 text-white text-sm font-semibold py-2 px-4 rounded transition shadow-md">
-                    Brush: Draw Obstacle
-                </button>
-                <div class="flex gap-2 mt-2">
-                    <button id="addPreyBtn" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold py-2 px-2 rounded transition shadow-md">
-                        +50 Prey
-                    </button>
-                    <button id="addPredBtn" class="flex-1 bg-red-600 hover:bg-red-500 text-white text-sm font-semibold py-2 px-2 rounded transition shadow-[0_0_10px_rgba(220,38,38,0.4)]">
-                        +1 Predator
-                    </button>
-                </div>
-                <button id="clearObsBtn" class="w-full bg-slate-800 border border-slate-600 hover:bg-slate-700 text-white text-sm font-semibold py-2 px-4 rounded transition mt-2">
-                    Clear Obstacles
-                </button>
-            </div>
-            
-            <div class="flex justify-between text-base font-bold bg-slate-900/50 p-2 rounded-lg border border-slate-700">
-                <span class="text-blue-400">Prey: <span id="preyCount">0</span></span>
-                <span class="text-red-400">Preds: <span id="predCount">0</span></span>
-            </div>
+            </details>
         </div>
-    </div>
+    </aside>
 
     <script>
         // --- Vector2 Math Library ---
@@ -611,8 +851,9 @@
             boidGrid.resize(width, height);
             obstacleGrid.resize(width, height);
             obstaclesDirty = true;
-            ctx.fillStyle = '#0f172a';
-            ctx.fillRect(0, 0, width, height);
+            // The canvas stays transparent so the CSS dusk sky shows through.
+            ctx.clearRect(0, 0, width, height);
+            sizeCensusChart();
         }
 
         function updateCountsDisplay(preyCount, predCount) {
@@ -635,8 +876,9 @@
         function handleInteraction(x, y) {
             const panel = document.getElementById('controlPanel');
             const rect = panel.getBoundingClientRect();
-            if (!panel.classList.contains('max-md:translate-x-[120%]')) { 
-                if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) return; 
+            // On small screens the panel is a bottom sheet that is hidden unless open.
+            if (window.innerWidth >= 768 || panel.classList.contains('is-open')) {
+                if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) return;
             }
 
             if (currentMode === 'draw') {
@@ -683,13 +925,14 @@
         }
 
         function render(alpha, elapsed) {
-            // Keep the trail duration consistent on high-refresh displays.
-            ctx.fillStyle = `rgba(15, 23, 42, ${1 - Math.pow(0.65, elapsed / STEP_MS)})`;
+            // Fade old frames toward transparent (not a solid colour) so trails dissolve
+            // into the sky gradient. Keep the trail duration consistent on high-refresh displays.
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.fillStyle = `rgba(0, 0, 0, ${1 - Math.pow(0.65, elapsed / STEP_MS)})`;
             ctx.fillRect(0, 0, width, height);
+            ctx.globalCompositeOperation = 'source-over';
 
-            // Draw a smooth path through the collision samples.
-            ctx.strokeStyle = '#64748b';
-            ctx.lineWidth = OBSTACLE_RADIUS * 2;
+            // Draw a smooth path through the collision samples: a soft halo, then a bright core.
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
             ctx.beginPath();
@@ -704,34 +947,119 @@
                 }
                 previous = obs;
             }
-            ctx.stroke();
+            if (obstacles.length) {
+                // Glowing filament: wide soft halo, then a warm solid core.
+                ctx.strokeStyle = 'rgba(255, 173, 122, 0.14)';
+                ctx.lineWidth = OBSTACLE_RADIUS * 2 + 10;
+                ctx.stroke();
+                ctx.strokeStyle = 'rgba(255, 196, 160, 0.9)';
+                ctx.lineWidth = OBSTACLE_RADIUS + 1;
+                ctx.stroke();
+            }
 
             // Draw Effects (Death = Red, Birth = Green)
+            ctx.lineWidth = 2;
             for (let i = deathEffects.length - 1; i >= 0; i--) {
                 let e = deathEffects[i];
                 ctx.beginPath();
                 ctx.arc(e.x, e.y, 10 * (1 - e.life) + 2, 0, Math.PI * 2);
-                ctx.strokeStyle = `rgba(239, 68, 68, ${e.life})`;
-                ctx.lineWidth = 2;
+                ctx.strokeStyle = `rgba(255, 107, 94, ${e.life})`;
                 ctx.stroke();
             }
             for (let i = birthEffects.length - 1; i >= 0; i--) {
                 let e = birthEffects[i];
                 ctx.beginPath();
                 ctx.arc(e.x, e.y, 15 * (1 - e.life) + 2, 0, Math.PI * 2);
-                ctx.strokeStyle = `rgba(16, 185, 129, ${e.life})`; 
-                ctx.lineWidth = 2;
+                ctx.strokeStyle = `rgba(130, 227, 182, ${e.life * 0.9})`;
                 ctx.stroke();
             }
 
             for (const boid of boids) boid.draw(alpha);
 
-            if (isDrawing && currentMode === 'erase') {
+            if (currentMode === 'erase' && pointerInside) {
                 ctx.beginPath();
                 ctx.arc(mouseX, mouseY, 40, 0, Math.PI * 2);
-                ctx.strokeStyle = 'rgba(255, 100, 100, 0.5)';
-                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 6]);
+                ctx.strokeStyle = isDrawing ? 'rgba(255, 140, 120, 0.85)' : 'rgba(255, 210, 200, 0.45)';
+                ctx.lineWidth = 1.5;
                 ctx.stroke();
+                ctx.setLineDash([]);
+            }
+        }
+
+        // --- Census: population history and average genes ---
+        const censusChart = document.getElementById('censusChart');
+        const censusCtx = censusChart.getContext('2d');
+        const HISTORY_LENGTH = 120; // one sample every 500ms -> 60 seconds
+        const preyHistory = [];
+        const predHistory = [];
+        let lastSampleTime = -Infinity;
+
+        function sizeCensusChart() {
+            const dpr = Math.min(2, window.devicePixelRatio || 1);
+            censusChart.width = Math.round((censusChart.clientWidth || 280) * dpr);
+            censusChart.height = Math.round((censusChart.clientHeight || 64) * dpr);
+            drawCensusChart();
+        }
+
+        function drawCensusChart() {
+            const w = censusChart.width, h = censusChart.height;
+            if (!w || !h) return;
+            censusCtx.clearRect(0, 0, w, h);
+            if (preyHistory.length < 2) return;
+            const pad = h * 0.08;
+            const step = w / (HISTORY_LENGTH - 1);
+            const offset = (HISTORY_LENGTH - preyHistory.length) * step;
+            const preyMax = Math.max(params.maxPrey, ...preyHistory);
+            const predMax = Math.max(8, ...predHistory) * 1.15;
+
+            const trace = (series, max) => {
+                censusCtx.beginPath();
+                series.forEach((value, i) => {
+                    const x = offset + i * step;
+                    const y = h - pad - (value / max) * (h - pad * 2);
+                    i ? censusCtx.lineTo(x, y) : censusCtx.moveTo(x, y);
+                });
+            };
+
+            // Prey: filled area
+            trace(preyHistory, preyMax);
+            censusCtx.lineTo(w, h);
+            censusCtx.lineTo(offset, h);
+            censusCtx.closePath();
+            const fill = censusCtx.createLinearGradient(0, 0, 0, h);
+            fill?.addColorStop(0, 'rgba(124, 200, 255, 0.35)');
+            fill?.addColorStop(1, 'rgba(124, 200, 255, 0)');
+            censusCtx.fillStyle = fill;
+            censusCtx.fill();
+            trace(preyHistory, preyMax);
+            censusCtx.strokeStyle = '#7cc8ff';
+            censusCtx.lineWidth = 1.5 * (w / (censusChart.clientWidth || w));
+            censusCtx.stroke();
+
+            // Predators: line on their own scale
+            trace(predHistory, predMax);
+            censusCtx.strokeStyle = '#ff6b5e';
+            censusCtx.stroke();
+        }
+
+        function updateCensus(timestamp) {
+            if (timestamp - lastSampleTime >= 500) {
+                lastSampleTime = timestamp;
+                preyHistory.push(currentPreyCount);
+                predHistory.push(currentPredCount);
+                if (preyHistory.length > HISTORY_LENGTH) { preyHistory.shift(); predHistory.shift(); }
+                drawCensusChart();
+
+                let speed = 0, flee = 0, prey = 0;
+                for (const boid of boids) {
+                    if (boid.type !== 'prey' || boid.dead) continue;
+                    speed += boid.dna.maxSpeed; flee += boid.dna.fleeWeight; prey++;
+                }
+                document.getElementById('geneSpeed').textContent = prey ? (speed / prey).toFixed(2) : '–';
+                document.getElementById('geneFlee').textContent = prey ? (flee / prey).toFixed(2) : '–';
+                document.getElementById('geneSpeedBar').style.width = prey ? `${Math.min(100, (speed / prey) / 10 * 100)}%` : '0';
+                document.getElementById('geneFleeBar').style.width = prey ? `${Math.min(100, (flee / prey) / 10 * 100)}%` : '0';
             }
         }
 
@@ -823,6 +1151,12 @@
             if (document.hidden) return;
             const elapsed = lastFrameTime === null ? STEP_MS : Math.max(0, timestamp - lastFrameTime);
             lastFrameTime = timestamp;
+            if (paused) {
+                // Hold the frame: let trails settle but keep birds where they are.
+                accumulator = 0;
+                render(1, Math.min(elapsed, STEP_MS * MAX_STEPS));
+                return;
+            }
             // Bound catch-up work after a stall so it cannot cause another long frame.
             accumulator += Math.min(elapsed, STEP_MS * MAX_STEPS);
             let steps = 0;
@@ -836,7 +1170,11 @@
                 updateCountsDisplay(currentPreyCount, currentPredCount);
                 lastCountTime = timestamp;
             }
+            updateCensus(timestamp);
         }
+
+        let paused = false;
+        let pointerInside = false;
 
         document.addEventListener('visibilitychange', () => {
             lastFrameTime = null;
@@ -876,11 +1214,22 @@
         const bindSlider = (id, paramKey, displayId, suffix = '') => {
             const el = document.getElementById(id);
             const disp = document.getElementById(displayId);
+            // Paint the filled part of the track up to the thumb.
+            const paintFill = () => {
+                const pct = (parseFloat(el.value) - parseFloat(el.min)) / (parseFloat(el.max) - parseFloat(el.min)) * 100;
+                if (el.style.setProperty) el.style.setProperty('--fill', `${pct}%`);
+            };
+            paintFill();
             el.addEventListener('input', (e) => {
                 const val = parseFloat(e.target.value);
                 params[paramKey] = val;
+                paintFill();
                 if(displayId) {
                     disp.innerText = (val % 1 === 0 && val > 20) ? val : val.toFixed(1) + suffix;
+                }
+                if (paramKey === 'maxPrey') {
+                    document.getElementById('chartCap').textContent = `cap ${val}`;
+                    drawCensusChart();
                 }
             });
         };
@@ -905,30 +1254,53 @@
             obstaclesDirty = true;
         });
 
-        const toggleModeBtn = document.getElementById('toggleModeBtn');
-        toggleModeBtn.addEventListener('click', () => {
+        // Brush: draw / erase segmented control
+        const brushDraw = document.getElementById('brushDraw');
+        const brushErase = document.getElementById('brushErase');
+        function setMode(mode) {
             endStroke();
-            if (currentMode === 'draw') {
-                currentMode = 'erase';
-                toggleModeBtn.innerText = 'Brush: Erase Obstacles';
-                toggleModeBtn.classList.replace('bg-slate-600', 'bg-slate-800');
-                toggleModeBtn.classList.add('border', 'border-red-500');
-            } else {
-                currentMode = 'draw';
-                toggleModeBtn.innerText = 'Brush: Draw Obstacle';
-                toggleModeBtn.classList.replace('bg-slate-800', 'bg-slate-600');
-                toggleModeBtn.classList.remove('border', 'border-red-500');
-            }
+            currentMode = mode;
+            brushDraw.setAttribute('aria-pressed', String(mode === 'draw'));
+            brushErase.setAttribute('aria-pressed', String(mode === 'erase'));
+            document.body.classList.toggle('erasing', mode === 'erase');
+        }
+        brushDraw.addEventListener('click', () => setMode('draw'));
+        brushErase.addEventListener('click', () => setMode('erase'));
+
+        // Pause / resume
+        const pauseBtn = document.getElementById('pauseBtn');
+        function setPaused(value) {
+            paused = value;
+            lastFrameTime = null;
+            pauseBtn.setAttribute('aria-pressed', String(paused));
+            document.getElementById('pauseLabel').textContent = paused ? 'Resume' : 'Pause';
+            document.getElementById('pauseIcon').innerHTML = paused
+                ? '<path d="M7 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L8.5 4.64A1 1 0 0 0 7 5.5z"/>'
+                : '<rect x="6" y="5" width="4" height="14" rx="1.2"/><rect x="14" y="5" width="4" height="14" rx="1.2"/>';
+            document.getElementById('liveLabel').textContent = paused ? 'Paused' : 'Live';
+            document.body.classList.toggle('paused', paused);
+        }
+        pauseBtn.addEventListener('click', () => setPaused(!paused));
+
+        document.addEventListener('keydown', (e) => {
+            if (e.target && /^(INPUT|BUTTON|SUMMARY|A)$/.test(e.target.tagName)) return;
+            if (e.code === 'Space') { e.preventDefault(); setPaused(!paused); }
+            else if (e.key === 'e' || e.key === 'E') setMode(currentMode === 'erase' ? 'draw' : 'erase');
         });
 
+        canvas.addEventListener('mouseenter', () => { pointerInside = true; });
+        canvas.addEventListener('mouseleave', () => { pointerInside = false; });
+
+        // Mobile bottom sheet
         const toggleBtn = document.getElementById('toggleBtn');
         const controlPanel = document.getElementById('controlPanel');
-        
-        toggleBtn.addEventListener('click', () => {
-            controlPanel.classList.toggle('max-md:translate-x-[120%]');
-            toggleBtn.style.transform = controlPanel.classList.contains('max-md:translate-x-[120%]') ? 'rotate(0deg)' : 'rotate(90deg)';
-            toggleBtn.style.transition = 'transform 0.3s';
-        });
+        function setPanelOpen(open) {
+            controlPanel.classList.toggle('is-open', open);
+            toggleBtn.setAttribute('aria-expanded', String(open));
+            if (open) sizeCensusChart();
+        }
+        toggleBtn.addEventListener('click', () => setPanelOpen(!controlPanel.classList.contains('is-open')));
+        document.getElementById('closePanelBtn').addEventListener('click', () => setPanelOpen(false));
 
         window.onload = init;
 
