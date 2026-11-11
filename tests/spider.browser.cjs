@@ -101,8 +101,9 @@ const screenshots = fs.mkdtempSync(path.join(os.tmpdir(), 'web-crawler-'));
       spider.angle = angle;
       for (let index = 0; index < 8; index++) {
         const pose = crawler.legPose(spider, index);
-        const joint = crawler.legJoint(pose.hip, pose.ideal, pose.outward);
-        const expected = crawler.reach() * .68;
+        // Species and size scale each spider's legs, so measure against that spider's reach.
+        const joint = crawler.legJoint(pose.hip, pose.ideal, pose.outward, spider);
+        const expected = crawler.reach(spider) * .68;
         const first = Math.hypot(joint.x - pose.hip.x, joint.y - pose.hip.y);
         const second = Math.hypot(joint.x - pose.ideal.x, joint.y - pose.ideal.y);
         if (Math.abs(first - expected) > 1e-6 || Math.abs(second - expected) > 1e-6) throw new Error('Articulated leg segment lengths changed while turning');
@@ -216,7 +217,12 @@ const screenshots = fs.mkdtempSync(path.join(os.tmpdir(), 'web-crawler-'));
     if (followLastArticle()) throw new Error('End navigation must not leave Wikipedia');
   });
   assert.match(await automatic.locator('#hint').innerText(), /ran out of new Wikipedia links/);
+  // The current homepage links to the experiment from its project cards.
   await page.goto(`${baseURL}/`);
+  await page.waitForFunction(() => [...document.querySelectorAll('a[href]')]
+    .some(a => decodeURIComponent(new URL(a.href).pathname) === '/Pages/For Fun/Spider/index.html'));
+  // The page tree (#pageTree) now lives on the Original site style.
+  await page.goto(`${baseURL}/original.html`);
   await page.locator('#pageTree a[href="Pages/For Fun/Spider/index.html"]').waitFor({state:'attached'});
   assert.equal(await page.locator('#pageTree a[href="Pages/For Fun/Spider/index.html"]').evaluate(el => el.classList.contains('page-link--parent')), false);
   assert.deepEqual(errors, []);

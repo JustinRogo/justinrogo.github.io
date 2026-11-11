@@ -1,4 +1,4 @@
-import { WebCrawler } from './spider.js';
+import { WebCrawler, SPECIES, SIZES, DIETS, rollCast } from './spider.js';
 
 const DEFAULT_URL = 'https://en.wikipedia.org/wiki/Spider';
 const AUTO_LINK_CHANCE = .004;
@@ -14,6 +14,33 @@ let autoNavigationPending = false;
 const recentArticles = [];
 const cache = new Map();
 const articleHistory = [];
+// One random cast per page load: spider 1 is a random species, size, and diet, and each extra
+// spider is a different species with a different diet. Article changes and Reset keep the cast.
+const cast = rollCast();
+
+function renderCast() {
+  const count = Math.max(1, Math.min(5, Number($('count').value) || 1));
+  const active = cast.slice(0, count);
+  const lead = active[0], leadSpecies = SPECIES[lead.species];
+  $('specimen-name').textContent = leadSpecies.latin;
+  $('specimen-size').textContent = `SIZE: ${SIZES[lead.size].label.toUpperCase()} · ${SIZES[lead.size].note.toUpperCase()}`;
+  $('specimen-diet').textContent = `DIET: ${DIETS[lead.diet].prey.toUpperCase()}`;
+  $('telemetry-count').textContent = `${count} SPECIMEN${count > 1 ? 'S' : ''} · 8 LEGS EACH`;
+  $('cast').replaceChildren(...active.map((specimen, index) => {
+    const kind = SPECIES[specimen.species], size = SIZES[specimen.size], diet = DIETS[specimen.diet];
+    const item = document.createElement('li');
+    item.style.setProperty('--species', kind.main);
+    const name = document.createElement('strong'); name.textContent = kind.name;
+    const tags = document.createElement('span'); tags.className = 'cast-tags';
+    for (const [label, title] of [[size.label, size.note], [diet.label, `Hunts ${diet.prey}`]]) {
+      const tag = document.createElement('span'); tag.textContent = label; tag.title = title; tags.append(tag);
+    }
+    const prey = document.createElement('small'); prey.textContent = `Hunts ${diet.prey}`;
+    const number = document.createElement('span'); number.className = 'cast-number'; number.textContent = String(index + 1).padStart(2, '0');
+    item.append(number, name, tags, prey);
+    return item;
+  }));
+}
 let historyPosition = -1, autoRetryAfter = 0;
 const failedAutoLinks = new Set();
 
@@ -93,7 +120,9 @@ function navigateAutomatically(url) {
   loadArticle(url.href, { automatic: true });
 }
 
-export function followSpiderLink(element, crawlTime) {
+export function followSpiderLink(element, crawlTime, landing) {
+  // A picky eater only follows links that are on its menu (e.g. links that start with a vowel).
+  if (landing && !landing.prey) return false;
   if (paused || autoNavigationPending || !$('loading').hidden || crawlTime < Math.max(AUTO_LINK_MIN_AGE, autoRetryAfter)) return false;
   const url = automaticArticleURL(element);
   // More spiders make more footsteps; keep the overall chance of a detour about the same.
@@ -216,7 +245,7 @@ function mountArticle(scrollTop = 0) {
   failedAutoLinks.clear(); autoRetryAfter = 0;
   $('mutations').textContent = '000';
   crawler = new WebCrawler({ root: content, canvas: $('spider-canvas'), viewport,
-    speed: Number($('speed').value), count: Number($('count').value), intensity: Number($('intensity').value) / 100, paused,
+    speed: Number($('speed').value), count: Number($('count').value), cast, intensity: Number($('intensity').value) / 100, paused,
     onPlant: followSpiderLink, onEnd: followLastArticle,
     onStats: ({ mutations, capped }) => {
       $('mutations').textContent = String(mutations).padStart(3, '0');
@@ -335,7 +364,8 @@ $('intensity').addEventListener('input', () => {
   $('intensity').setAttribute('aria-valuetext', `${value < 25 ? 'Subtle' : value <= 70 ? 'Balanced' : 'Chaotic'} (${value}%)`);
   crawler?.setIntensity(value / 100);
 });
-$('count').addEventListener('change', () => crawler?.setCount($('count').value));
+$('count').addEventListener('change', () => { crawler?.setCount($('count').value); renderCast(); });
+renderCast();
 $('pause').addEventListener('click', () => { paused = !paused; if (paused) cancelAutomaticNavigation(); crawler?.setPaused(paused); updatePause(); });
 $('reset').addEventListener('click', () => mountArticle());
 $('article-back').addEventListener('click', () => {
