@@ -39,35 +39,108 @@
   <a class="skip-link" href="#main-content">Skip to dashboard</a>
 
   <header class="site-header">
-    <div class="header-inner">
-      <a class="brand" href="./" aria-label="UCPEA Member Dashboard home">
-        <span class="brand-mark" aria-hidden="true">U</span>
-        <span>
-          <strong>UCPEA</strong>
-          <small>Member dashboard</small>
-        </span>
+    <button class="shell-button menu-toggle" id="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="dashboard-sidebar" hidden>
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path class="menu-icon" d="M4 6h16M4 12h16M4 18h16"/>
+        <path class="close-icon" d="m6 6 12 12M6 18 18 6"/>
+      </svg>
+    </button>
+    <p class="header-title"><a class="header-brand" href="./" aria-label="UCPEA Member Dashboard home">UCPEA</a> <span class="header-context">Member dashboard</span></p>
+    <div class="header-actions">
+      <a class="official-link" href="https://ucpea.ct.aft.org/" target="_blank" rel="noopener noreferrer" aria-label="Official UCPEA site">
+        <span>Official <span class="official-link-name">UCPEA</span> site</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg>
       </a>
-
-      <nav class="primary-nav" aria-label="Dashboard navigation">
-        <a href="#start-here">Start here</a>
-        <a href="#deadlines">Deadlines</a>
-        <a href="#calendar">Calendar</a>
-        <a href="#contract">Contract</a>
-        <a href="#resources">Resources</a>
-      </nav>
-
-      <div class="header-actions">
-        <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false">
-          <span class="theme-icon" aria-hidden="true"></span>
-        </button>
-        <a class="official-link" href="https://ucpea.ct.aft.org/" target="_blank" rel="noopener noreferrer">
-          Official UCPEA site <span aria-hidden="true">↗</span>
-        </a>
-      </div>
+      <button class="shell-button theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path class="moon-icon" d="M21 13A9 9 0 1 1 11 3a7 7 0 0 0 10 10Z"/>
+          <path class="sun-icon" d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1 1m12 12 1 1M5 19l1-1M18 6l1-1m-3 6a4 4 0 1 1-8 0 4 4 0 0 1 8 0"/>
+        </svg>
+      </button>
     </div>
   </header>
 
-  <main id="main-content">
+  <aside class="dashboard-sidebar" id="dashboard-sidebar">
+    <div class="sidebar-header">
+      <a class="brand" href="./" aria-label="UCPEA Member Dashboard home" title="UCPEA Member Dashboard home">
+        <span class="brand-mark" aria-hidden="true">U</span>
+        <strong class="sidebar-label">UCPEA</strong>
+      </a>
+      <button class="shell-button sidebar-toggle" id="sidebar-toggle" type="button" aria-label="Collapse sidebar" title="Collapse sidebar" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 3h18v18H3zM9 3v18"/>
+          <path class="sidebar-chevron" d="m16 8-4 4 4 4"/>
+        </svg>
+      </button>
+    </div>
+
+    <nav class="primary-nav" aria-label="Dashboard navigation">
+      <div class="sidebar-scroll">
+        <a href="#main-content" title="Overview" aria-current="location">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10H15v-7H9v7H3Z"/></svg>
+          <span class="sidebar-label">Overview</span>
+        </a>
+        <a href="#start-here" title="Start here">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 4H4v13h4v4l5-4h7zM8 9h8m-8 4h5"/></svg>
+          <span class="sidebar-label">Start here</span>
+        </a>
+        <a href="#deadlines" title="Deadlines">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8v5l3 2m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+          <span class="sidebar-label">Deadlines</span>
+        </a>
+        <a href="#calendar" title="Calendar">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v16H4zM8 2v6m8-6v6M4 11h16"/></svg>
+          <span class="sidebar-label">Calendar</span>
+        </a>
+        <a href="#contract" title="Contract">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5C8 2 3 3 2 4v16c3-1 7-1 10 1 3-2 7-2 10-1V4c-1-1-6-2-10 1Zm0 0v16"/></svg>
+          <span class="sidebar-label">Contract</span>
+        </a>
+        <a href="#updates" title="Union Wire">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h13v16H6a2 2 0 0 1-2-2zm13 4h3v10a2 2 0 0 1-2 2h-1M8 8h5m-5 4h5m-5 4h5"/></svg>
+          <span class="sidebar-label">Union Wire</span>
+        </a>
+
+        <div class="sidebar-branches">
+          <details>
+            <summary>
+              UCPEA pages
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+            </summary>
+            <ul>
+              <li><a href="UCPEAContract.html">Current contract</a></li>
+              <li><a href="UCPEA_Contract_History.html">Contract history</a></li>
+              <li><a href="UCPEA_Contract_Comparison.html">Compare contracts</a></li>
+              <li><a href="UCPEA-Area-Explorer.html">Area Explorer</a></li>
+            </ul>
+          </details>
+          <details>
+            <summary>
+              Member resources
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+            </summary>
+            <ul>
+              <li><a href="https://ucpea.ct.aft.org/professional-development">Professional development</a></li>
+              <li><a href="https://ucpea3695.my.canva.site/childcarereimbursement">Childcare reimbursement</a></li>
+              <li><a href="https://ucpea.ct.aft.org/hardship-fund">Hardship fund</a></li>
+              <li><a href="https://ucpea.ct.aft.org/sick-bank">Sick leave bank</a></li>
+              <li><a href="https://ucpea.ct.aft.org/tuition-benefits/tuition-waiver-and-reimbursement">Tuition benefits</a></li>
+              <li><a href="https://ucpea.ct.aft.org/scholarships/ucpea-scholarships">Scholarships</a></li>
+              <li><a href="https://ucpea.ct.aft.org/stewards">Find a steward</a></li>
+            </ul>
+          </details>
+        </div>
+      </div>
+      <div class="sidebar-contact">
+        <a href="#contact" title="Contact UCPEA">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18v14H3zm0 0 9 7 9-7"/></svg>
+          <span class="sidebar-label">Contact UCPEA</span>
+        </a>
+      </div>
+    </nav>
+  </aside>
+
+  <main id="main-content" tabindex="-1">
     <section class="hero" aria-labelledby="hero-title">
       <div class="hero-grid">
         <div class="hero-copy">
@@ -115,7 +188,7 @@
       </div>
     </section>
 
-    <section class="start-section section-shell" id="start-here" aria-labelledby="start-title">
+    <section class="start-section section-shell" id="start-here" aria-labelledby="start-title" tabindex="-1">
       <div class="section-heading">
         <div>
           <p class="section-kicker">Start with your situation</p>
@@ -170,7 +243,7 @@
       </div>
     </section>
 
-    <section class="deadline-section section-shell" id="deadlines" aria-labelledby="deadlines-title">
+    <section class="deadline-section section-shell" id="deadlines" aria-labelledby="deadlines-title" tabindex="-1">
       <div class="section-heading">
         <div>
           <p class="section-kicker">Plan ahead</p>
@@ -242,16 +315,9 @@
           <p class="deadline-result__note" id="deadlineResultNote">Always confirm eligibility and dates on the official UCPEA page before submitting.</p>
         </div>
       </div>
-
-      <nav class="deadline-shortcuts" aria-label="Other benefit resources">
-        <a href="https://ucpea.ct.aft.org/tuition-benefits/tuition-waiver-and-reimbursement" target="_blank" rel="noopener noreferrer"><span>Tuition benefits</span><strong>Official workflow ↗</strong></a>
-        <a href="https://ucpea.ct.aft.org/sick-bank" target="_blank" rel="noopener noreferrer"><span>Sick leave bank</span><strong>Eligibility &amp; application ↗</strong></a>
-        <a href="https://ucpea.ct.aft.org/hardship-fund" target="_blank" rel="noopener noreferrer"><span>Hardship fund</span><strong>Current policy ↗</strong></a>
-        <a href="https://ucpea.ct.aft.org/scholarships/ucpea-scholarships" target="_blank" rel="noopener noreferrer"><span>Scholarships</span><strong>Current opportunities ↗</strong></a>
-      </nav>
     </section>
 
-    <section class="calendar-section section-shell" id="calendar" aria-labelledby="calendar-title">
+    <section class="calendar-section section-shell" id="calendar" aria-labelledby="calendar-title" tabindex="-1">
       <div class="section-heading">
         <div>
           <p class="section-kicker">Stay connected</p>
@@ -278,7 +344,7 @@
       </div>
     </section>
 
-    <section class="contract-section section-shell" id="contract" aria-labelledby="contract-title">
+    <section class="contract-section section-shell" id="contract" aria-labelledby="contract-title" tabindex="-1">
       <div class="section-heading section-heading-single">
         <h2 id="contract-title">The Contract</h2>
       </div>
@@ -462,7 +528,7 @@
       </details>
     </section>
 
-    <section class="updates-section section-shell" id="updates" aria-labelledby="updates-title">
+    <section class="updates-section section-shell" id="updates" aria-labelledby="updates-title" tabindex="-1">
       <div class="section-heading section-heading-inline">
         <h2 id="updates-title">Union Wire</h2>
         <div class="feed-meta">
@@ -565,69 +631,7 @@
       <p class="no-updates" id="no-updates" hidden>No updates match this filter.</p>
     </section>
 
-    <section class="resources-section section-shell" id="resources" aria-labelledby="resources-title">
-      <div class="section-heading section-heading-single">
-        <h2 id="resources-title">Member Resources</h2>
-      </div>
-
-      <div class="resource-grid">
-        <a class="resource-card resource-card-wide" href="https://ucpea.ct.aft.org/professional-development" target="_blank" rel="noopener noreferrer">
-          <span class="resource-index">01</span>
-          <div>
-            <h3>Professional development</h3>
-            <p>Funding for conferences, workshops, training, memberships, and eligible certificates.</p>
-          </div>
-          <span class="resource-arrow" aria-hidden="true">↗</span>
-        </a>
-
-        <a class="resource-card" href="https://ucpea3695.my.canva.site/childcarereimbursement" target="_blank" rel="noopener noreferrer">
-          <span class="resource-index">02</span>
-          <div>
-            <h3>Childcare reimbursement</h3>
-            <p>Check childcare reimbursement rules and get the application materials.</p>
-          </div>
-          <span class="resource-arrow" aria-hidden="true">↗</span>
-        </a>
-
-        <a class="resource-card" href="https://ucpea.ct.aft.org/hardship-fund" target="_blank" rel="noopener noreferrer">
-          <span class="resource-index">03</span>
-          <div>
-            <h3>Hardship fund</h3>
-            <p>Financial assistance for eligible member and family expenses.</p>
-          </div>
-          <span class="resource-arrow" aria-hidden="true">↗</span>
-        </a>
-
-        <a class="resource-card" href="https://ucpea.ct.aft.org/sick-bank" target="_blank" rel="noopener noreferrer">
-          <span class="resource-index">04</span>
-          <div>
-            <h3>Sick leave bank</h3>
-            <p>Guidelines and application information for catastrophic illness or injury.</p>
-          </div>
-          <span class="resource-arrow" aria-hidden="true">↗</span>
-        </a>
-
-        <a class="resource-card" href="https://ucpea.ct.aft.org/tuition-benefits/tuition-waiver-and-reimbursement" target="_blank" rel="noopener noreferrer">
-          <span class="resource-index">05</span>
-          <div>
-            <h3>Tuition benefits</h3>
-            <p>Waiver and reimbursement information for employees and eligible dependents.</p>
-          </div>
-          <span class="resource-arrow" aria-hidden="true">↗</span>
-        </a>
-
-        <a class="resource-card resource-card-wide" href="https://ucpea.ct.aft.org/stewards" target="_blank" rel="noopener noreferrer">
-          <span class="resource-index">06</span>
-          <div>
-            <h3>Find a steward</h3>
-            <p>Find your area’s steward for help with a workplace question.</p>
-          </div>
-          <span class="resource-arrow" aria-hidden="true">↗</span>
-        </a>
-      </div>
-    </section>
-
-    <section class="contact-section section-shell" id="contact" aria-labelledby="contact-title">
+    <section class="contact-section section-shell" id="contact" aria-labelledby="contact-title" tabindex="-1">
       <div class="contact-card">
         <div>
           <h2 id="contact-title">Contact UCPEA</h2>
