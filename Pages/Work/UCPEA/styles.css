@@ -9,13 +9,6 @@
   --dock-height: var(--safe-bottom);
   --content-gutter: 24px;
   --shell-accent: var(--ucpea-accent);
-  --navy-950: var(--ucpea-brand);
-  --navy-900: #4b7aa0;
-  --navy-800: #345f82;
-  --blue: #4b7aa0;
-  --blue-bright: var(--ucpea-blue);
-  --gold: var(--ucpea-blue);
-  --gold-pale: var(--ucpea-selection);
   --ink: var(--ucpea-ink);
   --muted: var(--ucpea-muted);
   --paper: var(--ucpea-paper);
@@ -73,7 +66,7 @@ button {
 }
 
 :focus-visible {
-  outline: 3px solid var(--gold);
+  outline: 3px solid var(--shell-accent);
   outline-offset: 4px;
 }
 
@@ -84,8 +77,8 @@ button {
   z-index: 100;
   padding: 10px 14px;
   border-radius: 5px;
-  background: var(--gold);
-  color: var(--navy-950);
+  background: var(--ucpea-primary);
+  color: var(--ucpea-primary-ink);
   font-weight: 800;
   transform: translateY(-160%);
   transition: transform .2s ease;
@@ -243,7 +236,8 @@ html[data-theme="dark"] .sun-icon {
   min-height: 0;
 }
 
-.primary-nav a {
+.primary-nav a,
+.sidebar-install:not([hidden]) {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -255,14 +249,22 @@ html[data-theme="dark"] .sun-icon {
   text-decoration: none;
 }
 
+.sidebar-install {
+  border: 0;
+  background: transparent;
+  text-align: start;
+  cursor: pointer;
+}
+
 .primary-nav a:hover,
+.sidebar-install:hover,
 .sidebar-branches summary:hover {
   background: var(--surface-soft);
   color: var(--ink);
 }
 
 .primary-nav a[aria-current] {
-  background: var(--gold-pale);
+  background: var(--ucpea-selection);
   color: var(--shell-accent);
   font-weight: 700;
 }
@@ -470,7 +472,8 @@ body[data-tool-view] :is(#main-content > :not(#tool-view), .site-footer) {
     white-space: nowrap;
   }
 
-  [data-sidebar="compact"] .primary-nav a {
+  [data-sidebar="compact"] .primary-nav a,
+  [data-sidebar="compact"] .sidebar-install {
     justify-content: center;
     padding-inline: 0;
   }
@@ -524,7 +527,7 @@ body[data-tool-view] :is(#main-content > :not(#tool-view), .site-footer) {
 
   body:not([data-menu-open="resources"]) .mobile-dock :is([aria-current="page"], [aria-current="location"]),
   .mobile-dock [aria-expanded="true"] {
-    background: var(--gold-pale);
+    background: var(--ucpea-selection);
     color: var(--shell-accent);
   }
 
@@ -567,7 +570,7 @@ body[data-tool-view] :is(#main-content > :not(#tool-view), .site-footer) {
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   }
 
-  [data-menu-open="resources"] :is(.sidebar-scroll > a, .sidebar-contact, .sidebar-branches summary),
+  [data-menu-open="resources"] :is(.sidebar-scroll > a, .sidebar-install, .sidebar-contact, .sidebar-branches summary),
   [data-menu-open="resources"] .sidebar-branches li::before,
   [data-menu-open="resources"] .sidebar-branches li::after {
     display: none;
@@ -614,10 +617,10 @@ body[data-tool-view] :is(#main-content > :not(#tool-view), .site-footer) {
 }
 
 .hero {
-  --hero-base: #edf3fc;
-  --hero-glow: rgba(158, 186, 249, .28);
-  --hero-wash: rgba(75, 122, 160, .12);
-  --hero-muted: var(--navy-800);
+  --hero-base: var(--surface-soft);
+  --hero-glow: color-mix(in srgb, var(--ucpea-slate) 16%, transparent);
+  --hero-wash: color-mix(in srgb, var(--ucpea-brand) 9%, transparent);
+  --hero-muted: var(--muted);
   --hero-card: var(--surface);
   --hero-border: var(--border);
   --hero-shadow: var(--shadow);
@@ -626,15 +629,14 @@ body[data-tool-view] :is(#main-content > :not(#tool-view), .site-footer) {
     radial-gradient(circle at 80% 18%, var(--hero-glow), transparent 26%),
     radial-gradient(circle at 15% 100%, var(--hero-wash), transparent 30%),
     var(--hero-base);
-  color: var(--navy-950);
+  color: var(--ucpea-brand);
 }
 
 html[data-theme="dark"] .hero {
-  --hero-base: var(--navy-950);
-  --hero-glow: rgba(158, 186, 249, .3);
-  --hero-wash: rgba(75, 122, 160, .28);
-  --hero-muted: #c5d2e8;
-  --hero-card: rgba(22, 58, 99, .72);
+  --hero-base: var(--ucpea-dark-navy);
+  --hero-glow: color-mix(in srgb, var(--ucpea-slate) 35%, transparent);
+  --hero-wash: color-mix(in srgb, var(--ucpea-brand) 75%, transparent);
+  --hero-card: color-mix(in srgb, var(--ucpea-slate) 18%, var(--ucpea-dark-navy));
   --hero-border: rgba(255, 255, 255, .18);
   --hero-shadow: 0 30px 70px rgba(0, 0, 0, .23);
   color: #fff;
@@ -712,7 +714,7 @@ h1 {
 }
 
 h1 em {
-  color: var(--gold);
+  color: var(--shell-accent);
   font-family: Georgia, "Times New Roman", serif;
   font-weight: 500;
 }
@@ -752,13 +754,15 @@ h1 em {
 }
 
 .button-primary {
-  background: var(--gold);
-  color: var(--navy-950);
-  box-shadow: 0 12px 30px rgba(158, 186, 249, .18);
+  --button-fill: var(--ucpea-primary);
+  --button-ink: var(--ucpea-primary-ink);
+  background: var(--button-fill);
+  color: var(--button-ink);
+  box-shadow: 0 12px 30px color-mix(in srgb, var(--button-fill) 18%, transparent);
 }
 
 .button-primary:hover {
-  background: #c5d5fb;
+  background: color-mix(in srgb, var(--button-fill), var(--button-ink) 10%);
 }
 
 .button-secondary {
@@ -1114,7 +1118,7 @@ h1 em {
 
 .calendar-day[aria-current="date"] {
   border-radius: 50%;
-  background: var(--gold-pale);
+  background: var(--ucpea-selection);
   color: var(--shell-accent);
 }
 
@@ -1154,7 +1158,7 @@ h1 em {
 }
 
 .calendar-event-button:hover {
-  background: var(--gold-pale);
+  background: var(--ucpea-selection);
 }
 
 .calendar-event-button:is(:hover, :focus-visible) .calendar-event-title {
@@ -1389,9 +1393,14 @@ h1 em {
 }
 
 .help-topic.is-active {
-  background: var(--navy-950);
+  background: var(--ucpea-brand);
   color: #fff;
   transform: translateX(4px);
+}
+
+:is(.help-topic.is-active, .salary-calculator__header):focus-visible {
+  outline-color: var(--ucpea-on-navy);
+  outline-offset: -4px;
 }
 
 .help-topic__mark {
@@ -1401,7 +1410,7 @@ h1 em {
   height: 40px;
   border: 1px solid var(--border);
   border-radius: 50%;
-  color: var(--blue);
+  color: var(--shell-accent);
   font-size: 12px;
   font-weight: 800;
 }
@@ -1409,7 +1418,7 @@ h1 em {
 .help-topic.is-active .help-topic__mark {
   border-color: rgba(255, 255, 255, .35);
   background: rgba(255, 255, 255, .08);
-  color: var(--gold);
+  color: var(--ucpea-on-navy);
 }
 
 .help-topic strong,
@@ -1429,7 +1438,7 @@ h1 em {
 }
 
 .help-topic.is-active small {
-  color: #c5d2e8;
+  color: var(--ucpea-on-navy);
 }
 
 .help-result {
@@ -1439,7 +1448,7 @@ h1 em {
 
 .help-result__eyebrow {
   margin: 0 0 12px;
-  color: var(--blue);
+  color: var(--shell-accent);
   font-size: 12px;
   font-weight: 800;
   letter-spacing: .11em;
@@ -1482,8 +1491,8 @@ h1 em {
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: var(--gold-pale);
-  color: var(--navy-950);
+  background: var(--ucpea-selection);
+  color: var(--shell-accent);
   font-size: 13px;
   font-weight: 800;
 }
@@ -1526,7 +1535,7 @@ h1 em {
   grid-template-columns: minmax(340px, .9fr) minmax(400px, 1.1fr);
   overflow: hidden;
   border-radius: var(--radius-lg);
-  background: var(--navy-950);
+  background: var(--ucpea-brand);
   box-shadow: var(--shadow);
 }
 
@@ -1600,8 +1609,8 @@ h1 em {
 
 .deadline-field input:focus,
 .deadline-field select:focus {
-  border-color: var(--blue);
-  outline: 3px solid rgba(158, 186, 249, .35);
+  border-color: var(--shell-accent);
+  outline: 3px solid color-mix(in srgb, var(--shell-accent) 35%, transparent);
 }
 
 .deadline-helper {
@@ -1625,9 +1634,15 @@ h1 em {
   cursor: pointer;
 }
 
-.deadline-calculate {
-  background: var(--gold);
-  color: var(--navy-950);
+.deadline-calculate,
+.salary-calculator__calculate {
+  background: var(--ucpea-primary);
+  color: var(--ucpea-primary-ink);
+}
+
+.deadline-calculate:hover,
+.salary-calculator__calculate:hover {
+  background: color-mix(in srgb, var(--ucpea-primary), var(--ucpea-primary-ink) 10%);
 }
 
 .deadline-reset {
@@ -1638,10 +1653,10 @@ h1 em {
 .deadline-error {
   margin-top: 16px;
   padding: 11px 13px;
-  border-left: 4px solid #d92d20;
+  border: 1px solid var(--ucpea-red);
   border-radius: 4px;
-  background: #fff1f0;
-  color: #7a1b13;
+  background: var(--ucpea-error-bg);
+  color: var(--ucpea-error-ink);
   font-size: 13px;
 }
 
@@ -1650,6 +1665,7 @@ h1 em {
 }
 
 .deadline-result {
+  --shell-accent: var(--ucpea-on-navy);
   color: #fff;
 }
 
@@ -1659,7 +1675,7 @@ h1 em {
   justify-content: space-between;
   gap: 8px;
   margin-bottom: 26px;
-  color: #c5d2e8;
+  color: var(--ucpea-on-navy);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: .04em;
@@ -1676,7 +1692,7 @@ h1 em {
 
 .deadline-result > p {
   margin: 0;
-  color: #c5d2e8;
+  color: var(--ucpea-on-navy);
 }
 
 .deadline-dates {
@@ -1700,7 +1716,7 @@ h1 em {
 
 .deadline-dates span {
   margin-bottom: 6px;
-  color: #c5d2e8;
+  color: var(--ucpea-on-navy);
   font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
@@ -1719,6 +1735,11 @@ h1 em {
 
 .deadline-result__actions [hidden] {
   display: none;
+}
+
+.deadline-result .button-primary {
+  --button-fill: var(--ucpea-on-navy);
+  --button-ink: var(--ucpea-dark-navy);
 }
 
 .deadline-result .button-secondary {
@@ -1751,8 +1772,8 @@ h1 em {
   justify-content: space-between;
   gap: 24px;
   padding: 30px 34px;
-  border-bottom: 4px solid var(--gold);
-  background: var(--navy-950);
+  border-bottom: 4px solid var(--ucpea-slate);
+  background: var(--ucpea-brand);
   color: #fff;
   cursor: pointer;
   list-style: none;
@@ -1774,7 +1795,7 @@ h1 em {
 }
 
 .salary-calculator__header small {
-  color: #c5d2e8;
+  color: var(--ucpea-on-navy);
   font-size: 14px;
 }
 
@@ -1865,8 +1886,8 @@ h1 em {
 
 .salary-calculator input:focus,
 .salary-calculator select:focus {
-  border-color: var(--blue);
-  outline: 3px solid rgba(158, 186, 249, .35);
+  border-color: var(--shell-accent);
+  outline: 3px solid color-mix(in srgb, var(--shell-accent) 35%, transparent);
 }
 
 .salary-calculator__actions {
@@ -1885,15 +1906,6 @@ h1 em {
   cursor: pointer;
 }
 
-.salary-calculator__calculate {
-  background: var(--gold);
-  color: var(--navy-950);
-}
-
-.salary-calculator__calculate:hover {
-  background: #c5d5fb;
-}
-
 .salary-calculator__reset {
   background: var(--border);
   color: var(--ink);
@@ -1902,10 +1914,10 @@ h1 em {
 .salary-calculator__error {
   margin: 0 0 18px;
   padding: 12px 14px;
-  border-left: 5px solid #b42318;
+  border: 1px solid var(--ucpea-red);
   border-radius: 4px;
-  background: #fff1f0;
-  color: #7a1b13;
+  background: var(--ucpea-error-bg);
+  color: var(--ucpea-error-ink);
   font-size: 14px;
   line-height: 1.45;
 }
@@ -1975,7 +1987,7 @@ h1 em {
 }
 
 .salary-calculator th {
-  background: var(--navy-950);
+  background: var(--ucpea-brand);
   color: #fff;
   font-weight: 800;
   white-space: nowrap;
@@ -2006,7 +2018,7 @@ h1 em {
 }
 
 .salary-calculator__note a {
-  color: var(--blue);
+  color: var(--shell-accent);
   font-weight: 800;
   text-underline-offset: 3px;
 }
@@ -2027,6 +2039,7 @@ h1 em {
 }
 
 .contract-cover {
+  --cover-stripe: color-mix(in srgb, var(--ucpea-slate) 35%, transparent);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -2034,8 +2047,8 @@ h1 em {
   padding: 30px;
   overflow: hidden;
   background:
-    linear-gradient(165deg, transparent 55%, rgba(158, 186, 249, .18) 55% 72%, transparent 72%),
-    var(--navy-950);
+    linear-gradient(165deg, transparent 55%, var(--cover-stripe) 55% 72%, transparent 72%),
+    var(--ucpea-brand);
   color: #fff;
 }
 
@@ -2069,7 +2082,7 @@ h1 em {
   display: block;
   max-width: 150px;
   margin-bottom: 15px;
-  color: #b9c7df;
+  color: var(--ucpea-on-navy);
   font-size: 11px;
   font-weight: 750;
   letter-spacing: .08em;
@@ -2077,7 +2090,7 @@ h1 em {
 }
 
 .contract-cover strong {
-  color: var(--gold);
+  color: var(--ucpea-on-navy);
   font-family: Georgia, "Times New Roman", serif;
   font-size: 56px;
   font-weight: 500;
@@ -2086,7 +2099,7 @@ h1 em {
 
 .contract-cover p {
   margin: 0;
-  color: #d8e1ef;
+  color: var(--ucpea-on-navy);
   font-size: 12px;
   font-weight: 750;
   letter-spacing: .12em;
@@ -2142,13 +2155,7 @@ html[data-theme="dark"] .pill {
 }
 
 .contract-content .button-primary {
-  background: var(--navy-900);
-  color: #fff;
   box-shadow: none;
-}
-
-.contract-content .button-primary:hover {
-  background: var(--blue);
 }
 
 .salary-calculator__field--checks {
@@ -2178,7 +2185,7 @@ html[data-theme="dark"] .pill {
   min-height: 18px;
   margin: 1px 0 0;
   padding: 0;
-  accent-color: var(--navy-950);
+  accent-color: var(--ucpea-brand);
 }
 
 .contract-actions {
@@ -2187,16 +2194,16 @@ html[data-theme="dark"] .pill {
   gap: 12px;
 }
 
-.contract-content .button-secondary {
+:is(.contract-content, .help-result) .button-secondary {
   border-color: var(--border);
   background: var(--surface-soft);
   color: var(--ink);
 }
 
-.contract-content .button-secondary:hover {
-  border-color: var(--blue);
+:is(.contract-content, .help-result) .button-secondary:hover {
+  border-color: var(--shell-accent);
   background: var(--surface);
-  color: var(--blue);
+  color: var(--shell-accent);
 }
 
 .article-links {
@@ -2228,7 +2235,7 @@ html[data-theme="dark"] .pill {
 .article-links span {
   grid-row: 1 / 3;
   align-self: center;
-  color: var(--blue);
+  color: var(--shell-accent);
   font-family: Georgia, serif;
   font-size: 28px;
   font-weight: 800;
@@ -2248,7 +2255,7 @@ html[data-theme="dark"] .pill {
 }
 
 .text-link {
-  color: var(--blue);
+  color: var(--shell-accent);
   font-size: 14px;
   font-weight: 850;
   text-underline-offset: 5px;
@@ -2289,7 +2296,7 @@ html[data-theme="dark"] .pill {
 }
 
 .update-type {
-  color: var(--blue);
+  color: var(--shell-accent);
 }
 
 .update-state {
@@ -2341,64 +2348,34 @@ html[data-theme="dark"] .update-state {
   letter-spacing: -.06em;
 }
 
-.update-visual-gold {
-  background: #f6bd3c;
-  color: #4a3100;
-}
-
-.update-visual-blue {
-  background: #b8d3ff;
-  color: #0a377e;
-}
-
-.update-visual-green {
-  background: #a8dbc0;
-  color: #0d5632;
-}
-
-.update-visual-red {
-  background: #efa89e;
-  color: #6f1e17;
-}
-
-.update-visual-navy {
-  background: var(--navy-800);
-  color: #fff;
-}
-
-.update-visual-purple {
-  background: #ceb8e9;
-  color: #4d2478;
-}
-
 .update-visual-feed-0 {
-  background: #002d62;
-  color: #ffffff;
+  background: var(--ucpea-brand);
+  color: var(--ucpea-white);
 }
 
 .update-visual-feed-1 {
-  background: #9ebaf9;
-  color: #002d62;
+  background: var(--ucpea-on-navy);
+  color: var(--ucpea-dark-navy);
 }
 
 .update-visual-feed-2 {
-  background: #dce6f4;
-  color: #1a2b38;
+  background: color-mix(in srgb, var(--ucpea-slate) 16%, var(--ucpea-white));
+  color: var(--ucpea-dark-navy);
 }
 
 .update-visual-feed-3 {
-  background: #4b7aa0;
-  color: #ffffff;
+  background: color-mix(in srgb, var(--ucpea-slate) 70%, var(--ucpea-dark-navy));
+  color: var(--ucpea-white);
 }
 
 .update-visual-feed-4 {
-  background: #f0b49d;
-  color: #6c2a14;
+  background: var(--ucpea-dark-navy);
+  color: var(--ucpea-white);
 }
 
 .update-visual-feed-5 {
-  background: #b9d7d3;
-  color: #164d4a;
+  background: color-mix(in srgb, var(--ucpea-slate) 55%, var(--ucpea-white));
+  color: var(--ucpea-dark-navy);
 }
 
 .feed-meta {
@@ -2442,7 +2419,7 @@ html[data-theme="dark"] .update-state {
 }
 
 .update-card h3 a:hover {
-  color: var(--blue);
+  color: var(--shell-accent);
 }
 
 .update-card > p {
@@ -2454,7 +2431,7 @@ html[data-theme="dark"] .update-state {
 
 .card-link {
   width: fit-content;
-  color: var(--blue);
+  color: var(--shell-accent);
   font-size: 13px;
   font-weight: 850;
   text-underline-offset: 4px;
@@ -2471,8 +2448,8 @@ html[data-theme="dark"] .update-state {
   gap: clamp(50px, 8cqw, 130px);
   padding: clamp(34px, 6cqw, 78px);
   border-radius: var(--radius-lg);
-  background: var(--blue-bright);
-  color: var(--navy-950);
+  background: var(--ucpea-on-navy);
+  color: var(--ucpea-dark-navy);
 }
 
 .contact-card h2 {
@@ -2482,7 +2459,7 @@ html[data-theme="dark"] .update-state {
 .contact-card > div:first-child > p:last-child {
   max-width: 640px;
   margin: 22px 0 0;
-  color: #244866;
+  color: var(--ucpea-brand);
   font-size: 16px;
 }
 
@@ -2507,7 +2484,7 @@ html[data-theme="dark"] .update-state {
 }
 
 .contact-details span {
-  color: #345f82;
+  color: var(--ucpea-brand);
   font-size: 11px;
   font-weight: 850;
   letter-spacing: .11em;
@@ -2545,7 +2522,7 @@ html[data-theme="dark"] .update-state {
 }
 
 .site-footer a {
-  color: var(--blue);
+  color: var(--shell-accent);
   font-weight: 750;
   text-underline-offset: 3px;
 }
@@ -2557,7 +2534,7 @@ html[data-theme="dark"] .update-state {
 .salary-calculator__eligibility {
   margin-bottom: 18px;
   padding: 13px 15px;
-  border-left: 4px solid var(--blue);
+  border-left: 4px solid var(--shell-accent);
   border-radius: 4px;
   background: var(--surface);
   color: var(--muted);
@@ -2610,7 +2587,7 @@ html[data-theme="dark"] .update-state {
   width: 0;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--blue), var(--gold));
+  background: linear-gradient(90deg, var(--shell-accent), var(--ucpea-slate));
 }
 
 .salary-band p {

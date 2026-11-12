@@ -133,6 +133,11 @@ html[data-dashboard-tool="compare-contracts"] {
   --navy: var(--ucpea-brand);
 }
 
+html[data-dashboard-tool="compare-contracts"] .mobile-nav-toggle {
+  background: var(--ucpea-primary);
+  color: var(--ucpea-primary-ink);
+}
+
 html[data-dashboard-tool="compare-contracts"] :is(.search-input, button:not(.mobile-nav-toggle), .no-results) {
   background: var(--ucpea-surface);
   border-color: var(--ucpea-border);

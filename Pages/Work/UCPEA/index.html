@@ -13,8 +13,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description" content="UCPEA contracts, salary estimates, benefit deadlines, Union Wire updates, and member resources.">
-  <meta name="theme-color" content="#4b7aa0">
+  <meta name="theme-color" content="#002d62">
+  <meta name="apple-mobile-web-app-title" content="UCPEA">
   <title>UCPEA Member Dashboard</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -33,6 +36,7 @@
     })();
   </script>
   <link rel="stylesheet" href="styles.css">
+  <script src="pwa.js" defer></script>
   <script src="tool-views.js" defer></script>
   <script src="app.js" defer></script>
   <script src="calendar-events.js" defer></script>
@@ -139,6 +143,10 @@
             </ul>
           </details>
         </div>
+        <button class="sidebar-install" id="install-ucpea" type="button" title="Install UCPEA" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M5 16v4h14v-4"/></svg>
+          <span class="sidebar-label">Install UCPEA</span>
+        </button>
       </div>
       <div class="sidebar-contact">
         <a href="index.html#contact" title="Contact UCPEA">
@@ -557,7 +565,7 @@
             <span class="update-type">Benefits</span>
             <span class="update-state">Open now</span>
           </div>
-          <div class="update-visual update-visual-gold" aria-hidden="true">
+          <div class="update-visual update-visual-feed-0" aria-hidden="true">
             <span>$</span>
             <strong>1K</strong>
           </div>
@@ -571,7 +579,7 @@
             <span class="update-type">Contract corner</span>
             <span>Article 11</span>
           </div>
-          <div class="update-visual update-visual-blue" aria-hidden="true">
+          <div class="update-visual update-visual-feed-1" aria-hidden="true">
             <span>11</span>
             <strong>SL</strong>
           </div>
@@ -585,7 +593,7 @@
             <span class="update-type">Community</span>
             <span>Monthly</span>
           </div>
-          <div class="update-visual update-visual-green" aria-hidden="true">
+          <div class="update-visual update-visual-feed-2" aria-hidden="true">
             <span>03</span>
             <strong>WED</strong>
           </div>
@@ -599,7 +607,7 @@
             <span class="update-type">Community</span>
             <span>Seasonal</span>
           </div>
-          <div class="update-visual update-visual-red" aria-hidden="true">
+          <div class="update-visual update-visual-feed-3" aria-hidden="true">
             <span>SWAP</span>
             <strong>+</strong>
           </div>
@@ -613,7 +621,7 @@
             <span class="update-type">Contract corner</span>
             <span>Article 32</span>
           </div>
-          <div class="update-visual update-visual-navy" aria-hidden="true">
+          <div class="update-visual update-visual-feed-4" aria-hidden="true">
             <span>32</span>
             <strong>PAY</strong>
           </div>
@@ -627,7 +635,7 @@
             <span class="update-type">Recognition</span>
             <span>2026</span>
           </div>
-          <div class="update-visual update-visual-purple" aria-hidden="true">
+          <div class="update-visual update-visual-feed-5" aria-hidden="true">
             <span>UCPEA</span>
             <strong>★</strong>
           </div>

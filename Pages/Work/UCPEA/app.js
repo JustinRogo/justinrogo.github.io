@@ -1,6 +1,7 @@
 'use strict';
 
 const themeToggle = document.getElementById('theme-toggle');
+const themeColor = document.querySelector('meta[name="theme-color"]');
 const currentYear = document.getElementById('current-year');
 const updatesGrid = document.getElementById('updates-grid');
 const heroUpdateLabel = document.getElementById('hero-update-label');
@@ -12,6 +13,7 @@ const FEED_URL = 'union-wire.json';
 
 function setTheme(theme, persist = true) {
   document.documentElement.dataset.theme = theme;
+  themeColor.content = getComputedStyle(document.documentElement).getPropertyValue('--ucpea-surface').trim();
   UCPEAViews.messageTo(document.querySelector('#tool-view iframe')?.contentWindow, 'theme', { theme });
 
   if (themeToggle) {

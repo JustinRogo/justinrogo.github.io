@@ -1,27 +1,40 @@
 :root {
   --ucpea-brand: #002d62;
-  --ucpea-blue: #9ebaf9;
+  --ucpea-slate: #6578a2;
+  --ucpea-dark-navy: #002159;
+  --ucpea-gold: #bc8646;
+  --ucpea-red: #ed2e24;
+  --ucpea-white: #ffffff;
+  --ucpea-on-navy: color-mix(in srgb, var(--ucpea-slate) 38%, var(--ucpea-white));
   --ucpea-accent: var(--ucpea-brand);
-  --ucpea-ink: #1a2b38;
-  --ucpea-muted: #566b7b;
-  --ucpea-paper: #f7f8fa;
-  --ucpea-surface: #fff;
-  --ucpea-surface-soft: #eef2f5;
-  --ucpea-border: #d9e0e5;
-  --ucpea-selection: #e5ecfb;
+  --ucpea-ink: var(--ucpea-dark-navy);
+  --ucpea-muted: color-mix(in srgb, var(--ucpea-slate) 68%, var(--ucpea-dark-navy));
+  --ucpea-paper: color-mix(in srgb, var(--ucpea-slate) 5%, var(--ucpea-white));
+  --ucpea-surface: var(--ucpea-white);
+  --ucpea-surface-soft: color-mix(in srgb, var(--ucpea-slate) 11%, var(--ucpea-white));
+  --ucpea-border: color-mix(in srgb, var(--ucpea-slate) 25%, var(--ucpea-white));
+  --ucpea-selection: color-mix(in srgb, var(--ucpea-brand) 12%, var(--ucpea-white));
+  --ucpea-primary: var(--ucpea-brand);
+  --ucpea-primary-ink: var(--ucpea-white);
+  --ucpea-error-bg: color-mix(in srgb, var(--ucpea-red) 7%, var(--ucpea-white));
+  --ucpea-error-ink: color-mix(in srgb, var(--ucpea-red) 42%, #200c10);
   --ucpea-body-font: Arial, Helvetica, sans-serif;
   --ucpea-heading-font: Montserrat, Arial, Helvetica, sans-serif;
   color-scheme: light;
 }
 
 :root[data-theme="dark"] {
-  --ucpea-accent: var(--ucpea-blue);
-  --ucpea-ink: #edf2fb;
-  --ucpea-muted: #aebad0;
-  --ucpea-paper: #07111f;
-  --ucpea-surface: #0f1d30;
-  --ucpea-surface-soft: #16263b;
-  --ucpea-border: #293a52;
-  --ucpea-selection: #243a5c;
+  --ucpea-accent: var(--ucpea-on-navy);
+  --ucpea-ink: var(--ucpea-white);
+  --ucpea-muted: color-mix(in srgb, var(--ucpea-slate) 48%, var(--ucpea-white));
+  --ucpea-paper: color-mix(in srgb, var(--ucpea-dark-navy) 35%, #080f1e);
+  --ucpea-surface: #10203f;
+  --ucpea-surface-soft: color-mix(in srgb, var(--ucpea-slate) 20%, var(--ucpea-paper));
+  --ucpea-border: color-mix(in srgb, var(--ucpea-slate) 35%, var(--ucpea-paper));
+  --ucpea-selection: color-mix(in srgb, var(--ucpea-slate) 38%, var(--ucpea-paper));
+  --ucpea-primary: var(--ucpea-on-navy);
+  --ucpea-primary-ink: var(--ucpea-dark-navy);
+  --ucpea-error-bg: color-mix(in srgb, var(--ucpea-red) 9%, var(--ucpea-paper));
+  --ucpea-error-ink: color-mix(in srgb, var(--ucpea-red) 25%, var(--ucpea-white));
   color-scheme: dark;
 }
