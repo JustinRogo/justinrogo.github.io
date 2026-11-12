@@ -5,6 +5,8 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
 <title>UCPEA Contract Comparison: 2022–2025 and 2025–2029</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="tool-views.js"></script>
 <style>
 :root {
   color-scheme: light;
@@ -181,6 +183,7 @@ body.view-original .change-summary, body.view-revised .change-summary { display:
 .version-badge { display: inline-flex; align-items: center; margin: 0 0 .8rem; padding: .35rem .65rem; border: 1px solid rgba(255,255,255,.45); border-radius: 999px; background: rgba(255,255,255,.14); color: #fff; font-size: .82rem; font-weight: 700; letter-spacing: .01em; }
 
 </style>
+<link rel="stylesheet" href="tool-theme.css">
 </head>
 <body class="view-redline">
 <a class="skip-link" href="#contract-articles">Skip to agreement</a>
@@ -188,7 +191,7 @@ body.view-original .change-summary, body.view-revised .change-summary { display:
 <div class="hero-inner">
 <nav class="hero-links" aria-label="UCPEA contract navigation">
 <a class="back-link" href="index.html">← UCPEA dashboard</a>
-<a class="back-link" href="UCPEAContract.html">View current agreement</a>
+<a class="back-link" href="UCPEAContract.html" data-tool-link="current-contract">View current agreement</a>
 </nav>
 <div class="version-badge" role="status">2022–2025 → 2025–2029</div>
 <h1>UCPEA Contract Language Comparison</h1>
@@ -1594,7 +1597,7 @@ body.view-original .change-summary, body.view-revised .change-summary { display:
       target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       target.querySelector('summary')?.focus({ preventScroll: true });
     }));
-    history.replaceState(null, '', `#${target.id}`);
+    UCPEAViews.setHash(`#${target.id}`, { replace: true });
   }));
 
   articles.forEach(article => article.addEventListener('toggle', () => {
@@ -1605,16 +1608,18 @@ body.view-original .change-summary, body.view-revised .change-summary { display:
     if (article.open) setActiveArticle(article.id);
   }));
 
-  if (location.hash) {
-    const target = document.querySelector(location.hash);
+  function revealHashTarget() {
+    const target = document.getElementById(location.hash.slice(1));
     if (target?.matches('.article')) {
       target.open = true;
       setActiveArticle(target.id);
       requestAnimationFrame(() => target.scrollIntoView({ block: 'start' }));
+    } else if (articles[0]) {
+      setActiveArticle(articles[0].id);
     }
-  } else if (articles[0]) {
-    setActiveArticle(articles[0].id);
   }
+  window.addEventListener('hashchange', revealHashTarget);
+  revealHashTarget();
 })();
 </script>
 </body>

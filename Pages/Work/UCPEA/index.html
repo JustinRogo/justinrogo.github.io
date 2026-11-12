@@ -11,7 +11,7 @@
     gtag('config', 'G-19YT1QBYXV');
   </script>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description" content="UCPEA contracts, salary estimates, benefit deadlines, Union Wire updates, and member resources.">
   <meta name="theme-color" content="#4b7aa0">
   <title>UCPEA Member Dashboard</title>
@@ -33,7 +33,10 @@
     })();
   </script>
   <link rel="stylesheet" href="styles.css">
+  <script src="tool-views.js" defer></script>
   <script src="app.js" defer></script>
+  <script src="calendar-events.js" defer></script>
+  <script src="calendar.js" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to dashboard</a>
@@ -45,7 +48,12 @@
         <path class="close-icon" d="m6 6 12 12M6 18 18 6"/>
       </svg>
     </button>
-    <p class="header-title"><a class="header-brand" href="./" aria-label="UCPEA Member Dashboard home">UCPEA</a> <span class="header-context">Member dashboard</span></p>
+    <p class="header-title">
+      <a class="header-brand" href="index.html" aria-label="UCPEA Member Dashboard home">
+        <img class="brand-mark" src="ucpea-logo.png" width="36" height="36" alt="">
+      </a>
+      <span class="header-context">Member dashboard</span>
+    </p>
     <div class="header-actions">
       <a class="official-link" href="https://ucpea.ct.aft.org/" target="_blank" rel="noopener noreferrer" aria-label="Official UCPEA site">
         <span>Official <span class="official-link-name">UCPEA</span> site</span>
@@ -62,8 +70,8 @@
 
   <aside class="dashboard-sidebar" id="dashboard-sidebar">
     <div class="sidebar-header">
-      <a class="brand" href="./" aria-label="UCPEA Member Dashboard home" title="UCPEA Member Dashboard home">
-        <span class="brand-mark" aria-hidden="true">U</span>
+      <a class="brand" href="index.html" aria-label="UCPEA Member Dashboard home" title="UCPEA Member Dashboard home">
+        <img class="brand-mark" src="ucpea-logo.png" width="44" height="44" alt="">
         <strong class="sidebar-label">UCPEA</strong>
       </a>
       <button class="shell-button sidebar-toggle" id="sidebar-toggle" type="button" aria-label="Collapse sidebar" title="Collapse sidebar" hidden>
@@ -76,45 +84,46 @@
 
     <nav class="primary-nav" aria-label="Dashboard navigation">
       <div class="sidebar-scroll">
-        <a href="#main-content" title="Overview" aria-current="location">
+        <a href="index.html#main-content" title="Overview" aria-current="location">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10H15v-7H9v7H3Z"/></svg>
           <span class="sidebar-label">Overview</span>
         </a>
-        <a href="#start-here" title="Start here">
+        <a href="index.html#start-here" title="Start here">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 4H4v13h4v4l5-4h7zM8 9h8m-8 4h5"/></svg>
           <span class="sidebar-label">Start here</span>
         </a>
-        <a href="#deadlines" title="Deadlines">
+        <a href="index.html#deadlines" title="Deadlines">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8v5l3 2m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
           <span class="sidebar-label">Deadlines</span>
         </a>
-        <a href="#calendar" title="Calendar">
+        <a href="index.html#calendar" title="Calendar">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v16H4zM8 2v6m8-6v6M4 11h16"/></svg>
           <span class="sidebar-label">Calendar</span>
         </a>
-        <a href="#contract" title="Contract">
+        <a href="index.html?view=current-contract" title="Current contract">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5C8 2 3 3 2 4v16c3-1 7-1 10 1 3-2 7-2 10-1V4c-1-1-6-2-10 1Zm0 0v16"/></svg>
-          <span class="sidebar-label">Contract</span>
+          <span class="sidebar-label">Current contract</span>
         </a>
-        <a href="#updates" title="Union Wire">
+        <a href="index.html?view=contract-history" title="Contract history">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4v5h5M3.6 9A9 9 0 1 1 3 15m9-8v5l3 2"/></svg>
+          <span class="sidebar-label">Contract history</span>
+        </a>
+        <a href="index.html?view=compare-contracts" title="Compare contracts">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h17m-4-4 4 4-4 4M21 17H4m4-4-4 4 4 4"/></svg>
+          <span class="sidebar-label">Compare contracts</span>
+        </a>
+        <a href="index.html?view=area-explorer" title="Area Explorer">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2V5Zm6-2v16m6-14v16"/></svg>
+          <span class="sidebar-label">Area Explorer</span>
+        </a>
+        <a href="index.html#updates" title="Union Wire">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h13v16H6a2 2 0 0 1-2-2zm13 4h3v10a2 2 0 0 1-2 2h-1M8 8h5m-5 4h5m-5 4h5"/></svg>
           <span class="sidebar-label">Union Wire</span>
         </a>
 
         <div class="sidebar-branches">
-          <details>
-            <summary>
-              UCPEA pages
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
-            </summary>
-            <ul>
-              <li><a href="UCPEAContract.html">Current contract</a></li>
-              <li><a href="UCPEA_Contract_History.html">Contract history</a></li>
-              <li><a href="UCPEA_Contract_Comparison.html">Compare contracts</a></li>
-              <li><a href="UCPEA-Area-Explorer.html">Area Explorer</a></li>
-            </ul>
-          </details>
-          <details>
+          <h2 class="resources-heading">Member resources</h2>
+          <details id="member-resources">
             <summary>
               Member resources
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
@@ -132,7 +141,7 @@
         </div>
       </div>
       <div class="sidebar-contact">
-        <a href="#contact" title="Contact UCPEA">
+        <a href="index.html#contact" title="Contact UCPEA">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18v14H3zm0 0 9 7 9-7"/></svg>
           <span class="sidebar-label">Contact UCPEA</span>
         </a>
@@ -140,17 +149,38 @@
     </nav>
   </aside>
 
+  <nav class="mobile-dock" aria-label="Mobile shortcuts">
+    <a href="index.html#main-content" id="dock-home" aria-current="page">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10H15v-7H9v7H3Z"/></svg>
+      <span>Home</span>
+    </a>
+    <a href="index.html?view=current-contract" id="dock-contract">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5C8 2 3 3 2 4v16c3-1 7-1 10 1 3-2 7-2 10-1V4c-1-1-6-2-10 1Zm0 0v16"/></svg>
+      <span>Contract</span>
+    </a>
+    <a href="index.html#updates" id="dock-news">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h13v16H6a2 2 0 0 1-2-2zm13 4h3v10a2 2 0 0 1-2 2h-1M8 8h5m-5 4h5m-5 4h5"/></svg>
+      <span>News</span>
+    </a>
+    <button id="resources-toggle" type="button" aria-controls="dashboard-sidebar" aria-expanded="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h4l2 3h8a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Zm4 5h10m-10 4h7"/></svg>
+      <span>Resources</span>
+    </button>
+  </nav>
+
   <main id="main-content" tabindex="-1">
+    <div id="tool-view" hidden></div>
     <section class="hero" aria-labelledby="hero-title">
       <div class="hero-grid">
         <div class="hero-copy">
+          <img class="hero-logo" src="ucpea-logo.png" width="128" height="128" alt="">
           <h1 id="hero-title">UCPEA Member Information</h1>
           <p class="hero-intro">Read the contract, compare changes, estimate your salary, check benefit deadlines, and catch up on Union Wire.</p>
           <div class="hero-actions">
-            <a class="button button-primary" href="UCPEAContract.html">
+            <a class="button button-primary" href="index.html?view=current-contract">
               Open the Contract <span aria-hidden="true">→</span>
             </a>
-            <a class="button button-secondary" href="UCPEA_Contract_Comparison.html">
+            <a class="button button-secondary" href="index.html?view=compare-contracts">
               Compare Agreement Changes <span aria-hidden="true">→</span>
             </a>
           </div>
@@ -166,35 +196,18 @@
           <p class="hero-update-excerpt" id="hero-update-excerpt">Meet UCPEA’s 2026 award winners and read their stories.</p>
           <a id="hero-update-link" href="https://ucpea.ct.aft.org/union-wire/word-our-2026-ucpea-award-winning-members" target="_blank" rel="noopener noreferrer">Read the latest update <span aria-hidden="true">→</span></a>
         </aside>
-      </div>
-
-      <div class="snapshot-strip" aria-label="UCPEA at a glance">
-        <div class="snapshot-item">
-          <strong>2025–2029</strong>
-          <span>Current agreement term</span>
-        </div>
-        <div class="snapshot-item">
-          <strong>$1,000</strong>
-          <span>FY2027 professional development cap</span>
-        </div>
-        <div class="snapshot-item">
-          <strong>1,900+</strong>
-          <span>Professional staff represented</span>
-        </div>
-        <div class="snapshot-source">
-          <span>Source</span>
-          <a href="https://ucpea.ct.aft.org/" target="_blank" rel="noopener noreferrer">ucpea.ct.aft.org ↗</a>
-        </div>
+        <aside class="hero-today-card" id="hero-today-card" aria-labelledby="hero-today-title" hidden>
+          <h2 id="hero-today-title">Today’s events</h2>
+          <time id="hero-today-date"></time>
+          <div id="hero-today-events"></div>
+          <a id="hero-today-link" href="index.html#calendar">View calendar <span aria-hidden="true">→</span></a>
+        </aside>
       </div>
     </section>
 
     <section class="start-section section-shell" id="start-here" aria-labelledby="start-title" tabindex="-1">
-      <div class="section-heading">
-        <div>
-          <p class="section-kicker">Start with your situation</p>
-          <h2 id="start-title">What do you need help with?</h2>
-        </div>
-        <p>Choose an issue to see the relevant contract articles, UCPEA links, and next steps.</p>
+      <div class="section-heading section-heading-single">
+        <h2 id="start-title">What do you need help with?</h2>
       </div>
 
       <div class="help-launcher">
@@ -236,7 +249,7 @@
           </ol>
           <div class="help-result__actions" id="help-result-actions">
             <a class="button button-primary" href="https://ucpea.ct.aft.org/stewards" target="_blank" rel="noopener noreferrer">Find a steward <span aria-hidden="true">↗</span></a>
-            <a class="button button-secondary" href="UCPEAContract.html#article-23">Open Article 23 <span aria-hidden="true">→</span></a>
+            <a class="button button-secondary" href="index.html?view=current-contract#article-23">Open Article 23 <span aria-hidden="true">→</span></a>
           </div>
           <p class="help-result__note">This dashboard provides general information, not legal advice. Contact UCPEA for guidance about your circumstances.</p>
         </article>
@@ -244,12 +257,8 @@
     </section>
 
     <section class="deadline-section section-shell" id="deadlines" aria-labelledby="deadlines-title" tabindex="-1">
-      <div class="section-heading">
-        <div>
-          <p class="section-kicker">Plan ahead</p>
-          <h2 id="deadlines-title">Benefits Deadline Planner</h2>
-        </div>
-        <p>Calculate filing dates and save a calendar reminder. Check the official instructions before applying.</p>
+      <div class="section-heading section-heading-single">
+        <h2 id="deadlines-title">Benefits Deadline Planner</h2>
       </div>
 
       <div class="deadline-planner">
@@ -262,16 +271,18 @@
             </select>
           </div>
 
-          <div class="deadline-fields" id="professionalDevelopmentFields">
-            <div class="deadline-field">
-              <label for="activityStart">Activity or membership start date</label>
-              <input id="activityStart" type="date">
+          <div class="deadline-field deadline-activity" id="professionalDevelopmentFields">
+            <div class="deadline-activity-dates" role="group" aria-label="Activity date range">
+              <div>
+                <label for="activityStart" id="activityStartLabel">Activity or membership date</label>
+                <input id="activityStart" type="date">
+              </div>
+              <div id="activityEndField" hidden>
+                <label for="activityEnd">End date (optional)</label>
+                <input id="activityEnd" type="date">
+              </div>
             </div>
-            <div class="deadline-field">
-              <label for="activityEnd">Activity end date</label>
-              <input id="activityEnd" type="date">
-              <small>For a one-day activity, use the same date.</small>
-            </div>
+            <button class="deadline-range-toggle" id="activityRangeToggle" type="button" aria-controls="activityEndField" aria-expanded="false" hidden>Add end date</button>
           </div>
 
           <div class="deadline-fields" id="childcareFields" hidden>
@@ -318,29 +329,33 @@
     </section>
 
     <section class="calendar-section section-shell" id="calendar" aria-labelledby="calendar-title" tabindex="-1">
-      <div class="section-heading">
-        <div>
-          <p class="section-kicker">Stay connected</p>
-          <h2 id="calendar-title">UCPEA Calendar</h2>
-        </div>
-        <p>Check upcoming meetings, member events, and office closures.</p>
+      <div class="section-heading section-heading-single">
+        <h2 id="calendar-title">UCPEA Calendar</h2>
       </div>
 
       <div class="calendar-panel">
-        <div class="calendar-panel__topline">
-          <a class="text-link" href="https://embed.styledcalendar.com/#BeQlhkDJKGvzX3726Qh8" target="_blank" rel="noopener noreferrer">Open full calendar <span aria-hidden="true">&nearr;</span></a>
+        <div id="calendar-content" hidden>
+          <div class="calendar-toolbar">
+            <h3 id="calendar-month" aria-live="polite"></h3>
+            <div class="calendar-controls" role="group" aria-label="Change calendar month">
+              <button type="button" id="calendar-previous" aria-label="Previous month">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg>
+              </button>
+              <button type="button" id="calendar-today">Today</button>
+              <button type="button" id="calendar-next" aria-label="Next month">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+              </button>
+            </div>
+          </div>
+          <div id="calendar-month-view" class="calendar-month-view"></div>
+          <div id="calendar-agenda" class="calendar-agenda"></div>
+          <p id="calendar-empty" class="calendar-status" hidden>No events are listed for this month.</p>
         </div>
-
-        <div class="calendar-frame-wrap">
-          <iframe
-            class="calendar-frame"
-            src="https://embed.styledcalendar.com/#BeQlhkDJKGvzX3726Qh8"
-            title="UCPEA events calendar"
-            loading="lazy"
-            referrerpolicy="strict-origin-when-cross-origin"
-          ></iframe>
+        <p id="calendar-unavailable" class="calendar-status">Events are available in the official calendar.</p>
+        <div class="calendar-footer">
+          <p id="calendar-sync" hidden></p>
+          <a href="https://embed.styledcalendar.com/#BeQlhkDJKGvzX3726Qh8" target="_blank" rel="noopener noreferrer">Official calendar <span aria-hidden="true">&nearr;</span></a>
         </div>
-
       </div>
     </section>
 
@@ -367,17 +382,17 @@
           <h3>UCPEA Collective Bargaining Agreement</h3>
           <p>Read the 2025–2029 agreement, compare it with the prior contract, or trace UCPEA contracts back to 1977.</p>
           <div class="contract-actions">
-            <a class="button button-primary" href="UCPEAContract.html">Open the Contract <span aria-hidden="true">→</span></a>
-            <a class="button button-secondary" href="UCPEA_Contract_Comparison.html">Compare Changes <span aria-hidden="true">→</span></a>
-            <a class="button button-secondary" href="UCPEA_Contract_History.html">Contract History <span aria-hidden="true">→</span></a>
+            <a class="button button-primary" href="index.html?view=current-contract">Open the Contract <span aria-hidden="true">→</span></a>
+            <a class="button button-secondary" href="index.html?view=compare-contracts">Compare Changes <span aria-hidden="true">→</span></a>
+            <a class="button button-secondary" href="index.html?view=contract-history">Contract History <span aria-hidden="true">→</span></a>
           </div>
         </div>
 
         <nav class="article-links" aria-label="Popular contract articles">
-          <a href="UCPEAContract.html#article-32"><span>32</span><strong>Salary</strong><small>Wage increases &amp; eligibility</small></a>
-          <a href="UCPEAContract.html#article-11"><span>11</span><strong>Sick leave</strong><small>Use, accrual &amp; family care</small></a>
-          <a href="UCPEAContract.html#article-16"><span>16</span><strong>Work schedules</strong><small>Hours &amp; arrangements</small></a>
-          <a href="UCPEAContract.html#article-34"><span>34</span><strong>Professional development</strong><small>Funding &amp; reimbursement</small></a>
+          <a href="index.html?view=current-contract#article-32"><span>32</span><strong>Salary</strong><small>Wage increases &amp; eligibility</small></a>
+          <a href="index.html?view=current-contract#article-11"><span>11</span><strong>Sick leave</strong><small>Use, accrual &amp; family care</small></a>
+          <a href="index.html?view=current-contract#article-16"><span>16</span><strong>Work schedules</strong><small>Hours &amp; arrangements</small></a>
+          <a href="index.html?view=current-contract#article-34"><span>34</span><strong>Professional development</strong><small>Funding &amp; reimbursement</small></a>
         </nav>
       </div>
 
@@ -522,7 +537,7 @@
               <li>July 1, 2026: 2.5% GWI + 2% PBC</li>
               <li>July 1, 2027: 2.5% GWI + 1.5% PBC, plus a discretionary performance-based compensation pool equal to 0.5% of gross salaries</li>
             </ul>
-            <a href="UCPEAContract.html#article-32">Article 32 - Salary Increases</a>
+            <a href="index.html?view=current-contract#article-32">Article 32 - Salary Increases</a>
           </div>
         </div>
       </details>
@@ -536,15 +551,8 @@
         </div>
       </div>
 
-      <div class="filter-bar" role="group" aria-label="Filter updates">
-        <button class="filter-button is-active" type="button" data-filter="all" aria-pressed="true">All</button>
-        <button class="filter-button" type="button" data-filter="contract" aria-pressed="false">Contract</button>
-        <button class="filter-button" type="button" data-filter="benefits" aria-pressed="false">Benefits</button>
-        <button class="filter-button" type="button" data-filter="community" aria-pressed="false">Community</button>
-      </div>
-
       <div class="updates-grid" id="updates-grid">
-        <article class="update-card update-card-featured" data-category="benefits">
+        <article class="update-card update-card-featured">
           <div class="update-card-top">
             <span class="update-type">Benefits</span>
             <span class="update-state">Open now</span>
@@ -558,7 +566,7 @@
           <a class="card-link" href="https://ucpea.ct.aft.org/professional-development" target="_blank" rel="noopener noreferrer">Review details and apply <span aria-hidden="true">→</span></a>
         </article>
 
-        <article class="update-card" data-category="contract">
+        <article class="update-card">
           <div class="update-card-top">
             <span class="update-type">Contract corner</span>
             <span>Article 11</span>
@@ -569,10 +577,10 @@
           </div>
           <h3><a href="https://ucpea.ct.aft.org/union-wire/contract-corner-article-11-sick-leave" target="_blank" rel="noopener noreferrer">Understanding the sick leave changes</a></h3>
           <p>Read how the current agreement changes the definition of family for sick leave.</p>
-          <a class="card-link" href="UCPEAContract.html#article-11">Open Article 11 <span aria-hidden="true">→</span></a>
+          <a class="card-link" href="index.html?view=current-contract#article-11">Open Article 11 <span aria-hidden="true">→</span></a>
         </article>
 
-        <article class="update-card" data-category="community">
+        <article class="update-card">
           <div class="update-card-top">
             <span class="update-type">Community</span>
             <span>Monthly</span>
@@ -586,7 +594,7 @@
           <a class="card-link" href="https://ucpea.ct.aft.org/union-wire/join-ucpea-book-club" target="_blank" rel="noopener noreferrer">Read the announcement <span aria-hidden="true">→</span></a>
         </article>
 
-        <article class="update-card" data-category="community">
+        <article class="update-card">
           <div class="update-card-top">
             <span class="update-type">Community</span>
             <span>Seasonal</span>
@@ -600,7 +608,7 @@
           <a class="card-link" href="https://ucpea.ct.aft.org/union-wire/ucpea-produce-and-craft-swap" target="_blank" rel="noopener noreferrer">Get the swap details <span aria-hidden="true">→</span></a>
         </article>
 
-        <article class="update-card" data-category="contract">
+        <article class="update-card">
           <div class="update-card-top">
             <span class="update-type">Contract corner</span>
             <span>Article 32</span>
@@ -614,7 +622,7 @@
           <a class="card-link" href="#salary-calculator">Try the salary calculator <span aria-hidden="true">→</span></a>
         </article>
 
-        <article class="update-card" data-category="community">
+        <article class="update-card">
           <div class="update-card-top">
             <span class="update-type">Recognition</span>
             <span>2026</span>
@@ -628,14 +636,13 @@
           <a class="card-link" href="https://ucpea.ct.aft.org/union-wire/word-our-2026-ucpea-award-winning-members" target="_blank" rel="noopener noreferrer">Meet the honorees <span aria-hidden="true">→</span></a>
         </article>
       </div>
-      <p class="no-updates" id="no-updates" hidden>No updates match this filter.</p>
     </section>
 
     <section class="contact-section section-shell" id="contact" aria-labelledby="contact-title" tabindex="-1">
       <div class="contact-card">
         <div>
           <h2 id="contact-title">Contact UCPEA</h2>
-          <p>Ask the UCPEA office about your contract, membership, a workplace issue, or benefits.</p>
+          <p>Ask the UCPEA office about the contract, membership, a workplace issue, or benefits.</p>
         </div>
         <div class="contact-details">
           <a href="mailto:ucpeaoffice@ucpea.org"><span>Email</span><strong>ucpeaoffice@ucpea.org</strong></a>
@@ -645,6 +652,27 @@
       </div>
     </section>
   </main>
+
+  <dialog class="calendar-dialog" id="calendar-event-dialog" aria-labelledby="calendar-event-title" aria-describedby="calendar-event-when">
+    <div class="calendar-dialog-heading">
+      <h2 id="calendar-event-title"></h2>
+      <form method="dialog">
+        <button class="calendar-dialog-close" type="submit" aria-label="Close event details" autofocus>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+        </button>
+      </form>
+    </div>
+    <p class="calendar-dialog-when" id="calendar-event-when"></p>
+    <dl class="calendar-dialog-location" id="calendar-location" hidden>
+      <dt>Location</dt>
+      <dd id="calendar-event-location"></dd>
+    </dl>
+    <div class="calendar-dialog-description" id="calendar-event-description" hidden></div>
+    <section class="calendar-dialog-files" id="calendar-attachments" aria-labelledby="calendar-attachments-title" hidden>
+      <h3 id="calendar-attachments-title">Attachments</h3>
+      <ul id="calendar-event-attachments"></ul>
+    </section>
+  </dialog>
 
   <footer class="site-footer">
     <div>

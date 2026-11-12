@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="Search UCPEA buildings, areas, coverage descriptions and stewards in an interactive map.">
 <title>UCPEA Area Explorer</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="tool-views.js"></script>
 <style>/* required styles */
 
 .leaflet-pane,
@@ -677,7 +679,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 .detail{position:absolute;z-index:600;right:16px;top:16px;width:360px;max-width:calc(100% - 32px);max-height:calc(100% - 32px);overflow:auto;background:var(--surface);border:1px solid var(--edge);border-radius:8px;padding:20px;box-shadow:0 6px 24px #0002}.detail[hidden]{display:none}.detail-top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:12px}.detail-top .area{font-weight:650;font-size:14px}.close{font-size:22px;min-width:36px;height:36px;line-height:1;padding:0}.detail h2{margin-bottom:20px}.detail h3{margin:20px 0 6px}.detail p{font-size:14px}.steward-list{padding:0;list-style:none;margin:6px 0}.steward-list li{padding:3px 0}.detail-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}.detail-actions button{font-size:12px}.area-buildings{padding-left:20px;margin:8px 0 0;font-size:14px;line-height:1.5}.area-buildings li{padding:3px 0}
 dialog,#settings{border:1px solid var(--edge);border-radius:12px;padding:24px;background:var(--surface);color:var(--ink);overflow:auto}dialog{max-width:600px;width:calc(100% - 32px);max-height:85dvh}dialog::backdrop{background:#0005}dialog p{margin:14px 0}dialog ul{padding-left:20px}dialog li{margin:8px 0}.dialog-head{display:flex;justify-content:space-between;align-items:center;gap:16px}#settings{position:fixed;inset:64px 16px auto auto;margin:0;width:340px;max-width:calc(100vw - 32px);max-height:calc(100dvh - 80px);padding:20px;box-shadow:0 6px 24px #0002}#settings::backdrop{background:transparent}.setting{margin-top:20px}.settings-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px;padding-top:16px;border-top:1px solid var(--edge)}.settings-actions button{flex:1}.color-control{display:grid;grid-template-columns:36px minmax(0,1fr) 36px;align-items:center;gap:10px}.color-control button{padding:0;font-size:20px}.color-control input{padding:0;min-height:36px;accent-color:var(--accent);border:0;background:transparent}#color-count-value{font-weight:400;color:var(--muted);margin-left:6px}.palette-preview{display:flex;gap:4px;margin-top:10px;height:12px}.palette-preview span{flex:1;border-radius:2px}.settings-source{border-top:1px solid var(--edge);margin-top:20px;padding-top:16px}.settings-source p{font-size:13px;color:var(--muted);margin:8px 0 12px}#google-status{font-size:12px;line-height:1.5}.sr-only{position:absolute;clip:rect(0,0,0,0);width:1px;height:1px;overflow:hidden}noscript{display:block;padding:24px}
 @media(max-width:1000px){header{padding:0 16px}.workspace{grid-template-columns:300px minmax(0,1fr)}.sidebar{padding-left:16px;padding-right:16px}.map-toolbar{padding:8px 12px}.detail{right:8px;top:8px;max-width:calc(100% - 16px)}}
-@media(max-width:650px){header{height:60px;padding:0 16px;gap:8px}h1{font-size:17px;white-space:nowrap}.brand{gap:8px}.brand svg{display:none}.header-actions{gap:6px}.header-actions button{font-size:12px;min-height:40px;padding:7px 10px}.brand .sub{font-size:11px}.workspace,.drawer-closed .workspace{height:calc(100% - 60px);display:block;padding:0}.map-sheet{height:100%;border:0;border-radius:0}.sidebar{position:absolute;top:60px;bottom:0;left:0;right:0;z-index:1000;background:var(--ground);padding:16px}.map-toolbar{min-height:58px;padding:10px 16px;flex-wrap:nowrap}.map-toolbar .summary{font-size:13px}.map-toolbar select{min-height:40px;font-size:12px;max-width:145px}.map-note{left:8px;right:60px;max-width:none}.detail{top:auto;bottom:16px;right:8px;max-height:70%;padding:16px}.filters{margin:12px 0;gap:10px}.filters select{min-height:44px}.list-head{padding:10px 0}.map-stage{min-height:200px}#settings{top:60px;right:12px;max-height:calc(100dvh - 72px);max-width:calc(100vw - 24px)}}
+@media(max-width:650px){header{height:60px;padding:0 16px;gap:8px}h1{font-size:17px;white-space:nowrap}.brand{gap:8px}.brand svg{display:none}.header-actions{gap:6px}.header-actions button{font-size:12px;min-height:40px;padding:7px 10px}.brand .sub{font-size:11px}.map-sheet{border:0;border-radius:0}.map-toolbar{min-height:58px;padding:10px 16px;flex-wrap:nowrap}.map-toolbar .summary{font-size:13px}.map-toolbar select{min-height:40px;font-size:12px;max-width:145px}.map-note{left:8px;right:60px;max-width:none}.detail{top:auto;bottom:16px;right:8px;max-height:70%;padding:16px}.filters{margin:12px 0;gap:10px}.filters select{min-height:44px}.list-head{padding:10px 0}.map-stage{min-height:200px}#settings{top:60px;right:12px;max-height:calc(100dvh - 72px);max-width:calc(100vw - 24px)}}
 @media(max-width:360px){header{padding:0 12px}h1{font-size:15px}.brand .sub{display:none}.header-actions button{padding:7px 8px}.map-toolbar{gap:6px;padding:8px 12px}.map-toolbar select{max-width:130px}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 /* Center the identity on the viewport, independently of the two menus. */
@@ -689,9 +691,52 @@ header{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:1
 .workspace{--drawer-size:322px;grid-template-columns:var(--drawer-size) 18px minmax(0,1fr)}.sidebar{padding-right:8px}.drawer-closed .workspace{grid-template-columns:18px minmax(0,1fr);padding-left:0}.drawer-rail{height:100%;width:18px;min-height:0;padding:0;border:0;border-radius:0;background:transparent;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:24px;line-height:1}.drawer-rail:hover{background:var(--active);color:var(--ink)}.drawer-rail:active{transform:none}.drawer-rail:focus-visible{outline-offset:-3px}
 #resources{position:fixed;inset:64px auto auto 16px;margin:0;width:280px;max-width:calc(100vw - 32px);max-height:calc(100dvh - 80px);overflow:auto;padding:20px;background:var(--surface);color:var(--ink);border:1px solid var(--edge);border-radius:12px}#resources::backdrop{background:transparent}#resources a{display:block;padding:12px 0;color:var(--ink);text-decoration:none;border-bottom:1px solid var(--edge)}#resources a:last-child{border-bottom:0}#resources a:hover{text-decoration:underline;text-underline-offset:3px}#resources .dialog-head{margin-bottom:8px}
 @media(max-width:1000px){.workspace{--drawer-size:282px}}
-@media(max-width:650px){header{height:100px;grid-template-columns:1fr 1fr;grid-template-rows:44px 44px;gap:0;padding:4px 16px 8px}.brand{grid-column:1/-1;grid-row:1}.header-resources{grid-row:2;grid-column:1}.header-actions{grid-row:2;grid-column:2}.header-resources button{font-size:12px;min-height:40px;padding:7px 10px}.workspace,.drawer-closed .workspace{display:grid;grid-template-columns:24px minmax(0,1fr);height:calc(100% - 100px);padding:0}.map-sheet{min-height:0}.sidebar{top:100px;right:24px;padding:16px}.drawer-rail{width:24px}.browse .drawer-rail{position:absolute;z-index:1001;top:100px;bottom:0;right:0;height:calc(100% - 100px);background:var(--ground);border-left:1px solid var(--edge)}#settings,#resources{top:100px;max-height:calc(100dvh - 112px)}#resources{left:12px;max-width:calc(100vw - 24px)}}
+.mobile-map-views { display:none; }
+@media(max-width:650px) {
+  .mobile-map-views {
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:4px;
+    margin:0 16px 8px;
+    padding:4px;
+    border:1px solid var(--edge);
+    border-radius:10px;
+    background:var(--surface);
+  }
+  .mobile-map-views button {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    min-height:44px;
+    border:0;
+    font-weight:700;
+  }
+  .mobile-map-views button[aria-pressed="true"] {
+    background:var(--active);
+    color:var(--accent);
+  }
+  .mobile-map-views svg {
+    width:18px;
+    height:18px;
+    flex:none;
+    fill:none;
+    stroke:currentColor;
+    stroke-width:1.65;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+  }
+}
+@media(max-width:650px) and (max-height:450px) {
+  .sidebar { overflow-y:auto; }
+  .sidebar > * { flex:none; }
+  .sidebar .results { overflow:visible; }
+}
+
+@media(max-width:650px){header{height:100px;grid-template-columns:1fr 1fr;grid-template-rows:44px 44px;gap:0;padding:4px 16px 8px}.brand{grid-column:1/-1;grid-row:1}.header-resources{grid-row:2;grid-column:1}.header-actions{grid-row:2;grid-column:2}.header-resources button{font-size:12px;min-height:40px;padding:7px 10px}.workspace,.drawer-closed .workspace{grid-template: auto minmax(0,1fr) / minmax(0,1fr);height:calc(100% - 100px);padding:0}.map-sheet,.sidebar{grid-area:2 / 1;min-height:0}.sidebar{padding:16px}.drawer-rail{display:none}.browse .map-sheet{visibility:hidden}#settings,#resources{top:100px;max-height:calc(100dvh - 112px)}#resources{left:12px;max-width:calc(100vw - 24px)}}
 @media(max-width:650px){.map-toolbar{flex-wrap:wrap;gap:10px;align-items:flex-start}.campus-group{width:100%}.campus-label{width:100%}.campus-group button{flex:1 1 calc((100% - 12px)/3);min-height:36px;padding:6px 5px}.header-actions .icon-button{width:40px;padding:7px}}
 </style>
+<link rel="stylesheet" href="tool-theme.css">
 </head>
 <body>
 <header>
@@ -700,6 +745,14 @@ header{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:1
  <div class="header-actions"><button id="theme-toggle" class="icon-button" aria-label="Switch to dark mode" title="Switch to dark mode" aria-pressed="false"></button><button id="settings-open" popovertarget="settings" aria-expanded="false">Settings</button></div>
 </header>
 <main class="workspace">
+ <nav class="mobile-map-views" aria-label="Area Explorer view">
+  <button id="map-view" type="button" aria-controls="map-sheet" aria-pressed="true">
+   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2V5Zm6-2v16m6-14v16"/></svg>Map
+  </button>
+  <button id="areas-view" type="button" aria-controls="directory" aria-pressed="false">
+   <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5"/></svg>Search &amp; areas
+  </button>
+ </nav>
  <aside class="sidebar" id="directory" aria-label="Search and filter locations">
   <label for="search">Search buildings, areas or stewards</label>
   <div class="search-wrap"><input type="search" id="search" placeholder="Try Babbidge, Area 7, or a name" autocomplete="off"><button id="clear-search" aria-label="Clear search" hidden>×</button></div>
@@ -709,7 +762,7 @@ header{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:1
   <div class="results" id="results" aria-label="Matching locations"></div>
  </aside>
  <button class="drawer-rail" id="browse-toggle" aria-expanded="true" aria-controls="directory" aria-label="Collapse search" title="Collapse search"><span aria-hidden="true">‹</span></button>
- <section class="map-sheet" aria-label="Interactive area map">
+ <section class="map-sheet" id="map-sheet" aria-label="Interactive area map">
   <div class="map-toolbar"><div class="summary"><strong id="map-count"></strong><span class="muted" id="map-context"></span></div><div class="campus-group" role="group" aria-labelledby="campus-heading"><span class="campus-label" id="campus-heading">Campus</span><button data-campus="storrs" aria-pressed="false">Storrs</button><button data-campus="hartford" aria-pressed="false">Hartford</button><button data-campus="waterbury" aria-pressed="false">Waterbury</button><button data-campus="avery-point" aria-pressed="false">Avery Point</button><button data-campus="stamford" aria-pressed="false">Stamford</button><button data-campus="all" aria-pressed="false">All locations</button></div></div>
   <div id="data-alert" class="data-alert" role="status" hidden></div>
   <div class="map-stage">
@@ -1487,8 +1540,10 @@ let areas=[...new Set(DATA.features.map(f=>f.properties.area))].sort((a,b)=>Numb
 const COLOR_PALETTES={light:['#267d86','#3f70b5','#b77b27','#aa5369','#50854e','#b36535','#218aaf','#8b8634','#bd4c4c','#87624e','#348b74','#647a96'],dark:['#66bac4','#80a9eb','#dfb15f','#da8a9e','#95bf83','#dfa078','#70c0dd','#c5c076','#ee9494','#c5a68f','#7dc5ad','#9bafc9']};
 let preferences={theme:'light',colorCount:4};
 try{const saved=JSON.parse(localStorage.getItem('ucpea-map-settings')||'{}');if(['light','dark'].includes(saved.theme))preferences.theme=saved.theme;if(Number.isInteger(saved.colorCount)&&saved.colorCount>=1&&saved.colorCount<=12)preferences.colorCount=saved.colorCount;}catch{}
+const standaloneTheme=preferences.theme;
+if(UCPEAViews.embedded)preferences.theme=document.documentElement.dataset.theme;
 document.documentElement.dataset.theme=preferences.theme;
-function savePreferences(){try{localStorage.setItem('ucpea-map-settings',JSON.stringify(preferences));}catch{}}
+function savePreferences(){try{localStorage.setItem('ucpea-map-settings',JSON.stringify({...preferences,theme:UCPEAViews.embedded?standaloneTheme:preferences.theme}));}catch{}}
 function areaColor(area){return COLOR_PALETTES[preferences.theme][(Number(area)-1)%preferences.colorCount];}
 function selectionColors(){return preferences.theme==='dark'?{fill:'#ff61d7',outline:'#ffb0ee'}:{fill:'#e000bf',outline:'#92007c'};}
 function updateSettingsUI(){
@@ -1513,7 +1568,7 @@ function basemapStyle(){
  }
  return style;
 }
-function setTheme(theme){preferences.theme=theme==='dark'?'dark':'light';document.documentElement.dataset.theme=preferences.theme;savePreferences();updateSettingsUI();render();if(streetLayer)streetLayer.getMaplibreMap().setStyle(basemapStyle());}
+function setTheme(theme){preferences.theme=theme==='dark'?'dark':'light';document.documentElement.dataset.theme=preferences.theme;if(!UCPEAViews.embedded)savePreferences();updateSettingsUI();render();if(streetLayer)streetLayer.getMaplibreMap().setStyle(basemapStyle());}
 $('theme').onchange=()=>setTheme($('theme').value);
 $('theme-toggle').onclick=()=>setTheme(preferences.theme==='light'?'dark':'light');
 $('color-count').oninput=()=>setColorCount($('color-count').value);
@@ -1613,15 +1668,24 @@ function focusArea(area){
 function fit(bounds,maxZoom=17){if(bounds.isValid())map.fitBounds(bounds,{padding:[36,36],maxZoom,animate:!reduced});}
 function fitFiltered(){const b=L.latLngBounds([]);for(const f of filtered)b.extend(entries.get(f.id).bounds);fit(b);}
 let desktopDrawerOpen=true,mobileDrawerOpen=false;
+const mobileMapLayout=matchMedia('(max-width:650px)');
 function syncDrawer(){
- const mobile=innerWidth<=650,open=mobile?mobileDrawerOpen:desktopDrawerOpen;
+ const mobile=mobileMapLayout.matches,open=mobile?mobileDrawerOpen:desktopDrawerOpen;
  document.body.classList.toggle('browse',mobile&&open);document.body.classList.toggle('drawer-closed',!mobile&&!open);$('directory').hidden=!open;
+ $('map-view').setAttribute('aria-pressed',String(!mobileDrawerOpen));
+ $('areas-view').setAttribute('aria-pressed',String(mobileDrawerOpen));
  $('browse-toggle').setAttribute('aria-expanded',String(open));$('browse-toggle').querySelector('span').textContent=open?'‹':'›';
  $('browse-toggle').setAttribute('aria-label',open?'Collapse search':'Expand search');$('browse-toggle').title=open?'Collapse search':'Expand search';
  const center=map.getCenter(),zoom=map.getZoom();map.invalidateSize({pan:false});map.setView(center,zoom,{animate:false});render();
 }
-function setBrowse(open){if(innerWidth<=650)mobileDrawerOpen=open;else desktopDrawerOpen=open;syncDrawer();if(open)$('search').focus();else $('browse-toggle').focus();}
-function closeDetail(focus=true){const previous=selected;selected=null;applyFeatureStyles();$('detail').hidden=true;for(const b of $('results').querySelectorAll('[aria-pressed="true"]'))b.setAttribute('aria-pressed','false');if(focus){if(innerWidth<=650)$('browse-toggle').focus();else $('results').querySelector('[data-id="'+previous+'"]')?.focus();}}
+function setBrowse(open){
+ const mobile=mobileMapLayout.matches;
+ if(mobile)mobileDrawerOpen=open;else desktopDrawerOpen=open;
+ syncDrawer();
+ const target=mobile?(open?'areas-view':'map-view'):(open?'search':'browse-toggle');
+ $(target).focus({preventScroll:true});
+}
+function closeDetail(focus=true){const previous=selected;selected=null;applyFeatureStyles();$('detail').hidden=true;for(const b of $('results').querySelectorAll('[aria-pressed="true"]'))b.setAttribute('aria-pressed','false');if(focus){if(mobileMapLayout.matches)$('map-view').focus();else $('results').querySelector('[data-id="'+previous+'"]')?.focus();}}
 function selectFeature(id,{navigate=true,focus=true,preserveAreaHighlight=false}={}){
  const e=entries.get(id);if(!e)return;
  closeDetail(false);selected=id;if(!preserveAreaHighlight)highlightedArea=null;if(navigate&&innerWidth<=650)setBrowse(false);applyFeatureStyles();renderDirectory();e.shape.bringToFront();
@@ -1648,6 +1712,8 @@ $('fit-results').onclick=()=>{if(innerWidth<=650)setBrowse(false);fitFiltered();
 document.querySelector('.campus-group').addEventListener('click',ev=>{const button=ev.target.closest('[data-campus]');if(button&&!button.disabled)goToView(button.dataset.campus);});
 map.on('dragstart',()=>updateCampusButtons(''));
 $('browse-toggle').onclick=()=>setBrowse($('browse-toggle').getAttribute('aria-expanded')!=='true');
+$('map-view').onclick=()=>setBrowse(false);
+$('areas-view').onclick=()=>setBrowse(true);
 map.on('moveend',()=>{if($('in-view').checked)render();});map.on('zoomend',render);
 function showNote(s){$('map-note').textContent=s;$('map-note').hidden=!s;}
 function supportsWebGL(){
@@ -1694,9 +1760,11 @@ $('about').addEventListener('close',()=>{$('settings').showPopover();$('about-op
 document.addEventListener('keydown',ev=>{
  if(ev.key!=='Escape'||$('about').open)return;
  for(const id of ['settings','resources'])if($(id).matches(':popover-open')){ev.preventDefault();ev.stopPropagation();$(id).hidePopover();$(id+'-open').focus();return;}
- if(!$('detail').hidden)closeDetail();else if($('browse-toggle').getAttribute('aria-expanded')==='true')setBrowse(false);
+ if(mobileMapLayout.matches&&mobileDrawerOpen)setBrowse(false);
+ else if(!$('detail').hidden)closeDetail();
+ else if(desktopDrawerOpen&&!mobileMapLayout.matches)setBrowse(false);
 });
-matchMedia('(max-width:650px)').addEventListener('change',syncDrawer);
+mobileMapLayout.addEventListener('change',syncDrawer);
 window.addEventListener('resize',()=>map.invalidateSize());
 const sourceConfig=JSON.parse($('source-config').textContent);
 const googleURL=new URL('https://www.google.com/maps/d/kml');googleURL.searchParams.set('mid',sourceConfig.googleMapId);googleURL.searchParams.set('forcekml','1');
@@ -1762,6 +1830,7 @@ window.addEventListener('online',()=>{if(!dataLoading&&!document.hidden)loadGoog
 $('refresh-google').onclick=()=>loadGoogleData();
 
 updateDataViews();fitInitialData();render();syncDrawer();
+if(UCPEAViews.embedded)UCPEAViews.onThemeChange(setTheme);
 if(navigator.onLine){$('basemap').value='streets';setBasemap('streets');}
 window.UCPEA={get data(){return DATA;},map,entries,get filtered(){return filtered;},get selected(){return selected;}};
 startDataSource();

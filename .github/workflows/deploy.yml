@@ -34,6 +34,7 @@ jobs:
             data/pocket-part.json
             data/ai-corner.json
             data/outlook-availability.json
+            Pages/Work/UCPEA/calendar-events.js
           key: pocket-part-${{ github.run_id }}-${{ github.run_attempt }}
           restore-keys: pocket-part-
 
@@ -46,6 +47,9 @@ jobs:
       - name: Refresh Outlook availability
         run: node scripts/update-outlook-availability.mjs
 
+      - name: Refresh UCPEA calendar
+        run: node Pages/Work/UCPEA/update-calendar.mjs
+
       - name: Save feed snapshots for future builds
         uses: actions/cache/save@v4
         with:
@@ -53,6 +57,7 @@ jobs:
             data/pocket-part.json
             data/ai-corner.json
             data/outlook-availability.json
+            Pages/Work/UCPEA/calendar-events.js
           key: pocket-part-${{ github.run_id }}-${{ github.run_attempt }}
 
       - name: Refresh UCPEA Union Wire feed

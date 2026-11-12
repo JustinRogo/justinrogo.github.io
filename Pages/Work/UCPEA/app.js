@@ -1,9 +1,6 @@
 'use strict';
 
 const themeToggle = document.getElementById('theme-toggle');
-const filterButtons = Array.from(document.querySelectorAll('[data-filter]'));
-let updateCards = Array.from(document.querySelectorAll('[data-category]'));
-const noUpdates = document.getElementById('no-updates');
 const currentYear = document.getElementById('current-year');
 const updatesGrid = document.getElementById('updates-grid');
 const heroUpdateLabel = document.getElementById('hero-update-label');
@@ -15,6 +12,7 @@ const FEED_URL = 'union-wire.json';
 
 function setTheme(theme, persist = true) {
   document.documentElement.dataset.theme = theme;
+  UCPEAViews.messageTo(document.querySelector('#tool-view iframe')?.contentWindow, 'theme', { theme });
 
   if (themeToggle) {
     const isDark = theme === 'dark';
@@ -44,20 +42,51 @@ function initDashboardNavigation() {
   const sidebar = document.getElementById('dashboard-sidebar');
   const menuToggle = document.getElementById('menu-toggle');
   const sidebarToggle = document.getElementById('sidebar-toggle');
-  const links = Array.from(sidebar.querySelectorAll('.primary-nav a[href^="#"]'));
+  const resourcesToggle = document.getElementById('resources-toggle');
+  const resources = document.getElementById('member-resources');
+  const dockHome = document.getElementById('dock-home');
+  const dockContract = document.getElementById('dock-contract');
+  const dockNews = document.getElementById('dock-news');
+  const main = document.getElementById('main-content');
+  const footer = document.querySelector('.site-footer');
+  const toolView = document.getElementById('tool-view');
+  const headerContext = document.querySelector('.header-context');
+  const links = Array.from(sidebar.querySelectorAll('.primary-nav a[href^="index.html#"]'));
+  const toolLinks = Array.from(sidebar.querySelectorAll('.primary-nav a[href^="index.html?view="]'));
   const sections = links.map(link => document.getElementById(link.hash.slice(1)));
   const mobileLayout = window.matchMedia('(max-width: 800px)');
+  const dashboardTitle = document.title;
+  const dashboardPath = UCPEAViews.dashboardURL().pathname;
+  let frame;
+  let activeView = '';
+  let frameHash = '';
 
-  function setMenuOpen(open) {
-    body.toggleAttribute('data-menu-open', open);
-    menuToggle.setAttribute('aria-expanded', String(open));
-    menuToggle.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation');
+  function setOpenMenu(menu) {
+    if (menu) body.dataset.menuOpen = menu;
+    else delete body.dataset.menuOpen;
+
+    const navigationOpen = menu === 'navigation';
+    const resourcesOpen = menu === 'resources';
+    menuToggle.setAttribute('aria-expanded', String(navigationOpen));
+    menuToggle.setAttribute('aria-label', navigationOpen ? 'Close navigation' : 'Open navigation');
+    resourcesToggle.setAttribute('aria-expanded', String(resourcesOpen));
+    main.inert = Boolean(menu);
+    footer.inert = Boolean(menu);
   }
 
   menuToggle.addEventListener('click', () => {
-    const open = !body.hasAttribute('data-menu-open');
-    setMenuOpen(open);
+    const open = body.dataset.menuOpen !== 'navigation';
+    setOpenMenu(open ? 'navigation' : '');
     if (open) sidebar.querySelector('[aria-current]')?.focus();
+  });
+
+  resourcesToggle.addEventListener('click', () => {
+    const open = body.dataset.menuOpen !== 'resources';
+    setOpenMenu(open ? 'resources' : '');
+    if (open) {
+      resources.open = true;
+      resources.querySelector('a').focus();
+    }
   });
 
   sidebarToggle.addEventListener('click', () => {
@@ -68,35 +97,43 @@ function initDashboardNavigation() {
     sidebarToggle.title = label;
   });
 
-  mobileLayout.addEventListener('change', () => setMenuOpen(false));
+  mobileLayout.addEventListener('change', () => setOpenMenu(''));
 
   document.addEventListener('keydown', event => {
-    if (event.key === 'Escape' && body.hasAttribute('data-menu-open')) {
-      setMenuOpen(false);
-      menuToggle.focus();
+    const menu = body.dataset.menuOpen;
+    if (event.key === 'Escape' && menu) {
+      event.preventDefault();
+      setOpenMenu('');
+      (menu === 'resources' ? resourcesToggle : menuToggle).focus();
     }
   });
 
   function closeMenuOutside(event) {
-    if (body.hasAttribute('data-menu-open') &&
-        !sidebar.contains(event.target) && !menuToggle.contains(event.target)) {
-      setMenuOpen(false);
+    const menu = body.dataset.menuOpen;
+    if (menu && !sidebar.contains(event.target) &&
+        !menuToggle.contains(event.target) && !resourcesToggle.contains(event.target)) {
+      setOpenMenu('');
+      if (event.type === 'click' && event.target === body) {
+        (menu === 'resources' ? resourcesToggle : menuToggle).focus();
+      }
     }
   }
 
   document.addEventListener('click', closeMenuOutside);
   document.addEventListener('focusin', closeMenuOutside);
-  links.forEach(link => link.addEventListener('click', event => {
-    if (!event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey) {
-      setMenuOpen(false);
-    }
-  }));
 
   let activeLink = links[0];
   let pendingFrame;
 
+  function setActiveLink(link, state) {
+    activeLink?.removeAttribute('aria-current');
+    link?.setAttribute('aria-current', state);
+    activeLink = link;
+  }
+
   function updateCurrentSection() {
     pendingFrame = undefined;
+    if (activeView) return;
     const threshold = topbar.offsetHeight + 2;
     const atBottom = window.scrollY > 0 &&
       window.scrollY + window.innerHeight >= documentElement.scrollHeight - 2;
@@ -105,20 +142,130 @@ function initDashboardNavigation() {
       : sections.findLastIndex(section => section.getBoundingClientRect().top <= threshold);
     const currentLink = links[Math.max(0, index)];
 
-    if (currentLink !== activeLink) {
-      activeLink.removeAttribute('aria-current');
-      currentLink.setAttribute('aria-current', 'location');
-      activeLink = currentLink;
-    }
+    if (currentLink !== activeLink) setActiveLink(currentLink, 'location');
+    const readingNews = currentLink.hash === '#updates';
+    dockNews.setAttribute('aria-current', readingNews ? 'location' : 'false');
+    dockHome.setAttribute('aria-current', readingNews ? 'false' : 'page');
   }
 
   function scheduleSectionUpdate() {
     pendingFrame ??= window.requestAnimationFrame(updateCurrentSection);
   }
 
+  function showView({ focus = false, restoreScroll, scrollHome = false } = {}) {
+    const { searchParams, hash } = new URL(location.href);
+    const key = searchParams.get('view');
+    const tool = Object.hasOwn(UCPEAViews.views, key) ? UCPEAViews.views[key] : null;
+    const previousView = activeView;
+    activeView = tool ? key : '';
+    body.toggleAttribute('data-tool-view', Boolean(tool));
+    toolView.hidden = !tool;
+    dockHome.setAttribute('aria-current', tool ? 'false' : 'page');
+    dockContract.setAttribute('aria-current', activeView === 'current-contract' ? 'page' : 'false');
+    dockNews.setAttribute('aria-current', 'false');
+
+    if (tool) {
+      if (key !== previousView || (!hash && frameHash)) {
+        const source = new URL(tool.file, location.href);
+        source.searchParams.set('dashboard', documentElement.dataset.theme);
+        source.hash = hash;
+
+        const nextFrame = document.createElement('iframe');
+        nextFrame.src = source.href;
+        nextFrame.title = tool.title;
+        nextFrame.allow = 'clipboard-write';
+        nextFrame.addEventListener('load', () => {
+          if (nextFrame !== frame) return;
+          UCPEAViews.messageTo(frame.contentWindow, 'theme', { theme: documentElement.dataset.theme });
+          UCPEAViews.messageTo(frame.contentWindow, 'show-hash', { hash: frameHash });
+        });
+        frame = nextFrame;
+        toolView.replaceChildren(frame);
+      } else if (hash !== frameHash) {
+        UCPEAViews.messageTo(frame.contentWindow, 'show-hash', { hash });
+      }
+      frameHash = hash;
+      if (key !== previousView) {
+        const link = toolLinks.find(item => new URL(item.href).searchParams.get('view') === key);
+        setActiveLink(link, 'page');
+      }
+      document.title = tool.title + ' | ' + dashboardTitle;
+      headerContext.textContent = tool.title;
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    } else {
+      if (previousView) {
+        toolView.replaceChildren();
+        frame = undefined;
+        frameHash = '';
+        document.title = dashboardTitle;
+        headerContext.textContent = 'Member dashboard';
+      }
+      if (scrollHome || previousView) {
+        const target = document.getElementById(hash.slice(1)) || main;
+        if (typeof restoreScroll === 'number') {
+          window.scrollTo({ top: restoreScroll, behavior: 'instant' });
+        } else {
+          target.scrollIntoView({ behavior: previousView ? 'instant' : 'auto' });
+        }
+      }
+      scheduleSectionUpdate();
+    }
+
+    if (focus) (tool ? main : document.getElementById(hash.slice(1)) || main).focus({ preventScroll: true });
+  }
+
+  function navigate(key, hash) {
+    const destination = UCPEAViews.dashboardURL(key, hash);
+    if (destination.href !== location.href) {
+      if (key && !activeView) {
+        history.replaceState({ ...history.state, dashboardScroll: window.scrollY }, '');
+      }
+      history.pushState(null, '', destination);
+    }
+    setOpenMenu('');
+    showView({ focus: true, scrollHome: true });
+  }
+
+  document.addEventListener('click', event => {
+    const link = event.target.closest('a[href]');
+    if (!UCPEAViews.isPlainClick(event, link)) return;
+    const destination = new URL(link.href);
+    if (destination.origin !== location.origin || destination.pathname !== dashboardPath) return;
+    const key = destination.searchParams.get('view');
+    if (!link.getAttribute('href').startsWith('index.html') || (key && !Object.hasOwn(UCPEAViews.views, key))) return;
+    event.preventDefault();
+    navigate(key, destination.hash);
+  });
+
+  document.querySelector('.skip-link').addEventListener('click', event => {
+    if (!frame) return;
+    event.preventDefault();
+    frame.focus();
+  });
+
+  window.addEventListener('popstate', event => {
+    setOpenMenu('');
+    showView({ restoreScroll: event.state?.dashboardScroll });
+  });
+
+  window.addEventListener('message', event => {
+    if (!UCPEAViews.isFrom(event, frame?.contentWindow)) return;
+    const { type, view, hash, replace } = event.data || {};
+    if (typeof hash !== 'string' || (hash && !hash.startsWith('#'))) return;
+    if (type === 'ucpea-tool-link' && (!view || Object.hasOwn(UCPEAViews.views, view))) {
+      navigate(view, hash);
+    }
+    if (type === 'ucpea-tool-hash' && hash !== frameHash) {
+      frameHash = hash;
+      const destination = UCPEAViews.dashboardURL(activeView, hash);
+      if (replace) history.replaceState(null, '', destination);
+      else history.pushState(null, '', destination);
+    }
+  });
+
   window.addEventListener('scroll', scheduleSectionUpdate, { passive: true });
   new ResizeObserver(scheduleSectionUpdate).observe(sections[0]);
-  scheduleSectionUpdate();
+  showView();
 
   menuToggle.hidden = false;
   sidebarToggle.hidden = false;
@@ -127,32 +274,9 @@ function initDashboardNavigation() {
 
 initDashboardNavigation();
 
-function applyFilter(filter) {
-  let visibleCount = 0;
-
-  filterButtons.forEach(candidate => {
-    const isActive = candidate.dataset.filter === filter;
-    candidate.classList.toggle('is-active', isActive);
-    candidate.setAttribute('aria-pressed', String(isActive));
-  });
-
-  updateCards.forEach(card => {
-    const shouldShow = filter === 'all' || card.dataset.category === filter;
-    card.hidden = !shouldShow;
-    if (shouldShow) visibleCount += 1;
-  });
-
-  if (noUpdates) noUpdates.hidden = visibleCount > 0;
-}
-
-filterButtons.forEach(button => {
-  button.addEventListener('click', () => applyFilter(button.dataset.filter));
-});
-
 function createFeedCard(item) {
   const article = document.createElement('article');
   article.className = 'update-card';
-  article.dataset.category = item.category || 'community';
 
   const top = document.createElement('div');
   top.className = 'update-card-top';
@@ -231,9 +355,6 @@ async function loadUnionWire() {
 
     updateHeroStory(feed.items[0]);
     updatesGrid.replaceChildren(...feed.items.map(createFeedCard));
-    updateCards = Array.from(updatesGrid.querySelectorAll('[data-category]'));
-    const activeFilter = document.querySelector('[data-filter].is-active')?.dataset.filter || 'all';
-    applyFilter(activeFilter);
   } catch (error) {
     // Keep the saved dashboard cards visible if the live feed is unavailable.
   }
@@ -257,7 +378,7 @@ const helpTopics = {
     ],
     links: [
       ['Find a steward', 'https://ucpea.ct.aft.org/stewards', true],
-      ['Open Article 23', 'UCPEAContract.html#article-23', false],
+      ['Open Article 23', 'index.html?view=current-contract#article-23', false],
     ],
   },
   duties: {
@@ -270,7 +391,7 @@ const helpTopics = {
       ['Talk with UCPEA', 'A steward can help distinguish reclassification from temporary higher-level duties and explain the timelines.'],
     ],
     links: [
-      ['Open Article 31', 'UCPEAContract.html#article-31', false],
+      ['Open Article 31', 'index.html?view=current-contract#article-31', false],
       ['Contact UCPEA', 'mailto:ucpeaoffice@ucpea.org?subject=Question%20about%20changed%20job%20duties', false],
     ],
   },
@@ -284,8 +405,8 @@ const helpTopics = {
       ['Ask before a deadline passes', 'Contact UCPEA if the correct leave type is unclear or a request has been denied.'],
     ],
     links: [
-      ['Open sick leave', 'UCPEAContract.html#article-11', false],
-      ['Open parental benefits', 'UCPEAContract.html#article-12', false],
+      ['Open sick leave', 'index.html?view=current-contract#article-11', false],
+      ['Open parental benefits', 'index.html?view=current-contract#article-12', false],
     ],
   },
   development: {
@@ -393,6 +514,9 @@ const professionalDevelopmentFields = document.getElementById('professionalDevel
 const childcareFields = document.getElementById('childcareFields');
 const activityStart = document.getElementById('activityStart');
 const activityEnd = document.getElementById('activityEnd');
+const activityStartLabel = document.getElementById('activityStartLabel');
+const activityEndField = document.getElementById('activityEndField');
+const activityRangeToggle = document.getElementById('activityRangeToggle');
 const childcarePeriod = document.getElementById('childcarePeriod');
 const childcareYear = document.getElementById('childcareYear');
 const deadlineHelper = document.getElementById('deadline-helper');
@@ -527,9 +651,13 @@ function calculateDeadline() {
 
   if (deadlineBenefit.value === 'professional-development') {
     const start = parseLocalDate(activityStart.value);
-    const end = parseLocalDate(activityEnd.value);
-    if (!start || !end) {
-      showDeadlineError('Enter both the activity start and end dates.');
+    const end = activityEnd.value ? parseLocalDate(activityEnd.value) : start;
+    if (!start) {
+      showDeadlineError('Enter the activity or membership date.');
+      return;
+    }
+    if (!end) {
+      showDeadlineError('Enter a valid end date.');
       return;
     }
     if (end < start) {
@@ -540,7 +668,9 @@ function calculateDeadline() {
     const applicationDue = addCalendarDays(start, -15);
     const reimbursementDue = addCalendarDays(end, 28);
     deadlineResultTitle.textContent = 'Your planning dates';
-    deadlineResultSummary.textContent = `For an activity beginning ${deadlineDateFormatter.format(start)} and ending ${deadlineDateFormatter.format(end)}.`;
+    deadlineResultSummary.textContent = start.getTime() === end.getTime()
+      ? `For an activity on ${deadlineDateFormatter.format(start)}.`
+      : `For an activity beginning ${deadlineDateFormatter.format(start)} and ending ${deadlineDateFormatter.format(end)}.`;
     setDeadlineCards([
       ['Apply no later than', applicationDue],
       ['Reimbursement due', reimbursementDue],
@@ -580,12 +710,29 @@ function calculateDeadline() {
   deadlineCalendar.download = 'ucpea-childcare-reimbursement-deadline.ics';
 }
 
+function setActivityRange(expanded) {
+  activityEndField.hidden = !expanded;
+  activityRangeToggle.setAttribute('aria-expanded', String(expanded));
+  activityRangeToggle.textContent = expanded ? 'Remove end date' : 'Add end date';
+  activityStartLabel.textContent = expanded ? 'Activity or membership start date' : 'Activity or membership date';
+  if (!expanded) activityEnd.value = '';
+}
+
 if (childcareYear) childcareYear.value = String(new Date().getFullYear());
 deadlineBenefit?.addEventListener('change', updateDeadlineBenefit);
+activityRangeToggle.hidden = false;
+activityRangeToggle.addEventListener('click', () => {
+  const expanded = activityEndField.hidden;
+  if (!expanded && activityEnd.value) resetDeadlineResult();
+  setActivityRange(expanded);
+  if (expanded) activityEnd.focus();
+});
+activityStart.addEventListener('input', () => { activityEnd.min = activityStart.value; });
 calculateDeadlineButton?.addEventListener('click', calculateDeadline);
 resetDeadlineButton?.addEventListener('click', () => {
   activityStart.value = '';
-  activityEnd.value = '';
+  activityEnd.min = '';
+  setActivityRange(false);
   childcarePeriod.value = 'jan-apr';
   childcareYear.value = String(new Date().getFullYear());
   resetDeadlineResult();

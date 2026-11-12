@@ -5,6 +5,7 @@ import { buildSanitizer } from './build-sanitizer.mjs';
 import { refreshPocketPart } from './update-pocket-part.mjs';
 import { refreshAiCorner } from './update-ai-corner.mjs';
 import { refreshOutlookAvailability } from './update-outlook-availability.mjs';
+import { refreshUCPEACalendar } from '../Pages/Work/UCPEA/update-calendar.mjs';
 import { buildHomepage } from './build-homepage.mjs';
 import { buildV2 } from '../v2/build.mjs';
 
@@ -41,7 +42,7 @@ ${urls.map(url => `  <url><loc>${siteOrigin}${url}</loc></url>`).join('\n')}
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   // Local/reproducible builds can retain the existing feed without modifying it.
   if (!process.argv.includes('--skip-feed')) {
-    await Promise.all([refreshPocketPart(), refreshAiCorner(), refreshOutlookAvailability()]);
+    await Promise.all([refreshPocketPart(), refreshAiCorner(), refreshOutlookAvailability(), refreshUCPEACalendar()]);
   }
   await buildHomepage();
   await buildV2();

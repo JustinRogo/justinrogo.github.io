@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<script src="tool-views.js"></script>
 <style>
 :root {
   color-scheme: light;
@@ -1587,6 +1588,7 @@ mark.search-highlight {
   .back-link { font-size: 10px; }
 }
 </style>
+<link rel="stylesheet" href="tool-theme.css">
 </head>
 <body>
 <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -1709,7 +1711,7 @@ mark.search-highlight {
 
 <footer class="app-footer">
   <div class="footer-links">
-    <a href="UCPEA_Contract_Comparison.html">2022–2029 Language Redline</a>
+    <a href="UCPEA_Contract_Comparison.html" data-tool-link="compare-contracts">2022–2029 Language Redline</a>
     <a href="#reader/1977-1979">1977 Founding Agreement</a>
     <a href="#reader/2016-2021">2016–2021 Agreement</a>
   </div>
@@ -1816,7 +1818,7 @@ mark.search-highlight {
   }
 
   function setRoute(hash) {
-    if (window.location.hash !== hash) window.history.pushState(null, "", hash);
+    UCPEAViews.setHash(hash);
   }
 
   function baseRouteForMode(mode) {
@@ -3016,7 +3018,7 @@ mark.search-highlight {
   }
 
   async function copyPermalink(link) {
-    const url = new URL(link.getAttribute("href"), window.location.href).href;
+    const url = UCPEAViews.shareURL(link.hash);
     let copied = false;
     try {
       await navigator.clipboard.writeText(url);
@@ -3041,7 +3043,7 @@ mark.search-highlight {
       }, 2000);
     } else {
       status.textContent = "Link opened. Copy the URL from the address bar.";
-      window.location.hash = link.hash;
+      UCPEAViews.setHash(link.hash, { reveal: true });
     }
   }
 
