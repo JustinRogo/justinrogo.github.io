@@ -1,5 +1,52 @@
 'use strict';
 
+// Motion only answers something the person just did. Content is visible by
+// default, so a skipped or failed animation never hides anything.
+const UCPEAMotion = (() => {
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const easeOut = 'cubic-bezier(0.16, 1, 0.3, 1)';
+
+  // Fade new content in, drifting from (x, y). With reduced motion it only fades.
+  function arrive(elements, { x = 0, y = 8, duration = 240, stagger = 0 } = {}) {
+    if (document.hidden || !Element.prototype.animate) return;
+    const calm = reducedMotion.matches;
+    [elements].flat().filter(element => element && !element.hidden).forEach((element, index) => {
+      element.getAnimations().filter(animation => animation.id === 'ucpea-arrive').forEach(animation => animation.cancel());
+      element.animate([
+        { opacity: 0, transform: calm ? 'none' : `translate(${x}px, ${y}px)` },
+        { opacity: 1, transform: 'none' },
+      ], {
+        id: 'ucpea-arrive',
+        duration: calm ? 160 : duration,
+        delay: calm ? 0 : Math.min(index * stagger, 120),
+        easing: easeOut,
+        fill: 'backwards',
+      });
+    });
+  }
+
+  // Run a DOM change inside a view transition, tagging <html> so CSS can style it.
+  function transition(kind, update) {
+    const root = document.documentElement;
+    if (!document.startViewTransition || document.hidden) {
+      update();
+      return null;
+    }
+    root.dataset.transition = kind;
+    const viewTransition = document.startViewTransition(update);
+    viewTransition.finished.finally(() => {
+      if (root.dataset.transition === kind) delete root.dataset.transition;
+    });
+    return viewTransition;
+  }
+
+  return {
+    arrive,
+    transition,
+    get reduced() { return reducedMotion.matches; },
+  };
+})();
+
 const themeToggle = document.getElementById('theme-toggle');
 const themeColor = document.querySelector('meta[name="theme-color"]');
 
@@ -177,7 +224,7 @@ function initDashboardNavigation() {
     return { key, hash: url.hash };
   }
 
-  function showView({ focus = false, restoreScroll, scrollHome = false } = {}) {
+  function showView({ focus = false, restoreScroll, scrollHome = false, animate = false } = {}) {
     const url = new URL(location.href);
     const { key, hash, legacyLink } = readDestination(url);
     if (legacyLink) {
@@ -241,7 +288,10 @@ function initDashboardNavigation() {
     } else if (localView) {
       const target = document.getElementById(hash.slice(1));
       const selectedGuide = target?.closest('[data-view-guide]') ?? localView.defaultGuide;
+      const guideOpening = Boolean(selectedGuide?.hidden);
       for (const guide of localView.guides) guide.hidden = guide !== selectedGuide;
+      // A guide opening under its list on the same page settles in from just above.
+      if (animate && key === previousView && guideOpening) UCPEAMotion.arrive(selectedGuide, { y: -6, duration: 220 });
       for (const link of localView.guideLinks) {
         link.setAttribute('aria-current', link.hash === `#${selectedGuide?.id}` ? 'location' : 'false');
       }
@@ -279,6 +329,12 @@ function initDashboardNavigation() {
       scheduleSectionUpdate();
     }
 
+    // Moving to a different view: the new page rises into place. Hash jumps
+    // within the same view only scroll.
+    if (animate && activeView !== previousView) {
+      UCPEAMotion.arrive(tool ? toolView : localView ? localView.element : main, { y: 10, duration: 260 });
+    }
+
     if (focus) focusTarget.focus({ preventScroll: true });
   }
 
@@ -291,7 +347,7 @@ function initDashboardNavigation() {
       history.pushState(null, '', destination);
     }
     setOpenMenu('');
-    showView({ focus: true, scrollHome: true });
+    showView({ focus: true, scrollHome: true, animate: true });
   }
 
   document.addEventListener('click', event => {
@@ -313,7 +369,7 @@ function initDashboardNavigation() {
 
   window.addEventListener('popstate', event => {
     setOpenMenu('');
-    showView({ restoreScroll: event.state?.dashboardScroll });
+    showView({ restoreScroll: event.state?.dashboardScroll, animate: true });
   });
 
   window.addEventListener('hashchange', () => {
@@ -445,6 +501,7 @@ const helpResultActions = document.getElementById('help-result-actions');
 function showHelpTopic(topicKey) {
   const topic = helpTopics[topicKey];
   if (!topic || !helpResultTitle || !helpResultSteps || !helpResultActions) return;
+  const changed = !helpButtons.some(button => button.dataset.helpTopic === topicKey && button.classList.contains('is-active'));
 
   helpButtons.forEach(button => {
     const active = button.dataset.helpTopic === topicKey;
@@ -485,6 +542,14 @@ function showHelpTopic(topicKey) {
     link.append(arrow);
     return link;
   }));
+
+  // The answer is rewritten in place; a short rise shows that it changed.
+  if (changed) {
+    UCPEAMotion.arrive([
+      helpResultEyebrow, helpResultTitle, helpResultSummary,
+      ...helpResultSteps.children, helpResultActions,
+    ], { y: 6, duration: 220, stagger: 24 });
+  }
 }
 
 helpButtons.forEach(button => {

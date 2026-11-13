@@ -997,7 +997,21 @@
   els.filter.addEventListener('change', renderBrowse);
   els.past.addEventListener('change', renderBrowse);
   for (const button of els.layoutButtons) {
-    button.addEventListener('click', () => setLayout(button.dataset.boardLayout, true));
+    button.addEventListener('click', () => switchLayout(button.dataset.boardLayout));
+  }
+
+  // Switching layouts takes each note off the corkboard and files it into the
+  // list (or pins it back), straightening or tilting on the way. With reduced
+  // motion the two layouts simply cross-fade.
+  function switchLayout(layout) {
+    if (layout === els.posts.dataset.layout) return;
+    const notes = Array.from(els.posts.children);
+    const travel = !UCPEAMotion.reduced && !els.posts.hidden && notes.length <= 40;
+    if (travel) notes.forEach((note, index) => { note.style.viewTransitionName = `board-post-${index}`; });
+    const clear = () => notes.forEach(note => { note.style.viewTransitionName = ''; });
+    const transition = UCPEAMotion.transition('board', () => setLayout(layout, true));
+    if (transition) transition.finished.finally(clear);
+    else clear();
   }
 
   // ---------------------------------------------------------------------------

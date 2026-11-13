@@ -19,6 +19,9 @@
   --radius-lg: 14px;
   --radius-md: 9px;
   --radius-sm: 6px;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  /* Multiplies every travel distance; reduced motion sets it to 0 so only fades remain. */
+  --motion-scale: 1;
 }
 
 html[data-theme="dark"] {
@@ -152,8 +155,7 @@ button {
   cursor: pointer;
 }
 
-.shell-button:hover,
-.official-link:hover {
+.shell-button:hover {
   background: var(--surface-soft);
   color: var(--shell-accent);
 }
@@ -170,26 +172,6 @@ html[data-theme="dark"] .moon-icon {
 .menu-toggle[aria-expanded="true"] .close-icon,
 html[data-theme="dark"] .sun-icon {
   display: inline;
-}
-
-.official-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 44px;
-  padding: 0 12px;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  color: var(--shell-accent);
-  font-size: 13px;
-  font-weight: 700;
-  text-decoration: none;
-  white-space: nowrap;
-}
-
-.official-link svg {
-  width: 16px;
-  height: 16px;
 }
 
 .dashboard-sidebar {
@@ -549,6 +531,17 @@ body[data-local-view] #main-content > :not([data-dashboard-view]) {
     z-index: 24;
     background: rgba(7, 17, 31, .42);
     touch-action: none;
+    animation: ucpea-fade-in .2s ease-out;
+  }
+
+  /* Each menu arrives from the control that opened it: navigation from the
+     header's left edge, Resources up from the dock. Closing is instant. */
+  [data-menu-open="navigation"] .dashboard-sidebar {
+    animation: ucpea-drawer-in .26s var(--ease-out);
+  }
+
+  [data-menu-open="resources"] .dashboard-sidebar {
+    animation: ucpea-sheet-in .28s var(--ease-out);
   }
 
   [data-navigation-ready] .dashboard-sidebar {
@@ -616,8 +609,7 @@ body[data-local-view] #main-content > :not([data-dashboard-view]) {
     gap: 4px;
   }
 
-  .header-context,
-  .official-link-name {
+  .header-context {
     display: none;
   }
 }
@@ -777,6 +769,11 @@ h1 em {
 
 .button:hover {
   transform: translateY(-2px);
+}
+
+.button:active {
+  transform: scale(.98);
+  transition-duration: 60ms;
 }
 
 .button-primary {
@@ -1261,14 +1258,15 @@ html[data-theme="dark"] .button-primary {
   background: var(--surface-soft);
 }
 
+/* Scoped under .guide-index so these beat the three-column `.guide-index ul` base. */
 @media (max-width: 1020px) {
-  .guide-group-benefits {
+  .guide-index .guide-group-benefits {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 540px) {
-  .guide-group-rights {
+  .guide-index .guide-group-rights {
     grid-template-columns: 1fr;
   }
 
@@ -1297,14 +1295,6 @@ html[data-theme="dark"] .button-primary {
   }
 }
 
-.rights-shortcuts {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0 24px;
-  margin: 16px 0 0;
-}
-
-.rights-shortcuts a,
 .rights-text-action {
   display: inline-flex;
   align-items: center;
@@ -1571,10 +1561,6 @@ html[data-theme="dark"] .button-primary {
 @media (max-width: 640px) {
   .rights-followup dl {
     grid-template-columns: 1fr;
-  }
-
-  .rights-shortcuts {
-    gap: 0 16px;
   }
 
   .holiday-form,
@@ -1887,8 +1873,13 @@ html[data-theme="dark"] .button-primary {
   overscroll-behavior: contain;
 }
 
+.calendar-dialog[open] {
+  animation: ucpea-dialog-in .28s var(--ease-out);
+}
+
 .calendar-dialog::backdrop {
   background: rgba(7, 17, 31, .64);
+  animation: ucpea-fade-in .2s ease-out;
 }
 
 .calendar-dialog-heading {
@@ -3322,20 +3313,6 @@ html[data-theme="dark"] .pill {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-
-  *,
-  *::before,
-  *::after {
-    scroll-behavior: auto !important;
-    transition-duration: .01ms !important;
-    animation-duration: .01ms !important;
-  }
-}
-
 /* Account: sign-in, sign-up, and profile. */
 .sidebar-contact a + a {
   border-top: 0;
@@ -4493,4 +4470,90 @@ html[data-theme="dark"] .board-post[data-category="announcement"] { --pin: var(-
 
 .overview-board .board-flags:not(:has(.board-flag:not([data-flag="audience"]))) {
   display: none;
+}
+
+/* Motion. Each animation answers an action; nothing plays on page load.
+   Distances scale with --motion-scale so reduced motion keeps the fades. */
+@keyframes ucpea-fade-in {
+  from { opacity: 0; }
+}
+
+@keyframes ucpea-drawer-in {
+  from {
+    opacity: 0;
+    transform: translateX(calc(-16px * var(--motion-scale)));
+  }
+}
+
+@keyframes ucpea-sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(calc(24px * var(--motion-scale)));
+  }
+}
+
+@keyframes ucpea-dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(calc(12px * var(--motion-scale))) scale(calc(1 - .02 * var(--motion-scale)));
+  }
+}
+
+/* Board <-> List: notes travel between the corkboard and the list. The live
+   tilt transition is paused so the view transition alone carries the turn. */
+html[data-transition="board"] .board-post {
+  transition: none;
+}
+
+html[data-transition="board"]::view-transition-group(*) {
+  animation-duration: .42s;
+  animation-timing-function: var(--ease-out);
+}
+
+/* A note and a list row differ in shape. Draw both at natural size from the
+   top-left corner, so text never stretches while the box reshapes. */
+html[data-transition="board"]::view-transition-old(*),
+html[data-transition="board"]::view-transition-new(*) {
+  block-size: 100%;
+  object-fit: none;
+  object-position: 0 0;
+}
+
+/* Hand off quickly: the old shape clears before the new one settles, so the
+   two never read as a double exposure. */
+html[data-transition="board"]::view-transition-old(*) {
+  animation-duration: .14s;
+}
+
+html[data-transition="board"]::view-transition-new(*) {
+  animation-duration: .28s;
+  animation-delay: .06s;
+  animation-fill-mode: both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-scale: 0;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+
+  .skip-link {
+    transition: none;
+  }
+
+  .button:is(:hover, :active),
+  .help-topic.is-active {
+    transform: none;
+  }
+
+  .board-posts[data-layout="board"] .board-post:is(:hover, :focus-within) {
+    transform: rotate(var(--tilt, 0deg));
+  }
+
+  html[data-transition]::view-transition-group(*) {
+    animation-duration: .18s;
+  }
 }

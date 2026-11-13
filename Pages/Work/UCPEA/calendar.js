@@ -175,6 +175,13 @@
     month.setUTCMonth(month.getUTCMonth() + offset);
     selectedMonth = month.toISOString().slice(0, 7);
     render();
+    slideMonth(offset);
+  }
+
+  // The new month slides in from the side you moved toward.
+  function slideMonth(direction) {
+    if (!direction) return;
+    UCPEAMotion.arrive([monthHeading, monthView, agendaView], { x: 14 * Math.sign(direction), y: 0, duration: 240 });
   }
 
   function renderToday() {
@@ -200,8 +207,10 @@
   previous.addEventListener('click', () => shiftMonth(-1));
   next.addEventListener('click', () => shiftMonth(1));
   function showCurrentMonth() {
+    const direction = currentMonth.localeCompare(selectedMonth);
     selectedMonth = currentMonth;
     render();
+    slideMonth(direction);
   }
   document.getElementById('calendar-today').addEventListener('click', showCurrentMonth);
   document.getElementById('hero-today-link').addEventListener('click', event => {
