@@ -293,7 +293,10 @@ function initDashboardNavigation() {
       // A guide opening under its list on the same page settles in from just above.
       if (animate && key === previousView && guideOpening) UCPEAMotion.arrive(selectedGuide, { y: -6, duration: 220 });
       for (const link of localView.guideLinks) {
-        link.setAttribute('aria-current', link.hash === `#${selectedGuide?.id}` ? 'location' : 'false');
+        const open = link.hash === `#${selectedGuide?.id}`;
+        link.setAttribute('aria-current', open ? 'location' : 'false');
+        // Without a default guide, each link toggles its guide open and closed.
+        if (!localView.defaultGuide) link.setAttribute('aria-expanded', String(open));
       }
       focusTarget = target && localView.element.contains(target) && !target.closest('[hidden]')
         ? target : localView.element;
@@ -358,6 +361,15 @@ function initDashboardNavigation() {
     const { key, hash } = readDestination(destination);
     if (!link.getAttribute('href').startsWith('index.html') || (key && !isDashboardView(key))) return;
     event.preventDefault();
+    // Selecting the open guide again closes it, where the page has no default
+    // guide to fall back to. The page stays where it is.
+    const localView = localViews.get(key);
+    if (localView && !localView.defaultGuide && key === activeView &&
+        localView.guideLinks.includes(link) && link.getAttribute('aria-current') === 'location') {
+      history.pushState(null, '', UCPEAViews.dashboardURL(key));
+      showView({ restoreScroll: window.scrollY });
+      return;
+    }
     navigate(key, hash);
   });
 
@@ -413,6 +425,7 @@ const helpTopics = {
     ],
     links: [
       ['Find a steward', 'https://ucpea.ct.aft.org/stewards', true],
+      ['Open the discipline guide', 'index.html?view=rights-benefits#discipline', false],
       ['Open Article 23', 'index.html?view=current-contract#article-23', false],
     ],
   },

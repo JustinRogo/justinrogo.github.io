@@ -287,6 +287,7 @@
           </ol>
           <div class="help-result__actions" id="help-result-actions">
             <a class="button button-primary" href="https://ucpea.ct.aft.org/stewards" target="_blank" rel="noopener noreferrer">Find a steward <span aria-hidden="true">↗</span></a>
+            <a class="button button-secondary" href="index.html?view=rights-benefits#discipline">Open the discipline guide <span aria-hidden="true">→</span></a>
             <a class="button button-secondary" href="index.html?view=current-contract#article-23">Open Article 23 <span aria-hidden="true">→</span></a>
           </div>
           <p class="help-result__note">This dashboard provides general information. Contact the UCPEA for guidance about your circumstances.</p>
@@ -305,6 +306,8 @@
           <li><a href="index.html?view=rights-benefits#telecommuting-appeals"><strong>Telecommuting Appeals</strong><span>Check appeal criteria and filing deadlines</span></a></li>
           <li><a href="index.html?view=rights-benefits#position-audit"><strong>Position Audits</strong><span>Request a review when your duties change</span></a></li>
           <li><a href="index.html?view=rights-benefits#holiday-time"><strong>Holiday Time Tracker</strong><span>Track hours earned and use-by dates</span></a></li>
+          <li><a href="index.html?view=rights-benefits#discipline"><strong>Discipline &amp; Investigations</strong><span>Representation, hearings, and grievance deadlines</span></a></li>
+          <li><a href="index.html?view=rights-benefits#personnel-file"><strong>Your Personnel File</strong><span>Review, rebut, and remove old letters</span></a></li>
         </ul>
       </nav>
 
@@ -454,6 +457,112 @@
         </div>
         <noscript><p>Enable JavaScript to track hours and export calendar reminders.</p></noscript>
         <p class="rights-sources"><a href="index.html?view=current-contract#article-8">Article 8</a> · <a href="https://ucpea.ct.aft.org/union-wire/navigating-holiday-time-updated-faq">UCPEA holiday time FAQ</a></p>
+      </article>
+
+      <article class="rights-tool" id="discipline" data-view-guide aria-labelledby="discipline-title" tabindex="-1" hidden>
+        <h2 id="discipline-title">Discipline and investigations</h2>
+        <p>Article 22 requires just cause for discipline. Except for serious misconduct, dismissal comes only as the last step of progressive discipline and after a fair hearing. These protections apply once you’ve finished your initial probationary period.</p>
+        <div class="rights-layout">
+          <div class="rights-panel" id="discipline-check" hidden>
+            <h3>Check your situation</h3>
+            <div class="deadline-field">
+              <label for="discipline-stage">What did you receive?</label>
+              <select id="discipline-stage" autocomplete="off">
+                <option value="">Choose one</option>
+                <option value="interview">Notice of an investigatory or fact-finding interview</option>
+                <option value="leave">Placement on paid administrative leave</option>
+                <option value="hearing">Notice of a hearing on charges</option>
+                <option value="warning">A warning or reprimand</option>
+                <option value="decision">A suspension, withheld increase, demotion, or dismissal</option>
+              </select>
+            </div>
+            <div class="deadline-field" id="discipline-date-field" hidden>
+              <label for="discipline-date" id="discipline-date-label">Date (optional)</label>
+              <input id="discipline-date" type="date" autocomplete="off">
+            </div>
+            <p class="rights-result" id="discipline-result" role="status"></p>
+          </div>
+          <div class="rights-process">
+            <h3>When serious discipline is being considered</h3>
+            <ol class="rights-steps">
+              <li><strong>Investigatory interview.</strong> You get written notice, with a copy to UCPEA, and must be told you have the right to union representation. Going without a representative requires a written waiver.</li>
+              <li><strong>Hearing before any decision.</strong> After the investigation, you meet with the cabinet officer or designee to hear the specific charges and evidence and give your side. You get 15 calendar days’ written notice, a union representative, and the right to call witnesses.</li>
+              <li><strong>Written decision.</strong> It’s due within 15 calendar days of the hearing and must state the discipline and its effective dates. No one can be suspended without pay before this hearing.</li>
+              <li><strong>Appeal.</strong> Suspension without pay, a withheld performance increase, demotion, and dismissal can go to arbitration on the merits.</li>
+            </ol>
+          </div>
+        </div>
+        <div class="rights-followup">
+          <h3>Filing a grievance</h3>
+          <dl>
+            <div>
+              <dt>Deadline</dt>
+              <dd>Submit the grievance in writing to your immediate supervisor within 35 calendar days of the event. If you were on leave or couldn’t have known about it, you have 14 calendar days after returning to work. UConn doesn’t have to process a grievance filed more than 45 days after the event.</dd>
+            </div>
+            <div>
+              <dt>Steps for a contract grievance</dt>
+              <dd>Your supervisor meets with you within 14 days and answers in writing within 14 days of the meeting. If that doesn’t resolve it, you have 14 days to take it to the vice president. After the vice president’s answer, UCPEA has 14 days to take it to arbitration.</dd>
+            </div>
+            <div>
+              <dt>If management misses a deadline</dt>
+              <dd>The grievance can move to the next step (Article 23.6).</dd>
+            </div>
+            <div>
+              <dt>An order you think isn’t part of your job</dt>
+              <dd>Unless the order is illegal or clearly dangerous, ask for it in writing, carry it out, and then grieve it. Refusing can itself be grounds for discipline under Article 22.1(c).</dd>
+            </div>
+          </dl>
+        </div>
+        <div class="rights-actions">
+          <a class="button button-primary" href="https://ucpea.ct.aft.org/stewards">Find a steward</a>
+          <a class="button button-secondary" href="mailto:ucpeaoffice@ucpea.org?subject=Question%20about%20discipline">Contact UCPEA</a>
+          <a class="button button-secondary" href="index.html?view=rights-benefits#personnel-file">Your personnel file</a>
+        </div>
+        <p class="rights-sources"><a href="index.html?view=current-contract#article-22">Article 22</a> · <a href="index.html?view=current-contract#article-23">Article 23</a> · <a href="index.html?view=current-contract#section-19-5">Article 19.5</a></p>
+      </article>
+
+      <article class="rights-tool" id="personnel-file" data-view-guide aria-labelledby="personnel-file-title" tabindex="-1" hidden>
+        <h2 id="personnel-file-title">Your personnel file</h2>
+        <p>Your official, complete employee file is kept by Human Resources. Only material in that file, and negative judgments that were discussed with you, can be used in a promotion or disciplinary decision.</p>
+        <dl class="benefit-facts">
+          <div><dt>Reviewing your file</dt><dd>Ask HR to see your file. They must provide it, or an electronic copy, within five workdays. You can also get a copy of anything placed in it. Article 19.7 makes reviewing it your responsibility, so check it from time to time.</dd></div>
+          <div><dt>Negative material</dt><dd>You must be told within 10 workdays when negative evaluative material goes into your file. You can write a rebuttal to be kept with it.</dd></div>
+          <div><dt>What can’t be used against you</dt><dd>Anonymous material can’t be placed in your file. Negative judgments that weren’t discussed with you, and material kept outside the official file, can’t be used for promotion or discipline.</dd></div>
+          <div><dt>Who else can see it</dt><dd>Department staff responsible for personnel files, other administrators with a legitimate reason, and UCPEA. A UCPEA representative reviewing material for a grievance needs your written authorization.</dd></div>
+        </dl>
+        <div class="rights-layout">
+          <div class="rights-panel" id="removal-check" hidden>
+            <h3>When can I ask for removal?</h3>
+            <div class="deadline-field">
+              <label for="removal-type">Type of letter</label>
+              <select id="removal-type" autocomplete="off">
+                <option value="">Choose a letter type</option>
+                <option value="warning">Letter of warning</option>
+                <option value="reprimand">Letter of reprimand</option>
+              </select>
+            </div>
+            <div class="deadline-field">
+              <label for="removal-date">Date of the letter</label>
+              <input id="removal-date" type="date" autocomplete="off">
+            </div>
+            <p class="rights-result" id="removal-result" role="status"></p>
+            <a class="rights-text-action" id="removal-reminder" href="#" download="ucpea-file-removal-reminder.ics" hidden>Save calendar reminder</a>
+          </div>
+          <div class="rights-process">
+            <h3>Requesting removal</h3>
+            <ol class="rights-steps">
+              <li><strong>Wait out the period.</strong> You can ask after 12 months for a letter of warning or 24 months for a letter of reprimand, as long as you had no further discipline of any kind listed in Article 22.2, including verbal warnings.</li>
+              <li><strong>Request it in writing.</strong> Use the process UCPEA and UConn agreed on. Ask UCPEA for the current form or where to send it.</li>
+              <li><strong>Labor Relations decides.</strong> You get a written response. The decision can’t be taken to arbitration.</li>
+            </ol>
+          </div>
+        </div>
+        <noscript><p>Enable JavaScript to calculate when you can request removal.</p></noscript>
+        <div class="rights-actions">
+          <a class="button button-primary" href="mailto:ucpeaoffice@ucpea.org?subject=Question%20about%20my%20personnel%20file">Contact UCPEA</a>
+          <a class="button button-secondary" href="https://ucpea.ct.aft.org/stewards">Find a steward</a>
+        </div>
+        <p class="rights-sources"><a href="index.html?view=current-contract#article-19">Article 19</a> · <a href="index.html?view=current-contract#section-19-6">Article 19.6</a> · <a href="index.html?view=current-contract#section-22-2">Article 22.2</a></p>
       </article>
 
       </div>

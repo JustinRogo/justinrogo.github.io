@@ -1214,6 +1214,12 @@ html[data-theme="dark"] .button-primary {
   box-shadow: inset 3px 0 var(--shell-accent);
 }
 
+/* An open guide that can be closed shows a close mark in place of the chevron. */
+.guide-index a[aria-expanded="true"]::after {
+  content: "×" / "";
+  color: var(--ink);
+}
+
 .guide-index a:focus-visible {
   outline-offset: -3px;
 }

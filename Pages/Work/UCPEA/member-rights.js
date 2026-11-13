@@ -87,6 +87,125 @@
   });
   byId('audit-date-field').hidden = false;
 
+  function readAnyDate(input) {
+    const date = parseLocalDate(input.value);
+    if (input.validity.badInput || (input.value && !date)) return { error: 'Enter a valid date.' };
+    return { date };
+  }
+
+  function addMonths(date, months) {
+    const result = new Date(date);
+    const day = result.getDate();
+    result.setDate(1);
+    result.setMonth(result.getMonth() + months);
+    const lastDay = new Date(result.getFullYear(), result.getMonth() + 1, 0).getDate();
+    result.setDate(Math.min(day, lastDay));
+    return result;
+  }
+
+  const disciplineStage = byId('discipline-stage');
+  const disciplineDate = byId('discipline-date');
+  const disciplineStages = {
+    interview: {
+      message: 'You have the right to union representation at this interview (Article 22.3(a)). Contact a steward before the meeting. Going without one requires a written waiver.',
+    },
+    leave: {
+      message: 'Paid administrative leave is part of the disciplinary process but isn’t discipline (Article 22.3(d)). You can’t be suspended without pay until after a hearing. Contact UCPEA now, before any interview or hearing is scheduled.',
+    },
+    hearing: {
+      label: 'Date of the hearing (optional)',
+      anyDate: true,
+      message: 'You must get at least 15 calendar days’ written notice with the date, time, place, and specific charges. Union representation is an entitlement, and you can call witnesses. Attend the hearing: missing it without a legitimate reason means immediate termination under Article 22.3(b).',
+    },
+    warning: {
+      label: 'Date you received it (optional)',
+      grievance: true,
+      message: 'You can write a rebuttal for your personnel file (Article 19.5) and ask UCPEA whether to file a grievance. Later, you can ask to have the letter removed: after 12 months for a warning or 24 months for a reprimand, if you have no further discipline.',
+    },
+    decision: {
+      label: 'Date you received the decision (optional)',
+      grievance: true,
+      message: 'Suspension without pay, a withheld performance increase, demotion, and dismissal can be appealed to arbitration (Article 22.3(e)). Contact UCPEA right away.',
+    },
+  };
+
+  function updateDiscipline() {
+    const stage = disciplineStages[disciplineStage.value];
+    byId('discipline-date-field').hidden = !stage?.label;
+    if (stage?.label) byId('discipline-date-label').textContent = stage.label;
+    disciplineDate.removeAttribute('aria-invalid');
+
+    let message = stage?.message ?? 'Choose what you received to see your rights at that stage.';
+    if (stage?.label && disciplineDate.value) {
+      const { date, error } = stage.anyDate ? readAnyDate(disciplineDate) : readPastDate(disciplineDate);
+      if (error) {
+        disciplineDate.setAttribute('aria-invalid', 'true');
+        message = error;
+      } else if (stage.anyDate) {
+        message += ` The written decision is due by ${formatDate(addCalendarDays(date, 15))}.`;
+      } else {
+        const due = addCalendarDays(date, 35);
+        message += ` Estimated grievance deadline: ${formatDate(due)}, 35 calendar days after the event (Article 23.2). Ask UCPEA to confirm the date.`;
+        if (due < todayInConnecticut()) {
+          message += ' That date has passed. If you were on leave or didn’t know about the event, you may have 14 days after returning to work, so contact UCPEA now.';
+        }
+      }
+    }
+    byId('discipline-result').textContent = message;
+  }
+
+  disciplineStage.addEventListener('change', () => {
+    disciplineDate.value = '';
+    updateDiscipline();
+  });
+  disciplineDate.addEventListener('input', updateDiscipline);
+  updateDiscipline();
+  byId('discipline-check').hidden = false;
+
+  const removalType = byId('removal-type');
+  const removalDate = byId('removal-date');
+  const removalReminder = byId('removal-reminder');
+  let removalURL;
+
+  function updateRemoval() {
+    if (removalURL) URL.revokeObjectURL(removalURL);
+    removalURL = undefined;
+    removalReminder.hidden = true;
+    removalDate.removeAttribute('aria-invalid');
+
+    const months = { warning: 12, reprimand: 24 }[removalType.value];
+    const letter = removalType.value === 'warning' ? 'letter of warning' : 'letter of reprimand';
+    const { date, error } = readPastDate(removalDate);
+    let message = 'Choose the type of letter and enter its date.';
+    if (error) {
+      removalDate.setAttribute('aria-invalid', 'true');
+      message = error;
+    } else if (months && date) {
+      const eligible = addMonths(date, months);
+      if (eligible <= todayInConnecticut()) {
+        message = `${months} months have passed. If you’ve had no further discipline since ${formatDate(date)}, you can ask to have the ${letter} removed now.`;
+      } else {
+        message = `You can ask to have the ${letter} removed on or after ${formatDate(eligible)}, if you have no further discipline before then.`;
+        removalURL = URL.createObjectURL(buildCalendarFile([{
+          date: eligible,
+          uid: `ucpea-file-removal-${removalType.value}-${dateValue(date)}`,
+          title: `Request removal of UCPEA ${letter}`,
+          description: 'Article 19.6: if you have had no further discipline, request removal in writing. Ask UCPEA about the current process.',
+        }]));
+        removalReminder.href = removalURL;
+        removalReminder.hidden = false;
+      }
+    } else if (months) {
+      message = 'Enter the date on the letter.';
+    }
+    byId('removal-result').textContent = message;
+  }
+
+  removalType.addEventListener('change', updateRemoval);
+  removalDate.addEventListener('input', updateRemoval);
+  updateRemoval();
+  byId('removal-check').hidden = false;
+
   const storageKey = 'ucpea-dashboard-holiday-time-v1';
   const transitionStart = '2026-08-21';
   const transitionEnd = parseLocalDate('2027-08-21');
