@@ -157,13 +157,18 @@ function initDashboardNavigation() {
     return localViews.has(key) || Object.hasOwn(UCPEAViews.views, key);
   }
 
+  // My Rights and Benefits became one Rights & Benefits page. Old links and
+  // bookmarks still work: they open the same guide on the combined page.
+  const renamedViews = { 'my-rights': 'rights-benefits', benefits: 'rights-benefits' };
+
   function readDestination(url) {
     const key = url.searchParams.get('view');
     const target = document.getElementById(url.hash.slice(1));
+    if (Object.hasOwn(renamedViews, key)) return { key: renamedViews[key], hash: url.hash, legacyLink: true };
     if (!key && url.hash === '#updates') return { key: 'union-wire', hash: '', legacyLink: true };
     if (!key && url.hash === '#deadlines') {
       const hash = url.searchParams.get('benefit') === 'childcare' ? '#benefit-childcare' : '#deadlines';
-      return { key: 'benefits', hash, legacyLink: true };
+      return { key: 'rights-benefits', hash, legacyLink: true };
     }
     const localView = target?.closest('[data-dashboard-view]');
     if (!key && localView) {
@@ -242,8 +247,15 @@ function initDashboardNavigation() {
       }
       focusTarget = target && localView.element.contains(target) && !target.closest('[hidden]')
         ? target : localView.element;
+      // Switching guides on the same page keeps the page still. It only scrolls
+      // when the chosen guide would otherwise be entirely off-screen (phones).
+      const switchingGuide = key === previousView && focusTarget === selectedGuide;
       if (typeof restoreScroll === 'number') {
         window.scrollTo({ top: restoreScroll, behavior: 'instant' });
+      } else if (switchingGuide) {
+        if (focusTarget.getBoundingClientRect().top > window.innerHeight - 96) {
+          focusTarget.scrollIntoView({ block: 'start', behavior: 'smooth' });
+        }
       } else if (focusTarget === localView.element || localView.defaultGuide) {
         window.scrollTo({ top: 0, behavior: 'instant' });
       } else {
@@ -351,7 +363,7 @@ const helpTopics = {
       ['Talk with UCPEA', 'A steward can help distinguish reclassification from temporary higher-level duties and explain the timelines.'],
     ],
     links: [
-      ['Open the position audit guide', 'index.html?view=my-rights#position-audit', false],
+      ['Open the position audit guide', 'index.html?view=rights-benefits#position-audit', false],
       ['Open Article 31', 'index.html?view=current-contract#article-31', false],
       ['Contact UCPEA', 'mailto:ucpeaoffice@ucpea.org?subject=Question%20about%20changed%20job%20duties', false],
     ],
@@ -366,7 +378,7 @@ const helpTopics = {
       ['Ask before a deadline passes', 'Contact UCPEA if the correct leave type is unclear or a request has been denied.'],
     ],
     links: [
-      ['Track holiday time', 'index.html?view=my-rights#holiday-time', false],
+      ['Track holiday time', 'index.html?view=rights-benefits#holiday-time', false],
       ['Open sick leave', 'index.html?view=current-contract#article-11', false],
       ['Open parental benefits', 'index.html?view=current-contract#article-12', false],
     ],
@@ -381,7 +393,7 @@ const helpTopics = {
       ['Finish the reimbursement step', 'Reimbursement or expense reallocation is due within 28 calendar days after the activity ends.'],
     ],
     links: [
-      ['Open the professional development guide', 'index.html?view=benefits#benefit-professional-development', false],
+      ['Open the professional development guide', 'index.html?view=rights-benefits#benefit-professional-development', false],
       ['Official PD guidance', 'https://ucpea.ct.aft.org/professional-development', true],
     ],
   },
@@ -395,9 +407,9 @@ const helpTopics = {
       ['Confirm the filing date', 'See the childcare guide for expense periods and UConn HR for tuition deadlines.'],
     ],
     links: [
-      ['Childcare reimbursement', 'index.html?view=benefits#benefit-childcare', false],
-      ['Tuition benefits', 'index.html?view=benefits#benefit-tuition', false],
-      ['Browse all benefits', 'index.html?view=benefits', false],
+      ['Childcare reimbursement', 'index.html?view=rights-benefits#benefit-childcare', false],
+      ['Tuition benefits', 'index.html?view=rights-benefits#benefit-tuition', false],
+      ['Browse all benefits', 'index.html?view=rights-benefits', false],
     ],
   },
   membership: {
