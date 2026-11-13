@@ -1175,8 +1175,14 @@ html[data-theme="dark"] .button-primary {
   line-height: 1.3;
 }
 
-.guide-index ul + .guide-group-title {
-  margin-top: 26px;
+/* Each group holds its heading, its list, and its open guide. Opening a guide
+   scrolls the group's heading to just below the sticky header. */
+.guide-group-title {
+  scroll-margin-top: calc(var(--topbar-height) + 16px);
+}
+
+.guide-group + .guide-group {
+  margin-top: 36px;
 }
 
 .guide-index li {

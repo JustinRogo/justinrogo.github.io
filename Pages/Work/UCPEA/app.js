@@ -247,11 +247,18 @@ function initDashboardNavigation() {
       }
       focusTarget = target && localView.element.contains(target) && !target.closest('[hidden]')
         ? target : localView.element;
-      // Switching guides on the same page keeps the page still. It only scrolls
-      // when the chosen guide would otherwise be entirely off-screen (phones).
+      // Guides in a labeled group (Rights & Benefits) open under their own list,
+      // and the page scrolls so that group's heading sits at the top.
+      const groupTitle = focusTarget === selectedGuide
+        ? selectedGuide?.closest('.guide-group')?.querySelector('.guide-group-title') : null;
+      // Elsewhere, switching guides on the same page keeps the page still. It
+      // only scrolls when the chosen guide would otherwise be off-screen (phones).
       const switchingGuide = key === previousView && focusTarget === selectedGuide;
+      const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (typeof restoreScroll === 'number') {
         window.scrollTo({ top: restoreScroll, behavior: 'instant' });
+      } else if (groupTitle) {
+        groupTitle.scrollIntoView({ block: 'start', behavior: switchingGuide && !calm ? 'smooth' : 'instant' });
       } else if (switchingGuide) {
         if (focusTarget.getBoundingClientRect().top > window.innerHeight - 96) {
           focusTarget.scrollIntoView({ block: 'start', behavior: 'smooth' });
