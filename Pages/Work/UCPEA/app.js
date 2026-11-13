@@ -3,13 +3,6 @@
 const themeToggle = document.getElementById('theme-toggle');
 const themeColor = document.querySelector('meta[name="theme-color"]');
 const currentYear = document.getElementById('current-year');
-const updatesGrid = document.getElementById('updates-grid');
-const heroUpdateLabel = document.getElementById('hero-update-label');
-const heroUpdateVisual = document.getElementById('hero-update-visual');
-const heroUpdateTitle = document.getElementById('hero-update-title');
-const heroUpdateExcerpt = document.getElementById('hero-update-excerpt');
-const heroUpdateLink = document.getElementById('hero-update-link');
-const FEED_URL = 'union-wire.json';
 
 function setTheme(theme, persist = true) {
   document.documentElement.dataset.theme = theme;
@@ -48,11 +41,21 @@ function initDashboardNavigation() {
   const resources = document.getElementById('member-resources');
   const dockHome = document.getElementById('dock-home');
   const dockContract = document.getElementById('dock-contract');
-  const dockNews = document.getElementById('dock-news');
   const main = document.getElementById('main-content');
   const footer = document.querySelector('.site-footer');
   const toolView = document.getElementById('tool-view');
   const headerContext = document.querySelector('.header-context');
+  const localViews = new Map(Array.from(main.querySelectorAll('[data-dashboard-view]'), element => [
+    element.id,
+    {
+      element,
+      title: element.querySelector('h1').textContent,
+      dockLink: document.querySelector(`.mobile-dock a[href="index.html?view=${element.id}"]`),
+      guides: Array.from(element.querySelectorAll('[data-view-guide]')),
+      guideLinks: Array.from(element.querySelectorAll('.guide-index a')),
+      defaultGuide: element.querySelector('[data-default-guide]'),
+    },
+  ]));
   const links = Array.from(sidebar.querySelectorAll('.primary-nav a[href^="index.html#"]'));
   const toolLinks = Array.from(sidebar.querySelectorAll('.primary-nav a[href^="index.html?view="]'));
   const sections = links.map(link => document.getElementById(link.hash.slice(1)));
@@ -145,27 +148,70 @@ function initDashboardNavigation() {
     const currentLink = links[Math.max(0, index)];
 
     if (currentLink !== activeLink) setActiveLink(currentLink, 'location');
-    const readingNews = currentLink.hash === '#updates';
-    dockNews.setAttribute('aria-current', readingNews ? 'location' : 'false');
-    dockHome.setAttribute('aria-current', readingNews ? 'false' : 'page');
   }
 
   function scheduleSectionUpdate() {
     pendingFrame ??= window.requestAnimationFrame(updateCurrentSection);
   }
 
-  function showView({ focus = false, restoreScroll, scrollHome = false } = {}) {
-    const { searchParams, hash } = new URL(location.href);
-    const key = searchParams.get('view');
-    const tool = Object.hasOwn(UCPEAViews.views, key) ? UCPEAViews.views[key] : null;
-    const previousView = activeView;
-    activeView = tool ? key : '';
-    body.toggleAttribute('data-tool-view', Boolean(tool));
-    toolView.hidden = !tool;
-    dockHome.setAttribute('aria-current', tool ? 'false' : 'page');
-    dockContract.setAttribute('aria-current', activeView === 'current-contract' ? 'page' : 'false');
-    dockNews.setAttribute('aria-current', 'false');
+  function isDashboardView(key) {
+    return localViews.has(key) || Object.hasOwn(UCPEAViews.views, key);
+  }
 
+  function readDestination(url) {
+    const key = url.searchParams.get('view');
+    const target = document.getElementById(url.hash.slice(1));
+    if (!key && url.hash === '#updates') return { key: 'union-wire', hash: '', legacyLink: true };
+    if (!key && url.hash === '#deadlines') {
+      const hash = url.searchParams.get('benefit') === 'childcare' ? '#benefit-childcare' : '#deadlines';
+      return { key: 'benefits', hash, legacyLink: true };
+    }
+    const localView = target?.closest('[data-dashboard-view]');
+    if (!key && localView) {
+      return { key: localView.id, hash: target === localView ? '' : url.hash, legacyLink: true };
+    }
+    return { key, hash: url.hash };
+  }
+
+  function showView({ focus = false, restoreScroll, scrollHome = false } = {}) {
+    const url = new URL(location.href);
+    const { key, hash, legacyLink } = readDestination(url);
+    if (legacyLink) {
+      url.searchParams.set('view', key);
+      url.searchParams.delete('benefit');
+      url.hash = hash;
+      history.replaceState(history.state, '', url);
+    }
+
+    const tool = Object.hasOwn(UCPEAViews.views, key) ? UCPEAViews.views[key] : null;
+    const localView = localViews.get(key);
+    const previousView = activeView;
+    activeView = tool || localView ? key : '';
+    body.toggleAttribute('data-tool-view', Boolean(tool));
+    body.toggleAttribute('data-local-view', Boolean(localView));
+    toolView.hidden = !tool;
+    for (const view of localViews.values()) {
+      view.element.hidden = view !== localView;
+      view.dockLink?.setAttribute('aria-current', view === localView ? 'page' : 'false');
+    }
+    dockHome.setAttribute('aria-current', activeView ? 'false' : 'page');
+    dockContract.setAttribute('aria-current', activeView === 'current-contract' ? 'page' : 'false');
+
+    const title = tool?.title ?? localView?.title;
+    document.title = title ? title + ' | ' + dashboardTitle : dashboardTitle;
+    headerContext.textContent = title || 'Member dashboard';
+    if (activeView && activeView !== previousView) {
+      const link = toolLinks.find(item => new URL(item.href).searchParams.get('view') === key);
+      setActiveLink(link, 'page');
+    }
+
+    if (!tool && frame) {
+      toolView.replaceChildren();
+      frame = undefined;
+      frameHash = '';
+    }
+
+    let focusTarget = main;
     if (tool) {
       if (key !== previousView || (!hash && frameHash)) {
         const source = new URL(tool.file, location.href);
@@ -187,39 +233,41 @@ function initDashboardNavigation() {
         UCPEAViews.messageTo(frame.contentWindow, 'show-hash', { hash });
       }
       frameHash = hash;
-      if (key !== previousView) {
-        const link = toolLinks.find(item => new URL(item.href).searchParams.get('view') === key);
-        setActiveLink(link, 'page');
-      }
-      document.title = tool.title + ' | ' + dashboardTitle;
-      headerContext.textContent = tool.title;
       window.scrollTo({ top: 0, behavior: 'instant' });
-    } else {
-      if (previousView) {
-        toolView.replaceChildren();
-        frame = undefined;
-        frameHash = '';
-        document.title = dashboardTitle;
-        headerContext.textContent = 'Member dashboard';
+    } else if (localView) {
+      const target = document.getElementById(hash.slice(1));
+      const selectedGuide = target?.closest('[data-view-guide]') ?? localView.defaultGuide;
+      for (const guide of localView.guides) guide.hidden = guide !== selectedGuide;
+      for (const link of localView.guideLinks) {
+        link.setAttribute('aria-current', link.hash === `#${selectedGuide?.id}` ? 'location' : 'false');
       }
-      if (scrollHome || previousView) {
-        const target = document.getElementById(hash.slice(1)) || main;
-        if (typeof restoreScroll === 'number') {
-          window.scrollTo({ top: restoreScroll, behavior: 'instant' });
-        } else {
-          target.scrollIntoView({ behavior: previousView ? 'instant' : 'auto' });
-        }
+      focusTarget = target && localView.element.contains(target) && !target.closest('[hidden]')
+        ? target : localView.element;
+      if (typeof restoreScroll === 'number') {
+        window.scrollTo({ top: restoreScroll, behavior: 'instant' });
+      } else if (focusTarget === localView.element || localView.defaultGuide) {
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      } else {
+        focusTarget.scrollIntoView({ behavior: 'instant' });
+      }
+    } else {
+      focusTarget = document.getElementById(hash.slice(1)) || main;
+      if (hash === '#salary-calculator') focusTarget.open = true;
+      if (typeof restoreScroll === 'number') {
+        window.scrollTo({ top: restoreScroll, behavior: 'instant' });
+      } else if (scrollHome || previousView) {
+        focusTarget.scrollIntoView({ behavior: previousView ? 'instant' : 'auto' });
       }
       scheduleSectionUpdate();
     }
 
-    if (focus) (tool ? main : document.getElementById(hash.slice(1)) || main).focus({ preventScroll: true });
+    if (focus) focusTarget.focus({ preventScroll: true });
   }
 
   function navigate(key, hash) {
     const destination = UCPEAViews.dashboardURL(key, hash);
     if (destination.href !== location.href) {
-      if (key && !activeView) {
+      if ((key || '') !== activeView) {
         history.replaceState({ ...history.state, dashboardScroll: window.scrollY }, '');
       }
       history.pushState(null, '', destination);
@@ -233,10 +281,10 @@ function initDashboardNavigation() {
     if (!UCPEAViews.isPlainClick(event, link)) return;
     const destination = new URL(link.href);
     if (destination.origin !== location.origin || destination.pathname !== dashboardPath) return;
-    const key = destination.searchParams.get('view');
-    if (!link.getAttribute('href').startsWith('index.html') || (key && !Object.hasOwn(UCPEAViews.views, key))) return;
+    const { key, hash } = readDestination(destination);
+    if (!link.getAttribute('href').startsWith('index.html') || (key && !isDashboardView(key))) return;
     event.preventDefault();
-    navigate(key, destination.hash);
+    navigate(key, hash);
   });
 
   document.querySelector('.skip-link').addEventListener('click', event => {
@@ -250,11 +298,16 @@ function initDashboardNavigation() {
     showView({ restoreScroll: event.state?.dashboardScroll });
   });
 
+  window.addEventListener('hashchange', () => {
+    // Native fragment links can reach a legacy route without reloading.
+    if (readDestination(new URL(location.href)).legacyLink) showView();
+  });
+
   window.addEventListener('message', event => {
     if (!UCPEAViews.isFrom(event, frame?.contentWindow)) return;
     const { type, view, hash, replace } = event.data || {};
     if (typeof hash !== 'string' || (hash && !hash.startsWith('#'))) return;
-    if (type === 'ucpea-tool-link' && (!view || Object.hasOwn(UCPEAViews.views, view))) {
+    if (type === 'ucpea-tool-link' && (!view || isDashboardView(view))) {
       navigate(view, hash);
     }
     if (type === 'ucpea-tool-hash' && hash !== frameHash) {
@@ -274,99 +327,9 @@ function initDashboardNavigation() {
   body.setAttribute('data-navigation-ready', '');
 }
 
-initDashboardNavigation();
-
-function createFeedCard(item) {
-  const article = document.createElement('article');
-  article.className = 'update-card';
-
-  const top = document.createElement('div');
-  top.className = 'update-card-top';
-
-  const type = document.createElement('span');
-  type.className = 'update-type';
-  type.textContent = item.label || 'Union Wire';
-
-  const latest = document.createElement('span');
-  latest.textContent = 'Latest';
-  top.append(type, latest);
-
-  const visual = document.createElement('div');
-  visual.className = `update-visual update-visual-feed-${Number(item.colorIndex || 0) % 6}`;
-  visual.setAttribute('aria-hidden', 'true');
-
-  const visualLabel = document.createElement('span');
-  visualLabel.textContent = 'Union Wire';
-
-  const visualValue = document.createElement('strong');
-  visualValue.textContent = item.visual || 'UW';
-  visual.append(visualLabel, visualValue);
-
-  const heading = document.createElement('h3');
-  const titleLink = document.createElement('a');
-  titleLink.href = item.url;
-  titleLink.target = '_blank';
-  titleLink.rel = 'noopener noreferrer';
-  titleLink.textContent = item.title;
-  heading.append(titleLink);
-
-  const excerpt = document.createElement('p');
-  excerpt.textContent = item.excerpt;
-
-  const readLink = document.createElement('a');
-  readLink.className = 'card-link';
-  readLink.href = item.url;
-  readLink.target = '_blank';
-  readLink.rel = 'noopener noreferrer';
-  readLink.append('Read on UCPEA ');
-
-  const arrow = document.createElement('span');
-  arrow.setAttribute('aria-hidden', 'true');
-  arrow.textContent = '→';
-  readLink.append(arrow);
-
-  article.append(top, visual, heading, excerpt, readLink);
-  return article;
-}
-
-function updateHeroStory(item) {
-  if (!heroUpdateLabel || !heroUpdateVisual || !heroUpdateTitle || !heroUpdateExcerpt || !heroUpdateLink) return;
-
-  heroUpdateLabel.textContent = item.label || 'Union Wire';
-  heroUpdateVisual.textContent = item.visual || 'UW';
-  heroUpdateTitle.textContent = item.title;
-  heroUpdateExcerpt.textContent = item.excerpt;
-  heroUpdateLink.href = item.url;
-}
-
-async function loadUnionWire() {
-  if (!updatesGrid) return;
-
-  if (window.location.protocol === 'file:') {
-    return;
-  }
-
-  try {
-    const response = await fetch(FEED_URL, { cache: 'no-store' });
-    if (!response.ok) throw new Error(`Feed request failed: ${response.status}`);
-
-    const feed = await response.json();
-    if (!Array.isArray(feed.items) || feed.items.length === 0) {
-      throw new Error('The feed did not contain any posts');
-    }
-
-    updateHeroStory(feed.items[0]);
-    updatesGrid.replaceChildren(...feed.items.map(createFeedCard));
-  } catch (error) {
-    // Keep the saved dashboard cards visible if the live feed is unavailable.
-  }
-}
-
 if (currentYear) {
   currentYear.textContent = `© ${new Date().getFullYear()}`;
 }
-
-loadUnionWire();
 
 const helpTopics = {
   workplace: {
@@ -393,6 +356,7 @@ const helpTopics = {
       ['Talk with UCPEA', 'A steward can help distinguish reclassification from temporary higher-level duties and explain the timelines.'],
     ],
     links: [
+      ['Open the position audit guide', 'index.html?view=my-rights#position-audit', false],
       ['Open Article 31', 'index.html?view=current-contract#article-31', false],
       ['Contact UCPEA', 'mailto:ucpeaoffice@ucpea.org?subject=Question%20about%20changed%20job%20duties', false],
     ],
@@ -407,6 +371,7 @@ const helpTopics = {
       ['Ask before a deadline passes', 'Contact UCPEA if the correct leave type is unclear or a request has been denied.'],
     ],
     links: [
+      ['Track holiday time', 'index.html?view=my-rights#holiday-time', false],
       ['Open sick leave', 'index.html?view=current-contract#article-11', false],
       ['Open parental benefits', 'index.html?view=current-contract#article-12', false],
     ],
@@ -417,11 +382,11 @@ const helpTopics = {
     summary: 'UCPEA funding supports eligible self-directed development. If training is required for your departmental work, Article 34.3 says the University pays for it.',
     steps: [
       ['Confirm the activity is eligible', 'Review the official guidance for conferences, workshops, memberships, training, and eligible certificates.'],
-      ['Apply at least 15 days ahead', 'Use the deadline planner below to calculate the application date.'],
+      ['Apply at least 15 days ahead', 'Use the deadline planner in the professional development guide to calculate the application date.'],
       ['Finish the reimbursement step', 'Reimbursement or expense reallocation is due within 28 calendar days after the activity ends.'],
     ],
     links: [
-      ['Plan the deadlines', '#deadlines', false],
+      ['Open the professional development guide', 'index.html?view=benefits#benefit-professional-development', false],
       ['Official PD guidance', 'https://ucpea.ct.aft.org/professional-development', true],
     ],
   },
@@ -432,11 +397,12 @@ const helpTopics = {
     steps: [
       ['Review eligibility first', 'Confirm whether the benefit covers the employee, a dependent, or particular types of expenses.'],
       ['Collect the required records', 'Applications may require receipts, course information, or other supporting documentation.'],
-      ['Confirm the filing date', 'Use the planner for childcare periods and the official UConn HR workflow for tuition benefits.'],
+      ['Confirm the filing date', 'See the childcare guide for expense periods and UConn HR for tuition deadlines.'],
     ],
     links: [
-      ['Childcare planner', '#deadlines', false],
-      ['Tuition benefits', 'https://ucpea.ct.aft.org/tuition-benefits/tuition-waiver-and-reimbursement', true],
+      ['Childcare reimbursement', 'index.html?view=benefits#benefit-childcare', false],
+      ['Tuition benefits', 'index.html?view=benefits#benefit-tuition', false],
+      ['Browse all benefits', 'index.html?view=benefits', false],
     ],
   },
   membership: {
@@ -511,27 +477,18 @@ helpButtons.forEach(button => {
   button.addEventListener('click', () => showHelpTopic(button.dataset.helpTopic));
 });
 
-const deadlineBenefit = document.getElementById('deadlineBenefit');
-const professionalDevelopmentFields = document.getElementById('professionalDevelopmentFields');
-const childcareFields = document.getElementById('childcareFields');
 const activityStart = document.getElementById('activityStart');
 const activityEnd = document.getElementById('activityEnd');
 const activityStartLabel = document.getElementById('activityStartLabel');
 const activityEndField = document.getElementById('activityEndField');
 const activityRangeToggle = document.getElementById('activityRangeToggle');
-const childcarePeriod = document.getElementById('childcarePeriod');
-const childcareYear = document.getElementById('childcareYear');
-const deadlineHelper = document.getElementById('deadline-helper');
 const calculateDeadlineButton = document.getElementById('calculateDeadline');
 const resetDeadlineButton = document.getElementById('resetDeadline');
 const deadlineError = document.getElementById('deadlineError');
-const deadlineResultLabel = document.getElementById('deadlineResultLabel');
 const deadlineResultTitle = document.getElementById('deadlineResultTitle');
 const deadlineResultSummary = document.getElementById('deadlineResultSummary');
 const deadlineDates = document.getElementById('deadlineDates');
-const deadlineOfficialLink = document.getElementById('deadlineOfficialLink');
 const deadlineCalendar = document.getElementById('deadlineCalendar');
-const deadlineResultNote = document.getElementById('deadlineResultNote');
 let deadlineCalendarUrl = '';
 
 const deadlineDateFormatter = new Intl.DateTimeFormat('en-US', {
@@ -544,20 +501,16 @@ const deadlineDateFormatter = new Intl.DateTimeFormat('en-US', {
 function parseLocalDate(value) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
   const [year, month, day] = value.split('-').map(Number);
-  const date = new Date(year, month - 1, day, 12);
-  return Number.isNaN(date.getTime()) ? null : date;
+  const date = new Date(2000, 0, 1, 12);
+  date.setFullYear(year, month - 1, day);
+  return year > 0 && date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day
+    ? date
+    : null;
 }
 
 function addCalendarDays(date, amount) {
   const result = new Date(date);
   result.setDate(result.getDate() + amount);
-  return result;
-}
-
-function nextWeekday(date) {
-  const result = new Date(date);
-  if (result.getDay() === 6) result.setDate(result.getDate() + 2);
-  if (result.getDay() === 0) result.setDate(result.getDate() + 1);
   return result;
 }
 
@@ -569,21 +522,36 @@ function toIcsDate(date) {
   ].join('');
 }
 
-function createCalendarFile(events) {
-  if (deadlineCalendarUrl) URL.revokeObjectURL(deadlineCalendarUrl);
+function calendarText(value) {
+  return value.replace(/\\/g, '\\\\').replace(/\r?\n/g, '\\n').replace(/[;,]/g, '\\$&');
+}
+
+function buildCalendarFile(events) {
   const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
   const body = events.map((event, index) => [
     'BEGIN:VEVENT',
-    `UID:ucpea-${toIcsDate(event.date)}-${index}@justinrogo.github.io`,
+    `UID:${event.uid ?? `ucpea-${toIcsDate(event.date)}-${index}`}@justinrogo.github.io`,
     `DTSTAMP:${stamp}`,
     `DTSTART;VALUE=DATE:${toIcsDate(event.date)}`,
     `DTEND;VALUE=DATE:${toIcsDate(addCalendarDays(event.date, 1))}`,
-    `SUMMARY:${event.title}`,
-    `DESCRIPTION:${event.description}`,
+    `SUMMARY:${calendarText(event.title)}`,
+    `DESCRIPTION:${calendarText(event.description)}`,
+    ...(event.reminderDays ? [
+      'BEGIN:VALARM',
+      'ACTION:DISPLAY',
+      `TRIGGER:-P${event.reminderDays}D`,
+      `DESCRIPTION:${calendarText(event.title)}`,
+      'END:VALARM',
+    ] : []),
     'END:VEVENT',
   ].join('\r\n')).join('\r\n');
   const file = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//UCPEA Member Dashboard//EN', body, 'END:VCALENDAR', ''].join('\r\n');
-  deadlineCalendarUrl = URL.createObjectURL(new Blob([file], { type: 'text/calendar;charset=utf-8' }));
+  return new Blob([file], { type: 'text/calendar;charset=utf-8' });
+}
+
+function createCalendarFile(events) {
+  if (deadlineCalendarUrl) URL.revokeObjectURL(deadlineCalendarUrl);
+  deadlineCalendarUrl = URL.createObjectURL(buildCalendarFile(events));
   deadlineCalendar.href = deadlineCalendarUrl;
   deadlineCalendar.hidden = false;
 }
@@ -626,90 +594,38 @@ function resetDeadlineResult() {
   deadlineResultSummary.textContent = 'The planner will show the application and reimbursement dates here.';
 }
 
-function updateDeadlineBenefit() {
-  const isProfessionalDevelopment = deadlineBenefit.value === 'professional-development';
-  professionalDevelopmentFields.hidden = !isProfessionalDevelopment;
-  childcareFields.hidden = isProfessionalDevelopment;
-  deadlineResultLabel.textContent = isProfessionalDevelopment ? 'Professional development' : 'Childcare reimbursement';
-  deadlineHelper.textContent = isProfessionalDevelopment
-    ? 'Professional-development requests are due at least 15 days before the activity or membership due date; reimbursement or expense reallocation is due within 28 calendar days after the activity ends.'
-    : 'Childcare expenses are filed in three periods: January–April by May 15, May–August by September 15, and September–December by January 15 of the following year.';
-  deadlineOfficialLink.href = isProfessionalDevelopment
-    ? 'https://ucpea.ct.aft.org/professional-development'
-    : 'https://ucpea3695.my.canva.site/childcarereimbursement';
-  deadlineResultNote.textContent = isProfessionalDevelopment
-    ? 'Always confirm eligibility and dates on the official UCPEA page before submitting.'
-    : 'Official guidance moves a deadline falling on a weekend or holiday to the next business day. This planner adjusts weekends; confirm holidays with UCPEA.';
-  resetDeadlineResult();
-  if (!isProfessionalDevelopment) {
-    deadlineResultTitle.textContent = 'Choose an expense period';
-    deadlineResultSummary.textContent = 'The planner will show the filing deadline for that period.';
-    deadlineDates.replaceChildren();
-  }
-}
-
 function calculateDeadline() {
-  clearDeadlineError();
+  resetDeadlineResult();
 
-  if (deadlineBenefit.value === 'professional-development') {
-    const start = parseLocalDate(activityStart.value);
-    const end = activityEnd.value ? parseLocalDate(activityEnd.value) : start;
-    if (!start) {
-      showDeadlineError('Enter the activity or membership date.');
-      return;
-    }
-    if (!end) {
-      showDeadlineError('Enter a valid end date.');
-      return;
-    }
-    if (end < start) {
-      showDeadlineError('The activity end date must be on or after the start date.');
-      return;
-    }
-
-    const applicationDue = addCalendarDays(start, -15);
-    const reimbursementDue = addCalendarDays(end, 28);
-    deadlineResultTitle.textContent = 'Your planning dates';
-    deadlineResultSummary.textContent = start.getTime() === end.getTime()
-      ? `For an activity on ${deadlineDateFormatter.format(start)}.`
-      : `For an activity beginning ${deadlineDateFormatter.format(start)} and ending ${deadlineDateFormatter.format(end)}.`;
-    setDeadlineCards([
-      ['Apply no later than', applicationDue],
-      ['Reimbursement due', reimbursementDue],
-    ]);
-    createCalendarFile([
-      { date: applicationDue, title: 'UCPEA professional development application deadline', description: 'Confirm the current requirements and submit through the official UCPEA professional development workflow.' },
-      { date: reimbursementDue, title: 'UCPEA professional development reimbursement deadline', description: 'Submit reimbursement or expense reallocation through the official workflow.' },
-    ]);
-    deadlineCalendar.download = 'ucpea-professional-development-deadlines.ics';
+  const start = parseLocalDate(activityStart.value);
+  const end = activityEnd.value ? parseLocalDate(activityEnd.value) : start;
+  if (!start) {
+    showDeadlineError('Enter the activity or membership date.');
+    return;
+  }
+  if (!end) {
+    showDeadlineError('Enter a valid end date.');
+    return;
+  }
+  if (end < start) {
+    showDeadlineError('The activity end date must be on or after the start date.');
     return;
   }
 
-  const year = Number(childcareYear.value);
-  if (!Number.isInteger(year) || year < 2025 || year > 2100) {
-    showDeadlineError('Enter a valid four-digit expense year.');
-    return;
-  }
-
-  const periodRules = {
-    'jan-apr': { label: 'January–April', month: 4, day: 15, yearOffset: 0 },
-    'may-aug': { label: 'May–August', month: 8, day: 15, yearOffset: 0 },
-    'sep-dec': { label: 'September–December', month: 0, day: 15, yearOffset: 1 },
-  };
-  const rule = periodRules[childcarePeriod.value];
-  const publishedDate = new Date(year + rule.yearOffset, rule.month, rule.day, 12);
-  const filingDate = nextWeekday(publishedDate);
-  const weekendAdjusted = filingDate.getTime() !== publishedDate.getTime();
-
-  deadlineResultTitle.textContent = `${rule.label} ${year} expenses`;
-  deadlineResultSummary.textContent = weekendAdjusted
-    ? `The published deadline falls on a weekend, so this planner moves it to the next weekday.`
-    : 'Submit the completed application, receipt form, and itemized receipts by this date.';
-  setDeadlineCards([['Filing deadline', filingDate]]);
-  createCalendarFile([
-    { date: filingDate, title: 'UCPEA childcare reimbursement deadline', description: `Filing deadline for ${rule.label} ${year} expenses. Confirm holidays and current requirements with UCPEA.` },
+  const applicationDue = addCalendarDays(start, -15);
+  const reimbursementDue = addCalendarDays(end, 28);
+  deadlineResultTitle.textContent = 'Your planning dates';
+  deadlineResultSummary.textContent = start.getTime() === end.getTime()
+    ? `For an activity on ${deadlineDateFormatter.format(start)}.`
+    : `For an activity beginning ${deadlineDateFormatter.format(start)} and ending ${deadlineDateFormatter.format(end)}.`;
+  setDeadlineCards([
+    ['Apply no later than', applicationDue],
+    ['Reimbursement due', reimbursementDue],
   ]);
-  deadlineCalendar.download = 'ucpea-childcare-reimbursement-deadline.ics';
+  createCalendarFile([
+    { date: applicationDue, title: 'UCPEA professional development application deadline', description: 'Confirm the current requirements and submit through the official UCPEA professional development workflow.' },
+    { date: reimbursementDue, title: 'UCPEA professional development reimbursement deadline', description: 'Submit reimbursement or expense reallocation through the official workflow.' },
+  ]);
 }
 
 function setActivityRange(expanded) {
@@ -720,8 +636,6 @@ function setActivityRange(expanded) {
   if (!expanded) activityEnd.value = '';
 }
 
-if (childcareYear) childcareYear.value = String(new Date().getFullYear());
-deadlineBenefit?.addEventListener('change', updateDeadlineBenefit);
 activityRangeToggle.hidden = false;
 activityRangeToggle.addEventListener('click', () => {
   const expanded = activityEndField.hidden;
@@ -729,22 +643,26 @@ activityRangeToggle.addEventListener('click', () => {
   setActivityRange(expanded);
   if (expanded) activityEnd.focus();
 });
-activityStart.addEventListener('input', () => { activityEnd.min = activityStart.value; });
+activityStart.addEventListener('input', () => {
+  activityEnd.min = activityStart.value;
+  resetDeadlineResult();
+});
+activityEnd.addEventListener('input', resetDeadlineResult);
 calculateDeadlineButton?.addEventListener('click', calculateDeadline);
 resetDeadlineButton?.addEventListener('click', () => {
   activityStart.value = '';
   activityEnd.min = '';
   setActivityRange(false);
-  childcarePeriod.value = 'jan-apr';
-  childcareYear.value = String(new Date().getFullYear());
   resetDeadlineResult();
 });
 
-[activityStart, activityEnd, childcarePeriod, childcareYear].forEach(input => {
+[activityStart, activityEnd].forEach(input => {
   input?.addEventListener('keydown', event => {
     if (event.key === 'Enter') calculateDeadline();
   });
 });
+
+initDashboardNavigation();
 
 const SALARY_BANDS = {
   2025: {

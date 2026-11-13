@@ -1,10 +1,12 @@
-import { access, readFile, writeFile } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const SOURCE_URL = 'https://ucpea.ct.aft.org/union-wire';
-const OUTPUT = fileURLToPath(new URL('./union-wire.json', import.meta.url));
+const OUTPUT = fileURLToPath(new URL('./union-wire-feed.js', import.meta.url));
 const USER_AGENT = 'justinrogo.github.io UCPEA Union Wire feed/1.0';
-const ITEM_LIMIT = 9;
+const PAGE_COUNT = 3;
+const DATE_CONCURRENCY = 5;
 
 function decodeEntities(value = '') {
   const named = {
@@ -38,108 +40,111 @@ function textOnly(value = '') {
   );
 }
 
-function categoryFor(title, excerpt) {
-  const text = `${title} ${excerpt}`.toLowerCase();
-  if (/\bcontract\b|\barticle\s+\d+|\bsalary\b|\bwage\b|\bgrievance\b/.test(text)) return 'contract';
-  if (/professional development|hardship|scholarship|tuition|childcare|sick bank|\bbenefit\b|\bfund\b|\bapplication\b/.test(text)) return 'benefits';
-  return 'community';
-}
-
-function visualFor(title, category) {
-  const article = title.match(/\bArticle\s+(\d+)/i)?.[1];
-  if (article) return { label: 'Article', value: article };
-  if (/professional development/i.test(title)) return { label: 'Member benefit', value: 'PD' };
-  if (/book club/i.test(title)) return { label: 'Community', value: 'BOOK' };
-  if (/produce|craft swap/i.test(title)) return { label: 'Community', value: 'SWAP' };
-  if (/hardship/i.test(title)) return { label: 'Member support', value: 'HELP' };
-  if (/award/i.test(title)) return { label: 'Recognition', value: '★' };
-  return {
-    label: category === 'contract' ? 'Contract' : category === 'benefits' ? 'Benefits' : 'Union Wire',
-    value: 'UW',
-  };
-}
-
-function parseUnionWire(html) {
+export function parseUnionWire(html) {
   const chunks = html.split(
     /<div\b[^>]*class=["'][^"']*\bteaser\b[^"']*\bteaser--image_first\b[^"']*["'][^>]*>/i
   ).slice(1);
   const items = [];
-  const seen = new Set();
 
   for (const chunk of chunks) {
-    const linkMatch = chunk.match(
+    const match = chunk.match(
       /<a\b[^>]*class=["'][^"']*\bh2__link\b[^"']*["'][^>]*href=["']([^"']+)["'][^>]*>[\s\S]*?<span>([\s\S]*?)<\/span>/i
     );
-    if (!linkMatch) continue;
-
-    const url = new URL(decodeEntities(linkMatch[1]), SOURCE_URL).href;
-    if (seen.has(url)) continue;
-
-    const title = textOnly(linkMatch[2]);
-    const body = chunk.match(
-      /<div\b[^>]*class=["'][^"']*\bteaser__body\b[^"']*["'][^>]*>([\s\S]*?)<a\b[^>]*class=["'][^"']*\bteaser\b[^"']*["']/i
-    )?.[1] ?? '';
-    const excerpt = textOnly(body);
-    if (!title || !excerpt) continue;
-
-    const category = categoryFor(title, excerpt);
-    const visual = visualFor(title, category);
-    items.push({
-      title,
-      url,
-      excerpt,
-      category,
-      label: visual.label,
-      visual: visual.value,
-      colorIndex: items.length % 6,
-    });
-    seen.add(url);
-
-    if (items.length >= ITEM_LIMIT) break;
+    if (!match) continue;
+    const url = new URL(decodeEntities(match[1]), SOURCE_URL);
+    if (url.origin !== new URL(SOURCE_URL).origin || !/^\/union-wire\/[^/]+\/?$/.test(url.pathname)) continue;
+    const title = textOnly(match[2]);
+    if (title) items.push({ title, url: url.origin + url.pathname.replace(/\/$/, '') });
   }
-
-  if (items.length < 3) {
-    throw new Error(`Only ${items.length} Union Wire items were found`);
-  }
-
   return items;
 }
 
-async function hasExistingSnapshot() {
+export function readPublishedDate(html) {
+  for (const meta of html.match(/<meta\b[^>]*>/gi) ?? []) {
+    if (!/\bproperty=["']article:published_time["']/i.test(meta)) continue;
+    const date = meta.match(/\bcontent=["'](\d{4}-\d{2}-\d{2})T[^"']+["']/i)?.[1];
+    if (date) return date;
+  }
+  return null;
+}
+
+async function fetchHTML(url) {
+  const response = await fetch(url, {
+    headers: { accept: 'text/html,application/xhtml+xml', 'user-agent': USER_AGENT },
+    signal: AbortSignal.timeout(8000),
+  });
+  if (!response.ok) throw new Error(response.status + ' ' + response.statusText);
+  return response.text();
+}
+
+function readSnapshot(script) {
+  return JSON.parse(script.match(/^const UCPEAUnionWireFeed = ([\s\S]+);\s*$/m)?.[1] ?? '{}');
+}
+
+async function refreshUnionWire() {
+  let previous;
   try {
-    await access(OUTPUT);
-    const existing = JSON.parse(await readFile(OUTPUT, 'utf8'));
-    return Array.isArray(existing.items) && existing.items.length > 0;
-  } catch {
-    return false;
+    previous = readSnapshot(await readFile(OUTPUT, 'utf8'));
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error;
+  }
+
+  try {
+    const listing = await Promise.allSettled(Array.from({ length: PAGE_COUNT }, async (_, index) => {
+      const url = index ? SOURCE_URL + '?page=' + index : SOURCE_URL;
+      const items = parseUnionWire(await fetchHTML(url));
+      if (!items.length) throw new Error('No articles found on listing page ' + (index + 1));
+      return items;
+    }));
+
+    if (listing[0].status === 'rejected') throw listing[0].reason;
+    if (listing[0].value.length < 3) throw new Error('Fewer than three articles on the first listing page');
+    const unique = new Map();
+    for (const page of listing) {
+      if (page.status === 'rejected') {
+        console.warn('Union Wire listing page unavailable:', page.reason.message);
+        continue;
+      }
+      for (const item of page.value) if (!unique.has(item.url)) unique.set(item.url, item);
+    }
+
+    const previousItems = previous?.items ?? [];
+    const previousDates = new Map(previousItems.map(item => [item.url, item.publishedOn]));
+    const items = Array.from(unique.values());
+    const needsDate = [];
+    for (const item of items) {
+      item.publishedOn = previousDates.get(item.url) ?? null;
+      if (!item.publishedOn) needsDate.push(item);
+    }
+    for (let index = 0; index < needsDate.length; index += DATE_CONCURRENCY) {
+      await Promise.all(needsDate.slice(index, index + DATE_CONCURRENCY).map(async item => {
+        try {
+          item.publishedOn = readPublishedDate(await fetchHTML(item.url));
+        } catch {
+          // The dashboard can display articles without a publication date.
+        }
+      }));
+    }
+
+    // Reuse the last known entries if an older listing page was unavailable.
+    if (listing.some(page => page.status === 'rejected')) {
+      for (const item of previousItems) if (!unique.has(item.url)) items.push(item);
+    }
+
+    const snapshot = {
+      generatedAt: new Date().toISOString(),
+      items: items.slice(0, PAGE_COUNT * 10),
+    };
+    const script = '// Generated by update-union-wire.mjs.\nconst UCPEAUnionWireFeed = ' +
+      JSON.stringify(snapshot, null, 2) + ';\n';
+    await writeFile(OUTPUT, script, 'utf8');
+    console.log('Wrote ' + snapshot.items.length + ' Union Wire items to ' + OUTPUT);
+  } catch (error) {
+    if (!previous?.items?.length) throw error;
+    console.warn('Union Wire refresh failed; preserving the existing snapshot:', error.message);
   }
 }
 
-try {
-  const response = await fetch(SOURCE_URL, {
-    headers: {
-      accept: 'text/html,application/xhtml+xml',
-      'user-agent': USER_AGENT,
-    },
-    signal: AbortSignal.timeout(30000),
-  });
-
-  if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
-
-  const items = parseUnionWire(await response.text());
-  const snapshot = {
-    schemaVersion: 1,
-    generatedAt: new Date().toISOString(),
-    sourceUrl: SOURCE_URL,
-    items,
-  };
-
-  await writeFile(OUTPUT, `${JSON.stringify(snapshot, null, 2)}\n`, 'utf8');
-  console.log(`Wrote ${items.length} Union Wire items to ${OUTPUT}`);
-} catch (error) {
-  if (await hasExistingSnapshot()) {
-    console.warn(`Union Wire refresh failed; preserving the existing snapshot: ${error.message}`);
-  } else {
-    throw error;
-  }
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  await refreshUnionWire();
 }

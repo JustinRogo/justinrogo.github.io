@@ -1,7 +1,7 @@
 'use strict';
 
 const CACHE_PREFIX = 'ucpea-dashboard-';
-const CACHE_NAME = CACHE_PREFIX + 'v1';
+const CACHE_NAME = CACHE_PREFIX + 'v9';
 const scope = new URL(self.registration.scope);
 const homeURL = new URL('index.html', scope).href;
 const offlineURLs = new Set([
@@ -10,10 +10,13 @@ const offlineURLs = new Set([
   'theme.css',
   'tool-theme.css',
   'app.js',
+  'member-rights.js',
+  'document-library.js',
   'tool-views.js',
   'calendar.js',
   'calendar-events.js',
-  'union-wire.json',
+  'union-wire-feed.js',
+  'union-wire.js',
   'UCPEAContract.html',
   'UCPEA_Contract_History.html',
   'UCPEA_Contract_Comparison.html',

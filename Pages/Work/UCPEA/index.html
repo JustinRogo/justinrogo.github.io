@@ -39,6 +39,10 @@
   <script src="pwa.js" defer></script>
   <script src="tool-views.js" defer></script>
   <script src="app.js" defer></script>
+  <script src="member-rights.js" defer></script>
+  <script src="union-wire-feed.js" defer></script>
+  <script src="union-wire.js" defer></script>
+  <script src="document-library.js" defer></script>
   <script src="calendar-events.js" defer></script>
   <script src="calendar.js" defer></script>
 </head>
@@ -96,9 +100,13 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 4H4v13h4v4l5-4h7zM8 9h8m-8 4h5"/></svg>
           <span class="sidebar-label">Start here</span>
         </a>
-        <a href="index.html#deadlines" title="Deadlines">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8v5l3 2m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
-          <span class="sidebar-label">Deadlines</span>
+        <a href="index.html?view=my-rights" title="My Rights">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 6v5c0 5 3 8 8 10 5-2 8-5 8-10V6l-8-3Zm-4 9 3 3 5-5"/></svg>
+          <span class="sidebar-label">My Rights</span>
+        </a>
+        <a href="index.html?view=benefits" title="Benefits">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16v14H4zM2 3h20v4H2zm10 4v14m-4-9h8"/></svg>
+          <span class="sidebar-label">Benefits</span>
         </a>
         <a href="index.html#calendar" title="Calendar">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v16H4zM8 2v6m8-6v6M4 11h16"/></svg>
@@ -116,11 +124,15 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h17m-4-4 4 4-4 4M21 17H4m4-4-4 4 4 4"/></svg>
           <span class="sidebar-label">Compare contracts</span>
         </a>
+        <a href="index.html?view=document-library" title="Document Library">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h5v15H3zm5-3h5v18H8zm5 3 5-2 4 15-5 2z"/></svg>
+          <span class="sidebar-label">Document Library</span>
+        </a>
         <a href="index.html?view=area-explorer" title="Area Explorer">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2V5Zm6-2v16m6-14v16"/></svg>
           <span class="sidebar-label">Area Explorer</span>
         </a>
-        <a href="index.html#updates" title="Union Wire">
+        <a href="index.html?view=union-wire" title="Union Wire">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h13v16H6a2 2 0 0 1-2-2zm13 4h3v10a2 2 0 0 1-2 2h-1M8 8h5m-5 4h5m-5 4h5"/></svg>
           <span class="sidebar-label">Union Wire</span>
         </a>
@@ -133,12 +145,13 @@
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
             </summary>
             <ul>
-              <li><a href="https://ucpea.ct.aft.org/professional-development">Professional development</a></li>
-              <li><a href="https://ucpea3695.my.canva.site/childcarereimbursement">Childcare reimbursement</a></li>
-              <li><a href="https://ucpea.ct.aft.org/hardship-fund">Hardship fund</a></li>
-              <li><a href="https://ucpea.ct.aft.org/sick-bank">Sick leave bank</a></li>
-              <li><a href="https://ucpea.ct.aft.org/tuition-benefits/tuition-waiver-and-reimbursement">Tuition benefits</a></li>
-              <li><a href="https://ucpea.ct.aft.org/scholarships/ucpea-scholarships">Scholarships</a></li>
+              <li><a href="index.html?view=document-library">Document Library</a></li>
+              <li><a href="index.html?view=benefits#benefit-professional-development">Professional development</a></li>
+              <li><a href="index.html?view=benefits#benefit-childcare">Childcare reimbursement</a></li>
+              <li><a href="index.html?view=benefits#benefit-hardship">Hardship fund</a></li>
+              <li><a href="index.html?view=benefits#benefit-sick-leave-bank">Sick leave bank</a></li>
+              <li><a href="index.html?view=benefits#benefit-tuition">Tuition benefits</a></li>
+              <li><a href="index.html?view=benefits#benefit-scholarships">Scholarships</a></li>
               <li><a href="https://ucpea.ct.aft.org/stewards">Find a steward</a></li>
             </ul>
           </details>
@@ -166,7 +179,16 @@
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5C8 2 3 3 2 4v16c3-1 7-1 10 1 3-2 7-2 10-1V4c-1-1-6-2-10 1Zm0 0v16"/></svg>
       <span>Contract</span>
     </a>
-    <a href="index.html#updates" id="dock-news">
+    <a href="index.html?view=my-rights" id="dock-rights" aria-label="My Rights">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 6v5c0 5 3 8 8 10 5-2 8-5 8-10V6l-8-3Zm-4 9 3 3 5-5"/></svg>
+      <span class="dock-rights-label" aria-hidden="true">My Rights</span>
+      <span class="dock-rights-short" aria-hidden="true">Rights</span>
+    </a>
+    <a href="index.html?view=benefits">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16v14H4zM2 3h20v4H2zm10 4v14m-4-9h8"/></svg>
+      <span>Benefits</span>
+    </a>
+    <a href="index.html?view=union-wire" id="dock-news">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h13v16H6a2 2 0 0 1-2-2zm13 4h3v10a2 2 0 0 1-2 2h-1M8 8h5m-5 4h5m-5 4h5"/></svg>
       <span>News</span>
     </a>
@@ -196,13 +218,11 @@
 
         <aside class="hero-update-card" aria-labelledby="hero-update-title">
           <div class="hero-update-topline">
-            <p>Latest Union Wire</p>
-            <span id="hero-update-label">Recognition</span>
+            <p>Union Wire</p>
+            <time id="hero-update-date" hidden></time>
           </div>
-          <p class="hero-update-visual" id="hero-update-visual" aria-hidden="true">★</p>
-          <h2 id="hero-update-title">A Word From Our 2026 UCPEA Award-Winning Members</h2>
-          <p class="hero-update-excerpt" id="hero-update-excerpt">Meet UCPEA’s 2026 award winners and read their stories.</p>
-          <a id="hero-update-link" href="https://ucpea.ct.aft.org/union-wire/word-our-2026-ucpea-award-winning-members" target="_blank" rel="noopener noreferrer">Read the latest update <span aria-hidden="true">→</span></a>
+          <h2 id="hero-update-title">News from UCPEA</h2>
+          <a href="index.html?view=union-wire">Browse Union Wire <span aria-hidden="true">→</span></a>
         </aside>
         <aside class="hero-today-card" id="hero-today-card" aria-labelledby="hero-today-title" hidden>
           <h2 id="hero-today-title">Today’s events</h2>
@@ -238,7 +258,7 @@
           </button>
           <button class="help-topic" type="button" data-help-topic="benefits" aria-pressed="false" aria-controls="help-result">
             <span class="help-topic__mark" aria-hidden="true">05</span>
-            <span><strong>Tuition or childcare</strong><small>Eligibility and application steps</small></span>
+            <span><strong>Member benefits</strong><small>Eligibility, deadlines, and application steps</small></span>
           </button>
           <button class="help-topic" type="button" data-help-topic="membership" aria-pressed="false" aria-controls="help-result">
             <span class="help-topic__mark" aria-hidden="true">06</span>
@@ -262,78 +282,559 @@
           <p class="help-result__note">This dashboard provides general information, not legal advice. Contact UCPEA for guidance about your circumstances.</p>
         </article>
       </div>
+      <nav class="rights-shortcuts" aria-label="My Rights tools">
+        <a href="index.html?view=my-rights#telecommuting-appeals">Telecommuting appeals</a>
+        <a href="index.html?view=my-rights#position-audit">Position audits</a>
+        <a href="index.html?view=my-rights#holiday-time">Holiday time tracker</a>
+      </nav>
     </section>
 
-    <section class="deadline-section section-shell" id="deadlines" aria-labelledby="deadlines-title" tabindex="-1">
+    <section class="section-shell rights-section" id="my-rights" data-dashboard-view aria-labelledby="rights-title" tabindex="-1" hidden>
       <div class="section-heading section-heading-single">
-        <h2 id="deadlines-title">Benefits Deadline Planner</h2>
+        <h1 id="rights-title">My Rights</h1>
       </div>
+      <nav class="guide-index" aria-label="My Rights guides">
+        <ul>
+          <li><a href="index.html?view=my-rights#telecommuting-appeals"><strong>Telecommuting Appeals</strong><span>Check appeal criteria and filing deadlines</span></a></li>
+          <li><a href="index.html?view=my-rights#position-audit"><strong>Position Audits</strong><span>Request a review when your duties change</span></a></li>
+          <li><a href="index.html?view=my-rights#holiday-time"><strong>Holiday Time Tracker</strong><span>Track hours earned and use-by dates</span></a></li>
+        </ul>
+      </nav>
 
-      <div class="deadline-planner">
-        <div class="deadline-form" aria-describedby="deadline-helper">
-          <div class="deadline-field">
-            <label for="deadlineBenefit">Benefit</label>
-            <select id="deadlineBenefit">
-              <option value="professional-development">Professional development</option>
-              <option value="childcare">Childcare reimbursement</option>
-            </select>
-          </div>
-
-          <div class="deadline-field deadline-activity" id="professionalDevelopmentFields">
-            <div class="deadline-activity-dates" role="group" aria-label="Activity date range">
-              <div>
-                <label for="activityStart" id="activityStartLabel">Activity or membership date</label>
-                <input id="activityStart" type="date">
-              </div>
-              <div id="activityEndField" hidden>
-                <label for="activityEnd">End date (optional)</label>
-                <input id="activityEnd" type="date">
-              </div>
-            </div>
-            <button class="deadline-range-toggle" id="activityRangeToggle" type="button" aria-controls="activityEndField" aria-expanded="false" hidden>Add end date</button>
-          </div>
-
-          <div class="deadline-fields" id="childcareFields" hidden>
+      <article class="rights-tool" id="telecommuting-appeals" data-view-guide aria-labelledby="appeals-title" tabindex="-1" hidden>
+        <h2 id="appeals-title">Telecommuting appeals</h2>
+        <p>Under Article 16.5, UCPEA employees can request review of a full denial, approval for fewer than two remote days per workweek, or permanent revocation. The most recent performance evaluation must be rated Good or better.</p>
+        <div class="rights-layout">
+          <div class="rights-panel" id="appeal-check" hidden>
+            <h3>Check your situation</h3>
             <div class="deadline-field">
-              <label for="childcarePeriod">Expense period</label>
-              <select id="childcarePeriod">
-                <option value="jan-apr">January–April</option>
-                <option value="may-aug">May–August</option>
-                <option value="sep-dec">September–December</option>
+              <label for="appeal-decision">What was the decision?</label>
+              <select id="appeal-decision" autocomplete="off">
+                <option value="">Choose a decision</option>
+                <option value="zero">Denied in full or zero remote days</option>
+                <option value="one">One remote day per workweek</option>
+                <option value="two-plus">Two or more remote days per workweek</option>
+                <option value="pending">Still waiting for a decision</option>
+                <option value="revoked">Arrangement permanently revoked</option>
               </select>
             </div>
-            <div class="deadline-field">
-              <label for="childcareYear">Expense year</label>
-              <input id="childcareYear" type="number" min="2025" max="2100" step="1">
+            <div class="deadline-field" id="appeal-rating-field" hidden>
+              <label for="appeal-rating">Was your latest evaluation Good or better?</label>
+              <select id="appeal-rating" autocomplete="off">
+                <option value="">Choose a rating</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+                <option value="unknown">I’m unsure or haven’t been evaluated</option>
+              </select>
+            </div>
+            <div class="deadline-field" id="appeal-date-field" hidden>
+              <label for="appeal-date">Date you received the decision (optional)</label>
+              <input id="appeal-date" type="date" autocomplete="off">
+            </div>
+            <p class="rights-result" id="appeal-result" role="status"></p>
+          </div>
+          <div class="rights-process">
+            <h3>What happens after a decision</h3>
+            <ol class="rights-steps">
+              <li><strong>File with Human Resources.</strong> Submit a written appeal within four weeks of receiving the decision. UCPEA says the clock for full or partial denials already issued at launch began September 15, 2026, when the Kuali form became available.</li>
+              <li><strong>Panel review.</strong> HR convenes a two-person panel within two weeks of receiving a timely appeal, with one HR member and one UCPEA appointee. Within two weeks of completing its review, the panel upholds the decision or recommends reconsideration.</li>
+              <li><strong>Final determination, if referred.</strong> If the panel is divided or recommends reconsideration, the vice president or designee issues a final written decision within two weeks.</li>
+            </ol>
+          </div>
+        </div>
+        <div class="rights-actions">
+          <a class="button button-primary" href="https://uconn.kualibuild.com/app/6a3977b9ecd54b029a42c715/page/6a3977b9ecd54b029a42c715/run">Open Kuali appeal form</a>
+          <a class="button button-secondary" href="https://ucpea.ct.aft.org/stewards">Find a steward</a>
+          <a class="button button-secondary" href="mailto:ucpeaoffice@ucpea.org">Contact UCPEA</a>
+        </div>
+        <p class="rights-sources"><a href="index.html?view=current-contract#section-16-5">Article 16.5</a> · <a href="https://ucpea.ct.aft.org/union-wire/launch-new-telecommuting-appeal-process">UCPEA appeal guidance</a> · <a href="https://ucpea.ct.aft.org/sites/default/files/media/documents/2026/telecommutingappeals_2sided_updated.pdf">UCPEA flowchart (PDF)</a></p>
+      </article>
+
+      <article class="rights-tool" id="position-audit" data-view-guide aria-labelledby="audit-title" tabindex="-1" hidden>
+        <h2 id="audit-title">Position audits</h2>
+        <p>A position audit checks whether your classification still fits your duties. Career progression under Article 31.2 recognizes proficiency and development within your current position.</p>
+        <div class="rights-layout">
+          <div class="rights-panel">
+            <h3>Before you request an audit</h3>
+            <ul class="rights-checklist">
+              <li>A majority of your duties have changed enough that your classification no longer describes the work.</li>
+              <li>You’ve performed the changed duties consistently for at least two months.</li>
+              <li>You’ve completed your first year in this position and, if you were reclassified, at least a year has passed.</li>
+            </ul>
+            <p>Meet with your supervisor. Prepare a description of your current duties, a current résumé, and an organizational chart for the Kuali request.</p>
+            <div class="deadline-field" id="audit-date-field" hidden>
+              <label for="audit-date">Date HR received your complete packet (optional)</label>
+              <input id="audit-date" type="date" autocomplete="off">
+              <p class="rights-result" id="audit-result" role="status">Use the date on HR’s confirmation of receipt.</p>
             </div>
           </div>
-
-          <p class="deadline-helper" id="deadline-helper">Professional-development requests are due at least 15 days before the activity or membership due date; reimbursement or expense reallocation is due within 28 calendar days after the activity ends.</p>
-          <div class="deadline-actions">
-            <button class="deadline-calculate" id="calculateDeadline" type="button">Calculate deadlines</button>
-            <button class="deadline-reset" id="resetDeadline" type="button">Reset</button>
+          <div class="rights-process">
+            <h3>From submission to written result</h3>
+            <ol class="rights-steps">
+              <li><strong>Submit and get acknowledgment.</strong> The supervisory chain has four weeks from receipt of your form to acknowledge it and return it to HR.</li>
+              <li><strong>Wait for HR’s assessment.</strong> HR has 12 weeks from receipt of the completed job inventory to provide written results. UCPEA and UConn may agree to extend Article 31.3 time limits.</li>
+              <li><strong>Check the effective date.</strong> Article 31.3(e) uses the date you submitted the position audit form. HR’s webpage says 60 days before HR’s official receipt of the completed packet. Ask UCPEA to confirm the date that applies.</li>
+            </ol>
           </div>
-          <div class="deadline-error" id="deadlineError" role="alert" hidden></div>
         </div>
+        <div class="rights-followup">
+          <h3>If the request stalls or is denied</h3>
+          <dl>
+            <div>
+              <dt>Supervisor or manager declines to support the request</dt>
+              <dd>UConn HR says you can submit your packet to <a href="mailto:workforce@uconn.edu">Workforce Solutions</a> for independent review.</dd>
+            </div>
+            <div>
+              <dt>HR denies the request after an audit</dt>
+              <dd>Request a meeting with the classification specialist and the Chief Human Resources Officer or designee. You have 14 calendar days after the meeting to submit additional evidence. Article 31.3 provides for a final written response within six weeks.</dd>
+            </div>
+          </dl>
+        </div>
+        <div class="rights-actions">
+          <a class="button button-primary" href="https://uconn.kualibuild.com/app/6786823085cdb0027de72cea/run">Open Kuali position audit form</a>
+          <a class="button button-secondary" href="https://hr.uconn.edu/uconns-workforce/classification-and-compensation/#:~:text=Procedure%20to%20Request%20a%20Position%20Reclassification">View UConn HR instructions</a>
+        </div>
+        <p class="rights-sources"><a href="index.html?view=current-contract#article-31">Article 31</a> · <a href="https://hr.uconn.edu/uconns-workforce/classification-and-compensation/">UConn HR classification guidance</a> · <a href="https://hr.uconn.edu/uconns-workforce/classification-and-compensation/career-progression/">UConn HR career progression</a></p>
+      </article>
 
-        <div class="deadline-result" id="deadlineResult" aria-live="polite">
-          <div class="deadline-result__topline">
-            <span id="deadlineResultLabel">Professional development</span>
-            <span>Guidance checked August 8, 2026</span>
+      <article class="rights-tool" id="holiday-time" data-view-guide aria-labelledby="holiday-time-title" tabindex="-1" hidden>
+        <h2 id="holiday-time-title">Holiday compensatory time tracker</h2>
+        <p>Track your holiday compensatory time and plan when to use it. Per the UCPEA contract (Article 8), you have 365 days to use holiday compensatory time. Under UCPEA’s payroll transition guidance, unused time earned before August 21, 2026 expires August 21, 2027.</p>
+        <div id="holiday-tracker" hidden>
+          <div class="rights-panel">
+            <form class="holiday-form" id="holiday-form" autocomplete="off" novalidate>
+              <div class="deadline-field">
+                <label for="holiday-earned">Date earned</label>
+                <input id="holiday-earned" type="date" required>
+              </div>
+              <div class="deadline-field">
+                <label for="holiday-hours">Hours Earned</label>
+                <input id="holiday-hours" type="number" min="0.01" step="0.01" inputmode="decimal" required>
+              </div>
+              <div class="deadline-actions">
+                <button class="deadline-calculate" id="holiday-submit" type="submit">Add time</button>
+                <button class="deadline-reset" id="holiday-cancel" type="button" hidden>Cancel edit</button>
+              </div>
+            </form>
+            <div class="deadline-error" id="holiday-error" role="alert" hidden></div>
+            <div class="holiday-storage">
+              <label><input id="holiday-remember" type="checkbox" autocomplete="off" aria-describedby="holiday-storage-help"> Remember on this browser</label>
+              <p id="holiday-storage-help">By default, entries clear when you reload or close the dashboard. Opt in to save dates and hours on this browser.</p>
+            </div>
           </div>
-          <h3 id="deadlineResultTitle">Enter your activity dates</h3>
-          <p id="deadlineResultSummary">The planner will show the application and reimbursement dates here.</p>
-          <div class="deadline-dates" id="deadlineDates">
-            <div><span>Application due</span><strong>—</strong></div>
-            <div><span>Reimbursement due</span><strong>—</strong></div>
+          <p class="rights-result" id="holiday-status" role="status"></p>
+          <div class="holiday-list-heading">
+            <h3>Tracked holiday time</h3>
+            <button class="rights-text-action" id="holiday-clear" type="button" hidden>Clear tracker</button>
           </div>
-          <div class="deadline-result__actions">
-            <a class="button button-primary" id="deadlineOfficialLink" href="https://ucpea.ct.aft.org/professional-development" target="_blank" rel="noopener noreferrer">Official instructions <span aria-hidden="true">↗</span></a>
-            <a class="button button-secondary" id="deadlineCalendar" href="#" download="ucpea-deadline.ics" hidden>Save calendar reminder</a>
+          <p class="holiday-empty" id="holiday-empty">Add the date you earned holiday time and how many hours you earned.</p>
+          <ul class="holiday-list" id="holiday-entries" aria-label="Holiday time entries"></ul>
+          <template id="holiday-entry">
+            <li class="holiday-entry">
+              <div class="holiday-entry__date">
+                <time class="holiday-expiration"></time>
+                <span class="holiday-expiration-status"></span>
+              </div>
+              <p class="holiday-entry__hours"><strong></strong> earned<br><span></span></p>
+              <p class="holiday-entry__note"></p>
+              <div class="holiday-entry__actions">
+                <a class="rights-text-action" download="ucpea-holiday-time.ics">Save reminder</a>
+                <button class="rights-text-action" type="button">Edit</button>
+                <button class="rights-text-action" type="button">Remove</button>
+              </div>
+            </li>
+          </template>
+        </div>
+        <noscript><p>Enable JavaScript to track hours and export calendar reminders.</p></noscript>
+        <p class="rights-sources"><a href="index.html?view=current-contract#article-8">Article 8</a> · <a href="https://ucpea.ct.aft.org/union-wire/navigating-holiday-time-updated-faq">UCPEA holiday time FAQ</a></p>
+      </article>
+    </section>
+
+    <section class="section-shell rights-section" id="benefits" data-dashboard-view aria-labelledby="benefits-title" tabindex="-1" hidden>
+      <div class="section-heading section-heading-single">
+        <h1 id="benefits-title">Benefits</h1>
+      </div>
+      <nav class="guide-index" aria-label="Benefit guides">
+        <ul>
+          <li><a href="index.html?view=benefits#benefit-professional-development"><strong>Professional Development</strong><span>Funding for conferences, training, and memberships</span></a></li>
+          <li><a href="index.html?view=benefits#benefit-childcare"><strong>Childcare Reimbursement</strong><span>Eligible expenses, receipts, and filing dates</span></a></li>
+          <li><a href="index.html?view=benefits#benefit-tuition"><strong>Tuition Benefits</strong><span>Waivers and reimbursement for coursework</span></a></li>
+          <li><a href="index.html?view=benefits#benefit-scholarships"><strong>Scholarships</strong><span>Three awards for dependent children</span></a></li>
+          <li><a href="index.html?view=benefits#benefit-hardship"><strong>Hardship Fund</strong><span>Financial assistance for UCPEA members</span></a></li>
+          <li><a href="index.html?view=benefits#benefit-sick-leave-bank"><strong>Sick Leave Bank</strong><span>Paid time during qualifying approved leave</span></a></li>
+        </ul>
+      </nav>
+
+      <div>
+        <article class="rights-tool" id="benefit-professional-development" data-view-guide aria-labelledby="benefit-pd-title" tabindex="-1" hidden>
+          <h2 id="benefit-pd-title">Professional Development</h2>
+          <p>UCPEA’s Professional Development Award helps cover eligible activities you choose. UCPEA lists a <strong>$1,000 maximum per applicant for FY 2026–27</strong>.</p>
+          <dl class="benefit-facts">
+            <div><dt>What’s covered</dt><dd>Conferences, workshops, training, and professional dues may qualify. Certificates require committee review. License renewals, admission fees, and standardized tests are excluded.</dd></div>
+            <div><dt>Training required for your job</dt><dd>Article 34.3 requires the University to pay for work-related training that management requires. Ask your department about payment before using the award.</dd></div>
+            <div><dt>When to apply</dt><dd>Submit the request at least 15 days before the activity or membership due date. Submit reimbursement or expense reallocation within 28 calendar days after the activity ends.</dd></div>
+            <div><dt>What to prepare</dt><dd>Have the activity dates and costs ready. Coordinate payment and any expense reallocation with your department’s fiscal officer.</dd></div>
+          </dl>
+          <div class="rights-actions">
+            <a class="button button-primary" href="https://uconn.kualibuild.com/app/69e7c198e54ec402868b410e/run">Apply in Kuali</a>
+            <a class="button button-secondary" href="index.html?view=benefits#deadlines">Calculate my deadlines</a>
           </div>
-          <p class="deadline-result__note" id="deadlineResultNote">Always confirm eligibility and dates on the official UCPEA page before submitting.</p>
+          <p class="rights-sources"><a href="https://ucpea.ct.aft.org/professional-development">UCPEA guidance</a> · <a href="index.html?view=current-contract#section-34-3">Article 34.3</a> · <a href="https://myapps.microsoft.com/">LinkedIn Learning via UConn MyApps</a></p>
+          <section class="deadline-section" id="deadlines" aria-labelledby="deadlines-title" tabindex="-1">
+            <h3 id="deadlines-title">Deadline Planner</h3>
+            <div class="deadline-planner">
+              <div class="deadline-form">
+                <div class="deadline-field">
+                  <div class="deadline-activity-dates" role="group" aria-label="Activity date range">
+                    <div>
+                      <label for="activityStart" id="activityStartLabel">Activity or membership date</label>
+                      <input id="activityStart" type="date">
+                    </div>
+                    <div id="activityEndField" hidden>
+                      <label for="activityEnd">End date (optional)</label>
+                      <input id="activityEnd" type="date">
+                    </div>
+                  </div>
+                  <button class="deadline-range-toggle" id="activityRangeToggle" type="button" aria-controls="activityEndField" aria-expanded="false" hidden>Add end date</button>
+                </div>
+                <div class="deadline-actions">
+                  <button class="deadline-calculate" id="calculateDeadline" type="button">Calculate deadlines</button>
+                  <button class="deadline-reset" id="resetDeadline" type="button">Reset</button>
+                </div>
+                <div class="deadline-error" id="deadlineError" role="alert" hidden></div>
+              </div>
+              <div class="deadline-result" id="deadlineResult" aria-live="polite">
+                <h4 id="deadlineResultTitle">Enter your activity dates</h4>
+                <p id="deadlineResultSummary">The planner will show the application and reimbursement dates here.</p>
+                <div class="deadline-dates" id="deadlineDates">
+                  <div><span>Application due</span><strong>—</strong></div>
+                  <div><span>Reimbursement due</span><strong>—</strong></div>
+                </div>
+                <div class="deadline-result__actions">
+                  <a class="button button-secondary" id="deadlineCalendar" href="#" download="ucpea-professional-development-deadlines.ics" hidden>Save calendar reminder</a>
+                </div>
+              </div>
+            </div>
+          </section>
+        </article>
+
+        <article class="rights-tool" id="benefit-childcare" data-view-guide aria-labelledby="benefit-childcare-title" tabindex="-1" hidden>
+          <h2 id="benefit-childcare-title">Childcare Reimbursement</h2>
+          <p>Employees in UCPEA-represented positions can request partial reimbursement for eligible childcare expenses. The child must be a dependent under 13, with an exception for a documented disability.</p>
+          <dl class="benefit-facts">
+            <div><dt>What’s covered</dt><dd>UCPEA considers eligible expenses from state-licensed daycare providers and eligible summer day camps. The program considers up to $5,000 in expenses per filing period. If both parents apply, each must claim different expenses.</dd></div>
+            <div><dt>What to submit</dt><dd>Use UCPEA’s application and receipt form and gather itemized receipts for the expenses you’re claiming.</dd></div>
+            <div><dt>When to file</dt><dd>January–April expenses are due May 15, May–August expenses are due September 15, and September–December expenses are due January 15 of the following year. UCPEA moves weekend and holiday deadlines to the next business day.</dd></div>
+            <div><dt>Contract funding</dt><dd>The annual reimbursement pool is $175,000 starting July 2026, $225,000 starting July 2027, and $250,000 starting July 2028.</dd></div>
+          </dl>
+          <div class="rights-actions">
+            <a class="button button-primary" href="https://ucpea3695.my.canva.site/childcarereimbursement">Get application and forms</a>
+          </div>
+          <p class="rights-sources"><a href="https://ucpea3695.my.canva.site/childcarereimbursement">UCPEA childcare guidance</a> · <a href="index.html?view=current-contract#article-36">Article 36</a></p>
+        </article>
+
+        <article class="rights-tool" id="benefit-tuition" data-view-guide aria-labelledby="benefit-tuition-title" tabindex="-1" hidden>
+          <h2 id="benefit-tuition-title">Tuition Benefits</h2>
+          <p>A waiver reduces eligible tuition charges. Reimbursement pays back eligible expenses after successful completion. UConn HR generally requires at least 50% employment for the options below.</p>
+          <dl class="benefit-facts">
+            <div><dt>Employee tuition waiver</dt><dd>Use for eligible UConn fall or spring courses, space permitting. Graduate coursework must be part of a degree program or work-related. Apply each semester by the tenth day of classes, subject to HR’s late-registration rules. <a href="https://uconn.kualibuild.com/app/6812658d8a5a19027d2238ef/run">Employee waiver form</a></dd></div>
+            <div><dt>Dependent child tuition waiver</dt><dd>Use for a child enrolled in a UConn undergraduate degree program who qualifies as your tax dependent and is under 24 throughout the calendar year. Apply each semester for each child. HR lists June 1 for fall and November 15 for spring. Have proof of age and dependency ready for the first request. <a href="https://eaforms.uconn.edu/dtwaewebweb/beginDtwProcess">Dependent child waiver form</a></dd></div>
+            <div><dt>Employee tuition reimbursement</dt><dd>Use for eligible career-related coursework at an accredited institution when a waiver does not apply. Apply at the beginning of the term. Submit your paid fee bill and grade report by September 15 for summer, January 15 for fall, or June 1 for spring. <a href="https://uconn.kualibuild.com/app/661058ace5ddd1013b6bd8e9/run">Employee reimbursement form</a></dd></div>
+            <div><dt>Reciprocal tuition</dt><dd>Eligible dependent children enrolled at the University of Rhode Island or University of Maine at Orono may qualify for in-state tuition through UConn HR.</dd></div>
+          </dl>
+          <div class="rights-actions">
+            <a class="button button-primary" href="https://hr.uconn.edu/benefits-leaves/benefits/tuition-benefits/">Review UConn HR instructions</a>
+          </div>
+          <p class="rights-sources"><a href="index.html?view=current-contract#article-34">Article 34</a> · <a href="index.html?view=current-contract#article-35">Article 35</a></p>
+        </article>
+
+        <article class="rights-tool" id="benefit-scholarships" data-view-guide aria-labelledby="benefit-scholarships-title" tabindex="-1" hidden>
+          <h2 id="benefit-scholarships-title">Scholarships</h2>
+          <p>UCPEA offers three $1,300 scholarships to dependent children of UCPEA members. These were the eligibility criteria for the latest round listed by UCPEA.</p>
+          <dl class="benefit-facts">
+            <div><dt>Sandy Schulte Memorial Scholarship</dt><dd>For high school seniors age 17 or older entering a four-year institution as full-time students. UCPEA considers academic achievement and school and community involvement.</dd></div>
+            <div><dt>Austin Leadership Scholarship</dt><dd>For full-time students enrolled in a UConn degree program. UCPEA considers academic achievement and leadership.</dd></div>
+            <div><dt>Roslyn Swift Scholarship</dt><dd>For high school seniors age 17 or older pursuing a credential, certificate, or two-year degree through a vocational or technical school, community college, or certification program.</dd></div>
+          </dl>
+          <p class="benefit-note">The latest published deadline was April 21, 2026, for the 2026–27 academic year. Check UCPEA’s page for the next round’s dates, required materials, and application links.</p>
+          <div class="rights-actions">
+            <a class="button button-primary" href="https://ucpea.ct.aft.org/scholarships/ucpea-scholarships">Check UCPEA scholarship applications</a>
+          </div>
+        </article>
+
+        <article class="rights-tool" id="benefit-hardship" data-view-guide aria-labelledby="benefit-hardship-title" tabindex="-1" hidden>
+          <h2 id="benefit-hardship-title">Hardship Fund</h2>
+          <p>UCPEA’s FY 2026–27 program offers grants of up to <strong>$500</strong> to eligible union members facing financial hardship. Salary does not determine the grant amount.</p>
+          <dl class="benefit-facts">
+            <div><dt>Who can apply</dt><dd>UCPEA members who did not receive a grant in the preceding fiscal year. Members who received a grant in FY 2025–26 can next qualify in FY 2027–28, subject to the rules then in effect.</dd></div>
+            <div><dt>FY 2026–27 application periods</dt><dd>UCPEA lists July–October, November–February, and March–June. For FY 2026–27, the November–February period includes the funds from the missed July–October period. UCPEA reviews applications as they come in.</dd></div>
+            <div><dt>If funds run out</dt><dd>Check availability on UCPEA’s site. If UCPEA cannot fund your request, you can apply again during the next application period. Applications do not carry over automatically.</dd></div>
+          </dl>
+          <div class="rights-actions">
+            <a class="button button-primary" href="https://ucpea.ct.aft.org/hardship-fund">Check fund availability and apply</a>
+          </div>
+        </article>
+
+        <article class="rights-tool" id="benefit-sick-leave-bank" data-view-guide aria-labelledby="benefit-sick-leave-title" tabindex="-1" hidden>
+          <h2 id="benefit-sick-leave-title">Sick Leave Bank</h2>
+          <p>Article 11.3 allows eligible employees to request donated paid time while on approved federal or state FMLA or SEBAC supplemental leave.</p>
+          <dl class="benefit-facts">
+            <div><dt>Qualifying reasons</dt><dd>The bank may cover the employee’s own serious health condition or care for a spouse or dependent child with a qualifying serious health condition.</dd></div>
+            <div><dt>Leave balances</dt><dd>Other applicable paid leave must generally be used first, including sick, personal, holiday, and compensatory time. Employees may keep up to two weeks of vacation. Caretaker requests also require using the applicable 10 sick days under Article 11.1(a).</dd></div>
+            <div><dt>How much time is available</dt><dd>Article 11.3 caps bank time at 75 days in a rolling two-year period, subject to the applicable leave entitlement.</dd></div>
+          </dl>
+          <div class="rights-actions">
+            <a class="button button-primary" href="https://ucpea.ct.aft.org/sick-bank">Open UCPEA’s forms page</a>
+            <a class="button button-secondary" href="mailto:ucpeaoffice@ucpea.org">Contact UCPEA</a>
+          </div>
+          <p class="rights-sources"><a href="index.html?view=current-contract#section-11-3">Article 11.3</a> · <a href="https://ucpea.ct.aft.org/union-wire/contract-corner-article-11-sick-leave">UCPEA explanation of the changes</a></p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section-shell rights-section" id="document-library" data-dashboard-view aria-labelledby="document-library-title" tabindex="-1" hidden>
+      <div class="section-heading section-heading-single">
+        <h1 id="document-library-title">Document Library</h1>
+      </div>
+      <div class="library-filters" id="library-filters" hidden>
+        <div class="deadline-field">
+          <label for="library-search">Search documents</label>
+          <input id="library-search" type="search" placeholder="Try SEBAC, bylaws, or 2025" autocomplete="off">
+        </div>
+        <div class="deadline-field">
+          <label for="library-category">Category</label>
+          <select id="library-category">
+            <option value="">All categories</option>
+              <option value="agreements">Contracts and agreements</option>
+              <option value="governance">Governance and steward resources</option>
+              <option value="reports">Annual reports</option>
+              <option value="audits">Financial audits</option>
+              <option value="newsletters">Union Wire archive</option>
+          </select>
         </div>
       </div>
+      <div class="library-summary">
+        <p class="library-count" id="library-count" role="status"></p>
+        <button class="rights-text-action" id="library-clear" type="button" hidden>Clear filters</button>
+      </div>
+      <p class="library-empty" id="library-empty" hidden>No documents match your filters.</p>
+      <svg class="library-symbols" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <symbol id="library-icon-pdf" viewBox="0 0 24 24">
+          <path d="M6 3h8l4 4v14H6zM14 3v5h4M9 12h6m-6 4h6"/>
+        </symbol>
+        <symbol id="library-icon-tool" viewBox="0 0 24 24">
+          <rect x="3" y="4" width="18" height="16" rx="2"/>
+          <path d="M3 9h18M9 9v11"/>
+        </symbol>
+        <symbol id="library-icon-drive" viewBox="0 0 24 24">
+          <path d="M9 4h6l7 12-3 5H5l-3-5zm0 0 10 17M2 16h20M5 21 15 4"/>
+        </symbol>
+        <symbol id="library-icon-folder" viewBox="0 0 24 24">
+          <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+        </symbol>
+        <symbol id="library-icon-website" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="9"/>
+          <ellipse cx="12" cy="12" rx="4" ry="9"/>
+          <path d="M3 12h18"/>
+        </symbol>
+      </svg>
+      <table class="library-table" aria-labelledby="document-library-title">
+        <thead>
+          <tr><th scope="col">Title</th><th scope="col">Category</th><th scope="col">Type</th></tr>
+        </thead>
+        <tbody>
+          <tr data-library-category="agreements" data-search-terms="cba current contract">
+            <td><a href="https://ucpea.ct.aft.org/sites/default/files/media/documents/2026/UCPEA-CBA-7.1.25-to-6.30.29.pdf">2025–2029 UCPEA Collective Bargaining Agreement</a></td>
+            <td>Contracts and agreements</td>
+            <td><span class="library-type" role="img" aria-label="Official PDF" title="Official PDF"><svg aria-hidden="true"><use href="#library-icon-pdf"/></svg></span></td>
+          </tr>
+          <tr data-library-category="agreements" data-search-terms="cba current contract">
+            <td><a href="index.html?view=current-contract">2025–2029 Contract Reader</a></td>
+            <td>Contracts and agreements</td>
+            <td><span class="library-type" role="img" aria-label="Dashboard tool" title="Dashboard tool"><svg aria-hidden="true"><use href="#library-icon-tool"/></svg></span></td>
+          </tr>
+          <tr data-library-category="agreements">
+            <td><a href="https://ucpea.ct.aft.org/sites/default/files/media/documents/2025/UCPEA%20extension%20agreement.pdf">2025 UCPEA Contract Extension Agreement</a></td>
+            <td>Contracts and agreements</td>
+            <td><span class="library-type" role="img" aria-label="Official PDF" title="Official PDF"><svg aria-hidden="true"><use href="#library-icon-pdf"/></svg></span></td>
+          </tr>
+          <tr data-library-category="agreements" data-search-terms="cba previous contract">
+            <td><a href="https://drive.google.com/file/d/1_gAlHibh5a1VTNcOk_6k89SNcobp533x/view">2021–2025 UCPEA Collective Bargaining Agreement</a></td>
+            <td>Contracts and agreements</td>
+            <td><span class="library-type" role="img" aria-label="Google Drive" title="Google Drive"><svg aria-hidden="true"><use href="#library-icon-drive"/></svg></span></td>
+          </tr>
+          <tr data-library-category="agreements" data-search-terms="historical agreements archive">
+            <td><a href="index.html?view=contract-history">Contract History</a></td>
+            <td>Contracts and agreements</td>
+            <td><span class="library-type" role="img" aria-label="Dashboard tool" title="Dashboard tool"><svg aria-hidden="true"><use href="#library-icon-tool"/></svg></span></td>
+          </tr>
+          <tr data-library-category="agreements" data-search-terms="compare changes">
+            <td><a href="index.html?view=compare-contracts">Contract Comparison</a></td>
+            <td>Contracts and agreements</td>
+            <td><span class="library-type" role="img" aria-label="Dashboard tool" title="Dashboard tool"><svg aria-hidden="true"><use href="#library-icon-tool"/></svg></span></td>
+          </tr>
+          <tr data-library-category="agreements" data-search-terms="2017 2016 pension retirement health care State Employees Bargaining Agent Coalition">
+            <td><a href="https://ucpea.ct.aft.org/sites/default/files/article_pdf_files/2018-01/sebac_2017.pdf">SEBAC Agreement through June 2027</a></td>
+            <td>Contracts and agreements</td>
+            <td><span class="library-type" role="img" aria-label="Official PDF" title="Official PDF"><svg aria-hidden="true"><use href="#library-icon-pdf"/></svg></span></td>
+          </tr>
+          <tr data-library-category="agreements">
+            <td><a href="https://ucpea.ct.aft.org/sites/default/files/article_pdf_files/2022-03/sebac_booklet_03-10-2022.pdf">2022 SEBAC Agreement Booklet</a></td>
+            <td>Contracts and agreements</td>
+            <td><span class="library-type" role="img" aria-label="Official PDF" title="Official PDF"><svg aria-hidden="true"><use href="#library-icon-pdf"/></svg></span></td>
+          </tr>
+          <tr data-library-category="agreements">
+            <td><a href="https://ucpea.ct.aft.org/key-documents">UCPEA Key Documents</a></td>
+            <td>Contracts and agreements</td>
+            <td><span class="library-type" role="img" aria-label="UCPEA website" title="UCPEA website"><svg aria-hidden="true"><use href="#library-icon-website"/></svg></span></td>
+          </tr>
+          <tr data-library-category="governance" data-search-terms="constitution by-laws effective July 1">
+            <td><a href="https://ucpea.ct.aft.org/sites/default/files/media/documents/2026/CBL%20Effective%2007-01-2026.pdf">2026 UCPEA Constitution and Bylaws</a></td>
+            <td>Governance and steward resources</td>
+            <td><span class="library-type" role="img" aria-label="Official PDF" title="Official PDF"><svg aria-hidden="true"><use href="#library-icon-pdf"/></svg></span></td>
+          </tr>
+          <tr data-library-category="governance" data-search-terms="stewards duties">
+            <td><a href="https://drive.google.com/file/d/1H_FVyxIs4b1aOMhYPqxVqNEnfc9hCVuj/view">Union Steward Responsibilities</a></td>
+            <td>Governance and steward resources</td>
+            <td><span class="library-type" role="img" aria-label="Google Drive" title="Google Drive"><svg aria-hidden="true"><use href="#library-icon-drive"/></svg></span></td>
+          </tr>
+          <tr data-library-category="governance" data-search-terms="stewards">
+            <td><a href="https://drive.google.com/drive/folders/1ZE_KqhYUNTQ7zDZCuCeLpApT4RUBWQly?usp=drive_link">Union Steward Meeting Agendas</a></td>
+            <td>Governance and steward resources</td>
+            <td><span class="library-type" role="img" aria-label="Google Drive folder" title="Google Drive folder"><svg aria-hidden="true"><use href="#library-icon-folder"/></svg></span></td>
+          </tr>
+          <tr data-library-category="reports">
+            <td><a href="https://ucpea.ct.aft.org/sites/default/files/media/documents/2026/2026%20UCPEA%20Annual%20Report%20(1).pdf">2025–2026 UCPEA Annual Report</a></td>
+            <td>Annual reports</td>
+            <td><span class="library-type" role="img" aria-label="Official PDF" title="Official PDF"><svg aria-hidden="true"><use href="#library-icon-pdf"/></svg></span></td>
+          </tr>
+          <tr data-library-category="reports">
+            <td><a href="https://drive.google.com/file/d/1xida0ntQUwtGD7efKMYBDnRFbLWofKkU/view?usp=drive_link">2024–2025 UCPEA Annual Report</a></td>
+            <td>Annual reports</td>
+            <td><span class="library-type" role="img" aria-label="Google Drive" title="Google Drive"><svg aria-hidden="true"><use href="#library-icon-drive"/></svg></span></td>
+          </tr>
+          <tr data-library-category="reports">
+            <td><a href="https://drive.google.com/file/d/1UwXqFdpov16vJdundLpFMuu8KuGAIvdu/view?usp=drive_link">2023–2024 UCPEA Annual Report</a></td>
+            <td>Annual reports</td>
+            <td><span class="library-type" role="img" aria-label="Google Drive" title="Google Drive"><svg aria-hidden="true"><use href="#library-icon-drive"/></svg></span></td>
+          </tr>
+          <tr data-library-category="reports">
+            <td><a href="https://drive.google.com/file/d/1oQmzlYVgy3Z04lJU1NX7hWVsMD8E-uo2/view?usp=drive_link">2022–2023 UCPEA Annual Report</a></td>
+            <td>Annual reports</td>
+            <td><span class="library-type" role="img" aria-label="Google Drive" title="Google Drive"><svg aria-hidden="true"><use href="#library-icon-drive"/></svg></span></td>
+          </tr>
+          <tr data-library-category="reports">
+            <td><a href="https://drive.google.com/file/d/1oV3oLDfFJxKECcLp1iSnVhCVe4Sur6ES/view?usp=sharing">2021–2022 UCPEA Annual Report</a></td>
+            <td>Annual reports</td>
+            <td><span class="library-type" role="img" aria-label="Google Drive" title="Google Drive"><svg aria-hidden="true"><use href="#library-icon-drive"/></svg></span></td>
+          </tr>
+          <tr data-library-category="reports">
+            <td><a href="https://drive.google.com/file/d/1Y26jLxlkKBkzD6cTFlzvHSzVwF4dUHAE/view?usp=sharing">2020–2021 UCPEA Annual Report</a></td>
+            <td>Annual reports</td>
+            <td><span class="library-type" role="img" aria-label="Google Drive" title="Google Drive"><svg aria-hidden="true"><use href="#library-icon-drive"/></svg></span></td>
+          </tr>
+          <tr data-library-category="reports">
+            <td><a href="https://drive.google.com/file/d/1ZpF0E1cUUmxNA4wtqZBOYhPITlaZ61QQ/view?usp=sharing">2019–2020 UCPEA Annual Report</a></td>
+            <td>Annual reports</td>
+            <td><span class="library-type" role="img" aria-label="Google Drive" title="Google Drive"><svg aria-hidden="true"><use href="#library-icon-drive"/></svg></span></td>
+          </tr>
+          <tr data-library-category="reports">
+            <td><a href="https://drive.google.com/file/d/132AwoaT3d-vyOMJOEE3kGuN8nUOrXxHw/view?usp=sharing">2018–2019 UCPEA Annual Report</a></td>
+            <td>Annual reports</td>
+            <td><span class="library-type" role="img" aria-label="Google Drive" title="Google Drive"><svg aria-hidden="true"><use href="#library-icon-drive"/></svg></span></td>
+          </tr>
+          <tr data-library-category="reports">
+            <td><a href="https://drive.google.com/file/d/1mL_xA9AKwCuK2xqv69aLSNXtRDM1_IWv/view?usp=sharing">2017–2018 UCPEA Annual Report</a></td>
+            <td>Annual reports</td>
+            <td><span class="library-type" role="img" aria-label="Google Drive" title="Google Drive"><svg aria-hidden="true"><use href="#library-icon-drive"/></svg></span></td>
+          </tr>
+          <tr data-library-category="reports">
+            <td><a href="https://ucpea.ct.aft.org/annual-reports">UCPEA Annual Reports Index</a></td>
+            <td>Annual reports</td>
+            <td><span class="library-type" role="img" aria-label="UCPEA website" title="UCPEA website"><svg aria-hidden="true"><use href="#library-icon-website"/></svg></span></td>
+          </tr>
+          <tr data-library-category="audits" data-search-terms="audited financial statements">
+            <td><a href="https://ucpea.ct.aft.org/sites/default/files/media/documents/2025/UCPEA%20Audited%20Financial%20Statement%20June%2030,%202024%20and%202023.pdf">FY 2024 UCPEA Financial Audit</a></td>
+            <td>Financial audits</td>
+            <td><span class="library-type" role="img" aria-label="Official PDF" title="Official PDF"><svg aria-hidden="true"><use href="#library-icon-pdf"/></svg></span></td>
+          </tr>
+          <tr data-library-category="audits" data-search-terms="audited financial statements">
+            <td><a href="https://ucpea.ct.aft.org/sites/default/files/media/documents/2024/Audited%20Financial%20Statements%20FY%20Ending%20June%202023.pdf">FY 2023 UCPEA Financial Audit</a></td>
+            <td>Financial audits</td>
+            <td><span class="library-type" role="img" aria-label="Official PDF" title="Official PDF"><svg aria-hidden="true"><use href="#library-icon-pdf"/></svg></span></td>
+          </tr>
+          <tr data-library-category="audits" data-search-terms="audited financial statements">
+            <td><a href="https://ucpea.ct.aft.org/sites/default/files/article_pdf_files/2023-03/2022_annual_audit.pdf">FY 2022 UCPEA Financial Audit</a></td>
+            <td>Financial audits</td>
+            <td><span class="library-type" role="img" aria-label="Official PDF" title="Official PDF"><svg aria-hidden="true"><use href="#library-icon-pdf"/></svg></span></td>
+          </tr>
+          <tr data-library-category="audits" data-search-terms="audited financial statements">
+            <td><a href="https://ucpea.ct.aft.org/sites/default/files/article_pdf_files/2022-03/ucpea_audited_financial_statements_06.30.21.pdf">FY 2021 UCPEA Financial Audit</a></td>
+            <td>Financial audits</td>
+            <td><span class="library-type" role="img" aria-label="Official PDF" title="Official PDF"><svg aria-hidden="true"><use href="#library-icon-pdf"/></svg></span></td>
+          </tr>
+          <tr data-library-category="audits" data-search-terms="audited financial statements">
+            <td><a href="https://ucpea.ct.aft.org/sites/default/files/article_pdf_files/2021-02/ucpea__final_audit_report_2019-2020.pdf">FY 2020 UCPEA Financial Audit</a></td>
+            <td>Financial audits</td>
+            <td><span class="library-type" role="img" aria-label="Official PDF" title="Official PDF"><svg aria-hidden="true"><use href="#library-icon-pdf"/></svg></span></td>
+          </tr>
+          <tr data-library-category="audits" data-search-terms="audited financial statements">
+            <td><a href="https://ucpea.ct.aft.org/sites/default/files/article_pdf_files/2020-05/ucpea_audited_financial_statements_06.30.19.pdf">FY 2019 UCPEA Financial Audit</a></td>
+            <td>Financial audits</td>
+            <td><span class="library-type" role="img" aria-label="Official PDF" title="Official PDF"><svg aria-hidden="true"><use href="#library-icon-pdf"/></svg></span></td>
+          </tr>
+          <tr data-library-category="audits" data-search-terms="audited financial statements">
+            <td><a href="https://ucpea.ct.aft.org/sites/default/files/article_pdf_files/2019-02/ucpea_audit_report_6.30.18.pdf">FY 2018 UCPEA Financial Audit</a></td>
+            <td>Financial audits</td>
+            <td><span class="library-type" role="img" aria-label="Official PDF" title="Official PDF"><svg aria-hidden="true"><use href="#library-icon-pdf"/></svg></span></td>
+          </tr>
+          <tr data-library-category="audits" data-search-terms="audited financial statements">
+            <td><a href="https://ucpea.ct.aft.org/sites/default/files/article_pdf_files/2018-04/ucpea_audited_financial_statements_2017.pdf">FY 2017 UCPEA Financial Audit</a></td>
+            <td>Financial audits</td>
+            <td><span class="library-type" role="img" aria-label="Official PDF" title="Official PDF"><svg aria-hidden="true"><use href="#library-icon-pdf"/></svg></span></td>
+          </tr>
+          <tr data-library-category="newsletters" data-search-terms="newsletter current issues">
+            <td><a href="https://ucpea.ct.aft.org/union-wire">Union Wire</a></td>
+            <td>Union Wire archive</td>
+            <td><span class="library-type" role="img" aria-label="UCPEA website" title="UCPEA website"><svg aria-hidden="true"><use href="#library-icon-website"/></svg></span></td>
+          </tr>
+          <tr data-library-category="newsletters" data-search-terms="newsletter archive issues">
+            <td><a href="https://drive.google.com/drive/u/1/folders/1ucY05UYDtkUcFSd3DdA19U6GTbH6InqB">2025 Union Wire Editions</a></td>
+            <td>Union Wire archive</td>
+            <td><span class="library-type" role="img" aria-label="Google Drive folder" title="Google Drive folder"><svg aria-hidden="true"><use href="#library-icon-folder"/></svg></span></td>
+          </tr>
+          <tr data-library-category="newsletters" data-search-terms="newsletter archive issues">
+            <td><a href="https://drive.google.com/drive/folders/1mTSTRu2HOpQ6hinip7MlvgMzo45g-Bu0?usp=drive_link">2024 Union Wire Editions</a></td>
+            <td>Union Wire archive</td>
+            <td><span class="library-type" role="img" aria-label="Google Drive folder" title="Google Drive folder"><svg aria-hidden="true"><use href="#library-icon-folder"/></svg></span></td>
+          </tr>
+          <tr data-library-category="newsletters" data-search-terms="newsletter archive issues">
+            <td><a href="https://drive.google.com/drive/folders/1PmGak77z6hkyJj8C39fMTDf5o7-bce-A?usp=share_link">2023 Union Wire Editions</a></td>
+            <td>Union Wire archive</td>
+            <td><span class="library-type" role="img" aria-label="Google Drive folder" title="Google Drive folder"><svg aria-hidden="true"><use href="#library-icon-folder"/></svg></span></td>
+          </tr>
+          <tr data-library-category="newsletters" data-search-terms="newsletter archive issues">
+            <td><a href="https://drive.google.com/drive/folders/1nL4RjmsHkcXOxcVXOzJFH6nVuOh8O_9w?usp=sharing">2022 Union Wire Editions</a></td>
+            <td>Union Wire archive</td>
+            <td><span class="library-type" role="img" aria-label="Google Drive folder" title="Google Drive folder"><svg aria-hidden="true"><use href="#library-icon-folder"/></svg></span></td>
+          </tr>
+          <tr data-library-category="newsletters" data-search-terms="newsletter archive issues">
+            <td><a href="https://drive.google.com/drive/folders/1pjycbPPOQcioCFPBX9tDSOCkH-KvmH8J?usp=sharing">2021 Union Wire Editions</a></td>
+            <td>Union Wire archive</td>
+            <td><span class="library-type" role="img" aria-label="Google Drive folder" title="Google Drive folder"><svg aria-hidden="true"><use href="#library-icon-folder"/></svg></span></td>
+          </tr>
+          <tr data-library-category="newsletters" data-search-terms="newsletter archive issues">
+            <td><a href="https://drive.google.com/drive/folders/1h3G_kmypPC49_Z3t6FbcQmxBUa9SfcT-?usp=sharing">2020 Union Wire Editions</a></td>
+            <td>Union Wire archive</td>
+            <td><span class="library-type" role="img" aria-label="Google Drive folder" title="Google Drive folder"><svg aria-hidden="true"><use href="#library-icon-folder"/></svg></span></td>
+          </tr>
+          <tr data-library-category="newsletters" data-search-terms="newsletter archive issues">
+            <td><a href="https://drive.google.com/drive/folders/17Jh_PoiRQbZlxUOLEEtXgH0zPJvALa_t?usp=sharing">2019 Union Wire Editions</a></td>
+            <td>Union Wire archive</td>
+            <td><span class="library-type" role="img" aria-label="Google Drive folder" title="Google Drive folder"><svg aria-hidden="true"><use href="#library-icon-folder"/></svg></span></td>
+          </tr>
+        </tbody>
+      </table>
     </section>
 
     <section class="calendar-section section-shell" id="calendar" aria-labelledby="calendar-title" tabindex="-1">
@@ -551,99 +1052,73 @@
       </details>
     </section>
 
-    <section class="updates-section section-shell" id="updates" aria-labelledby="updates-title" tabindex="-1">
-      <div class="section-heading section-heading-inline">
-        <h2 id="updates-title">Union Wire</h2>
-        <div class="feed-meta">
-          <a class="text-link" href="https://ucpea.ct.aft.org/union-wire" target="_blank" rel="noopener noreferrer">View all updates ↗</a>
+    <section class="section-shell rights-section" id="union-wire" data-dashboard-view aria-labelledby="union-wire-title" tabindex="-1" hidden>
+      <div class="section-heading section-heading-single">
+        <h1 id="union-wire-title">Union Wire</h1>
+      </div>
+      <nav class="guide-index wire-index" aria-label="Union Wire sections">
+        <ul>
+          <li><a href="index.html?view=union-wire#latest-news"><strong>Latest News</strong><span>Recent announcements from UCPEA</span></a></li>
+          <li><a href="index.html?view=union-wire#member-guides"><strong>Member Guides</strong><span>Reference articles about your contract and benefits</span></a></li>
+        </ul>
+      </nav>
+
+      <section class="wire-section" id="latest-news" data-view-guide data-default-guide aria-labelledby="wire-news-title" tabindex="-1" hidden>
+        <h2 id="wire-news-title">Latest News</h2>
+        <p class="wire-status" id="wire-status" hidden></p>
+        <ol class="wire-news-list" id="wire-news-list" aria-label="Recent Union Wire articles"></ol>
+        <p class="wire-empty" id="wire-empty">Browse the official Union Wire for current updates.</p>
+        <div class="wire-actions">
+          <button class="rights-text-action" id="wire-more" type="button" hidden>Show older articles</button>
+          <a class="rights-text-action" href="https://ucpea.ct.aft.org/union-wire">Open official Union Wire</a>
+          <a class="rights-text-action" href="index.html?view=document-library">PDF archive in the Document Library</a>
         </div>
-      </div>
+      </section>
 
-      <div class="updates-grid" id="updates-grid">
-        <article class="update-card update-card-featured">
-          <div class="update-card-top">
-            <span class="update-type">Benefits</span>
-            <span class="update-state">Open now</span>
-          </div>
-          <div class="update-visual update-visual-feed-0" aria-hidden="true">
-            <span>$</span>
-            <strong>1K</strong>
-          </div>
-          <h3><a href="https://ucpea.ct.aft.org/union-wire/fy2027-professional-development-award-application" target="_blank" rel="noopener noreferrer">FY2027 Professional Development Award</a></h3>
-          <p>The application is open, with a maximum allocation of $1,000 per applicant. Submit at least 15 days before the activity or membership due date.</p>
-          <a class="card-link" href="https://ucpea.ct.aft.org/professional-development" target="_blank" rel="noopener noreferrer">Review details and apply <span aria-hidden="true">→</span></a>
-        </article>
-
-        <article class="update-card">
-          <div class="update-card-top">
-            <span class="update-type">Contract corner</span>
-            <span>Article 11</span>
-          </div>
-          <div class="update-visual update-visual-feed-1" aria-hidden="true">
-            <span>11</span>
-            <strong>SL</strong>
-          </div>
-          <h3><a href="https://ucpea.ct.aft.org/union-wire/contract-corner-article-11-sick-leave" target="_blank" rel="noopener noreferrer">Understanding the sick leave changes</a></h3>
-          <p>Read how the current agreement changes the definition of family for sick leave.</p>
-          <a class="card-link" href="index.html?view=current-contract#article-11">Open Article 11 <span aria-hidden="true">→</span></a>
-        </article>
-
-        <article class="update-card">
-          <div class="update-card-top">
-            <span class="update-type">Community</span>
-            <span>Monthly</span>
-          </div>
-          <div class="update-visual update-visual-feed-2" aria-hidden="true">
-            <span>03</span>
-            <strong>WED</strong>
-          </div>
-          <h3><a href="https://ucpea.ct.aft.org/union-wire/join-ucpea-book-club" target="_blank" rel="noopener noreferrer">Join the UCPEA Book Club</a></h3>
-          <p>The book club meets virtually on the third Wednesday of each month.</p>
-          <a class="card-link" href="https://ucpea.ct.aft.org/union-wire/join-ucpea-book-club" target="_blank" rel="noopener noreferrer">Read the announcement <span aria-hidden="true">→</span></a>
-        </article>
-
-        <article class="update-card">
-          <div class="update-card-top">
-            <span class="update-type">Community</span>
-            <span>Seasonal</span>
-          </div>
-          <div class="update-visual update-visual-feed-3" aria-hidden="true">
-            <span>SWAP</span>
-            <strong>+</strong>
-          </div>
-          <h3><a href="https://ucpea.ct.aft.org/union-wire/ucpea-produce-and-craft-swap" target="_blank" rel="noopener noreferrer">Produce &amp; Craft Swap</a></h3>
-          <p>Share extra garden produce, trade craft materials, and connect with members through a low-waste community exchange.</p>
-          <a class="card-link" href="https://ucpea.ct.aft.org/union-wire/ucpea-produce-and-craft-swap" target="_blank" rel="noopener noreferrer">Get the swap details <span aria-hidden="true">→</span></a>
-        </article>
-
-        <article class="update-card">
-          <div class="update-card-top">
-            <span class="update-type">Contract corner</span>
-            <span>Article 32</span>
-          </div>
-          <div class="update-visual update-visual-feed-4" aria-hidden="true">
-            <span>32</span>
-            <strong>PAY</strong>
-          </div>
-          <h3><a href="https://ucpea.ct.aft.org/union-wire/contract-corner-understanding-article-32" target="_blank" rel="noopener noreferrer">How the salary increases work</a></h3>
-          <p>See the scheduled increases, who qualifies, and when retroactive pay appears in paychecks.</p>
-          <a class="card-link" href="#salary-calculator">Try the salary calculator <span aria-hidden="true">→</span></a>
-        </article>
-
-        <article class="update-card">
-          <div class="update-card-top">
-            <span class="update-type">Recognition</span>
-            <span>2026</span>
-          </div>
-          <div class="update-visual update-visual-feed-5" aria-hidden="true">
-            <span>UCPEA</span>
-            <strong>★</strong>
-          </div>
-          <h3><a href="https://ucpea.ct.aft.org/union-wire/word-our-2026-ucpea-award-winning-members" target="_blank" rel="noopener noreferrer">Meet the 2026 award recipients</a></h3>
-          <p>Hear from this year’s Unionists of the Year, Advocacy Awardee, and Campus Connection Awardee.</p>
-          <a class="card-link" href="https://ucpea.ct.aft.org/union-wire/word-our-2026-ucpea-award-winning-members" target="_blank" rel="noopener noreferrer">Meet the honorees <span aria-hidden="true">→</span></a>
-        </article>
-      </div>
+      <section class="wire-section" id="member-guides" data-view-guide aria-labelledby="wire-guides-title" tabindex="-1" hidden>
+        <h2 id="wire-guides-title">Member Guides</h2>
+        <ul class="wire-guide-list">
+          <li>
+            <h3><a href="https://ucpea.ct.aft.org/union-wire/launch-new-telecommuting-appeal-process">Telecommuting appeals</a></h3>
+            <p>Read UCPEA’s guidance on requesting review of a telecommuting decision.</p>
+            <a class="text-link" href="index.html?view=my-rights#telecommuting-appeals">Check the appeal steps</a>
+          </li>
+          <li>
+            <h3><a href="https://ucpea.ct.aft.org/union-wire/navigating-holiday-time-updated-faq">Holiday compensatory time</a></h3>
+            <p>See how holiday time is earned and when it expires.</p>
+            <a class="text-link" href="index.html?view=my-rights#holiday-time">Open the Holiday Time Tracker</a>
+          </li>
+          <li>
+            <h3><a href="https://ucpea.ct.aft.org/union-wire/contract-corner-accessible-parking-win">Accessible parking</a></h3>
+            <p>Review the parking provision for employees with an Area 2 permit and a state-issued accessible parking permit.</p>
+            <a class="text-link" href="index.html?view=current-contract#section-30-6">Read Article 30.6</a>
+          </li>
+          <li>
+            <h3><a href="https://ucpea.ct.aft.org/union-wire/contract-corner-article-11-sick-leave">Sick leave changes</a></h3>
+            <p>Read what changed in Article 11, including the Sick Leave Bank.</p>
+            <a class="text-link" href="index.html?view=benefits#benefit-sick-leave-bank">Open the Sick Leave Bank guide</a>
+          </li>
+          <li>
+            <h3><a href="https://ucpea.ct.aft.org/union-wire/fy2027-professional-development-award-application">Professional Development Award</a></h3>
+            <p>Find UCPEA’s FY 2026–27 application announcement and the dashboard’s deadline planner.</p>
+            <a class="text-link" href="index.html?view=benefits#benefit-professional-development">Open the Professional Development guide</a>
+          </li>
+          <li>
+            <h3><a href="https://ucpea.ct.aft.org/union-wire/contract-corner-contractual-gains">Highlights of the 2025–2029 agreement</a></h3>
+            <p>Read UCPEA’s overview of changes to pay, leave, benefits, and working conditions.</p>
+            <a class="text-link" href="index.html?view=compare-contracts">Compare the agreements</a>
+          </li>
+          <li>
+            <h3><a href="https://ucpea.ct.aft.org/union-wire/contract-corner-understanding-article-32">Salary and performance increases</a></h3>
+            <p>Read UCPEA’s explanation of the salary provisions and model an estimate.</p>
+            <a class="text-link" href="index.html#salary-calculator">Open the Salary Calculator</a>
+          </li>
+          <li>
+            <h3><a href="https://ucpea.ct.aft.org/union-wire/join-ucpea-committee">Join a UCPEA committee</a></h3>
+            <p>Explore committee responsibilities, meeting schedules, and the interest form.</p>
+          </li>
+        </ul>
+      </section>
     </section>
 
     <section class="contact-section section-shell" id="contact" aria-labelledby="contact-title" tabindex="-1">
