@@ -659,6 +659,9 @@
   // 'ucpea-account' event, which fires whenever the signed-in profile changes.
   // ---------------------------------------------------------------------------
   window.UCPEAAccount = {
+    // Public values (see the note on SUPABASE_KEY above), for lightweight
+    // read-only requests that don't need the full library.
+    config: { url: SUPABASE_URL, key: SUPABASE_KEY },
     getClient,
     get profile() { return state.profile; },
     async refresh() {

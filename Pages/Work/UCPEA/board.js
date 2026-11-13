@@ -232,8 +232,8 @@
     return canvas;
   }
 
-  function applyMotion() {
-    const gifs = Array.from(view.querySelectorAll('img[data-gif]'));
+  function applyMotion(root = view) {
+    const gifs = Array.from(root.querySelectorAll('img[data-gif]'));
     for (const img of gifs) {
       if (state.motionPaused) {
         img.loading = 'eager'; // a hidden lazy image would never load its frame
@@ -389,9 +389,9 @@
     return wrap;
   }
 
-  function media(post, { full = false } = {}) {
+  function media(post, { full = false, urls = state.urls } = {}) {
     if (!post.image_path) return null;
-    const url = state.urls.get(post.id);
+    const url = urls.get(post.id);
     if (isPdf(post.image_path)) {
       const box = el(url ? 'a' : 'div', 'board-pdf');
       if (url) {
@@ -426,7 +426,7 @@
     return figure;
   }
 
-  function card(post) {
+  function card(post, urls = state.urls) {
     const item = el('li', 'board-post');
     item.dataset.category = post.category;
     item.dataset.status = post.status;
@@ -436,12 +436,12 @@
     note.append(flagList(post));
     const heading = el('h2', 'board-note-title');
     const link = el('a', null, post.title);
-    link.href = postURL(post.id).href;
+    link.href = `index.html?view=board#post-${post.id}`; // the dashboard router handles index.html links
     link.dataset.boardPost = post.id;
     heading.append(link);
     note.append(heading);
 
-    const picture = media(post);
+    const picture = media(post, { urls });
     if (picture) note.append(picture);
     // Flyer-only posts show just the flyer on the corkboard (the list still
     // shows the text). Without a loaded image, fall back to a normal note.
@@ -460,12 +460,20 @@
   function renderBrowse() {
     const { canPostAnywhere, active } = access();
     fillFilter();
+    // Without an approved account there are only a few public posts, so the
+    // board filter and past-posts toggle would do nothing useful.
+    els.filter.closest('.board-filter-field').hidden = !active;
+    els.past.closest('.board-check').hidden = !active;
+    if (!active) {
+      els.filter.value = '';
+      els.past.checked = false;
+    }
     els.newPost.hidden = !canPostAnywhere || state.offline;
     els.signin.hidden = Boolean(state.me);
     els.offline.hidden = !state.offline;
 
     const posts = visiblePosts();
-    els.posts.replaceChildren(...posts.map(card));
+    els.posts.replaceChildren(...posts.map(post => card(post)));
     els.posts.hidden = !posts.length;
     if (state.loading) {
       els.status.textContent = 'Loading posts…';
@@ -890,6 +898,7 @@
     state.editing = null;
     setMode('browse');
     await load();
+    loadOverview();
     go(id);
     showNotice(status === 'draft'
       ? 'Saved as a draft. Only people who can post to this board can see it.'
@@ -953,6 +962,7 @@
       if (!data?.length) throw Object.assign(new Error('No rows'), { code: 'no_rows' });
       await removeFile(client, post.image_path ? { bucket: post.image_bucket, path: post.image_path } : null);
       await load();
+      loadOverview();
       go(null);
       showNotice(`"${post.title}" was deleted.`);
     } catch (error) {
@@ -1021,9 +1031,43 @@
     }
   });
 
+  // ---------------------------------------------------------------------------
+  // Overview: a read-only corkboard of current public posts. It reads the
+  // public posts directly, so the Overview never loads the sign-in library.
+  // ---------------------------------------------------------------------------
+  const overview = { section: $('overview-board'), list: $('overview-board-posts') };
+
+  async function loadOverview() {
+    if (!overview.section) return;
+    const { url, key } = UCPEAAccount.config;
+    const params = new URLSearchParams({
+      select: COLUMNS.replace(/\s+/g, ''),
+      visibility: 'eq.public',
+      status: 'eq.published',
+      or: `(expires_at.is.null,expires_at.gt.${new Date().toISOString()})`,
+      order: 'pinned.desc,published_at.desc',
+      limit: '6',
+    });
+    try {
+      const response = await fetch(`${url}/rest/v1/posts?${params}`, { headers: { apikey: key, Accept: 'application/json' } });
+      if (!response.ok) throw new Error(`Posts request failed: ${response.status}`);
+      const posts = await response.json();
+      const urls = new Map(posts
+        .filter(post => post.image_path && post.image_bucket === 'board-public')
+        .map(post => [post.id, `${url}/storage/v1/object/public/board-public/${post.image_path.split('/').map(encodeURIComponent).join('/')}`]));
+      overview.list.replaceChildren(...posts.map(post => card(post, urls)));
+      overview.section.hidden = !posts.length;
+      applyMotion(overview.list);
+    } catch {
+      overview.section.hidden = true; // offline or unavailable: the Overview simply goes without it
+    }
+  }
+
   state.me = UCPEAAccount.profile;
   state.motionPaused = preferredMotion();
   setLayout(preferredLayout());
   setMode('browse');
   if (!view.hidden) route();
+  if ('requestIdleCallback' in window) requestIdleCallback(loadOverview, { timeout: 3000 });
+  else setTimeout(loadOverview, 1000);
 })();

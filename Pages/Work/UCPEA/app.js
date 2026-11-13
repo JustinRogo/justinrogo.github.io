@@ -2,7 +2,6 @@
 
 const themeToggle = document.getElementById('theme-toggle');
 const themeColor = document.querySelector('meta[name="theme-color"]');
-const currentYear = document.getElementById('current-year');
 
 function setTheme(theme, persist = true) {
   document.documentElement.dataset.theme = theme;
@@ -325,10 +324,6 @@ function initDashboardNavigation() {
   menuToggle.hidden = false;
   sidebarToggle.hidden = false;
   body.setAttribute('data-navigation-ready', '');
-}
-
-if (currentYear) {
-  currentYear.textContent = `© ${new Date().getFullYear()}`;
 }
 
 const helpTopics = {

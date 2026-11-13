@@ -4463,3 +4463,22 @@ html[data-theme="dark"] .board-post[data-category="announcement"] { --pin: var(-
 .board-flyer-only .account-hint {
   margin-top: 0;
 }
+
+/* The corkboard's display rule must not override an empty, hidden board. */
+.board-section .board-posts[hidden] {
+  display: none;
+}
+
+/* Overview: the public board, read-only. Everything here is public, so the
+   "Everyone" pill would only repeat itself. */
+.section-shell.overview-board {
+  padding-block: 0;
+}
+
+.overview-board .board-flag[data-flag="audience"] {
+  display: none;
+}
+
+.overview-board .board-flags:not(:has(.board-flag:not([data-flag="audience"]))) {
+  display: none;
+}
