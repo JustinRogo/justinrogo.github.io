@@ -1,7 +1,7 @@
 'use strict';
 
 const CACHE_PREFIX = 'ucpea-dashboard-';
-const CACHE_NAME = CACHE_PREFIX + 'v9';
+const CACHE_NAME = CACHE_PREFIX + 'v14';
 const scope = new URL(self.registration.scope);
 const homeURL = new URL('index.html', scope).href;
 const offlineURLs = new Set([
@@ -15,6 +15,9 @@ const offlineURLs = new Set([
   'tool-views.js',
   'calendar.js',
   'calendar-events.js',
+  'account.js',
+  'members.js',
+  'board.js',
   'union-wire-feed.js',
   'union-wire.js',
   'UCPEAContract.html',
@@ -29,8 +32,17 @@ const offlineURLs = new Set([
   'icons/apple-touch-icon.png',
 ].map(path => new URL(path, scope).href));
 
+// The sign-in library is shared with the Updates page (the site build copies it
+// there). It is cached too, but separately, so a missing copy never breaks the install.
+const supabaseURL = new URL('../../Updates/vendor/supabase.js', scope).href;
+const coreURLs = [...offlineURLs];
+offlineURLs.add(supabaseURL);
+
 self.addEventListener('install', event => {
-  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll([...offlineURLs])));
+  event.waitUntil(caches.open(CACHE_NAME).then(async cache => {
+    await cache.addAll(coreURLs);
+    await cache.add(supabaseURL).catch(() => {});
+  }));
 });
 
 self.addEventListener('activate', event => {

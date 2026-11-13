@@ -45,6 +45,9 @@
   <script src="document-library.js" defer></script>
   <script src="calendar-events.js" defer></script>
   <script src="calendar.js" defer></script>
+  <script src="account.js" defer></script>
+  <script src="members.js" defer></script>
+  <script src="board.js" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to dashboard</a>
@@ -63,6 +66,9 @@
       <span class="header-context">Member dashboard</span>
     </p>
     <div class="header-actions">
+      <a class="shell-button account-button" id="account-button" href="index.html?view=account" aria-label="Sign in" title="Sign in">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 9a7 7 0 0 1 14 0"/></svg>
+      </a>
       <a class="official-link" href="https://ucpea.ct.aft.org/" target="_blank" rel="noopener noreferrer" aria-label="Official UCPEA site">
         <span>Official <span class="official-link-name">UCPEA</span> site</span>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg>
@@ -136,6 +142,10 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h13v16H6a2 2 0 0 1-2-2zm13 4h3v10a2 2 0 0 1-2 2h-1M8 8h5m-5 4h5m-5 4h5"/></svg>
           <span class="sidebar-label">Union Wire</span>
         </a>
+        <a href="index.html?view=board" title="Bulletin Board">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6l-1 6 4 4H6l4-4-1-6Zm3 10v8"/></svg>
+          <span class="sidebar-label">Bulletin Board</span>
+        </a>
 
         <div class="sidebar-branches">
           <h2 class="resources-heading">Member resources</h2>
@@ -162,6 +172,15 @@
         </button>
       </div>
       <div class="sidebar-contact">
+        <a href="index.html?view=members" id="sidebar-members" title="Members" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-6 10a6 6 0 0 1 12 0m1-10a3 3 0 1 0 0-6m2 16h3a5 5 0 0 0-4-5"/></svg>
+          <span class="sidebar-label">Members</span>
+          <span class="nav-count" id="members-nav-count" hidden></span>
+        </a>
+        <a href="index.html?view=account" id="sidebar-account" title="Sign in">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 9a7 7 0 0 1 14 0"/></svg>
+          <span class="sidebar-label">Sign in</span>
+        </a>
         <a href="index.html#contact" title="Contact UCPEA">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18v14H3zm0 0 9 7 9-7"/></svg>
           <span class="sidebar-label">Contact UCPEA</span>
@@ -835,6 +854,285 @@
           </tr>
         </tbody>
       </table>
+    </section>
+
+    <section class="section-shell rights-section account-section" id="account" data-dashboard-view aria-labelledby="account-title" tabindex="-1" hidden>
+      <div class="section-heading section-heading-single">
+        <h1 id="account-title">Account</h1>
+      </div>
+      <p class="account-notice" id="account-notice" role="status"></p>
+      <p class="deadline-error account-error" id="account-error" role="alert" hidden></p>
+
+      <div class="account-step" data-account-step="loading">
+        <p class="account-lede">Loading your account…</p>
+      </div>
+
+      <div class="account-step" data-account-step="unavailable" hidden>
+        <h2 tabindex="-1">Sign-in isn't available right now</h2>
+        <p class="account-lede">Check your internet connection, then try again. Everything else in the dashboard still works.</p>
+        <div class="account-actions">
+          <button class="account-primary" type="button" data-account-retry>Try again</button>
+        </div>
+      </div>
+
+      <form class="account-card account-step" data-account-step="sign-in" id="account-sign-in" novalidate hidden>
+        <h2 tabindex="-1">Sign in</h2>
+        <p class="account-lede">We'll email you a sign-in code. There's no password to remember.</p>
+        <div class="deadline-field">
+          <label for="sign-in-email">Email address</label>
+          <input id="sign-in-email" name="email" type="email" autocomplete="email" inputmode="email" spellcheck="false" required>
+        </div>
+        <div class="account-actions">
+          <button class="account-primary" type="submit">Email me a code</button>
+        </div>
+        <p class="account-switch">New to the app? <button class="rights-text-action" type="button" data-account-go="sign-up">Create an account</button></p>
+      </form>
+
+      <form class="account-card account-step" data-account-step="sign-up" id="account-sign-up" novalidate hidden>
+        <h2 tabindex="-1">Create an account</h2>
+        <div class="deadline-field">
+          <label for="sign-up-name">Your name</label>
+          <input id="sign-up-name" name="name" type="text" autocomplete="name" maxlength="80" required>
+        </div>
+        <div class="deadline-field">
+          <label for="sign-up-email">Email address</label>
+          <input id="sign-up-email" name="email" type="email" autocomplete="email" inputmode="email" spellcheck="false" required>
+        </div>
+        <div class="deadline-field">
+          <label for="sign-up-area">Your UCPEA area</label>
+          <select id="sign-up-area" name="area" aria-describedby="sign-up-area-hint">
+            <option value="">Not sure</option>
+          </select>
+          <p class="account-hint" id="sign-up-area-hint">Not sure? Look up your building in the <a href="index.html?view=area-explorer">Area Explorer</a>.</p>
+        </div>
+        <div class="account-actions">
+          <button class="account-primary" type="submit">Email me a code</button>
+        </div>
+        <p class="account-switch">Already have an account? <button class="rights-text-action" type="button" data-account-go="sign-in">Sign in</button></p>
+      </form>
+
+      <form class="account-card account-step" data-account-step="code" id="account-code" novalidate hidden>
+        <h2 tabindex="-1">Check your email</h2>
+        <p class="account-lede">We sent an email to <strong id="account-code-email"></strong>. Enter the code from it, or open its sign-in link on this device. Both work for one hour.</p>
+        <div class="deadline-field account-code-field">
+          <label for="account-code-input">Sign-in code</label>
+          <input id="account-code-input" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]*" maxlength="10" spellcheck="false" required>
+        </div>
+        <div class="account-actions">
+          <button class="account-primary" type="submit">Sign in</button>
+          <button class="account-secondary" type="button" id="account-resend">Send a new code</button>
+        </div>
+        <p class="account-switch">Wrong address? <button class="rights-text-action" type="button" data-account-go="back">Use a different email</button></p>
+      </form>
+
+      <div class="account-step" data-account-step="profile" hidden>
+        <div class="account-card account-summary">
+          <p class="account-badge" id="account-badge"></p>
+          <h2 id="account-name" tabindex="-1"></h2>
+          <dl class="account-details">
+            <div><dt>Email</dt><dd id="account-email"></dd></div>
+            <div><dt>Role</dt><dd id="account-role"></dd></div>
+            <div><dt id="account-areas-label">Areas</dt><dd id="account-areas"></dd></div>
+          </dl>
+          <p class="account-note" id="account-pending-note" hidden></p>
+          <p class="account-note" id="account-suspended-note" hidden>Your account is paused, so members-only pages are hidden. If you think this is a mistake, <a href="index.html#contact">contact UCPEA</a>.</p>
+          <p class="account-note" id="account-offline-note" hidden>You're offline. This is the account information saved on this device.</p>
+        </div>
+
+        <form class="account-card" id="account-details-form" novalidate>
+          <h2>Your details</h2>
+          <div class="deadline-field">
+            <label for="account-name-input">Your name</label>
+            <input id="account-name-input" name="name" type="text" autocomplete="name" maxlength="80" required>
+          </div>
+          <div class="deadline-field" id="account-area-field" hidden>
+            <label for="account-area-input">Your UCPEA area</label>
+            <select id="account-area-input" name="area">
+              <option value="">Not sure</option>
+            </select>
+            <p class="account-hint">You can change this until your account is approved.</p>
+          </div>
+          <div class="account-actions">
+            <button class="account-primary" type="submit">Save changes</button>
+          </div>
+        </form>
+
+        <div class="account-actions account-sign-out">
+          <button class="account-secondary" type="button" id="account-sign-out">Sign out on this device</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-shell rights-section board-section" id="board" data-dashboard-view aria-labelledby="board-title" tabindex="-1" hidden>
+      <div class="section-heading section-heading-single">
+        <h1 id="board-title">Bulletin Board</h1>
+      </div>
+      <p class="account-notice" id="board-notice" role="status"></p>
+      <p class="deadline-error account-error" id="board-error" role="alert" hidden></p>
+
+      <div class="board-browse" id="board-browse">
+        <div class="board-toolbar">
+          <div class="deadline-field board-filter-field">
+            <label for="board-filter">Board</label>
+            <select id="board-filter">
+              <option value="">All boards</option>
+            </select>
+          </div>
+          <label class="board-check"><input type="checkbox" id="board-past"> Show past posts</label>
+          <div class="board-layout-toggle" role="group" aria-label="Layout">
+            <button type="button" data-board-layout="board" aria-pressed="true">Board</button>
+            <button type="button" data-board-layout="list" aria-pressed="false">List</button>
+          </div>
+          <button class="account-secondary board-motion" type="button" data-board-motion aria-pressed="false" hidden>Pause animations</button>
+          <button class="account-primary board-new" type="button" id="board-new" hidden>New post</button>
+        </div>
+        <p class="board-hint" id="board-signin" hidden>Members-only posts appear here after you <a href="index.html?view=account">sign in</a>.</p>
+        <p class="board-hint" id="board-offline" hidden>You're offline. These are the posts saved on this device.</p>
+        <p class="members-empty" id="board-status" role="status">Loading posts…</p>
+        <ol class="board-posts" id="board-posts" data-layout="board"></ol>
+      </div>
+
+      <article class="board-detail" id="board-detail" aria-labelledby="board-detail-title" hidden></article>
+
+      <form class="account-card board-composer" id="board-composer" novalidate hidden>
+        <h2 id="board-composer-title" tabindex="-1">New post</h2>
+        <div class="board-form-grid">
+          <div class="deadline-field">
+            <label for="post-board">Board</label>
+            <select id="post-board" required></select>
+          </div>
+          <div class="deadline-field">
+            <label for="post-category">Type</label>
+            <select id="post-category">
+              <option value="announcement">Announcement</option>
+              <option value="event">Event</option>
+              <option value="meeting">Meeting</option>
+              <option value="action">Action alert</option>
+              <option value="flyer">Flyer</option>
+            </select>
+          </div>
+        </div>
+        <fieldset class="board-choice">
+          <legend>Who can see it</legend>
+          <label><input type="radio" name="post-visibility" value="members" checked> Members of this board</label>
+          <label><input type="radio" name="post-visibility" value="public"> Everyone, including people who aren't signed in</label>
+        </fieldset>
+        <div class="deadline-field">
+          <label for="post-title">Title</label>
+          <input id="post-title" type="text" maxlength="140" required>
+        </div>
+        <div class="deadline-field">
+          <label for="post-summary">Summary</label>
+          <textarea id="post-summary" rows="3" maxlength="600" aria-describedby="post-summary-hint" required></textarea>
+          <p class="account-hint" id="post-summary-hint">One or two sentences. This is what shows on the board, in the list, and in alerts.</p>
+        </div>
+        <div class="deadline-field">
+          <label for="post-body">Details <span class="board-optional">(optional)</span></label>
+          <textarea id="post-body" rows="6" maxlength="10000"></textarea>
+        </div>
+        <div class="board-form-grid">
+          <div class="deadline-field">
+            <label for="post-event">Event date and time <span class="board-optional">(optional)</span></label>
+            <input id="post-event" type="datetime-local">
+          </div>
+          <div class="deadline-field">
+            <label for="post-expires">Take down after <span class="board-optional">(optional)</span></label>
+            <input id="post-expires" type="date" aria-describedby="post-expires-hint">
+            <p class="account-hint" id="post-expires-hint">The post moves to "past posts" after this day.</p>
+          </div>
+        </div>
+        <div class="deadline-field">
+          <label for="post-link">Link <span class="board-optional">(optional)</span></label>
+          <input id="post-link" type="url" inputmode="url" placeholder="https://" spellcheck="false">
+        </div>
+        <div class="board-flyer-field">
+          <div class="deadline-field">
+            <label for="post-flyer">Flyer <span class="board-optional">(optional image or PDF)</span></label>
+            <input id="post-flyer" type="file" accept="image/*,application/pdf">
+          </div>
+          <div class="board-flyer-current" id="post-flyer-current" hidden>
+            <span id="post-flyer-name"></span>
+            <button class="rights-text-action" type="button" id="post-flyer-remove">Remove flyer</button>
+          </div>
+          <div class="deadline-field" id="post-alt-field" hidden>
+            <label for="post-alt">Describe the flyer</label>
+            <textarea id="post-alt" rows="2" maxlength="500" aria-describedby="post-alt-hint"></textarea>
+            <p class="account-hint" id="post-alt-hint">Read aloud to people using screen readers. Include any dates, places, or details printed on it.</p>
+          </div>
+          <div class="board-flyer-only" id="post-flyer-only-field" hidden>
+            <label class="board-check"><input type="checkbox" id="post-flyer-only" aria-describedby="post-flyer-only-hint"> Show only the flyer on the board</label>
+            <p class="account-hint" id="post-flyer-only-hint">People click the flyer to see the title, summary, and details. The list layout still shows the text.</p>
+          </div>
+        </div>
+        <label class="board-check"><input type="checkbox" id="post-pinned"> Pin to the top of the board</label>
+        <div class="account-actions">
+          <button class="account-primary" type="submit" value="published" id="post-publish">Publish</button>
+          <button class="account-secondary" type="submit" value="draft" id="post-draft">Save as draft</button>
+          <button class="rights-text-action" type="button" id="post-cancel">Cancel</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="section-shell rights-section members-section" id="members" data-dashboard-view aria-labelledby="members-title" tabindex="-1" hidden>
+      <div class="section-heading section-heading-single">
+        <h1 id="members-title">Members</h1>
+      </div>
+      <p class="account-notice" id="members-notice" role="status"></p>
+      <p class="deadline-error account-error" id="members-error" role="alert" hidden></p>
+
+      <div class="members-gate" id="members-gate" hidden>
+        <p class="account-lede" id="members-gate-text">Loading…</p>
+        <div class="account-actions">
+          <a class="account-primary members-gate-link" id="members-gate-link" href="index.html?view=account" hidden>Go to Account</a>
+          <button class="account-secondary" type="button" id="members-retry" hidden>Try again</button>
+        </div>
+      </div>
+
+      <div class="members-app" id="members-app" hidden>
+        <section class="members-block" aria-labelledby="members-pending-title">
+          <h2 id="members-pending-title">Waiting for approval <span class="members-count" id="members-pending-count"></span></h2>
+          <p class="account-lede" id="members-pending-help"></p>
+          <p class="members-empty" id="members-pending-empty" hidden>No one is waiting for approval.</p>
+          <ul class="member-list" id="members-pending-list"></ul>
+        </section>
+
+        <section class="members-block" id="members-fyi-block" aria-labelledby="members-fyi-title" hidden>
+          <div class="members-block-head">
+            <h2 id="members-fyi-title">Approved by stewards <span class="members-count" id="members-fyi-count"></span></h2>
+            <button class="account-secondary" type="button" id="members-fyi-all">Mark all as seen</button>
+          </div>
+          <p class="account-lede">These members are already active. This list is so staff know who joined; nothing more is needed.</p>
+          <ul class="member-list" id="members-fyi-list"></ul>
+        </section>
+
+        <section class="members-block" aria-labelledby="members-all-title">
+          <h2 id="members-all-title">All members</h2>
+          <div class="members-filters">
+            <div class="deadline-field">
+              <label for="members-search">Search</label>
+              <input id="members-search" type="search" placeholder="Name or email" autocomplete="off" spellcheck="false">
+            </div>
+            <div class="deadline-field">
+              <label for="members-status">Status</label>
+              <select id="members-status">
+                <option value="">All statuses</option>
+                <option value="active">Approved</option>
+                <option value="pending">Waiting for approval</option>
+                <option value="suspended">Paused or declined</option>
+              </select>
+            </div>
+            <div class="deadline-field">
+              <label for="members-area">Area</label>
+              <select id="members-area">
+                <option value="">All areas</option>
+                <option value="none">No area yet</option>
+              </select>
+            </div>
+          </div>
+          <p class="library-count" id="members-count" role="status"></p>
+          <ul class="member-list" id="members-list"></ul>
+        </section>
+      </div>
     </section>
 
     <section class="calendar-section section-shell" id="calendar" aria-labelledby="calendar-title" tabindex="-1">
