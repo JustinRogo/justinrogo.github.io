@@ -31,6 +31,19 @@ export function parseEvents(xml) {
   }).slice(0, 8);
 }
 
+// Calendar-leaf pieces in Eastern time: { month: "Nov", day: "16", weekday: "Mon", time: "12:30 PM EST" }.
+export function eventParts(date) {
+  const parsed = new Date(date);
+  if (Number.isNaN(parsed.getTime())) return null;
+  const part = (options) => parsed.toLocaleString("en-US", { timeZone: "America/New_York", ...options });
+  return {
+    month: part({ month: "short" }),
+    day: part({ day: "numeric" }),
+    weekday: part({ weekday: "short" }),
+    time: part({ hour: "numeric", minute: "2-digit", timeZoneName: "short" }),
+  };
+}
+
 export function eventDate(date) {
   const parsed = new Date(date);
   return Number.isNaN(parsed.getTime()) ? "" : parsed.toLocaleString("en-US", {

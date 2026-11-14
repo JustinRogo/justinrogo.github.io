@@ -37,10 +37,14 @@ test("Pocket Part replaces the contact section with linked image/text cards and 
   const origin = await root.evaluate(el => el.getBoundingClientRect().top + scrollY);
   await page.evaluate(y => window.scrollTo({ top: y - 108, behavior: "instant" }), origin);
   await expect(links.first().locator("img")).toBeVisible();
-  const [image, copy] = await Promise.all([links.first().locator("img").boundingBox(), links.first().locator(".pocket-post-copy").boundingBox()]);
-  expect(Math.abs(image.width - copy.width)).toBeLessThan(1);
-  expect(image.x).toBeLessThan(copy.x);
-  const [secondImage, secondCopy] = await Promise.all([links.nth(1).locator("img").boundingBox(), links.nth(1).locator(".pocket-post-copy").boundingBox()]);
+  await expect(links.first()).toHaveAccessibleName("Connecticut’s Forgotten Witch Trials Oct 23, 2026");
+  const [image, plate, copy] = await Promise.all([links.first().locator("img").boundingBox(), links.first().locator(".pocket-plate").boundingBox(), links.first().locator(".pocket-post-copy").boundingBox()]);
+  // The print sits inside its plate, which shares the card with the label.
+  expect(image.x).toBeGreaterThan(plate.x);
+  expect(image.x + image.width).toBeLessThan(plate.x + plate.width);
+  expect(plate.width / copy.width).toBeGreaterThan(0.7);
+  expect(plate.x).toBeLessThan(copy.x);
+  const [secondImage, secondCopy] = await Promise.all([links.nth(1).locator(".pocket-plate").boundingBox(), links.nth(1).locator(".pocket-post-copy").boundingBox()]);
   expect(secondImage.x).toBeGreaterThan(secondCopy.x);
   await page.evaluate(y => window.scrollTo({ top: y + 800, behavior: "instant" }), origin);
   await expect(section.locator(".pocket-post").first()).not.toHaveCSS("transform", "none");

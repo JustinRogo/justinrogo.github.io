@@ -388,20 +388,43 @@ export function Sprout({ className = "" }) {
   );
 }
 
-// The wordmark's sprig: a curving stem with one leaf and a bud, in place of
-// Original's arrow.
+// A tradescantia leaf: pointed, broadest near the base where it clasps the stem.
+// `bend` sweeps the tip sideways so the leaf arches away from the stem.
+const spiderwortLeaf = (len, w, bend = 0) =>
+  `M0 0C${r1(w * 1.2)} ${r1(-len * 0.1)} ${r1(w * 0.9 + bend * 0.45)} ${r1(-len * 0.6)} ${r1(bend)} ${r1(-len)}C${r1(-w * 0.9 + bend * 0.45)} ${r1(-len * 0.6)} ${r1(-w * 1.2)} ${r1(-len * 0.1)} 0 0Z`;
+// Leaves along the trailing stem: node position, angle, length, bend. They alternate sides.
+const wordmarkLeaves = [
+  [8.2, 16, -22, 9.4, -1.4],
+  [12.6, 12.2, 112, 9, 1.4],
+  [16.4, 9.2, -28, 7.6, -1.1],
+];
+
+// The wordmark's sprig, in place of Original's arrow: a trailing tradescantia
+// stem with jointed nodes, alternate striped leaves (zebrina's silver bands),
+// and a three-petaled flower at the tip.
 export function WordmarkSprig({ size = 28 }) {
   return (
     <svg className="wordmark-sprig" width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path d="M5.6 19.6C8 16 10.4 13.2 13.6 10.6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-      <g transform="translate(13.2 11) rotate(46)">
-        <g className="wordmark-sprig-leaf">
-          <path d={leafPath(12, 5, 1)} fill="currentColor" />
-          <path d="M0 -1Q0.6 -5 0.9 -9.5" fill="none" stroke="var(--rail-bg, #18392b)" strokeWidth="0.8" strokeLinecap="round" opacity="0.55" />
+      <path d="M3.8 21.6C6.2 18.6 8.6 15.4 12.4 12.4S17 8.8 19.2 6.2" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      {wordmarkLeaves.map(([x, y, angle, len, bend]) => (
+        <g key={`${x}-${y}`} transform={`translate(${x} ${y}) rotate(${angle})`}>
+          <g className="wordmark-sprig-leaf">
+            <path d={spiderwortLeaf(len, 2.45, bend)} fill="currentColor" />
+            <path d={`M-0.8 -1.2Q${r1(-1.2 + bend * 0.4)} ${r1(-len * 0.45)} ${r1(bend * 0.8 - 0.2)} ${r1(-len * 0.84)}M0.8 -1.2Q${r1(1.2 + bend * 0.4)} ${r1(-len * 0.45)} ${r1(bend * 0.8 + 0.2)} ${r1(-len * 0.84)}`}
+              fill="none" stroke="var(--rail-ink, #f3ecdb)" strokeWidth="0.7" strokeLinecap="round" opacity="0.55" />
+            <path d={`M0 -0.6Q${r1(bend * 0.3)} ${r1(-len * 0.5)} ${r1(bend * 0.85)} ${r1(-len * 0.88)}`} fill="none" stroke="var(--rail-bg, #18392b)" strokeWidth="0.55" strokeLinecap="round" opacity="0.5" />
+          </g>
+          <circle r="0.9" fill="currentColor" />
         </g>
-      </g>
-      <g transform="translate(8.6 15.6) rotate(-28)">
-        <path className="wordmark-sprig-bud" d={leafPath(6.4, 2.8)} fill="currentColor" opacity="0.75" />
+      ))}
+      <g transform="translate(19.6 5.6)">
+        <g className="wordmark-sprig-bud">
+          {[0, 120, 240].map((angle) => (
+            <path key={angle} transform={`rotate(${angle - 20})`} d="M0 0C1.9 -0.4 2 -2.9 0 -3.4C-2 -2.9 -1.9 -0.4 0 0Z"
+              fill="var(--berry, #c98a6b)" />
+          ))}
+          <circle r="0.7" fill="var(--rail-accent, #e2c48c)" />
+        </g>
       </g>
     </svg>
   );

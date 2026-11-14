@@ -708,6 +708,58 @@
   box-shadow: 0 0 0 1px var(--glass-edge), 0 -10px 30px -18px rgba(40, 28, 10, 0.3),
     0 22px 40px -26px rgba(40, 28, 10, 0.45);
 }
+/* Pocket Part posts as herbarium sheets: an ivory print in dark paper
+   corners on a parchment plate, and a ruled collector's label. */
+:root[data-style="botanical"] .pocket-stack {
+  --pocket-plate: var(--grain), var(--b-parchment);
+  --pocket-plate-rule: var(--plate-rule);
+  --pocket-mat: var(--b-ivory);
+  --pocket-mat-edge: rgba(92, 74, 40, 0.16);
+  --pocket-corner: rgba(43, 32, 22, 0.9);
+}
+:root[data-style="botanical"][data-theme="dark"] .pocket-stack {
+  --pocket-plate: var(--grain), #0e1d15;
+  --pocket-mat: #e4dbc4;
+  --pocket-mat-edge: rgba(43, 32, 22, 0.35);
+}
+:root[data-style="botanical"] .pocket-post { background: var(--grain), var(--paper); }
+:root[data-style="botanical"] .pocket-plate::before { border-radius: 4px; }
+:root[data-style="botanical"] .pocket-post-link.has-image .pocket-plate {
+  box-shadow: inset -1px 0 0 var(--plate-rule);
+}
+:root[data-style="botanical"] .pocket-post.is-reversed .pocket-post-link.has-image .pocket-plate {
+  box-shadow: inset 1px 0 0 var(--plate-rule);
+}
+@media (max-width: 600px) {
+  :root[data-style="botanical"] .pocket-post .pocket-post-link.has-image .pocket-plate {
+    box-shadow: inset 0 -1px 0 var(--plate-rule);
+  }
+}
+:root[data-style="botanical"] .pocket-post-copy h3 {
+  font-family: var(--font-display);
+  font-weight: 450;
+  letter-spacing: -0.015em;
+}
+:root[data-style="botanical"] .pocket-label {
+  border-top: 3px double var(--plate-rule);
+}
+:root[data-style="botanical"] .pocket-accession b {
+  margin-left: 0.2em;
+  color: var(--orange);
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1;
+  text-transform: none;
+}
+:root[data-style="botanical"] .pocket-read {
+  color: var(--blue);
+}
+:root[data-style="botanical"] .pocket-read svg {
+  color: var(--orange);
+}
 :root[data-style="botanical"] .law-events .carousel-container {
   --carousel-frame: var(--paper) !important;
   --carousel-tile: var(--paper) !important;
@@ -723,6 +775,33 @@
 }
 :root[data-style="botanical"] .law-events .carousel-card img {
   border-radius: 10px;
+}
+/* The events' calendar leaf: terracotta strip, ivory page, serif day. */
+:root[data-style="botanical"] .law-events {
+  --leaf-paper: var(--b-ivory);
+  --leaf-strip: var(--b-terracotta);
+  --leaf-strip-ink: var(--b-ivory);
+  --leaf-edge: rgba(92, 74, 40, 0.18);
+}
+:root[data-style="botanical"][data-theme="dark"] .law-events {
+  --leaf-paper: #e4dbc4;
+  --leaf-strip: #a5603f;
+  --leaf-strip-ink: #f5f0e6;
+}
+:root[data-style="botanical"] .event-leaf {
+  color: var(--b-forest);
+  border-radius: 4px;
+}
+:root[data-style="botanical"] .event-leaf-day {
+  font-family: var(--font-display);
+  font-weight: 500;
+}
+:root[data-style="botanical"] .event-leaf-weekday {
+  color: #5d5442;
+}
+:root[data-style="botanical"] .event-card-body h3 {
+  font-family: var(--font-display);
+  font-weight: 450;
 }
 /* Page headings on other views: a fern unfurls each time the view opens. */
 :root[data-style="botanical"] .page-heading > h1 {

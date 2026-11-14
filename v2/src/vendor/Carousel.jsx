@@ -2,7 +2,8 @@
  * Source revision ff5121ef4e11d7988025fad7c1e23ac40d251bce.
  * Local changes: remove demo content/icon dependencies; add site label and Calm mode;
  * keep inactive event links out of focus order and focus the region on keyboard navigation;
- * allow adjacent playback controls and use unpadded slide counts.
+ * allow adjacent playback controls and use unpadded slide counts;
+ * expose autoplay progress as --carousel-progress (0–1) on the root.
  */
 'use client';
 
@@ -273,8 +274,9 @@ export default function Carousel({
         const shade = shadeRefs.current[i];
         if (shade) shade.style.opacity = String(next.shade);
       }
-      if (!s.bars) return;
       const progress = s.autoplay ? clamp(state.elapsed / s.autoplayDelay, 0, 1) : 1;
+      rootRef.current?.style.setProperty('--carousel-progress', s.autoplay ? progress.toFixed(4) : '0');
+      if (!s.bars) return;
       for (let i = 0; i < s.count; i++) {
         const fill = fillRefs.current[i];
         if (fill) fill.style.transform = `scaleX(${i < state.shown ? 1 : i === state.shown ? progress : 0})`;
