@@ -69,6 +69,28 @@
       <a class="shell-button account-button" id="account-button" href="index.html?view=account" aria-label="Sign in" title="Sign in">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 9a7 7 0 0 1 14 0"/></svg>
       </a>
+      <!-- Signed in: the icon and first name open a small account menu. -->
+      <div class="account-menu" id="account-menu" hidden>
+        <button class="shell-button account-menu__button" id="account-menu-button" type="button" aria-expanded="false" aria-controls="account-menu-panel">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 9a7 7 0 0 1 14 0"/></svg>
+          <span class="account-menu__first-name" id="account-menu-first-name"></span>
+          <svg class="account-menu__caret" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>
+        </button>
+        <div class="account-menu__panel" id="account-menu-panel" hidden>
+          <p class="account-menu__who">
+            <strong id="account-menu-full-name"></strong>
+            <span id="account-menu-email"></span>
+          </p>
+          <a class="account-menu__item" id="account-menu-view" href="index.html?view=account">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 9a7 7 0 0 1 14 0"/></svg>
+            View Account
+          </a>
+          <button class="account-menu__item" id="account-menu-sign-out" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4h4v16h-4M10 8l-4 4 4 4m-4-4h10"/></svg>
+            Sign Out
+          </button>
+        </div>
+      </div>
       <button class="shell-button theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path class="moon-icon" d="M21 13A9 9 0 1 1 11 3a7 7 0 0 0 10 10Z"/>
@@ -215,6 +237,7 @@
         <div class="hero-copy">
           <img class="hero-logo" src="ucpea-logo.png" width="128" height="128" alt="">
           <h1 id="hero-title">UCPEA Member Information</h1>
+          <time class="hero-date" id="hero-date" hidden></time>
           <p class="hero-intro">Read the contract, compare changes, estimate your salary, check benefit deadlines, and catch up on Union Wire.</p>
           <div class="hero-actions">
             <a class="button button-primary" href="index.html?view=current-contract">
@@ -238,6 +261,74 @@
           <a id="hero-today-link" href="index.html#calendar">View calendar <span aria-hidden="true">→</span></a>
         </aside>
       </div>
+    </section>
+
+    <!-- Phones: the Overview opens like an app. What's next, the contract, and the tools members reach for most. -->
+    <section class="home-launch" aria-label="Today and member tools">
+      <div class="home-today">
+        <a class="home-today__row" id="home-next" href="index.html#calendar">
+          <span class="home-today__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M4 5h16v16H4zM8 2v6m8-6v6M4 11h16"/></svg>
+          </span>
+          <span class="home-today__text">
+            <small id="home-next-when">UCPEA Calendar</small>
+            <strong id="home-next-title">See upcoming events</strong>
+          </span>
+          <svg class="home-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+        </a>
+        <a class="home-today__row" id="home-wire" href="index.html?view=union-wire">
+          <span class="home-today__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M4 4h13v16H6a2 2 0 0 1-2-2zm13 4h3v10a2 2 0 0 1-2 2h-1M8 8h5m-5 4h5m-5 4h5"/></svg>
+          </span>
+          <span class="home-today__text">
+            <small id="home-wire-when">Union Wire</small>
+            <strong id="home-wire-title">Read the latest from UCPEA</strong>
+          </span>
+          <svg class="home-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+        </a>
+      </div>
+
+      <article class="home-contract" aria-labelledby="home-contract-title">
+        <div class="home-contract__cover" aria-hidden="true">
+          <span>UCPEA</span>
+          <strong>2025<i></i>2029</strong>
+        </div>
+        <div class="home-contract__copy">
+          <h2 id="home-contract-title">The Contract</h2>
+          <p>Effective July 1, 2025 – June 30, 2029</p>
+        </div>
+        <div class="home-contract__actions">
+          <a class="button button-primary" href="index.html?view=current-contract">Open the Contract</a>
+          <a class="button button-secondary" href="index.html?view=compare-contracts">Compare changes</a>
+        </div>
+      </article>
+
+      <nav class="home-tiles" aria-label="Member tools">
+        <a href="index.html?view=rights-benefits">
+          <span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3 4 6v5c0 5 3 8 8 10 5-2 8-5 8-10V6l-8-3Zm-4 9 3 3 5-5"/></svg></span>
+          Rights &amp; Benefits
+        </a>
+        <a href="index.html#salary-calculator">
+          <span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v18m4.5-13.2C15.7 6.5 14.1 5.8 12 5.8c-2.6 0-4.1 1.3-4.1 3s1.5 2.5 4.1 3 4.6 1.4 4.6 3.3-1.9 3.1-4.6 3.1c-2.2 0-3.9-.8-4.8-2.3"/></svg></span>
+          Salary planner
+        </a>
+        <a href="index.html#calendar">
+          <span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5h16v16H4zM8 2v6m8-6v6M4 11h16m-11 4h2m4 0h2"/></svg></span>
+          Calendar
+        </a>
+        <a href="https://ucpea.ct.aft.org/stewards" target="_blank" rel="noopener noreferrer">
+          <span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-6 10a6 6 0 0 1 12 0m1-10a3 3 0 1 0 0-6m2 16h3a5 5 0 0 0-4-5"/></svg></span>
+          Find a steward
+        </a>
+        <a href="index.html?view=document-library">
+          <span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 6h5v15H3zm5-3h5v18H8zm5 3 5-2 4 15-5 2z"/></svg></span>
+          Documents
+        </a>
+        <a href="index.html?view=contract-history">
+          <span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 4v5h5M3.6 9A9 9 0 1 1 3 15m9-8v5l3 2"/></svg></span>
+          Contract history
+        </a>
+      </nav>
     </section>
 
     <section class="start-section section-shell" id="start-here" aria-labelledby="start-title" tabindex="-1">
@@ -368,7 +459,7 @@
         <div class="rights-actions">
           <a class="button button-primary" href="https://uconn.kualibuild.com/app/6a3977b9ecd54b029a42c715/page/6a3977b9ecd54b029a42c715/run">Open Kuali appeal form</a>
           <a class="button button-secondary" href="https://ucpea.ct.aft.org/stewards">Find a steward</a>
-          <a class="button button-secondary" href="mailto:ucpeaoffice@ucpea.org">Contact UCPEA</a>
+          <a class="button button-secondary" href="mailto:ucpeaoffice@ucpea.org" data-contact-ucpea>Contact UCPEA</a>
         </div>
         <p class="rights-sources"><a href="index.html?view=current-contract#section-16-5">Article 16.5</a> · <a href="https://ucpea.ct.aft.org/union-wire/launch-new-telecommuting-appeal-process">UCPEA appeal guidance</a> · <a href="https://ucpea.ct.aft.org/sites/default/files/media/documents/2026/telecommutingappeals_2sided_updated.pdf">UCPEA flowchart (PDF)</a></p>
       </article>
@@ -528,7 +619,7 @@
         </div>
         <div class="rights-actions">
           <a class="button button-primary" href="https://ucpea.ct.aft.org/stewards">Find a steward</a>
-          <a class="button button-secondary" href="mailto:ucpeaoffice@ucpea.org?subject=Question%20about%20discipline">Contact UCPEA</a>
+          <a class="button button-secondary" href="mailto:ucpeaoffice@ucpea.org?subject=Question%20about%20discipline" data-contact-ucpea>Contact UCPEA</a>
           <a class="button button-secondary" href="index.html?view=rights-benefits#personnel-file">Personnel file guide</a>
         </div>
         <p class="rights-sources"><a href="index.html?view=current-contract#article-22">Article 22</a> · <a href="index.html?view=current-contract#article-23">Article 23</a> · <a href="index.html?view=current-contract#section-19-5">Article 19.5</a></p>
@@ -548,7 +639,7 @@
         </dl>
         <div class="rights-actions">
           <a class="button button-primary" href="https://ucpea.ct.aft.org/stewards">Find a steward</a>
-          <a class="button button-secondary" href="mailto:ucpeaoffice@ucpea.org">Contact UCPEA</a>
+          <a class="button button-secondary" href="mailto:ucpeaoffice@ucpea.org" data-contact-ucpea>Contact UCPEA</a>
         </div>
         <p class="rights-sources"><a href="index.html?view=current-contract#article-22">Article 22</a> · <a href="index.html?view=current-contract#article-5">Article 5</a> · <a href="https://www.law.cornell.edu/supremecourt/text/420/251">NLRB v. J. Weingarten, Inc., 420 U.S. 251 (1975)</a></p>
       </article>
@@ -591,7 +682,7 @@
         </div>
         <noscript><p>Enable JavaScript to calculate when you can request removal.</p></noscript>
         <div class="rights-actions">
-          <a class="button button-primary" href="mailto:ucpeaoffice@ucpea.org?subject=Question%20about%20my%20personnel%20file">Contact UCPEA</a>
+          <a class="button button-primary" href="mailto:ucpeaoffice@ucpea.org?subject=Question%20about%20my%20personnel%20file" data-contact-ucpea>Contact UCPEA</a>
           <a class="button button-secondary" href="https://ucpea.ct.aft.org/stewards">Find a steward</a>
         </div>
         <p class="rights-sources"><a href="index.html?view=current-contract#article-19">Article 19</a> · <a href="index.html?view=current-contract#section-19-6">Article 19.6</a> · <a href="index.html?view=current-contract#section-22-2">Article 22.2</a></p>
@@ -610,7 +701,7 @@
         </dl>
         <div class="rights-actions">
           <a class="button button-primary" href="https://ucpea.ct.aft.org/stewards">Find a steward</a>
-          <a class="button button-secondary" href="mailto:ucpeaoffice@ucpea.org">Contact UCPEA</a>
+          <a class="button button-secondary" href="mailto:ucpeaoffice@ucpea.org" data-contact-ucpea>Contact UCPEA</a>
         </div>
         <p class="rights-sources"><a href="index.html?view=current-contract#article-23">Article 23</a> · <a href="index.html?view=current-contract#article-5">Article 5.5</a> · <a href="index.html?view=current-contract#article-41">Article 41.3</a></p>
       </article>
@@ -626,7 +717,7 @@
           <div><dt>Grieving a rating</dt><dd>Only an overall Unsatisfactory rating can be grieved. A rating below Good also affects eligibility for telecommuting appeals.</dd></div>
         </dl>
         <div class="rights-actions">
-          <a class="button button-secondary" href="mailto:ucpeaoffice@ucpea.org">Contact UCPEA</a>
+          <a class="button button-secondary" href="mailto:ucpeaoffice@ucpea.org" data-contact-ucpea>Contact UCPEA</a>
         </div>
         <p class="rights-sources"><a href="index.html?view=current-contract#article-21">Article 21</a></p>
       </article>
@@ -641,7 +732,7 @@
           <div><dt>Exemptions</dt><dd>Childcare or parental care, health, and unavoidable personal issues can exempt you from a required schedule change. Declared emergencies allow immediate, temporary changes for their duration.</dd></div>
         </dl>
         <div class="rights-actions">
-          <a class="button button-secondary" href="mailto:ucpeaoffice@ucpea.org">Contact UCPEA</a>
+          <a class="button button-secondary" href="mailto:ucpeaoffice@ucpea.org" data-contact-ucpea>Contact UCPEA</a>
         </div>
         <p class="rights-sources"><a href="index.html?view=current-contract#article-16">Article 16</a></p>
       </article>
@@ -656,7 +747,7 @@
           <div><dt>Non-exempt staff</dt><dd>Comp time follows federal overtime law at time and a half for hours over 40 in a week. Balances over 105 hours are paid out, and unused comp time is paid when you leave.</dd></div>
         </dl>
         <div class="rights-actions">
-          <a class="button button-secondary" href="mailto:ucpeaoffice@ucpea.org">Contact UCPEA</a>
+          <a class="button button-secondary" href="mailto:ucpeaoffice@ucpea.org" data-contact-ucpea>Contact UCPEA</a>
         </div>
         <p class="rights-sources"><a href="index.html?view=current-contract#article-18">Article 18</a></p>
       </article>
@@ -670,7 +761,7 @@
           <div><dt>Effective date</dt><dd>The raise takes effect on the reclassification’s effective date. The <a href="index.html?view=rights-benefits#position-audit">Position Audits</a> guide explains how that date is set.</dd></div>
         </dl>
         <div class="rights-actions">
-          <a class="button button-secondary" href="mailto:ucpeaoffice@ucpea.org">Contact UCPEA</a>
+          <a class="button button-secondary" href="mailto:ucpeaoffice@ucpea.org" data-contact-ucpea>Contact UCPEA</a>
         </div>
         <p class="rights-sources"><a href="index.html?view=current-contract#article-31">Article 31</a></p>
       </article>
@@ -696,7 +787,7 @@
         </dl>
         <div class="rights-actions">
           <a class="button button-primary" href="https://ucpea.ct.aft.org/stewards">Find a steward</a>
-          <a class="button button-secondary" href="mailto:ucpeaoffice@ucpea.org">Contact UCPEA</a>
+          <a class="button button-secondary" href="mailto:ucpeaoffice@ucpea.org" data-contact-ucpea>Contact UCPEA</a>
         </div>
         <p class="rights-sources"><a href="index.html?view=current-contract#article-20">Article 20</a> · <a href="index.html?view=current-contract#article-22">Article 22</a></p>
       </article>
@@ -711,7 +802,7 @@
           <div><dt>Who’s covered</dt><dd>These rules don’t apply to probationary staff. Grant- and contract-funded positions follow Article 27.2.</dd></div>
         </dl>
         <div class="rights-actions">
-          <a class="button button-secondary" href="mailto:ucpeaoffice@ucpea.org">Contact UCPEA</a>
+          <a class="button button-secondary" href="mailto:ucpeaoffice@ucpea.org" data-contact-ucpea>Contact UCPEA</a>
         </div>
         <p class="rights-sources"><a href="index.html?view=current-contract#article-27">Article 27</a></p>
       </article>
@@ -726,7 +817,7 @@
         </dl>
         <div class="rights-actions">
           <a class="button button-primary" href="https://ucpea.ct.aft.org/stewards">Find a steward</a>
-          <a class="button button-secondary" href="mailto:ucpeaoffice@ucpea.org">Contact UCPEA</a>
+          <a class="button button-secondary" href="mailto:ucpeaoffice@ucpea.org" data-contact-ucpea>Contact UCPEA</a>
         </div>
         <p class="rights-sources"><a href="index.html?view=current-contract#article-5">Article 5</a></p>
       </article>
@@ -899,7 +990,7 @@
           </dl>
           <div class="rights-actions">
             <a class="button button-primary" href="https://ucpea.ct.aft.org/sick-bank">Get sick leave bank forms</a>
-            <a class="button button-secondary" href="mailto:ucpeaoffice@ucpea.org">Contact UCPEA</a>
+            <a class="button button-secondary" href="mailto:ucpeaoffice@ucpea.org" data-contact-ucpea>Contact UCPEA</a>
           </div>
           <p class="rights-sources"><a href="index.html?view=current-contract#section-11-3">Article 11.3</a> · <a href="https://ucpea.ct.aft.org/union-wire/contract-corner-article-11-sick-leave">UCPEA explanation of the changes</a></p>
         </article>
@@ -1317,9 +1408,15 @@
 
       <form class="account-card account-step" data-account-step="sign-up" id="account-sign-up" novalidate hidden>
         <h2 tabindex="-1">Create an account</h2>
-        <div class="deadline-field">
-          <label for="sign-up-name">Your name</label>
-          <input id="sign-up-name" name="name" type="text" autocomplete="name" maxlength="80" required>
+        <div class="account-name-fields">
+          <div class="deadline-field">
+            <label for="sign-up-first-name">First name</label>
+            <input id="sign-up-first-name" name="first_name" type="text" autocomplete="given-name" maxlength="50" required>
+          </div>
+          <div class="deadline-field">
+            <label for="sign-up-last-name">Last name</label>
+            <input id="sign-up-last-name" name="last_name" type="text" autocomplete="family-name" maxlength="50" required>
+          </div>
         </div>
         <div class="deadline-field">
           <label for="sign-up-email">Email address</label>
@@ -1368,9 +1465,15 @@
 
         <form class="account-card" id="account-details-form" novalidate>
           <h2>Your details</h2>
-          <div class="deadline-field">
-            <label for="account-name-input">Your name</label>
-            <input id="account-name-input" name="name" type="text" autocomplete="name" maxlength="80" required>
+          <div class="account-name-fields">
+            <div class="deadline-field">
+              <label for="account-first-name">First name</label>
+              <input id="account-first-name" name="first_name" type="text" autocomplete="given-name" maxlength="50" required>
+            </div>
+            <div class="deadline-field">
+              <label for="account-last-name">Last name</label>
+              <input id="account-last-name" name="last_name" type="text" autocomplete="family-name" maxlength="50" required>
+            </div>
           </div>
           <div class="deadline-field" id="account-area-field" hidden>
             <label for="account-area-input">Your UCPEA area</label>
@@ -1565,6 +1668,7 @@
     <section class="section-shell board-section overview-board" id="overview-board" aria-labelledby="overview-board-title" hidden>
       <div class="section-heading section-heading-single">
         <h2 id="overview-board-title">Bulletin Board</h2>
+        <a class="section-more" href="index.html?view=board" aria-label="See all Bulletin Board posts">See all</a>
       </div>
       <ol class="board-posts" id="overview-board-posts" data-layout="board"></ol>
     </section>
@@ -1590,6 +1694,7 @@
           </div>
           <div id="calendar-month-view" class="calendar-month-view"></div>
           <div id="calendar-agenda" class="calendar-agenda"></div>
+          <button class="calendar-expand" id="calendar-expand" type="button" aria-controls="calendar-agenda" aria-expanded="false" hidden>Show the whole month</button>
           <p id="calendar-empty" class="calendar-status" hidden>No events are listed for this month.</p>
         </div>
         <p id="calendar-unavailable" class="calendar-status">Events are available in the official calendar.</p>
@@ -1641,29 +1746,17 @@
         <summary class="salary-calculator__header">
           <span>
             <strong id="salary-calculator-title">Salary &amp; Band Planner</strong>
-            <small>Estimate eligible increases and compare your salary with the 2027 band.</small>
+            <small>Estimate your July 1, 2027 increase and compare your salary with the 2027 band.</small>
           </span>
           <span class="salary-calculator__toggle" aria-hidden="true"></span>
         </summary>
 
         <div class="salary-calculator__body">
-          <p class="salary-calculator__intro">Choose the first July increase you want to model. The planner separates general wage increases, performance-based compensation, discretionary merit, and any reclassification estimate.</p>
-
           <div class="salary-calculator__grid">
             <div class="salary-calculator__field">
-              <label for="baseSalary">Salary before the first modeled increase</label>
+              <label for="baseSalary">Current annual base salary</label>
               <input id="baseSalary" type="number" min="0" step="100" placeholder="65000">
-              <p class="salary-calculator__hint">Use your annual base salary, before any July increase selected below.</p>
-            </div>
-
-            <div class="salary-calculator__field">
-              <label for="startingYear">First increase to model</label>
-              <select id="startingYear">
-                <option value="2025">July 1, 2025</option>
-                <option value="2026">July 1, 2026</option>
-                <option value="2027" selected>July 1, 2027</option>
-              </select>
-              <p class="salary-calculator__hint">The estimate continues through July 1, 2027.</p>
+              <p class="salary-calculator__hint">Your salary today, which already includes the July 2025 and July 2026 increases.</p>
             </div>
 
             <div class="salary-calculator__field">
@@ -1689,20 +1782,17 @@
               <p class="salary-calculator__hint">Optional award amount; the 0.5% pool is not an automatic individual increase.</p>
             </div>
 
-            <div class="salary-calculator__field">
-              <label for="reclassPercent">Reclassification increase</label>
-              <input id="reclassPercent" type="number" min="0" max="10" step="0.1" placeholder="0">
-              <p class="salary-calculator__hint">Optional estimate: enter 3%–10%, or leave blank.</p>
-            </div>
-
-            <div class="salary-calculator__field">
-              <label for="reclassYear">Reclassification year</label>
-              <select id="reclassYear">
-                <option value="2025">2025</option>
-                <option value="2026">2026</option>
-                <option value="2027" selected>2027</option>
-              </select>
-              <p class="salary-calculator__hint">Applied before that year’s July 1 increase.</p>
+            <div class="salary-calculator__field salary-calculator__field--reclass">
+              <label class="salary-calculator__switch">
+                <input id="reclassToggle" type="checkbox" role="switch" aria-controls="reclassDetails">
+                Model a reclassification
+              </label>
+              <p class="salary-calculator__hint" id="reclassOffHint">Turn on to add an estimated reclassification before the July 1, 2027 increase.</p>
+              <div class="salary-calculator__reveal" id="reclassDetails" hidden>
+                <label for="reclassPercent">Reclassification increase (%)</label>
+                <input id="reclassPercent" type="number" min="3" max="10" step="0.1" placeholder="5">
+                <p class="salary-calculator__hint">Enter 3%–10%. Applied before the July 1, 2027 increase.</p>
+              </div>
             </div>
 
             <fieldset class="salary-calculator__field salary-calculator__field--checks">
@@ -1769,14 +1859,10 @@
             </table>
           </div>
 
-          <p class="salary-calculator__note">Calculation method: eligible increases are compounded. General wage increases and performance-based compensation are shown separately. When a salary level is selected, estimated PBC above the applicable band maximum is shown as a non-base lump sum. Reclassification is applied immediately before the selected year’s July increase.</p>
-
           <div class="salary-calculator__note">
-            <p>Scheduled increases:</p>
+            <p>Scheduled increase:</p>
             <ul>
-              <li>July 1, 2025: 2.5% General Wage Increase (GWI) + 2% Performance-Based Compensation (PBC)</li>
-              <li>July 1, 2026: 2.5% GWI + 2% PBC</li>
-              <li>July 1, 2027: 2.5% GWI + 1.5% PBC, plus a discretionary performance-based compensation pool equal to 0.5% of gross salaries</li>
+              <li>July 1, 2027: 2.5% General Wage Increase (GWI) + 1.5% Performance-Based Compensation (PBC), plus a discretionary performance-based compensation pool equal to 0.5% of gross salaries</li>
             </ul>
             <a href="index.html?view=current-contract#article-32">Article 32 - Salary Increases</a>
           </div>
@@ -1887,6 +1973,46 @@
       <h3 id="calendar-attachments-title">Attachments</h3>
       <ul id="calendar-event-attachments"></ul>
     </section>
+  </dialog>
+
+  <!-- Every "Contact UCPEA" button opens this. Each way to reach the office can also be copied, for devices with no mail app set up. -->
+  <dialog class="calendar-dialog contact-dialog" id="contact-dialog" aria-labelledby="contact-dialog-title">
+    <div class="calendar-dialog-heading">
+      <h2 id="contact-dialog-title">Contact UCPEA</h2>
+      <form method="dialog">
+        <button class="calendar-dialog-close" type="submit" aria-label="Close" autofocus>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+        </button>
+      </form>
+    </div>
+    <ul class="contact-dialog-list">
+      <li>
+        <a class="contact-dialog-method" id="contact-dialog-email" href="mailto:ucpeaoffice@ucpea.org">
+          <span class="contact-dialog-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 5h18v14H3zm0 0 9 7 9-7"/></svg></span>
+          <span><small>Email</small><strong>ucpeaoffice@<wbr>ucpea.org</strong></span>
+        </a>
+        <button class="contact-dialog-copy" type="button" data-copy="ucpeaoffice@ucpea.org" aria-label="Copy email address">Copy</button>
+      </li>
+      <li>
+        <a class="contact-dialog-method" href="tel:+18604870850">
+          <span class="contact-dialog-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 3h4l2 5-2.5 1.5a11 11 0 0 0 6 6L16 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 5a2 2 0 0 1 2-2"/></svg></span>
+          <span><small>Phone</small><strong>860-487-0850</strong></span>
+        </a>
+        <button class="contact-dialog-copy" type="button" data-copy="860-487-0850" aria-label="Copy phone number">Copy</button>
+      </li>
+    </ul>
+    <p class="contact-dialog-status" id="contact-dialog-status" role="status"></p>
+  </dialog>
+
+  <!-- Phones: a help topic opens its answer in this sheet. On wider screens the answer stays beside the topics. -->
+  <dialog class="help-sheet" id="help-sheet" aria-labelledby="help-result-title">
+    <div class="help-sheet__bar">
+      <span class="help-sheet__grabber" aria-hidden="true"></span>
+      <button class="help-sheet__close" id="help-sheet-close" type="button" aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+    <div class="help-sheet__body" id="help-sheet-body"></div>
   </dialog>
 
   <footer class="site-footer">

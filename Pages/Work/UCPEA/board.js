@@ -244,7 +244,8 @@
         if (img.nextElementSibling?.classList.contains('board-gif-still')) img.nextElementSibling.hidden = true;
       }
     }
-    for (const button of view.querySelectorAll('[data-board-motion]')) {
+    // The sheet on phones lives outside the Board view, so look in both.
+    for (const button of new Set([...view.querySelectorAll('[data-board-motion]'), ...root.querySelectorAll('[data-board-motion]')])) {
       button.setAttribute('aria-pressed', String(state.motionPaused));
       button.textContent = state.motionPaused ? 'Play animations' : 'Pause animations';
       if (button.closest('.board-toolbar')) button.hidden = !view.querySelector('#board-posts img[data-gif]');
@@ -507,6 +508,50 @@
     return fragment;
   }
 
+  // A post's full contents: used by the Board view's detail page and by the
+  // phone sheet that opens from the Overview.
+  function detailNodes(post, { titleId, urls = state.urls }) {
+    const nodes = [flagList(post)];
+    const title = el('h2', 'board-detail-title', post.title);
+    title.id = titleId;
+    title.tabIndex = -1;
+    nodes.push(title);
+
+    const facts = el('dl', 'board-facts');
+    const fact = (term, value) => {
+      if (!value) return;
+      const row = el('div');
+      row.append(el('dt', null, term), el('dd', null, value));
+      facts.append(row);
+    };
+    fact('When', eventText(post.event_starts_at));
+    fact('Board', boardName(post.area_id));
+    fact('Posted', post.published_at ? dateText(post.published_at) : 'Not published yet');
+    fact('Until', post.expires_at ? dateText(post.expires_at) : '');
+    fact('Who can see it', post.visibility === 'public' ? 'Everyone' : 'Members of this board');
+    nodes.push(facts);
+
+    nodes.push(el('p', 'board-detail-summary', post.summary));
+    const picture = media(post, { full: true, urls });
+    if (picture) nodes.push(picture);
+    if (post.body) {
+      const body = el('div', 'board-detail-body');
+      body.append(paragraphs(post.body));
+      nodes.push(body);
+    }
+    if (post.link_url) {
+      const link = el('a', 'account-primary board-detail-link', 'Open link');
+      link.href = post.link_url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      const host = el('span', 'board-link-host', new URL(post.link_url).hostname);
+      const wrap = el('p', 'board-detail-actions');
+      wrap.append(link, host);
+      nodes.push(wrap);
+    }
+    return nodes;
+  }
+
   function renderDetail(id) {
     const post = state.posts.find(item => item.id === id);
     els.detail.replaceChildren();
@@ -523,45 +568,7 @@
       return;
     }
 
-    els.detail.append(flagList(post));
-    const title = el('h2', 'board-detail-title', post.title);
-    title.id = 'board-detail-title';
-    title.tabIndex = -1;
-    els.detail.append(title);
-
-    const facts = el('dl', 'board-facts');
-    const fact = (term, value) => {
-      if (!value) return;
-      const row = el('div');
-      row.append(el('dt', null, term), el('dd', null, value));
-      facts.append(row);
-    };
-    fact('When', eventText(post.event_starts_at));
-    fact('Board', boardName(post.area_id));
-    fact('Posted', post.published_at ? dateText(post.published_at) : 'Not published yet');
-    fact('Until', post.expires_at ? dateText(post.expires_at) : '');
-    fact('Who can see it', post.visibility === 'public' ? 'Everyone' : 'Members of this board');
-    els.detail.append(facts);
-
-    els.detail.append(el('p', 'board-detail-summary', post.summary));
-    const picture = media(post, { full: true });
-    if (picture) els.detail.append(picture);
-    if (post.body) {
-      const body = el('div', 'board-detail-body');
-      body.append(paragraphs(post.body));
-      els.detail.append(body);
-    }
-    if (post.link_url) {
-      const link = el('a', 'account-primary board-detail-link', 'Open link');
-      link.href = post.link_url;
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
-      const host = el('span', 'board-link-host', new URL(post.link_url).hostname);
-      const wrap = el('p', 'board-detail-actions');
-      wrap.append(link, host);
-      els.detail.append(wrap);
-    }
-
+    els.detail.append(...detailNodes(post, { titleId: 'board-detail-title' }));
     applyMotion();
 
     if (access().canPostTo(post.area_id) && !state.offline) {
@@ -1051,7 +1058,41 @@
   // Overview: a read-only corkboard of current public posts. It reads the
   // public posts directly, so the Overview never loads the sign-in library.
   // ---------------------------------------------------------------------------
-  const overview = { section: $('overview-board'), list: $('overview-board-posts') };
+  const overview = { section: $('overview-board'), list: $('overview-board-posts'), posts: [], urls: new Map() };
+
+  // Phones: an Overview post opens in the bottom sheet, growing out of its
+  // note, instead of leaving for the Board view. Wider screens follow the link.
+  overview.list?.addEventListener('click', event => {
+    const link = event.target.closest('a[data-board-post]');
+    const post = link && overview.posts.find(item => item.id === link.dataset.boardPost);
+    if (!post || !plainClick(event) || !window.UCPEASheet?.phone) return;
+    // Handled here, so the dashboard's router doesn't switch views.
+    event.preventDefault();
+    event.stopPropagation();
+
+    const content = el('div', 'board-detail board-sheet');
+    content.append(...detailNodes(post, { titleId: 'board-sheet-title', urls: overview.urls }));
+    const more = el('a', 'board-sheet-more', 'See it on the Bulletin Board');
+    more.href = `index.html?view=board#post-${post.id}`; // relative, so the dashboard router switches views in place
+    more.dataset.boardSheetMore = '';
+    content.append(more);
+    applyMotion(content);
+
+    UCPEASheet.open(link.closest('.board-note'), { content, labelledBy: 'board-sheet-title', focus: link });
+  });
+
+  // Inside the sheet: "See it on the Bulletin Board" closes the sheet as the
+  // dashboard switches views, and a GIF flyer's pause button still works.
+  document.addEventListener('click', event => {
+    const sheetContent = event.target.closest?.('.board-sheet');
+    if (!sheetContent) return;
+    if (event.target.closest('[data-board-sheet-more]') && plainClick(event)) {
+      UCPEASheet.close({ instant: true });
+    } else if (event.target.closest('button[data-board-motion]')) {
+      toggleMotion();
+      applyMotion(sheetContent);
+    }
+  });
 
   async function loadOverview() {
     if (!overview.section) return;
@@ -1071,6 +1112,8 @@
       const urls = new Map(posts
         .filter(post => post.image_path && post.image_bucket === 'board-public')
         .map(post => [post.id, `${url}/storage/v1/object/public/board-public/${post.image_path.split('/').map(encodeURIComponent).join('/')}`]));
+      overview.posts = posts;
+      overview.urls = urls;
       overview.list.replaceChildren(...posts.map(post => card(post, urls, 3)));
       overview.section.hidden = !posts.length;
       applyMotion(overview.list);

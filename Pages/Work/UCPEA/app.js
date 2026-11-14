@@ -700,6 +700,8 @@ function initDashboardNavigation() {
   menuToggle.hidden = false;
   sidebarToggle.hidden = false;
   body.setAttribute('data-navigation-ready', '');
+  // The phone home's entrance plays once; coming back to it later is instant.
+  window.setTimeout(() => { documentElement.dataset.homeSettled = ''; }, 900);
 }
 
 const helpTopics = {
@@ -792,17 +794,20 @@ const helpResultTitle = document.getElementById('help-result-title');
 const helpResultSummary = document.getElementById('help-result-summary');
 const helpResultSteps = document.getElementById('help-result-steps');
 const helpResultActions = document.getElementById('help-result-actions');
+const helpSheetLayout = window.matchMedia('(max-width: 800px)');
 
 function showHelpTopic(topicKey) {
   const topic = helpTopics[topicKey];
   if (!topic || !helpResultTitle || !helpResultSteps || !helpResultActions) return;
   const changed = !helpButtons.some(button => button.dataset.helpTopic === topicKey && button.classList.contains('is-active'));
 
-  // Topics are tabs over one shared panel: the selected tab is the only one
-  // in the tab order, and the arrow keys move between the others.
+  // Wider screens: topics are tabs over one shared panel, so the selected tab
+  // is the only one in the tab order and the arrow keys move between the
+  // others. Phones: every topic is a plain button that stays in the tab order.
   helpButtons.forEach(button => {
     const active = button.dataset.helpTopic === topicKey;
     button.classList.toggle('is-active', active);
+    if (helpSheetLayout.matches) return;
     button.setAttribute('aria-selected', String(active));
     button.tabIndex = active ? 0 : -1;
   });
@@ -830,6 +835,7 @@ function showHelpTopic(topicKey) {
     const link = document.createElement('a');
     link.className = `button ${index === 0 ? 'button-primary' : 'button-secondary'}`;
     link.href = href;
+    if (label === 'Contact UCPEA') link.dataset.contactUcpea = '';
     if (external) {
       link.target = '_blank';
       link.rel = 'noopener noreferrer';
@@ -843,7 +849,8 @@ function showHelpTopic(topicKey) {
   }));
 
   // The answer is rewritten in place; a short rise shows that it changed.
-  if (changed) {
+  // On phones the sheet carrying it is the motion, so the copy stays still.
+  if (changed && !helpSheetLayout.matches) {
     UCPEAMotion.arrive([
       helpResultTitle, helpResultSummary,
       ...helpResultSteps.children, helpResultActions,
@@ -856,9 +863,9 @@ helpButtons.forEach(button => {
 });
 
 // Arrow keys, Home, and End move between topics and show each as it's reached.
-document.querySelector('.help-topics[role="tablist"]')?.addEventListener('keydown', event => {
+document.querySelector('.help-topics')?.addEventListener('keydown', event => {
   const current = helpButtons.indexOf(event.target);
-  if (current === -1) return;
+  if (current === -1 || helpSheetLayout.matches) return;
   const last = helpButtons.length - 1;
   const next = {
     ArrowDown: current === last ? 0 : current + 1,
@@ -873,6 +880,258 @@ document.querySelector('.help-topics[role="tablist"]')?.addEventListener('keydow
   helpButtons[next].focus();
   showHelpTopic(helpButtons[next].dataset.helpTopic);
 });
+
+// Phones: a bottom sheet that grows out of whatever was tapped and shrinks
+// back into it on close, and can be dragged down to dismiss. Help topics
+// open their answer in it; other scripts (the Overview's Bulletin Board) use
+// it through window.UCPEASheet. Wider screens keep the help tabs with the
+// answer beside them.
+(() => {
+  const sheet = document.getElementById('help-sheet');
+  const sheetBody = document.getElementById('help-sheet-body');
+  const launcher = document.querySelector('.help-launcher');
+  const topicList = document.querySelector('.help-topics');
+  const result = document.getElementById('help-result');
+  if (!sheet || !launcher || !topicList || !result) return;
+
+  const bar = sheet.querySelector('.help-sheet__bar');
+  const canMorph = typeof document.startViewTransition === 'function';
+  // A gently damped spring: a small overshoot, then it settles.
+  const spring = CSS.supports('animation-timing-function', 'linear(0, 1)')
+    ? 'linear(0, .2 5%, .54 12%, .8 19%, .94 26%, 1.012 34%, 1.026 41%, 1.016 52%, 1.004 66%, 1)'
+    : 'cubic-bezier(0.16, 1, 0.3, 1)';
+  let trigger = null;
+  let returnFocus = null;
+  let drag = null;
+
+  function place() {
+    const phone = helpSheetLayout.matches;
+    if (!phone && sheet.open) sheet.close();
+    // On phones the help answer waits in the sheet; wider, it sits beside the tabs.
+    if (!phone) launcher.append(result);
+    else if (!sheet.open) sheetBody.replaceChildren(result);
+    topicList.setAttribute('role', phone ? 'group' : 'tablist');
+    topicList.toggleAttribute('aria-orientation', !phone);
+    if (!phone) topicList.setAttribute('aria-orientation', 'vertical');
+    result.toggleAttribute('role', !phone);
+    if (!phone) result.setAttribute('role', 'tabpanel');
+    for (const button of helpButtons) {
+      const active = button.classList.contains('is-active');
+      if (phone) {
+        button.removeAttribute('role');
+        button.removeAttribute('aria-selected');
+        button.setAttribute('aria-haspopup', 'dialog');
+        button.setAttribute('aria-controls', 'help-sheet');
+        button.tabIndex = 0;
+      } else {
+        button.setAttribute('role', 'tab');
+        button.setAttribute('aria-selected', String(active));
+        button.removeAttribute('aria-haspopup');
+        button.setAttribute('aria-controls', 'help-result');
+        button.tabIndex = active ? 0 : -1;
+      }
+    }
+  }
+
+  function onScreen(element) {
+    const box = element?.getBoundingClientRect();
+    return Boolean(box) && box.bottom > 0 && box.top < window.innerHeight;
+  }
+
+  // trigger: the element the sheet grows out of. content: what to show.
+  // labelledBy: the id of the content's heading. focus: where focus returns.
+  function open(button, { content = result, labelledBy = 'help-result-title', focus = button } = {}) {
+    trigger = button;
+    returnFocus = focus;
+    if (sheetBody.firstElementChild !== content || sheetBody.childElementCount !== 1) {
+      sheetBody.replaceChildren(content);
+    }
+    sheet.setAttribute('aria-labelledby', labelledBy);
+    const show = () => {
+      sheet.style.transform = '';
+      sheet.showModal();
+      sheetBody.scrollTop = 0;
+    };
+    if (!canMorph || UCPEAMotion.reduced) {
+      show();
+      sheet.animate(UCPEAMotion.reduced
+        ? [{ opacity: 0 }, { opacity: 1 }]
+        : [{ transform: 'translateY(100%)' }, { transform: 'none' }],
+      { duration: UCPEAMotion.reduced ? 160 : 420, easing: spring });
+      return;
+    }
+    button.style.viewTransitionName = 'help-sheet';
+    UCPEAMotion.transition('help-sheet', () => {
+      button.style.viewTransitionName = '';
+      sheet.style.viewTransitionName = 'help-sheet';
+      show();
+    }).finished.finally(() => { sheet.style.viewTransitionName = ''; });
+  }
+
+  function finishClose({ restoreFocus = true } = {}) {
+    sheet.close();
+    sheet.style.transform = '';
+    if (restoreFocus) returnFocus?.focus({ preventScroll: true });
+  }
+
+  // Slides the sheet off the bottom edge from wherever it is now.
+  function slideAway() {
+    const from = sheet.style.transform || 'none';
+    sheet.animate([{ transform: from }, { transform: 'translateY(100%)' }], {
+      duration: UCPEAMotion.reduced ? 120 : 260,
+      easing: 'cubic-bezier(0.4, 0, 1, 1)',
+      fill: 'forwards',
+    }).finished.then(animation => {
+      finishClose();
+      animation.cancel();
+    });
+  }
+
+  // instant: close at once, leaving focus alone (a link inside the sheet is
+  // taking the person somewhere else).
+  function close({ instant = false } = {}) {
+    if (!sheet.open) return;
+    if (instant) {
+      finishClose({ restoreFocus: false });
+      return;
+    }
+    // The morph back only makes sense if the row is still on screen.
+    if (!canMorph || UCPEAMotion.reduced || !onScreen(trigger) || sheet.style.transform) {
+      slideAway();
+      return;
+    }
+    sheet.style.viewTransitionName = 'help-sheet';
+    UCPEAMotion.transition('help-sheet', () => {
+      sheet.style.viewTransitionName = '';
+      finishClose();
+      trigger.style.viewTransitionName = 'help-sheet';
+    }).finished.finally(() => { trigger.style.viewTransitionName = ''; });
+  }
+
+  helpButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      if (helpSheetLayout.matches) open(button);
+    });
+  });
+
+  document.getElementById('help-sheet-close').addEventListener('click', close);
+  sheet.addEventListener('cancel', event => {
+    event.preventDefault();
+    close();
+  });
+  // A tap on the dimmed page behind the sheet closes it.
+  sheet.addEventListener('click', event => {
+    if (event.target === sheet) close();
+  });
+
+  // Drag the grabber bar down to dismiss. Short or slow drags spring back.
+  bar.addEventListener('pointerdown', event => {
+    if (event.button !== 0 || event.target.closest('button')) return;
+    sheet.getAnimations().forEach(animation => animation.cancel());
+    drag = { start: event.clientY, last: event.clientY, time: event.timeStamp, speed: 0 };
+    bar.setPointerCapture(event.pointerId);
+  });
+
+  bar.addEventListener('pointermove', event => {
+    if (!drag) return;
+    const raw = event.clientY - drag.start;
+    // Pulling up meets resistance; pulling down follows the finger.
+    const offset = raw < 0 ? -Math.min(24, Math.sqrt(-raw) * 2) : raw;
+    drag.speed = (event.clientY - drag.last) / Math.max(1, event.timeStamp - drag.time);
+    drag.last = event.clientY;
+    drag.time = event.timeStamp;
+    sheet.style.transform = `translateY(${offset}px)`;
+  });
+
+  function endDrag() {
+    if (!drag) return;
+    const travelled = drag.last - drag.start;
+    const flung = drag.speed > 0.55;
+    drag = null;
+    if (travelled > sheet.offsetHeight * 0.28 || (flung && travelled > 24)) {
+      slideAway();
+      return;
+    }
+    const from = sheet.style.transform || 'none';
+    sheet.style.transform = '';
+    sheet.animate([{ transform: from }, { transform: 'none' }], { duration: 420, easing: spring });
+  }
+
+  bar.addEventListener('pointerup', endDrag);
+  bar.addEventListener('pointercancel', endDrag);
+
+  helpSheetLayout.addEventListener('change', place);
+  place();
+
+  window.UCPEASheet = {
+    get phone() { return helpSheetLayout.matches; },
+    open,
+    close,
+  };
+})();
+
+// "Contact UCPEA" buttons open a pop-up with the office's email and phone.
+// Their mailto: link stays as the fallback, and its subject line carries over
+// to the pop-up's email link. Copy buttons help on devices with no mail app.
+(() => {
+  const dialog = document.getElementById('contact-dialog');
+  if (!dialog) return;
+  const emailLink = document.getElementById('contact-dialog-email');
+  const status = document.getElementById('contact-dialog-status');
+  const copyButtons = Array.from(dialog.querySelectorAll('[data-copy]'));
+  let resetTimer;
+
+  function resetCopies() {
+    clearTimeout(resetTimer);
+    status.textContent = '';
+    for (const button of copyButtons) {
+      button.textContent = 'Copy';
+      button.classList.remove('is-copied');
+    }
+  }
+
+  document.addEventListener('click', event => {
+    const trigger = event.target.closest('a[data-contact-ucpea]');
+    if (!trigger || !UCPEAViews.isPlainClick(event, trigger)) return;
+    event.preventDefault();
+    emailLink.href = trigger.getAttribute('href');
+    resetCopies();
+    dialog.showModal();
+  });
+
+  // A click on the dimmed page behind the pop-up closes it. (Clicks on the
+  // pop-up's own padding also target the dialog, so check the position.)
+  dialog.addEventListener('click', event => {
+    if (event.target !== dialog) return;
+    const box = dialog.getBoundingClientRect();
+    const outside = event.clientX < box.left || event.clientX > box.right
+      || event.clientY < box.top || event.clientY > box.bottom;
+    if (outside) dialog.close();
+  });
+
+  for (const button of copyButtons) {
+    button.addEventListener('click', async () => {
+      const value = button.dataset.copy;
+      try {
+        await navigator.clipboard.writeText(value);
+      } catch {
+        // No clipboard access (an insecure page, or permission denied):
+        // select the text instead so it can be copied by hand.
+        const text = button.previousElementSibling.querySelector('strong');
+        getSelection().selectAllChildren(text);
+        status.textContent = 'Copying isn’t available here. The text is selected; copy it with your keyboard.';
+        return;
+      }
+      resetCopies();
+      button.textContent = 'Copied';
+      button.classList.add('is-copied');
+      status.textContent = `Copied ${value}.`;
+      resetTimer = setTimeout(resetCopies, 2400);
+    });
+  }
+
+  dialog.addEventListener('close', resetCopies);
+})();
 
 const activityStart = document.getElementById('activityStart');
 const activityEnd = document.getElementById('activityEnd');
@@ -1083,11 +1342,15 @@ const salaryCalculator = document.getElementById('salary-calculator');
 
 if (salaryCalculator) {
   const baseSalaryInput = salaryCalculator.querySelector('#baseSalary');
-  const startingYearInput = salaryCalculator.querySelector('#startingYear');
+  // The July 2025 and July 2026 increases are already in members' pay, so
+  // the planner models only the next scheduled one.
+  const MODELED_YEAR = 2027;
   const salaryLevelInput = salaryCalculator.querySelector('#salaryLevel');
   const meritAmountInput = salaryCalculator.querySelector('#meritAmount');
+  const reclassToggle = salaryCalculator.querySelector('#reclassToggle');
+  const reclassDetails = salaryCalculator.querySelector('#reclassDetails');
+  const reclassOffHint = salaryCalculator.querySelector('#reclassOffHint');
   const reclassPercentInput = salaryCalculator.querySelector('#reclassPercent');
-  const reclassYearInput = salaryCalculator.querySelector('#reclassYear');
   const membershipEligibleInput = salaryCalculator.querySelector('#membershipEligible');
   const satisfactoryPerformanceInput = salaryCalculator.querySelector('#satisfactoryPerformance');
   const probationCompleteInput = salaryCalculator.querySelector('#probationComplete');
@@ -1183,11 +1446,10 @@ if (salaryCalculator) {
     clearSalaryError();
 
     const baseSalary = getNumber(baseSalaryInput);
-    const startingYear = Number(startingYearInput.value);
     const salaryLevel = Number(salaryLevelInput.value) || 0;
     const meritAmount = getNumber(meritAmountInput);
-    const reclassPercent = getNumber(reclassPercentInput);
-    const reclassYear = Number(reclassYearInput.value);
+    // A reclassification counts only while its switch is on.
+    const reclassPercent = reclassToggle.checked ? getNumber(reclassPercentInput) : 0;
     const meetsCoreConditions = membershipEligibleInput.checked && satisfactoryPerformanceInput.checked;
     const receivesPbc = meetsCoreConditions && probationCompleteInput.checked;
 
@@ -1201,13 +1463,9 @@ if (salaryCalculator) {
       return;
     }
 
-    if (reclassPercent !== 0 && (reclassPercent < 3 || reclassPercent > 10)) {
-      showSalaryError('Enter a reclassification estimate from 3% through 10%, or leave the field blank.');
-      return;
-    }
-
-    if (reclassPercent > 0 && reclassYear < startingYear) {
-      showSalaryError('Choose a reclassification year that is not earlier than the first increase being modeled.');
+    if (reclassToggle.checked && (reclassPercent < 3 || reclassPercent > 10)) {
+      showSalaryError('Enter a reclassification increase from 3% through 10%, or turn off Model a reclassification.');
+      reclassPercentInput.focus();
       return;
     }
 
@@ -1216,7 +1474,7 @@ if (salaryCalculator) {
     let estimatedLumpSum = 0;
 
     function applyReclassification(year) {
-      if (reclassPercent <= 0 || reclassYear !== year) return;
+      if (reclassPercent <= 0) return;
       const salaryBefore = salary;
       const increaseAmount = salaryBefore * (reclassPercent / 100);
       salary += increaseAmount;
@@ -1253,7 +1511,8 @@ if (salaryCalculator) {
       );
     }
 
-    for (let year = startingYear; year <= 2027; year += 1) {
+    {
+      const year = MODELED_YEAR;
       applyReclassification(year);
       const yearOpeningSalary = salary;
 
@@ -1299,7 +1558,7 @@ if (salaryCalculator) {
 
     const eligibilityNotes = [];
     if (meetsCoreConditions) {
-      eligibilityNotes.push('General wage increases are included for the selected years.');
+      eligibilityNotes.push('The July 1, 2027 general wage increase is included.');
       eligibilityNotes.push(receivesPbc
         ? 'Performance-based compensation is included.'
         : 'Performance-based compensation is omitted because the initial probationary period is marked incomplete.');
@@ -1320,11 +1579,11 @@ if (salaryCalculator) {
   function resetSalary() {
     clearSalaryError();
     baseSalaryInput.value = '';
-    startingYearInput.value = '2027';
     salaryLevelInput.value = '';
     meritAmountInput.value = '';
     reclassPercentInput.value = '';
-    reclassYearInput.value = '2027';
+    reclassToggle.checked = false;
+    showReclassification();
     membershipEligibleInput.checked = true;
     satisfactoryPerformanceInput.checked = true;
     probationCompleteInput.checked = true;
@@ -1348,10 +1607,24 @@ if (salaryCalculator) {
     if (window.location.hash === '#salary-calculator') salaryCalculator.open = true;
   }
 
+  // The reclassification inputs appear only when the switch is on.
+  function showReclassification({ focus = false } = {}) {
+    const on = reclassToggle.checked;
+    reclassDetails.hidden = !on;
+    reclassOffHint.hidden = on;
+    if (on) {
+      UCPEAMotion.arrive(reclassDetails, { y: -4, duration: 200 });
+      if (focus) reclassPercentInput.focus();
+    }
+  }
+
+  reclassToggle.addEventListener('change', () => showReclassification({ focus: true }));
+  showReclassification();
+
   calculateButton.addEventListener('click', calculateSalary);
   resetButton.addEventListener('click', resetSalary);
 
-  [baseSalaryInput, startingYearInput, salaryLevelInput, meritAmountInput, reclassPercentInput, reclassYearInput].forEach(input => {
+  [baseSalaryInput, salaryLevelInput, meritAmountInput, reclassPercentInput].forEach(input => {
     input.addEventListener('keydown', event => {
       if (event.key === 'Enter') calculateSalary();
     });

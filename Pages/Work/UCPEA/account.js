@@ -26,11 +26,20 @@
     notice: $('account-notice'),
     error: $('account-error'),
     headerButton: $('account-button'),
+    menu: $('account-menu'),
+    menuButton: $('account-menu-button'),
+    menuPanel: $('account-menu-panel'),
+    menuFirstName: $('account-menu-first-name'),
+    menuFullName: $('account-menu-full-name'),
+    menuEmail: $('account-menu-email'),
+    menuView: $('account-menu-view'),
+    menuSignOut: $('account-menu-sign-out'),
     sidebarLink: $('sidebar-account'),
     signInForm: $('account-sign-in'),
     signInEmail: $('sign-in-email'),
     signUpForm: $('account-sign-up'),
-    signUpName: $('sign-up-name'),
+    signUpFirstName: $('sign-up-first-name'),
+    signUpLastName: $('sign-up-last-name'),
     signUpEmail: $('sign-up-email'),
     signUpArea: $('sign-up-area'),
     codeForm: $('account-code'),
@@ -47,7 +56,8 @@
     suspendedNote: $('account-suspended-note'),
     offlineNote: $('account-offline-note'),
     detailsForm: $('account-details-form'),
-    nameInput: $('account-name-input'),
+    firstNameInput: $('account-first-name'),
+    lastNameInput: $('account-last-name'),
     areaField: $('account-area-field'),
     areaInput: $('account-area-input'),
     signOut: $('account-sign-out'),
@@ -55,7 +65,7 @@
 
   const state = {
     step: 'loading',
-    pending: null, // { email, createUser, name, areaId } while waiting for a code
+    pending: null, // { email, createUser, firstName, lastName, areaId } while waiting for a code
     profile: null,
     areas: null,
     resendTimer: 0,
@@ -191,8 +201,65 @@
       els.sidebarLink.title = profile ? 'Account' : 'Sign in';
       els.sidebarLink.querySelector('.sidebar-label').textContent = profile ? 'Account' : 'Sign in';
     }
+    // Signed in: the header shows the account menu (icon and first name) in
+    // place of the plain sign-in link.
+    if (els.menu) {
+      const signedIn = Boolean(profile);
+      if (!signedIn) setMenuOpen(false);
+      els.menu.hidden = !signedIn;
+      els.headerButton.hidden = signedIn;
+      if (signedIn) {
+        const firstName = (profile.firstName ?? splitName(profile.displayName).firstName) || '';
+        els.menuFirstName.textContent = firstName || 'Account';
+        els.menuButton.setAttribute('aria-label', firstName ? `Account menu for ${firstName}` : 'Account menu');
+        els.menuFullName.textContent = profile.displayName || firstName || 'Your account';
+        els.menuEmail.textContent = profile.email || '';
+      }
+    }
     document.dispatchEvent(new CustomEvent('ucpea-account', { detail: { profile } }));
   }
+
+  // ---------------------------------------------------------------------------
+  // Header account menu: View Account and Sign Out
+  // ---------------------------------------------------------------------------
+  function setMenuOpen(open, { focus = false } = {}) {
+    if (!els.menu) return;
+    els.menuPanel.hidden = !open;
+    els.menuButton.setAttribute('aria-expanded', String(open));
+    if (open && focus) els.menuView.focus();
+  }
+
+  els.menuButton?.addEventListener('click', () => {
+    const open = els.menuPanel.hidden;
+    // Opened from the keyboard, focus lands on the first item.
+    setMenuOpen(open, { focus: open && els.menuButton.matches(':focus-visible') });
+  });
+
+  els.menuView?.addEventListener('click', () => setMenuOpen(false));
+
+  els.menuSignOut?.addEventListener('click', async () => {
+    setMenuOpen(false);
+    await signOut();
+    // The plain sign-in icon is back in the menu's place; keep focus there.
+    els.headerButton.focus({ preventScroll: true });
+  });
+
+  // Close on Escape (focus back to the button), a click elsewhere, or tabbing out.
+  els.menu?.addEventListener('keydown', event => {
+    if (event.key !== 'Escape' || els.menuPanel.hidden) return;
+    event.preventDefault();
+    event.stopPropagation();
+    setMenuOpen(false);
+    els.menuButton.focus();
+  });
+
+  document.addEventListener('click', event => {
+    if (els.menu && !els.menuPanel.hidden && !els.menu.contains(event.target)) setMenuOpen(false);
+  });
+
+  els.menu?.addEventListener('focusout', event => {
+    if (event.relatedTarget && !els.menu.contains(event.relatedTarget)) setMenuOpen(false);
+  });
 
   // ---------------------------------------------------------------------------
   // Steps
@@ -247,10 +314,26 @@
   // ---------------------------------------------------------------------------
   // Profile
   // ---------------------------------------------------------------------------
+  function cleanName(value) {
+    return value.trim().replace(/\s+/g, ' ');
+  }
+
+  // Profiles saved before first and last names were split hold one full name:
+  // the last word is the last name, as the database migration splits it.
+  function splitName(fullName) {
+    const name = cleanName(fullName || '');
+    const space = name.lastIndexOf(' ');
+    return space === -1
+      ? { firstName: name, lastName: '' }
+      : { firstName: name.slice(0, space), lastName: name.slice(space + 1) };
+  }
+
   async function fetchProfile(client, user) {
     const [profileResult, rolesResult] = await Promise.all([
+      // Every column, so this keeps working whether or not the first/last
+      // name migration has run yet.
       client.from('profiles')
-        .select('id, email, display_name, role, status, requested_area_id')
+        .select('*')
         .eq('id', user.id)
         .maybeSingle(),
       client.from('area_roles')
@@ -281,6 +364,9 @@
       id: profile.id,
       email: profile.email || user.email || '',
       displayName: profile.display_name || '',
+      ...('first_name' in profile
+        ? { firstName: profile.first_name || '', lastName: profile.last_name || '' }
+        : splitName(profile.display_name)),
       role: profile.role,
       status: profile.status,
       requestedAreaId: profile.requested_area_id,
@@ -347,7 +433,10 @@
     els.suspendedNote.hidden = status !== 'suspended';
     els.offlineNote.hidden = !offline;
 
-    els.nameInput.value = profile.displayName;
+    // A profile saved on this device before the split has only displayName.
+    const { firstName, lastName } = profile.firstName == null ? splitName(profile.displayName) : profile;
+    els.firstNameInput.value = firstName;
+    els.lastNameInput.value = lastName;
     els.areaField.hidden = status !== 'pending';
     if (status === 'pending') {
       if (state.areas) fillAreaSelect(els.areaInput, state.areas, profile.requestedAreaId);
@@ -454,8 +543,15 @@
         options: {
           shouldCreateUser: request.createUser,
           emailRedirectTo: dashboard.href,
+          // display_name is the full name, for a database that hasn't had
+          // the first/last name migration yet.
           data: request.createUser
-            ? { display_name: request.name, requested_area_id: request.areaId || '' }
+            ? {
+              first_name: request.firstName,
+              last_name: request.lastName,
+              display_name: `${request.firstName} ${request.lastName}`,
+              requested_area_id: request.areaId || '',
+            }
             : undefined,
         },
       });
@@ -506,11 +602,12 @@
 
   els.signUpForm.addEventListener('submit', event => {
     event.preventDefault();
-    const name = els.signUpName.value.trim().replace(/\s+/g, ' ');
+    const firstName = cleanName(els.signUpFirstName.value);
+    const lastName = cleanName(els.signUpLastName.value);
     const email = els.signUpEmail.value.trim().toLowerCase();
-    if (!name) {
-      showError('Enter your name so UCPEA can recognize your request.');
-      els.signUpName.focus();
+    if (!firstName || !lastName) {
+      showError('Enter your first and last name so UCPEA can recognize your request.');
+      (firstName ? els.signUpLastName : els.signUpFirstName).focus();
       return;
     }
     if (!validEmail(email)) {
@@ -518,7 +615,7 @@
       els.signUpEmail.focus();
       return;
     }
-    sendCode({ email, createUser: true, name, areaId: els.signUpArea.value }, els.signUpForm);
+    sendCode({ email, createUser: true, firstName, lastName, areaId: els.signUpArea.value }, els.signUpForm);
   });
 
   els.resend.addEventListener('click', () => {
@@ -603,14 +700,16 @@
     event.preventDefault();
     const profile = state.profile;
     if (!profile) return;
-    const displayName = els.nameInput.value.trim().replace(/\s+/g, ' ');
-    if (!displayName) {
-      showError('Your name can’t be empty.');
-      els.nameInput.focus();
+    const firstName = cleanName(els.firstNameInput.value);
+    const lastName = cleanName(els.lastNameInput.value);
+    if (!firstName || !lastName) {
+      showError('Enter both your first and last name.');
+      (firstName ? els.lastNameInput : els.firstNameInput).focus();
       return;
     }
     const changes = {};
-    if (displayName !== profile.displayName) changes.display_name = displayName;
+    if (firstName !== profile.firstName) changes.first_name = firstName;
+    if (lastName !== profile.lastName) changes.last_name = lastName;
     if (profile.status === 'pending') {
       const areaId = els.areaInput.value ? Number(els.areaInput.value) : null;
       if (areaId !== profile.requestedAreaId) changes.requested_area_id = areaId;
@@ -637,7 +736,8 @@
     }
   });
 
-  els.signOut.addEventListener('click', async () => {
+  // Used by the Account page's Sign out button and the header menu.
+  async function signOut() {
     els.signOut.disabled = true;
     clearMessages();
     try {
@@ -649,9 +749,14 @@
     }
     await clearLocalAccount();
     els.signInEmail.value = '';
-    showStep('sign-in');
+    showStep('sign-in', { focus: false });
     showNotice("You're signed out on this device.");
     els.signOut.disabled = false;
+  }
+
+  els.signOut.addEventListener('click', async () => {
+    await signOut();
+    showStep('sign-in');
   });
 
   // ---------------------------------------------------------------------------

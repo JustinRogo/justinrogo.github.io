@@ -140,10 +140,20 @@
     monthView.replaceChildren(table);
   }
 
+  // On phones the current month opens on what's coming up: earlier days and
+  // anything past the next three event days fold away behind one button.
+  const expandButton = document.getElementById('calendar-expand');
+  let agendaExpanded = false;
+
   function renderAgenda(monthDays) {
     const groups = element('ul', 'calendar-agenda-days');
-    for (const day of monthDays.filter(day => day.events.length)) {
+    const eventDays = monthDays.filter(day => day.events.length);
+    const upcoming = eventDays.filter(day => day.key >= today);
+    const folding = selectedMonth === currentMonth && upcoming.length > 0;
+    const shown = new Set(upcoming.slice(0, 3));
+    for (const day of eventDays) {
       const group = element('li', 'calendar-agenda-day');
+      if (folding && !shown.has(day)) group.dataset.folded = '';
       const heading = element('h4');
       const date = element('time', '', dayLabel.format(day.date));
       date.dateTime = day.key;
@@ -153,7 +163,60 @@
       groups.append(group);
     }
     agendaView.replaceChildren(groups);
+    const folded = folding && eventDays.length > shown.size;
+    agendaView.classList.toggle('is-folded', folded && !agendaExpanded);
+    expandButton.hidden = !folded || agendaExpanded;
+    expandButton.textContent = `Show all of ${monthLabel.format(new Date(selectedMonth + '-01T00:00:00Z')).split(' ')[0]}`;
   }
+
+  expandButton.addEventListener('click', () => {
+    agendaExpanded = true;
+    agendaView.classList.remove('is-folded');
+    expandButton.setAttribute('aria-expanded', 'true');
+    expandButton.hidden = true;
+    const revealed = Array.from(agendaView.querySelectorAll('[data-folded]'));
+    revealed[0]?.querySelector('button')?.focus({ preventScroll: true });
+    UCPEAMotion.arrive(revealed, { y: 6, duration: 220, stagger: 18 });
+  });
+
+  // Phones: the hero names today's date, and the Today card shows the next
+  // event still to come. Its row opens that event's details directly.
+  const heroDate = document.getElementById('hero-date');
+  const heroDateLabel = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric', timeZone });
+  const nextRow = document.getElementById('home-next');
+  let nextEvent = null;
+
+  function upcomingEvent() {
+    const now = Date.now();
+    const days = Object.keys(data.days).filter(key => key >= today).sort();
+    for (const day of days) {
+      const event = data.days[day].find(item => day > today || !item.end || new Date(item.end).getTime() > now);
+      if (event) return { event, day, count: data.days[day].length };
+    }
+    return null;
+  }
+
+  function renderNext() {
+    heroDate.dateTime = today;
+    heroDate.textContent = heroDateLabel.format(new Date());
+    heroDate.hidden = false;
+    nextEvent = upcomingEvent();
+    if (!nextRow || !nextEvent) return;
+    const { event, day, count } = nextEvent;
+    const tomorrow = dateKey(easternDate, new Date(new Date(today + 'T12:00:00Z').getTime() + 86_400_000));
+    const dayName = day === today ? 'Today' : day === tomorrow ? 'Tomorrow' : dayLabel.format(new Date(day + 'T00:00:00Z'));
+    const time = event.start ? timeLabel.format(new Date(event.start)) : 'All day';
+    const more = count > 1 ? ` · ${count - 1} more` : '';
+    document.getElementById('home-next-when').textContent = `${dayName} · ${time}${more}`;
+    document.getElementById('home-next-title').textContent = event.title;
+    nextRow.setAttribute('aria-haspopup', 'dialog');
+  }
+
+  nextRow?.addEventListener('click', event => {
+    if (!nextEvent || !UCPEAViews.isPlainClick(event, nextRow)) return;
+    event.preventDefault();
+    showEvent(nextEvent.event, nextEvent.day, nextRow);
+  });
 
   function render() {
     const firstDate = new Date(selectedMonth + '-01T00:00:00Z');
@@ -202,6 +265,7 @@
     if (followingCurrentMonth) selectedMonth = currentMonth;
     render();
     renderToday();
+    renderNext();
   }
 
   previous.addEventListener('click', () => shiftMonth(-1));
@@ -226,6 +290,7 @@
   sync.hidden = false;
   render();
   renderToday();
+  renderNext();
   document.getElementById('calendar-unavailable').hidden = true;
   document.getElementById('calendar-content').hidden = false;
 })();

@@ -18,6 +18,9 @@ declare
   v_pending  constant uuid := '00000000-0000-4000-a000-000000000006';
   v_wants7   constant uuid := '00000000-0000-4000-a000-000000000007';
   v_wants3   constant uuid := '00000000-0000-4000-a000-000000000008';
+  -- Post counts look only at posts written by the test accounts above, so
+  -- real Bulletin Board posts already in the database don't change them.
+  v_test_posts constant text := 'select count(*) from public.posts where author_id::text like ''00000000-0000-4000-a000-%''';
   c record;
   n bigint;
   v_outcome text;
@@ -27,14 +30,15 @@ declare
 begin
   -- ----- Setup (as the database owner) -----------------------------------
   insert into auth.users (id, aud, role, email, raw_user_meta_data) values
-    (v_admin,    'authenticated', 'authenticated', 'rls-admin@ucpea.test',    '{"display_name":"Test Admin"}'),
-    (v_staff,    'authenticated', 'authenticated', 'rls-staff@ucpea.test',    '{"display_name":"Test Staff"}'),
-    (v_steward7, 'authenticated', 'authenticated', 'rls-steward7@ucpea.test', '{"display_name":"Test Steward"}'),
-    (v_member7,  'authenticated', 'authenticated', 'rls-member7@ucpea.test',  '{"display_name":"Test Member 7"}'),
+    (v_admin,    'authenticated', 'authenticated', 'rls-admin@ucpea.test',    '{"first_name":"Test","last_name":"Admin"}'),
+    (v_staff,    'authenticated', 'authenticated', 'rls-staff@ucpea.test',    '{"first_name":"Test","last_name":"Staff"}'),
+    -- Signed up from a page that still sent one name.
+    (v_steward7, 'authenticated', 'authenticated', 'rls-steward7@ucpea.test', '{"display_name":"Test  Area Steward"}'),
+    (v_member7,  'authenticated', 'authenticated', 'rls-member7@ucpea.test',  '{"first_name":"Test","last_name":"Member 7"}'),
     (v_member3,  'authenticated', 'authenticated', 'rls-member3@ucpea.test',  '{"requested_area_id":"abc"}'),
-    (v_pending,  'authenticated', 'authenticated', 'rls-pending@ucpea.test',  '{"display_name":"Test Pending","requested_area_id":"7"}'),
-    (v_wants7,   'authenticated', 'authenticated', 'rls-wants7@ucpea.test',   '{"display_name":"Wants Area 7","requested_area_id":"7"}'),
-    (v_wants3,   'authenticated', 'authenticated', 'rls-wants3@ucpea.test',   '{"display_name":"Wants Area 3","requested_area_id":"3"}');
+    (v_pending,  'authenticated', 'authenticated', 'rls-pending@ucpea.test',  '{"first_name":"Test","last_name":"Pending","requested_area_id":"7"}'),
+    (v_wants7,   'authenticated', 'authenticated', 'rls-wants7@ucpea.test',   '{"first_name":"Wants","last_name":"Area 7","requested_area_id":"7"}'),
+    (v_wants3,   'authenticated', 'authenticated', 'rls-wants3@ucpea.test',   '{"first_name":"Wants","last_name":"Area 3","requested_area_id":"3"}');
 
   update public.profiles set status = 'active', role = 'admin' where id = v_admin;
   update public.profiles set status = 'active', role = 'staff' where id = v_staff;
@@ -60,28 +64,28 @@ begin
     select * from (values
       ( 1, 'Sign-up keeps a valid requested area',            'postgres', 'count',   format('select count(*) from public.profiles where id = %L and requested_area_id = 7 and status = ''pending''', v_pending), 1),
       ( 2, 'Sign-up ignores an invalid requested area',       'postgres', 'count',   format('select count(*) from public.profiles where id = %L and requested_area_id is null', v_member3), 1),
-      ( 3, 'Signed out: sees only public posts',              'anon',     'count',   'select count(*) from public.posts', 1),
+      ( 3, 'Signed out: sees only public posts',              'anon',     'count',   v_test_posts, 1),
       ( 4, 'Signed out: can read the area list',              'anon',     'count',   'select count(*) from public.areas', 36),
       ( 5, 'Signed out: cannot read profiles',                'anon',     'blocked', 'select count(*) from public.profiles', null),
       ( 6, 'Signed out: cannot read push subscriptions',      'anon',     'blocked', 'select count(*) from public.push_subscriptions', null),
       ( 7, 'Signed out: cannot register for push',            'anon',     'blocked', 'select public.register_push_subscription(''https://push.example/anon'', ''k'', ''a'')', null),
-      ( 8, 'Pending: sees only public posts',                 v_pending::text,  'count',   'select count(*) from public.posts', 1),
+      ( 8, 'Pending: sees only public posts',                 v_pending::text,  'count',   v_test_posts, 1),
       ( 9, 'Pending: can change requested area',              v_pending::text,  'rows',    format('update public.profiles set requested_area_id = 3 where id = %L', v_pending), 1),
       (10, 'Pending: cannot approve self',                    v_pending::text,  'blocked', format('update public.profiles set status = ''active'' where id = %L', v_pending), null),
       (11, 'Pending: cannot turn on alerts',                  v_pending::text,  'blocked', 'select public.register_push_subscription(''https://push.example/p'', ''k'', ''a'')', null),
-      (12, 'Member 7: sees public, union and Area 7 posts',   v_member7::text,  'count',   'select count(*) from public.posts', 3),
+      (12, 'Member 7: sees public, union and Area 7 posts',   v_member7::text,  'count',   v_test_posts, 3),
       (13, 'Member 7: sees only own profile',                 v_member7::text,  'count',   'select count(*) from public.profiles', 1),
       (14, 'Member 7: cannot make self admin',                v_member7::text,  'blocked', format('update public.profiles set role = ''admin'' where id = %L', v_member7), null),
-      (15, 'Member 7: cannot rename someone else',            v_member7::text,  'rows',    format('update public.profiles set display_name = ''x'' where id = %L', v_member3), 0),
+      (15, 'Member 7: cannot rename someone else',            v_member7::text,  'rows',    format('update public.profiles set first_name = ''x'' where id = %L', v_member3), 0),
       (16, 'Member 7: cannot move self to another area',      v_member7::text,  'blocked', format('update public.profiles set requested_area_id = 3 where id = %L', v_member7), null),
       (17, 'Member 7: cannot post to Area 7',                 v_member7::text,  'blocked', 'insert into public.posts (area_id, title, summary) values (7, ''t'', ''s'')', null),
       (18, 'Member 7: cannot make self steward',              v_member7::text,  'blocked', format('insert into public.area_roles (user_id, area_id, role) values (%L, 9, ''steward'')', v_member7), null),
       (19, 'Member 7: can turn on alerts',                    v_member7::text,  'count',   'select count(*) from (select public.register_push_subscription(''https://push.example/shared'', ''k'', ''a'')) s', 1),
-      (20, 'Member 3: sees public, union and Area 3 posts',   v_member3::text,  'count',   'select count(*) from public.posts', 3),
+      (20, 'Member 3: sees public, union and Area 3 posts',   v_member3::text,  'count',   v_test_posts, 3),
       (21, 'Member 3: can take over a shared device',         v_member3::text,  'count',   'select count(*) from (select public.register_push_subscription(''https://push.example/shared'', ''k2'', ''a2'')) s', 1),
       (22, 'Member 7: lost the shared device subscription',   v_member7::text,  'count',   'select count(*) from public.push_subscriptions', 0),
       (23, 'Member 3: owns the shared device subscription',   v_member3::text,  'count',   'select count(*) from public.push_subscriptions', 1),
-      (24, 'Steward 7: also sees Area 7 drafts',              v_steward7::text, 'count',   'select count(*) from public.posts', 4),
+      (24, 'Steward 7: also sees Area 7 drafts',              v_steward7::text, 'count',   v_test_posts, 4),
       (25, 'Steward 7: can post to Area 7',                   v_steward7::text, 'rows',    'insert into public.posts (area_id, title, summary, status) values (7, ''Steward post'', ''Summary'', ''published'')', 1),
       (26, 'Steward 7: cannot post to Area 3',                v_steward7::text, 'blocked', 'insert into public.posts (area_id, title, summary) values (3, ''t'', ''s'')', null),
       (27, 'Steward 7: cannot post union-wide',               v_steward7::text, 'blocked', 'insert into public.posts (area_id, title, summary) values (null, ''t'', ''s'')', null),
@@ -90,13 +94,13 @@ begin
       (30, 'Steward 7: sees Area 7 roster rows only',         v_steward7::text, 'count',   'select count(*) from public.area_roles', 2),
       (31, 'Steward 7: cannot promote members',               v_steward7::text, 'rows',    format('update public.area_roles set role = ''steward'' where user_id = %L', v_member7), 0),
       (32, 'Steward 7: flyer folders 7 yes, 3 and union no',  v_steward7::text, 'count',   'select count(*) where private.can_post_to_folder(''7'') and not private.can_post_to_folder(''3'') and not private.can_post_to_folder(''union'')', 1),
-      (33, 'Staff: sees every post',                          v_staff::text,    'count',   'select count(*) from public.posts', 6),
+      (33, 'Staff: sees every post',                          v_staff::text,    'count',   v_test_posts, 6),
       (34, 'Staff: can approve a pending member',             v_staff::text,    'rows',    format('update public.profiles set status = ''active'' where id = %L', v_pending), 1),
       (35, 'Approval records who approved and when',          'postgres',       'count',   format('select count(*) from public.profiles where id = %L and approved_by = %L and approved_at is not null', v_pending, v_staff), 1),
       (36, 'Staff: can add someone to an area',               v_staff::text,    'rows',    format('insert into public.area_roles (user_id, area_id, role) values (%L, 7, ''member'')', v_pending), 1),
       (37, 'Staff: cannot change roles',                      v_staff::text,    'blocked', format('update public.profiles set role = ''staff'' where id = %L', v_member7), null),
       (38, 'Staff: can suspend a member',                     v_staff::text,    'rows',    format('update public.profiles set status = ''suspended'' where id = %L', v_member3), 1),
-      (39, 'Suspended: sees only public posts',               v_member3::text,  'count',   'select count(*) from public.posts', 1),
+      (39, 'Suspended: sees only public posts',               v_member3::text,  'count',   v_test_posts, 1),
       (40, 'Admin: can make a member staff',                  v_admin::text,    'rows',    format('update public.profiles set role = ''staff'' where id = %L', v_member7), 1),
       (41, 'Admin: cannot change own role',                   v_admin::text,    'blocked', format('update public.profiles set role = ''member'' where id = %L', v_admin), null),
       (42, 'New staff: cannot suspend an admin',              v_member7::text,  'blocked', format('update public.profiles set status = ''suspended'' where id = %L', v_admin), null),
@@ -104,7 +108,7 @@ begin
       -- and one sign-up is still waiting to join Area 7.
       (43, 'Steward 7: sees Area 7 members and sign-ups',     v_steward7::text, 'count',   'select count(*) from public.profiles', 4),
       (44, 'Steward 7: cannot see an Area 3 member',          v_steward7::text, 'count',   format('select count(*) from public.profiles where id = %L', v_member3), 0),
-      (45, 'Steward 7: cannot edit Area 7 members'' profiles', v_steward7::text, 'rows',    format('update public.profiles set display_name = ''x'' where id = %L', v_pending), 0),
+      (45, 'Steward 7: cannot edit Area 7 members'' profiles', v_steward7::text, 'rows',    format('update public.profiles set last_name = ''x'' where id = %L', v_pending), 0),
       (46, 'Steward 7: sees a sign-up asking for Area 7',     v_steward7::text, 'count',   format('select count(*) from public.profiles where id = %L', v_wants7), 1),
       (47, 'Steward 7: cannot see a sign-up for Area 3',      v_steward7::text, 'count',   format('select count(*) from public.profiles where id = %L', v_wants3), 0),
       (48, 'Steward 7: cannot approve a sign-up',             v_steward7::text, 'rows',    format('update public.profiles set status = ''active'' where id = %L', v_wants7), 0),
@@ -124,7 +128,13 @@ begin
       (61, 'Staff approvals need no FYI',                     'postgres',       'count',   format('select count(*) from public.profiles where id = %L and approved_via = ''staff'' and staff_acknowledged_at is not null', v_pending), 1),
       (62, 'Staff: can approve into a chosen area',           v_staff::text,    'count',   format('select count(*) from (select public.approve_signup(%L, 9::smallint)) s', v_wants3), 1),
       (63, 'Staff approval lands in the chosen area',         'postgres',       'count',   format('select count(*) from public.area_roles where user_id = %L and area_id = 9', v_wants3), 1),
-      (64, 'Signed out: cannot approve sign-ups',             'anon',           'blocked', format('select public.approve_signup(%L)', v_pending), null)
+      (64, 'Signed out: cannot approve sign-ups',             'anon',           'blocked', format('select public.approve_signup(%L)', v_pending), null),
+      -- First and last names
+      (65, 'Sign-up stores first and last name',              'postgres',       'count',   format('select count(*) from public.profiles where id = %L and first_name = ''Test'' and last_name = ''Admin'' and display_name = ''Test Admin''', v_admin), 1),
+      (66, 'Older sign-up page: one name is split',           'postgres',       'count',   format('select count(*) from public.profiles where id = %L and first_name = ''Test Area'' and last_name = ''Steward'' and display_name = ''Test Area Steward''', v_steward7), 1),
+      (67, 'Member: can change own first and last name',      v_member7::text,  'rows',    format('update public.profiles set first_name = '' Pat '', last_name = ''Lee'' where id = %L', v_member7), 1),
+      (68, 'Name change rebuilds the full name',              'postgres',       'count',   format('select count(*) from public.profiles where id = %L and first_name = ''Pat'' and display_name = ''Pat Lee''', v_member7), 1),
+      (69, 'Member: cannot write the full name directly',     v_member7::text,  'blocked', format('update public.profiles set display_name = ''x'' where id = %L', v_member7), null)
     ) as t(ord, label, actor, kind, query, expected)
     order by ord
   loop
