@@ -1292,9 +1292,10 @@ html[data-theme="dark"] .button-primary {
   color: var(--tile-ink);
 }
 
+/* Dark mode: the same light slate as the primary buttons. */
 html[data-theme="dark"] .guide-group .guide-index > ul > li > a[aria-current="location"] {
-  --tile-fill: var(--ucpea-white);
-  --tile-ink: var(--ucpea-brand);
+  --tile-fill: var(--ucpea-primary);
+  --tile-ink: var(--ucpea-primary-ink);
   --tile-muted: color-mix(in srgb, var(--ucpea-slate) 68%, var(--ucpea-dark-navy));
 }
 
@@ -2133,6 +2134,21 @@ html[data-theme="dark"] .guide-group .guide-index > ul > li > a[aria-current="lo
   color: var(--ucpea-on-navy);
 }
 
+/* Dark mode: the selected topic is the same light slate as the primary
+   buttons, with navy text. */
+html[data-theme="dark"] .help-topic.is-active {
+  background: var(--ucpea-primary);
+  color: var(--ucpea-primary-ink);
+}
+
+html[data-theme="dark"] .help-topic.is-active small {
+  color: color-mix(in srgb, var(--ucpea-slate) 68%, var(--ucpea-dark-navy));
+}
+
+html[data-theme="dark"] .help-topic.is-active:focus-visible {
+  outline-color: var(--ucpea-primary-ink);
+}
+
 .help-result {
   min-height: 100%;
   padding: clamp(32px, 5cqw, 62px);
@@ -2504,6 +2520,73 @@ html[data-theme="dark"] .guide-group .guide-index > ul > li > a[aria-current="lo
   color: var(--ink);
   font-size: 14px;
   font-weight: 800;
+}
+
+/* Reclassification: a switch that reveals its inputs. */
+.salary-calculator__field label.salary-calculator__switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 28px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.salary-calculator .salary-calculator__switch input {
+  flex: none;
+  order: 1;
+  position: relative;
+  width: 44px;
+  height: 26px;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 13px;
+  background: color-mix(in srgb, var(--ucpea-slate) 46%, var(--surface));
+  cursor: pointer;
+  appearance: none;
+  transition: background-color .2s ease, border-color .2s ease;
+}
+
+.salary-calculator .salary-calculator__switch input::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--ucpea-white);
+  box-shadow: 0 1px 3px rgba(0, 20, 50, .3);
+  transition: transform .22s var(--ease-out);
+}
+
+.salary-calculator .salary-calculator__switch input:checked {
+  border-color: var(--ucpea-primary);
+  background: var(--ucpea-primary);
+}
+
+.salary-calculator .salary-calculator__switch input:checked::before {
+  background: var(--ucpea-primary-ink);
+  transform: translateX(18px);
+}
+
+.salary-calculator .salary-calculator__switch input:focus-visible {
+  outline: 3px solid var(--shell-accent);
+  outline-offset: 2px;
+}
+
+.salary-calculator__reveal {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.salary-calculator__hint[hidden],
+.salary-calculator__reveal[hidden] {
+  display: none;
 }
 
 .salary-calculator__hint {
@@ -3408,6 +3491,273 @@ body:is([data-account="active"], [data-account="pending"], [data-account="suspen
   color: var(--shell-accent);
 }
 
+/* Contact UCPEA pop-up: email and phone, each with a Copy button. */
+.contact-dialog {
+  width: min(440px, calc(100% - 32px - var(--safe-left) - var(--safe-right)));
+}
+
+.contact-dialog h2 {
+  margin: 6px 0 0;
+}
+
+.contact-dialog-list {
+  display: grid;
+  margin: 18px 0 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  list-style: none;
+}
+
+.contact-dialog-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-right: 10px;
+}
+
+.contact-dialog-list li + li {
+  border-top: 1px solid var(--border);
+}
+
+.contact-dialog-method {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  min-height: 64px;
+  padding: 10px 12px;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.contact-dialog-method:hover strong {
+  color: var(--shell-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.contact-dialog-method:focus-visible {
+  outline-offset: -3px;
+}
+
+.contact-dialog-method > span:last-child {
+  display: grid;
+  min-width: 0;
+}
+
+.contact-dialog-method small {
+  color: var(--muted);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+/* The email may wrap after the @ (a <wbr> in the markup), never mid-word. */
+.contact-dialog-method strong {
+  font-size: 16px;
+  overflow-wrap: normal;
+}
+
+@media (max-width: 480px) {
+  .contact-dialog-method {
+    gap: 10px;
+    padding-inline: 10px;
+  }
+
+  .contact-dialog-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .contact-dialog-copy {
+    min-width: 60px;
+    padding-inline: 10px;
+  }
+}
+
+.contact-dialog-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--ucpea-selection);
+  color: var(--shell-accent);
+}
+
+.contact-dialog-icon svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.contact-dialog-copy {
+  flex: none;
+  min-width: 72px;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface-soft);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.contact-dialog-copy:hover {
+  border-color: var(--shell-accent);
+  color: var(--shell-accent);
+}
+
+.contact-dialog-copy.is-copied {
+  border-color: var(--ucpea-primary);
+  background: var(--ucpea-primary);
+  color: var(--ucpea-primary-ink);
+}
+
+.contact-dialog-status {
+  min-height: 1.4em;
+  margin: 10px 2px 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* Header account menu: icon, first name and a caret; opens View Account and Sign Out. */
+.account-menu:not([hidden]) {
+  position: relative;
+  display: flex;
+}
+
+.shell-button.account-menu__button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: auto;
+  max-width: 190px;
+  padding: 0 8px 0 10px;
+  border-radius: 999px;
+  color: var(--shell-accent);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.account-menu__button[aria-expanded="true"] {
+  background: var(--surface-soft);
+}
+
+.account-menu__first-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-menu__button svg {
+  flex: none;
+}
+
+.account-menu__button .account-menu__caret {
+  width: 16px;
+  height: 16px;
+  transition: transform .2s var(--ease-out);
+}
+
+.account-menu__button[aria-expanded="true"] .account-menu__caret {
+  transform: rotate(180deg);
+}
+
+.account-menu__panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 40;
+  display: grid;
+  width: max-content;
+  min-width: 220px;
+  max-width: min(300px, calc(100vw - 24px));
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  animation: ucpea-dialog-in .18s var(--ease-out);
+  transform-origin: top right;
+}
+
+.account-menu__panel[hidden] {
+  display: none;
+}
+
+.account-menu__who {
+  display: grid;
+  gap: 2px;
+  margin: 0 0 6px;
+  padding: 8px 10px 10px;
+  border-bottom: 1px solid var(--border);
+  overflow-wrap: anywhere;
+}
+
+.account-menu__who strong {
+  color: var(--ink);
+  font-size: 14px;
+}
+
+.account-menu__who span {
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+.account-menu__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.account-menu__item:hover {
+  background: var(--surface-soft);
+  color: var(--shell-accent);
+}
+
+.account-menu__item:focus-visible {
+  outline-offset: -2px;
+}
+
+.account-menu__item svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@media (max-width: 480px) {
+  .shell-button.account-menu__button {
+    max-width: 150px;
+  }
+}
+
 /* Same left edge as the other dashboard views, but a narrower measure for forms. */
 .account-section {
   max-width: 640px;
@@ -3435,6 +3785,13 @@ body:is([data-account="active"], [data-account="pending"], [data-account="suspen
 
 .account-card + .account-card {
   margin-top: 16px;
+}
+
+/* First and last name sit side by side, stacking on narrow cards. */
+.account-name-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  gap: 18px 14px;
 }
 
 .account-card h2,
@@ -3914,9 +4271,11 @@ body[data-sidebar="compact"] .nav-count {
   --note-muted: color-mix(in srgb, var(--ucpea-slate) 70%, var(--ucpea-dark-navy));
 }
 
+/* Dark mode: the board is the same light slate as the primary buttons, so
+   the navy notes stand out on it. */
 html[data-theme="dark"] .board-section {
-  --cork: color-mix(in srgb, var(--ucpea-gold) 24%, #17120c);
-  --cork-grain: color-mix(in srgb, var(--ucpea-gold) 30%, #000);
+  --cork: var(--ucpea-primary);
+  --cork-grain: var(--ucpea-dark-navy);
   --note-paper: var(--surface);
   --note-ink: var(--ink);
   --note-muted: var(--muted);
@@ -4145,7 +4504,8 @@ html[data-theme="dark"] .board-section {
 .board-post[data-category="action"] { --pin: var(--ucpea-red); }
 .board-post[data-category="flyer"] { --pin: #1f7a4d; }
 
-html[data-theme="dark"] .board-post[data-category="announcement"] { --pin: var(--ucpea-on-navy); }
+/* Mid-blue: shows against both the light board and the navy note. */
+html[data-theme="dark"] .board-post[data-category="announcement"] { --pin: color-mix(in srgb, var(--ucpea-slate) 70%, var(--ucpea-brand)); }
 
 /* Corkboard */
 .board-posts[data-layout="board"] {
@@ -4558,7 +4918,8 @@ html[data-theme="dark"] .board-post[data-category="announcement"] { --pin: var(-
   display: none;
 }
 
-/* Motion. Each animation answers an action; nothing plays on page load.
+/* Motion. Each animation answers an action. The one exception is the phone
+   home, whose Today card and tools rise in once when the dashboard first opens.
    Distances scale with --motion-scale so reduced motion keeps the fades. */
 @keyframes ucpea-fade-in {
   from { opacity: 0; }
@@ -4707,5 +5068,736 @@ html[data-transition="guide"][data-guide-swap]::view-transition-old(guide-fold-o
 
   html[data-transition]::view-transition-group(*) {
     animation-duration: .18s;
+  }
+}
+
+/* ==========================================================================
+   Phones: the Overview opens like an app.
+   A compact brand band with today's date, a Today card (next event, newest
+   Union Wire story), the contract, and the member tools. Help topics open
+   their answers in a bottom sheet. The sections below condense to previews.
+   Wider screens never see any of this.
+   ========================================================================== */
+.home-launch,
+.hero-date,
+.section-more,
+.calendar-expand,
+.help-sheet {
+  display: none;
+}
+
+@media (max-width: 800px) {
+  :root {
+    --home-radius: 18px;
+    --home-lift: 0 1px 2px rgba(0, 33, 89, .08), 0 18px 38px -16px rgba(0, 33, 89, .38);
+  }
+
+  html[data-theme="dark"] {
+    --home-lift: 0 1px 2px rgba(0, 0, 0, .35), 0 22px 44px -18px rgba(0, 0, 0, .75);
+  }
+
+  :is(.home-launch, .help-sheet) svg {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* Brand band: navy in both themes, short enough that the tools show first. */
+  .hero {
+    --hero-muted: var(--ucpea-on-navy);
+    background:
+      radial-gradient(120% 90% at 100% 0%, color-mix(in srgb, var(--ucpea-slate) 34%, transparent), transparent 64%),
+      var(--ucpea-brand);
+    color: var(--ucpea-white);
+  }
+
+  html[data-theme="dark"] .hero {
+    background:
+      radial-gradient(120% 90% at 100% 0%, color-mix(in srgb, var(--ucpea-slate) 24%, transparent), transparent 64%),
+      var(--ucpea-dark-navy);
+  }
+
+  .hero .hero-grid {
+    display: block;
+    padding: 22px 0 86px;
+  }
+
+  /* One phone-width column, even on a small tablet. */
+  .hero .hero-grid,
+  .home-launch,
+  #main-content > .section-shell:not([data-dashboard-view]) {
+    width: min(640px, calc(100% - 2 * var(--content-gutter)));
+  }
+
+  .hero-grid::before {
+    top: -54px;
+    right: -64px;
+    width: 210px;
+    height: 210px;
+    border-color: color-mix(in srgb, var(--ucpea-white) 9%, transparent);
+  }
+
+  .hero-grid::after {
+    display: none;
+  }
+
+  .hero .hero-copy {
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr);
+    align-items: center;
+    column-gap: 14px;
+  }
+
+  .hero .hero-logo {
+    grid-row: span 2;
+    width: 56px;
+    margin: 0;
+  }
+
+  .hero h1 {
+    font-size: clamp(24px, 7vw, 30px);
+    line-height: 1.06;
+    letter-spacing: -.03em;
+    text-wrap: balance;
+  }
+
+  .hero-date:not([hidden]) {
+    display: block;
+    margin-top: 6px;
+    color: var(--ucpea-on-navy);
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .hero :is(.hero-intro, .hero-actions, .hero-update-card, .hero-today-card) {
+    display: none;
+  }
+
+  .hero :focus-visible {
+    outline-color: var(--ucpea-on-navy);
+  }
+
+  /* The launch area tucks up over the band's lower edge. */
+  .home-launch {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: 26px;
+    margin: -66px auto 0;
+  }
+
+  .home-today {
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--home-radius);
+    background: var(--surface);
+    box-shadow: var(--home-lift);
+  }
+
+  .home-today__row {
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1fr) 18px;
+    align-items: center;
+    gap: 14px;
+    min-height: 74px;
+    padding: 14px 14px 14px 16px;
+    color: var(--ink);
+    text-decoration: none;
+    transition: background-color .18s ease;
+  }
+
+  .home-today__row + .home-today__row {
+    border-top: 1px solid var(--border);
+  }
+
+  .home-today__row:active {
+    background: var(--surface-soft);
+  }
+
+  .home-today__row:focus-visible {
+    outline-offset: -3px;
+  }
+
+  .home-today__icon {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: var(--ucpea-selection);
+    color: var(--shell-accent);
+  }
+
+  .home-today__icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .home-today__text {
+    display: grid;
+    gap: 3px;
+    min-width: 0;
+  }
+
+  .home-today__text small {
+    color: var(--muted);
+    font-size: 12.5px;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  .home-today__text strong {
+    display: -webkit-box;
+    overflow: hidden;
+    font-family: var(--ucpea-heading-font);
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.3;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .home-chevron {
+    width: 18px;
+    height: 18px;
+    color: var(--muted);
+  }
+
+  /* The contract: a small cover beside its dates, then the two ways in. */
+  .home-contract {
+    display: grid;
+    grid-template-columns: 60px minmax(0, 1fr);
+    grid-template-areas:
+      "cover copy"
+      "actions actions";
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--home-radius);
+    background: var(--surface);
+  }
+
+  .home-contract__cover {
+    position: relative;
+    grid-area: cover;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 80px;
+    padding: 8px 7px 8px 11px;
+    border-radius: 3px 7px 7px 3px;
+    background: linear-gradient(155deg, color-mix(in srgb, var(--ucpea-slate) 22%, var(--ucpea-brand)), var(--ucpea-dark-navy));
+    color: var(--ucpea-on-navy);
+    box-shadow: 0 10px 18px -10px rgba(0, 33, 89, .7);
+  }
+
+  html[data-theme="dark"] .home-contract__cover {
+    background: linear-gradient(155deg, color-mix(in srgb, var(--ucpea-slate) 46%, var(--ucpea-brand)), var(--ucpea-brand));
+    box-shadow: 0 10px 18px -10px rgba(0, 0, 0, .9);
+  }
+
+  /* The spine. */
+  .home-contract__cover::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 5px;
+    width: 1px;
+    background: color-mix(in srgb, var(--ucpea-white) 22%, transparent);
+  }
+
+  .home-contract__cover span {
+    font-size: 7.5px;
+    font-weight: 850;
+    letter-spacing: .14em;
+  }
+
+  .home-contract__cover strong {
+    display: grid;
+    color: var(--ucpea-white);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1;
+  }
+
+  .home-contract__cover i {
+    width: 14px;
+    height: 1px;
+    margin: 4px 0;
+    background: var(--ucpea-gold);
+  }
+
+  .home-contract__copy h2 {
+    margin: 0;
+    font-size: 20px;
+    line-height: 1.15;
+    letter-spacing: -.02em;
+  }
+
+  .home-contract__copy p {
+    margin: 5px 0 0;
+    text-wrap: pretty;
+    color: var(--muted);
+    font-size: 13.5px;
+    line-height: 1.4;
+  }
+
+  .home-contract__actions {
+    grid-area: actions;
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .home-contract .button {
+    width: auto;
+    min-height: 46px;
+    padding: 10px 8px;
+    border-radius: 12px;
+    font-size: 13.5px;
+    white-space: nowrap;
+  }
+
+  .home-contract .button-primary,
+  html[data-theme="dark"] .home-contract .button-primary {
+    box-shadow: none;
+  }
+
+  .home-contract .button-secondary {
+    border-color: var(--border);
+    background: var(--surface-soft);
+    color: var(--ink);
+  }
+
+  /* Member tools: an app-style launcher. */
+  .home-tiles {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px 8px;
+  }
+
+  .home-tiles a {
+    display: grid;
+    justify-items: center;
+    align-content: start;
+    gap: 8px;
+    padding: 2px;
+    border-radius: 14px;
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.25;
+    text-align: center;
+    text-decoration: none;
+  }
+
+  .home-tiles a > span {
+    display: grid;
+    place-items: center;
+    width: 58px;
+    height: 58px;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background: var(--surface);
+    color: var(--shell-accent);
+    box-shadow: 0 1px 1px rgba(0, 33, 89, .05), 0 8px 16px -10px rgba(0, 33, 89, .35);
+    transition: transform .22s var(--ease-out), background-color .18s ease;
+  }
+
+  html[data-theme="dark"] .home-tiles a > span {
+    box-shadow: 0 8px 16px -10px rgba(0, 0, 0, .8);
+  }
+
+  .home-tiles a:active > span {
+    background: var(--surface-soft);
+    transform: scale(.93);
+  }
+
+  .home-tiles svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* Overview sections below the launch area read as app sections: a short
+     title with its "See all" beside it, then a preview. */
+  #main-content > .section-shell:not([data-dashboard-view]) {
+    padding-block: 40px 4px;
+  }
+
+  #main-content > .section-shell:not([data-dashboard-view]) .section-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  #main-content > .section-shell:not([data-dashboard-view]) .section-heading h2,
+  .contact-section .contact-card h2 {
+    font-size: 22px;
+    line-height: 1.2;
+    letter-spacing: -.02em;
+  }
+
+  .section-more {
+    display: block;
+    flex: none;
+    padding-block: 10px;
+    color: var(--shell-accent);
+    font-size: 14px;
+    font-weight: 800;
+    text-decoration: none;
+  }
+
+  /* Help topics: one grouped list; each row opens the sheet. */
+  .start-section .help-launcher {
+    display: block;
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+  }
+
+  .start-section .help-topics {
+    display: block;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--home-radius);
+    background: var(--surface);
+  }
+
+  .help-topics .help-topic,
+  .help-topics .help-topic.is-active {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 18px;
+    align-items: center;
+    gap: 12px;
+    min-height: 66px;
+    padding: 12px 14px 12px 16px;
+    border-radius: 0;
+    background: transparent;
+    color: var(--ink);
+    transform: none;
+  }
+
+  .help-topic + .help-topic {
+    border-top: 1px solid var(--border);
+  }
+
+  .help-topic::after {
+    content: "";
+    justify-self: center;
+    width: 7px;
+    height: 7px;
+    border-top: 1.7px solid var(--muted);
+    border-right: 1.7px solid var(--muted);
+    transform: rotate(45deg);
+  }
+
+  .help-topics .help-topic:active {
+    background: var(--surface-soft);
+  }
+
+  .help-topics .help-topic small,
+  .help-topics .help-topic.is-active small {
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 12.5px;
+  }
+
+  .help-topics .help-topic:focus-visible {
+    outline-color: var(--shell-accent);
+    outline-offset: -3px;
+  }
+
+  /* The sheet. */
+  .help-sheet[open] {
+    position: fixed;
+    inset: auto 0 0;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: none;
+    max-height: calc(100dvh - var(--topbar-height) - 10px);
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    border-radius: 24px 24px 0 0;
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: 0 -14px 40px rgba(0, 20, 50, .22);
+  }
+
+  .help-sheet::backdrop {
+    background: rgba(4, 14, 34, .5);
+  }
+
+  html:has(.help-sheet[open]) {
+    overflow: hidden;
+  }
+
+  .help-sheet__bar {
+    position: relative;
+    flex: none;
+    display: grid;
+    place-items: center;
+    height: 46px;
+    cursor: grab;
+    touch-action: none;
+  }
+
+  .help-sheet__bar:active {
+    cursor: grabbing;
+  }
+
+  .help-sheet__grabber {
+    width: 40px;
+    height: 5px;
+    border-radius: 3px;
+    background: color-mix(in srgb, var(--ucpea-slate) 45%, transparent);
+  }
+
+  .help-sheet__close {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--surface-soft);
+    color: var(--ink);
+    cursor: pointer;
+  }
+
+  .help-sheet__close svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .help-sheet__close:focus-visible {
+    outline-offset: 2px;
+  }
+
+  .help-sheet__body {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 0 20px calc(24px + var(--safe-bottom));
+  }
+
+  .help-sheet .help-result {
+    min-height: 0;
+    padding: 0;
+  }
+
+  .help-sheet .help-result h3 {
+    margin: 2px 0 10px;
+    font-size: 24px;
+    text-wrap: balance;
+  }
+
+  .help-sheet .help-steps {
+    margin: 22px 0;
+  }
+
+  .help-sheet .help-result__actions {
+    display: grid;
+    gap: 10px;
+  }
+
+  .help-sheet .button {
+    width: 100%;
+  }
+
+  /* A Bulletin Board post in the sheet: the detail page's layout, in the
+     sheet's colors rather than the corkboard's. */
+  .help-sheet .board-sheet {
+    --note-ink: var(--ink);
+    --note-muted: var(--muted);
+    gap: 14px;
+    padding-top: 2px;
+  }
+
+  .help-sheet .board-detail-title {
+    font-size: 24px;
+    text-wrap: balance;
+  }
+
+  .help-sheet .board-facts div {
+    grid-template-columns: 7rem minmax(0, 1fr);
+  }
+
+  .help-sheet .board-detail-summary {
+    font-size: 16px;
+  }
+
+  .help-sheet .board-media-full :is(img, canvas) {
+    max-height: 60vh;
+    border-radius: 8px;
+  }
+
+  .help-sheet .board-detail-link {
+    min-height: 46px;
+  }
+
+  .board-sheet-more {
+    justify-self: start;
+    padding-block: 10px;
+    color: var(--shell-accent);
+    font-size: 14px;
+    font-weight: 800;
+    text-underline-offset: 3px;
+  }
+
+  .board-sheet-more::after {
+    content: " →";
+  }
+
+  /* Bulletin Board: a corkboard strip that scrolls sideways. */
+  .overview-board .board-posts[data-layout="board"] {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-inline: calc(-1 * var(--content-gutter));
+    padding: 22px var(--content-gutter) 26px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    border-radius: 0;
+    scroll-padding-inline: var(--content-gutter);
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .overview-board .board-posts[data-layout="board"]::-webkit-scrollbar {
+    display: none;
+  }
+
+  .overview-board .board-post {
+    flex: 0 0 min(78%, 300px);
+    scroll-snap-align: start;
+  }
+
+  /* Calendar: the current month opens on the next few event days. */
+  .calendar-agenda.is-folded [data-folded] {
+    display: none;
+  }
+
+  .calendar-expand:not([hidden]) {
+    display: block;
+    width: 100%;
+    min-height: 50px;
+    border: 0;
+    border-top: 1px solid var(--border);
+    background: transparent;
+    color: var(--shell-accent);
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .calendar-expand:focus-visible {
+    outline-offset: -3px;
+  }
+
+  /* The contract section keeps what the launch card leaves out: popular
+     articles and the salary planner. */
+  .contract-section :is(.contract-cover, .contract-content) {
+    display: none;
+  }
+
+  .contact-section .contact-card {
+    gap: 18px;
+    padding: 24px 20px 8px;
+    border-radius: var(--home-radius);
+  }
+
+  .contact-section .contact-card > div:first-child > p:last-child {
+    margin-top: 8px;
+    font-size: 15px;
+  }
+
+  .contact-section .contact-details a {
+    grid-template-columns: 52px 1fr;
+    padding: 15px 2px;
+  }
+
+  .contact-section .contact-details a:last-child {
+    border-bottom: 0;
+  }
+
+  /* One entrance, when the dashboard first opens on the home screen. */
+  :root:not([data-home-settled]) :is(.home-today, .home-contract, .home-tiles) {
+    animation: ucpea-home-rise .56s var(--ease-out) backwards;
+  }
+
+  :root:not([data-home-settled]) .home-contract {
+    animation-delay: .07s;
+  }
+
+  :root:not([data-home-settled]) .home-tiles {
+    animation-delay: .14s;
+  }
+}
+
+@keyframes ucpea-home-rise {
+  from {
+    opacity: 0;
+    transform: translateY(calc(14px * var(--motion-scale)));
+  }
+}
+
+/* A help topic's row grows into the sheet, then shrinks back into it.
+   The growing box is solid surface, so it reads as one panel: the row's
+   text clears first, the answer settles in once the box is nearly open.
+   Both images are drawn at natural size from the top, so text never
+   stretches while the box reshapes; the box itself rides a soft spring. */
+html[data-transition="help-sheet"]::view-transition-group(help-sheet) {
+  overflow: clip;
+  border-radius: 22px;
+  background: var(--surface);
+  box-shadow: 0 -10px 36px rgba(0, 20, 50, .2);
+  animation-duration: .5s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  animation-timing-function: linear(0, .2 5%, .54 12%, .8 19%, .94 26%, 1.012 34%, 1.026 41%, 1.016 52%, 1.004 66%, 1);
+}
+
+html[data-transition="help-sheet"]::view-transition-old(help-sheet),
+html[data-transition="help-sheet"]::view-transition-new(help-sheet) {
+  block-size: 100%;
+  object-fit: none;
+  object-position: 50% 0;
+}
+
+html[data-transition="help-sheet"]::view-transition-old(help-sheet) {
+  animation-duration: .12s;
+}
+
+html[data-transition="help-sheet"]::view-transition-new(help-sheet) {
+  animation-duration: .24s;
+  animation-delay: .09s;
+  animation-fill-mode: both;
+}
+
+html[data-transition="help-sheet"]::view-transition-group(root) {
+  animation-duration: .32s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root:not([data-home-settled]) :is(.home-today, .home-contract, .home-tiles) {
+    animation-duration: .2s;
+    animation-delay: 0s;
+  }
+
+  .home-tiles a:active > span {
+    transform: none;
   }
 }

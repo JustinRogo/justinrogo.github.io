@@ -56,6 +56,14 @@
 
   heroTitle.replaceChildren(articleLink(lead));
   if (lead.publishedOn && setPublicationDate(heroDate, lead.publishedOn)) heroDate.hidden = false;
+
+  // Phones: the Today card's second row carries the newest story.
+  const homeWire = document.getElementById('home-wire');
+  if (homeWire) {
+    homeWire.href = lead.url;
+    document.getElementById('home-wire-title').textContent = lead.title;
+    if (!heroDate.hidden) document.getElementById('home-wire-when').textContent = `Union Wire · ${heroDate.textContent}`;
+  }
   if (generatedAt) {
     status.textContent = `Feed refreshed ${refreshFormat.format(new Date(generatedAt))}`;
     status.hidden = false;

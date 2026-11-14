@@ -14,6 +14,7 @@ the site build skips `.sql` and `.md` files.
 | `migrations/20261113000400_board_storage.sql` | Two storage buckets for flyers (public and members-only) and who may upload or read them |
 | `migrations/20261113000500_board_gifs.sql` | Lets the flyer buckets accept GIFs, which upload unchanged so they stay animated |
 | `migrations/20261113000600_flyer_only_posts.sql` | Adds `flyer_only`: the corkboard shows just the flyer image, and clicking it opens the full post |
+| `migrations/20261114000100_first_last_names.sql` | Stores first and last names separately (`first_name`, `last_name`). `display_name` is rebuilt from them automatically and is read-only to the app. Existing names are split at the last space |
 | `tests/rls_check.sql` | A permissions check that signs in as eight test accounts and tries allowed and forbidden actions |
 
 ## Who can do what
@@ -63,7 +64,7 @@ await supabase.rpc('approve_signup', { p_user: userId, p_area: 12 });  // staff 
 2. Paste and run each file in `migrations/`, **in filename order**.
 3. Paste and run `tests/rls_check.sql`. It always ends with an error message;
    that is how it undoes its test data. The message should say
-   `64 passed, 0 failed`.
+   `69 passed, 0 failed`.
 4. Make yourself the first admin. Sign up through the app (or **Authentication →
    Users → Add user**), then run, with your email:
 
