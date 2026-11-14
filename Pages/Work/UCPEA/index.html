@@ -39,6 +39,7 @@
   <script src="pwa.js" defer></script>
   <script src="tool-views.js" defer></script>
   <script src="app.js" defer></script>
+  <script src="contract-sheet.js" defer></script>
   <script src="member-rights.js" defer></script>
   <script src="union-wire-feed.js" defer></script>
   <script src="union-wire.js" defer></script>
@@ -2007,6 +2008,9 @@
   <!-- Phones: a help topic opens its answer in this sheet. On wider screens the answer stays beside the topics. -->
   <dialog class="help-sheet" id="help-sheet" aria-labelledby="help-result-title">
     <div class="help-sheet__bar">
+      <button class="help-sheet__back" id="help-sheet-back" type="button" aria-label="Back" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg>
+      </button>
       <span class="help-sheet__grabber" aria-hidden="true"></span>
       <button class="help-sheet__close" id="help-sheet-close" type="button" aria-label="Close">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>

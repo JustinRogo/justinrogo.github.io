@@ -388,6 +388,7 @@ html[data-theme="dark"] nav.toc a.is-active, html[data-theme="dark"] .mobile-art
 }
 </style>
 <link rel="stylesheet" href="tool-theme.css">
+<link rel="stylesheet" href="contract-reader.css">
 </head>
 <body>
 <a class="skip-link" href="#contract-content">Skip to contract</a>
@@ -2122,4 +2123,5 @@ articles.forEach(article => {
 document.getElementById('expand-all').addEventListener('click', () => articles.forEach(a => { if(!a.hidden) a.open=true; }));
 document.getElementById('collapse-all').addEventListener('click', () => articles.forEach(a => a.open=false));
 </script>
+<script src="contract-reader.js"></script>
 </body></html>

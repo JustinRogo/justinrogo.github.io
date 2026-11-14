@@ -900,9 +900,13 @@ document.querySelector('.help-topics')?.addEventListener('keydown', event => {
   const spring = CSS.supports('animation-timing-function', 'linear(0, 1)')
     ? 'linear(0, .2 5%, .54 12%, .8 19%, .94 26%, 1.012 34%, 1.026 41%, 1.016 52%, 1.004 66%, 1)'
     : 'cubic-bezier(0.16, 1, 0.3, 1)';
+  const back = document.getElementById('help-sheet-back');
   let trigger = null;
   let returnFocus = null;
   let drag = null;
+  // Opening something from inside the sheet (an article linked from a help
+  // answer) swaps it in place; the back arrow returns to what was there.
+  let stack = [];
 
   function place() {
     const phone = helpSheetLayout.matches;
@@ -940,7 +944,23 @@ document.querySelector('.help-topics')?.addEventListener('keydown', event => {
 
   // trigger: the element the sheet grows out of. content: what to show.
   // labelledBy: the id of the content's heading. focus: where focus returns.
+  function swap(content, labelledBy, { scroll = 0, from = 1 } = {}) {
+    sheetBody.replaceChildren(content);
+    sheet.setAttribute('aria-labelledby', labelledBy);
+    sheetBody.scrollTop = scroll;
+    back.hidden = !stack.length;
+    UCPEAMotion.arrive(content, { x: 16 * from, y: 0, duration: 220 });
+    document.getElementById(labelledBy)?.focus({ preventScroll: true });
+  }
+
   function open(button, { content = result, labelledBy = 'help-result-title', focus = button } = {}) {
+    if (sheet.open) {
+      stack.push({ content: sheetBody.firstElementChild, labelledBy: sheet.getAttribute('aria-labelledby'), scroll: sheetBody.scrollTop });
+      swap(content, labelledBy);
+      return;
+    }
+    stack = [];
+    back.hidden = true;
     trigger = button;
     returnFocus = focus;
     if (sheetBody.firstElementChild !== content || sheetBody.childElementCount !== 1) {
@@ -971,6 +991,8 @@ document.querySelector('.help-topics')?.addEventListener('keydown', event => {
   function finishClose({ restoreFocus = true } = {}) {
     sheet.close();
     sheet.style.transform = '';
+    stack = [];
+    back.hidden = true;
     if (restoreFocus) returnFocus?.focus({ preventScroll: true });
   }
 
@@ -1015,6 +1037,10 @@ document.querySelector('.help-topics')?.addEventListener('keydown', event => {
   });
 
   document.getElementById('help-sheet-close').addEventListener('click', close);
+  back.addEventListener('click', () => {
+    const previous = stack.pop();
+    if (previous) swap(previous.content, previous.labelledBy, { scroll: previous.scroll, from: -1 });
+  });
   sheet.addEventListener('cancel', event => {
     event.preventDefault();
     close();
