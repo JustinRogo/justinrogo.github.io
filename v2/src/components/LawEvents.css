@@ -25,11 +25,87 @@
 .law-events .carousel-card-rim { box-shadow: none; } /* taste-skill-ignore: explicitly removes upstream shadows. */
 .event-carousel-link { display: block; height: 100%; border-radius: inherit; text-decoration: none; text-align: center; }
 .event-carousel-link:focus-visible { outline: 3px solid var(--orange); outline-offset: -3px; }
-.event-card-body { display: flex; flex-direction: column; gap: 16px; padding: 22px; height: 100%; box-sizing: border-box; border-radius: inherit; background: var(--surface); color: var(--ink); }
-.event-card-body h3 { flex-shrink: 0; margin: 0; font-size: 1.05rem; line-height: 1.4; overflow-wrap: anywhere; }
+.event-card-body { display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 22px; height: 100%; box-sizing: border-box; border-radius: inherit; background: var(--surface); color: var(--ink); }
+.event-card-body.has-leaf { gap: 12px; padding-top: 18px; }
+.event-card-body h3 { flex-shrink: 0; width: 100%; margin: 0; font-size: 1.05rem; line-height: 1.35; text-wrap: balance; overflow-wrap: anywhere; }
 .event-card-body > img { display: block; width: 100%; min-height: 0; height: auto; flex: 1; object-fit: contain; }
 .event-card-body > img[hidden] { display: none; }
-.event-date { color: var(--muted); font-size: 0.9rem; margin: 10px 0 0; line-height: 1.6; }
+
+/* A tear-off calendar leaf: a bound month strip over the day. Styles theme it
+   through the --leaf-* properties. */
+.law-events {
+  --leaf-paper: var(--surface);
+  --leaf-strip: var(--orange);
+  --leaf-strip-ink: var(--surface);
+  --leaf-edge: var(--line);
+  --leaf-ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+.event-leaf {
+  position: relative;
+  display: grid;
+  flex: none;
+  justify-items: center;
+  width: 58px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--leaf-paper);
+  box-shadow: inset 0 0 0 1px var(--leaf-edge), 0 1px 1px rgb(0 0 0 / 0.12), 0 8px 14px -8px rgb(0 0 0 / 0.5);
+  line-height: 1;
+  font-variant-numeric: lining-nums tabular-nums;
+  transform-origin: 50% 0;
+}
+.event-leaf-month {
+  justify-self: stretch;
+  padding: 7px 0 4px;
+  background: var(--leaf-strip);
+  color: var(--leaf-strip-ink);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+/* Two binding holes punched through the strip. */
+.event-leaf::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 50%;
+  width: 26px;
+  height: 3px;
+  translate: -50% 0;
+  background: radial-gradient(circle, var(--leaf-paper) 1.4px, transparent 1.6px) 0 50% / 13px 3px repeat-x;
+}
+.event-leaf-day { padding-top: 5px; font-size: 1.7rem; font-weight: 650; letter-spacing: -0.02em; }
+.event-leaf-weekday { padding: 3px 0 7px; color: var(--muted); font-size: 0.62rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; }
+
+/* Time and place share one line under the card; a long room name truncates. */
+.event-date { display: flex; justify-content: center; gap: 0.5em; margin: 10px 0 0; color: var(--muted); font-size: 0.88rem; line-height: 1.6; white-space: nowrap; }
+.event-time { flex: none; color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+.event-place { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.event-place::before { content: "·" / ""; margin-right: 0.5em; }
+
+/* The pause button's ring fills over the autoplay interval, so the next turn is never a surprise. */
+.law-events .event-playback { position: relative; }
+.event-countdown { position: absolute; inset: 0; width: 100%; height: 100%; rotate: -90deg; pointer-events: none; }
+.event-countdown circle {
+  fill: none;
+  stroke: var(--orange);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: calc(1 - var(--carousel-progress, 0));
+}
+
+/* The one authored moment: the current event's leaf flips down onto its card. */
+@media (prefers-reduced-motion: no-preference) {
+  .law-events [data-motion="moving"] .carousel-slide[data-current] .event-leaf {
+    animation: event-leaf-flip 720ms var(--leaf-ease) 120ms backwards;
+  }
+}
+@keyframes event-leaf-flip {
+  from { opacity: 0; transform: perspective(240px) rotateX(-78deg) translateY(-4px); }
+}
+
 .law-events [data-motion="still"] .carousel-card,
 .law-events [data-motion="still"] .carousel-arrow,
 .law-events [data-motion="still"] .carousel-dot-mark { transition: none; }
@@ -37,4 +113,9 @@
   .law-events { gap: 8px; }
   .event-calendar-link { font-size: 0.8rem; }
   .event-card-body { padding: 22px; gap: 16px; }
+  .event-card-body.has-leaf { gap: 10px; padding-top: 16px; }
+}
+@media (forced-colors: active) {
+  .event-leaf { border: 1px solid CanvasText; }
+  .event-countdown circle { stroke: Highlight; }
 }

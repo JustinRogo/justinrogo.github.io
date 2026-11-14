@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { integrations } from "../content.js";
-import { eventDate, parseEvents } from "../events.js";
+import { eventDate, eventParts, parseEvents } from "../events.js";
 import { useMedia, useResource } from "../hooks.js";
 import { useAssemblyBusy } from "../assembly/HomepageAssembly.jsx";
 import Carousel from "../vendor/Carousel.jsx";
@@ -8,22 +8,35 @@ import { ExternalLink, LoadState, SectionTitle } from "./UI.jsx";
 import Icon from "./Icon.jsx";
 import "./LawEvents.css";
 
+// The date leads as a tear-off calendar leaf; the time and place sit below the card.
 function EventCard({ event }) {
+  const when = eventParts(event.date);
+  const label = [event.title, eventDate(event.date) || "Time to be announced", event.location].filter(Boolean).join(", ");
   return (
     <ExternalLink
       href={event.href}
       className="event-carousel-link"
-      aria-label={`${event.title}, ${eventDate(event.date) || "Time to be announced"}`}
+      aria-label={label}
       draggable={false}
     >
-      <div className="event-card-body">
+      <div className={`event-card-body${when ? " has-leaf" : ""}`}>
+        {when && (
+          <span className="event-leaf" aria-hidden="true">
+            <span className="event-leaf-month">{when.month}</span>
+            <span className="event-leaf-day">{when.day}</span>
+            <span className="event-leaf-weekday">{when.weekday}</span>
+          </span>
+        )}
         <h3>{event.title}</h3>
         {event.image && (
           <img src={event.image} alt="" width="600" height="600" loading="lazy"
             draggable={false} onError={(event) => { event.currentTarget.hidden = true; }} />
         )}
       </div>
-      <p className="event-date">{eventDate(event.date) || "Time to be announced"}</p>
+      <p className="event-date">
+        <span className="event-time">{when?.time || "Time to be announced"}</span>
+        {event.location && <span className="event-place">{event.location}</span>}
+      </p>
     </ExternalLink>
   );
 }
@@ -62,6 +75,11 @@ function EventCarousel({ events, effects, theme }) {
           <button className="text-button event-playback" onClick={() => setPlaying(!playing)}
             aria-label={playing ? "Pause events" : "Play events"}
             title={playing ? "Pause events" : "Play events"}>
+            {playing && (
+              <svg className="event-countdown" viewBox="0 0 44 44" aria-hidden="true" focusable="false">
+                <circle cx="22" cy="22" r="20.5" pathLength="1" />
+              </svg>
+            )}
             <Icon name={playing ? "pause" : "play"} size={17} />
           </button>
         ) : null}

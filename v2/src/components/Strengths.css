@@ -194,7 +194,8 @@
 .strengths .strength .flip-card__face { position: absolute; }
 .strength-card-front, .strength-card-back { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; min-height: 0; height: 100%; padding: 16px; }
 .strength-card-back { gap: 12px; padding: 20px; }
-.strengths .strength.flip-card .strength-rank { display: block; width: auto; height: auto; border-radius: 0; font-size: 1.8rem; line-height: 1; font-weight: 500; }
+/* The card's rank number takes the card's own text color, in every site style. */
+.strengths .strength.flip-card .strength-rank { display: block; width: auto; height: auto; border-radius: 0; color: inherit; font-size: 1.8rem; line-height: 1; font-weight: 500; }
 .strength-card-front .strength-name { margin-top: auto; }
 .strength-name { font-size: 1.1rem; line-height: 1.2; font-weight: 550; overflow-wrap: anywhere; }
 .strength-card-back .strength-name { font-size: 1.35rem; }
