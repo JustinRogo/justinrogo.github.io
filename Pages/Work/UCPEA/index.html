@@ -227,10 +227,7 @@
         </div>
 
         <aside class="hero-update-card" aria-labelledby="hero-update-title">
-          <div class="hero-update-topline">
-            <p>Union Wire</p>
-            <time id="hero-update-date" hidden></time>
-          </div>
+          <time class="hero-update-date" id="hero-update-date" hidden></time>
           <h2 id="hero-update-title">News from UCPEA</h2>
           <a href="index.html?view=union-wire">Browse Union Wire <span aria-hidden="true">→</span></a>
         </aside>
@@ -249,41 +246,34 @@
       </div>
 
       <div class="help-launcher">
-        <div class="help-topics" role="group" aria-label="Choose a help topic">
-          <button class="help-topic is-active" type="button" data-help-topic="workplace" aria-pressed="true" aria-controls="help-result">
-            <span class="help-topic__mark" aria-hidden="true">01</span>
+        <div class="help-topics" role="tablist" aria-label="Help topics" aria-orientation="vertical">
+          <button class="help-topic is-active" type="button" role="tab" id="help-tab-workplace" data-help-topic="workplace" aria-selected="true" aria-controls="help-result">
             <span><strong>Workplace concern</strong><small>Representation, discipline, or a possible grievance</small></span>
           </button>
-          <button class="help-topic" type="button" data-help-topic="duties" aria-pressed="false" aria-controls="help-result">
-            <span class="help-topic__mark" aria-hidden="true">02</span>
+          <button class="help-topic" type="button" role="tab" id="help-tab-duties" data-help-topic="duties" aria-selected="false" tabindex="-1" aria-controls="help-result">
             <span><strong>My duties changed</strong><small>Reclassification or temporary higher-level work</small></span>
           </button>
-          <button class="help-topic" type="button" data-help-topic="leave" aria-pressed="false" aria-controls="help-result">
-            <span class="help-topic__mark" aria-hidden="true">03</span>
+          <button class="help-topic" type="button" role="tab" id="help-tab-leave" data-help-topic="leave" aria-selected="false" tabindex="-1" aria-controls="help-result">
             <span><strong>I need leave</strong><small>Sick, parental, vacation, or personal leave</small></span>
           </button>
-          <button class="help-topic" type="button" data-help-topic="development" aria-pressed="false" aria-controls="help-result">
-            <span class="help-topic__mark" aria-hidden="true">04</span>
+          <button class="help-topic" type="button" role="tab" id="help-tab-development" data-help-topic="development" aria-selected="false" tabindex="-1" aria-controls="help-result">
             <span><strong>Professional development</strong><small>Funding, eligibility, and application timing</small></span>
           </button>
-          <button class="help-topic" type="button" data-help-topic="benefits" aria-pressed="false" aria-controls="help-result">
-            <span class="help-topic__mark" aria-hidden="true">05</span>
+          <button class="help-topic" type="button" role="tab" id="help-tab-benefits" data-help-topic="benefits" aria-selected="false" tabindex="-1" aria-controls="help-result">
             <span><strong>Member benefits</strong><small>Eligibility, deadlines, and application steps</small></span>
           </button>
-          <button class="help-topic" type="button" data-help-topic="membership" aria-pressed="false" aria-controls="help-result">
-            <span class="help-topic__mark" aria-hidden="true">06</span>
+          <button class="help-topic" type="button" role="tab" id="help-tab-membership" data-help-topic="membership" aria-selected="false" tabindex="-1" aria-controls="help-result">
             <span><strong>Join or get involved</strong><small>Membership, stewards, and participation</small></span>
           </button>
         </div>
 
-        <article class="help-result" id="help-result" aria-live="polite" aria-labelledby="help-result-title">
-          <p class="help-result__eyebrow" id="help-result-eyebrow">Workplace support</p>
+        <article class="help-result" id="help-result" role="tabpanel" aria-labelledby="help-result-title">
           <h3 id="help-result-title">Start with a steward or the UCPEA office</h3>
           <p id="help-result-summary">You do not need to decide whether an issue is a formal grievance before asking for guidance. A union representative can help you understand the process and applicable timelines.</p>
           <ol class="help-steps" id="help-result-steps">
-            <li><span>1</span><p><strong>Write down the facts</strong><small>Keep relevant dates, messages, documents, and the names of people involved.</small></p></li>
-            <li><span>2</span><p><strong>Contact UCPEA promptly</strong><small>Contractual timelines can be short, so do not wait for the situation to resolve itself.</small></p></li>
-            <li><span>3</span><p><strong>Review the governing language</strong><small>Articles 23 and 41 cover grievances and representation rights.</small></p></li>
+            <li><span aria-hidden="true">1</span><p><strong>Write down the facts</strong><small>Keep relevant dates, messages, documents, and the names of people involved.</small></p></li>
+            <li><span aria-hidden="true">2</span><p><strong>Contact UCPEA promptly</strong><small>Contractual timelines can be short, so do not wait for the situation to resolve itself.</small></p></li>
+            <li><span aria-hidden="true">3</span><p><strong>Review the governing language</strong><small>Articles 23 and 41 cover grievances and representation rights.</small></p></li>
           </ol>
           <div class="help-result__actions" id="help-result-actions">
             <a class="button button-primary" href="https://ucpea.ct.aft.org/stewards" target="_blank" rel="noopener noreferrer">Find a steward <span aria-hidden="true">↗</span></a>
@@ -299,8 +289,19 @@
       <div class="section-heading section-heading-single">
         <h1 id="rights-benefits-title">Rights &amp; Benefits</h1>
       </div>
+      <div class="guide-search" id="guide-search" role="search" hidden>
+        <div class="deadline-field">
+          <label for="guide-search-input">Search guides</label>
+          <input id="guide-search-input" type="search" placeholder="Try sick leave, grievance, or parking" autocomplete="off" spellcheck="false" aria-describedby="guide-search-count">
+        </div>
+        <div class="library-summary">
+          <p class="library-count" id="guide-search-count" role="status"></p>
+          <button class="rights-text-action" id="guide-search-clear" type="button" hidden>Clear search</button>
+        </div>
+        <p class="library-empty" id="guide-search-empty" hidden>No guides match that search. Try a different word, or <a href="mailto:ucpeaoffice@ucpea.org">email UCPEA</a> your question.</p>
+      </div>
       <div class="guide-group">
-      <nav class="guide-index" aria-labelledby="guide-group-rights">
+      <section class="guide-index" aria-labelledby="guide-group-rights">
         <h2 class="guide-group-title" id="guide-group-rights">Your rights</h2>
         <ul class="guide-group-rights" aria-labelledby="guide-group-rights">
           <li><a href="index.html?view=rights-benefits#telecommuting-appeals"><strong>Telecommuting Appeals</strong><span>Check appeal criteria and filing deadlines</span></a></li>
@@ -314,17 +315,17 @@
           <li><a href="index.html?view=rights-benefits#schedule-changes"><strong>Schedule Changes</strong><span>Flexible schedules and notice for changes</span></a></li>
           <li><a href="index.html?view=rights-benefits#comp-time"><strong>Extra Hours and Comp Time</strong><span>Flexing hours and earning comp time</span></a></li>
           <li><a href="index.html?view=rights-benefits#higher-level-work"><strong>Higher-Level Work and Reclass Pay</strong><span>Pay for temporary assignments and reclassifications</span></a></li>
-          <li><a href="index.html?view=rights-benefits#job-postings"><strong>Applying for UConn Jobs</strong><span>Guaranteed interviews for unit members</span></a></li>
+          <li><a href="index.html?view=rights-benefits#job-postings"><strong>Applying for University Jobs</strong><span>Guaranteed interviews for unit members</span></a></li>
           <li><a href="index.html?view=rights-benefits#probation"><strong>Probationary Period</strong><span>Length, evaluations, and appeals</span></a></li>
           <li><a href="index.html?view=rights-benefits#layoff"><strong>Layoff and Recall</strong><span>Seniority, notice periods, and recall rights</span></a></li>
           <li><a href="index.html?view=rights-benefits#nondiscrimination"><strong>Discrimination and Retaliation</strong><span>Protections and where to report</span></a></li>
-          <li><a href="index.html?view=rights-benefits#leaving"><strong>Leaving UConn</strong><span>Notice and what gets paid out</span></a></li>
+          <li><a href="index.html?view=rights-benefits#leaving"><strong>Leaving the University</strong><span>Notice and what gets paid out</span></a></li>
           <li><a href="index.html?view=rights-benefits#sebac"><strong>SEBAC: Your Pension and Health Contract</strong><span>What it covers and what’s next</span></a></li>
         </ul>
-      </nav>
+      </section>
 
       <article class="rights-tool" id="telecommuting-appeals" data-view-guide aria-labelledby="appeals-title" tabindex="-1" hidden>
-        <h2 id="appeals-title">Telecommuting appeals</h2>
+        <h2 id="appeals-title">Telecommuting Appeals</h2>
         <p>Under Article 16.5, UCPEA employees can request review of a full denial, approval for fewer than two remote days per workweek, or permanent revocation. The most recent performance evaluation must be rated Good or better.</p>
         <div class="rights-layout">
           <div class="rights-panel" id="appeal-check" hidden>
@@ -358,7 +359,7 @@
           <div class="rights-process">
             <h3>What happens after a decision</h3>
             <ol class="rights-steps">
-              <li><strong>File with Human Resources.</strong> Submit a written appeal within four weeks of receiving the decision. UCPEA says the clock for full or partial denials already issued at launch began September 15, 2026, when the Kuali form became available.</li>
+              <li><strong>File with Human Resources.</strong> Submit a written appeal within four weeks of receiving the decision. For full or partial denials issued before the appeal process launched, UCPEA says the four weeks began September 15, 2026, when the Kuali form opened.</li>
               <li><strong>Panel review.</strong> HR convenes a two-person panel within two weeks of receiving a timely appeal, with one HR member and one UCPEA appointee. Within two weeks of completing its review, the panel upholds the decision or recommends reconsideration.</li>
               <li><strong>Final determination, if referred.</strong> If the panel is divided or recommends reconsideration, the vice president or designee issues a final written decision within two weeks.</li>
             </ol>
@@ -373,7 +374,7 @@
       </article>
 
       <article class="rights-tool" id="position-audit" data-view-guide aria-labelledby="audit-title" tabindex="-1" hidden>
-        <h2 id="audit-title">Position audits</h2>
+        <h2 id="audit-title">Position Audits</h2>
         <p>A position audit checks whether your classification still fits your duties. Career progression under Article 31.2 recognizes proficiency and development within your current position.</p>
         <div class="rights-layout">
           <div class="rights-panel">
@@ -394,8 +395,8 @@
             <h3>From submission to written result</h3>
             <ol class="rights-steps">
               <li><strong>Submit and get acknowledgment.</strong> The supervisory chain has four weeks from receipt of your form to acknowledge it and return it to HR.</li>
-              <li><strong>Wait for HR’s assessment.</strong> HR has 12 weeks from receipt of the completed job inventory to provide written results. UCPEA and UConn may agree to extend Article 31.3 time limits.</li>
-              <li><strong>Check the effective date.</strong> Article 31.3(e) uses the date you submitted the position audit form. HR’s webpage says 60 days before HR’s official receipt of the completed packet. Ask UCPEA to confirm the date that applies.</li>
+              <li><strong>Wait for HR’s assessment.</strong> HR has 12 weeks from receipt of the completed job inventory to provide written results. UCPEA and the University may agree to extend Article 31.3 time limits.</li>
+              <li><strong>Check the effective date.</strong> Article 31.3(e) sets it at the date you submitted the position audit form. University HR’s webpage instead says 60 days before HR officially received your completed packet. Ask UCPEA to confirm the date that applies.</li>
             </ol>
           </div>
         </div>
@@ -404,7 +405,7 @@
           <dl>
             <div>
               <dt>Supervisor or manager declines to support the request</dt>
-              <dd>UConn HR says you can submit your packet to <a href="mailto:workforce@uconn.edu">Workforce Solutions</a> for independent review.</dd>
+              <dd>University HR says you can submit your packet to <a href="mailto:workforce@uconn.edu">Workforce Solutions</a> for independent review.</dd>
             </div>
             <div>
               <dt>HR denies the request after an audit</dt>
@@ -414,13 +415,13 @@
         </div>
         <div class="rights-actions">
           <a class="button button-primary" href="https://uconn.kualibuild.com/app/6786823085cdb0027de72cea/run">Open Kuali position audit form</a>
-          <a class="button button-secondary" href="https://hr.uconn.edu/uconns-workforce/classification-and-compensation/#:~:text=Procedure%20to%20Request%20a%20Position%20Reclassification">View UConn HR instructions</a>
+          <a class="button button-secondary" href="https://hr.uconn.edu/uconns-workforce/classification-and-compensation/#:~:text=Procedure%20to%20Request%20a%20Position%20Reclassification">View University HR instructions</a>
         </div>
-        <p class="rights-sources"><a href="index.html?view=current-contract#article-31">Article 31</a> · <a href="https://hr.uconn.edu/uconns-workforce/classification-and-compensation/">UConn HR classification guidance</a> · <a href="https://hr.uconn.edu/uconns-workforce/classification-and-compensation/career-progression/">UConn HR career progression</a></p>
+        <p class="rights-sources"><a href="index.html?view=current-contract#article-31">Article 31</a> · <a href="https://hr.uconn.edu/uconns-workforce/classification-and-compensation/">University HR classification guidance</a> · <a href="https://hr.uconn.edu/uconns-workforce/classification-and-compensation/career-progression/">University HR career progression</a></p>
       </article>
 
       <article class="rights-tool" id="holiday-time" data-view-guide aria-labelledby="holiday-time-title" tabindex="-1" hidden>
-        <h2 id="holiday-time-title">Holiday compensatory time tracker</h2>
+        <h2 id="holiday-time-title">Holiday Time Tracker</h2>
         <p>Track your holiday compensatory time and plan when to use it. Per the UCPEA contract (Article 8), you have 365 days to use holiday compensatory time. Under UCPEA’s payroll transition guidance, unused time earned before August 21, 2026 expires August 21, 2027.</p>
         <div id="holiday-tracker" hidden>
           <div class="rights-panel">
@@ -430,7 +431,7 @@
                 <input id="holiday-earned" type="date" required>
               </div>
               <div class="deadline-field">
-                <label for="holiday-hours">Hours Earned</label>
+                <label for="holiday-hours">Hours earned</label>
                 <input id="holiday-hours" type="number" min="0.01" step="0.01" inputmode="decimal" required>
               </div>
               <div class="deadline-actions">
@@ -460,7 +461,7 @@
               <p class="holiday-entry__hours"><strong></strong> earned<br><span></span></p>
               <p class="holiday-entry__note"></p>
               <div class="holiday-entry__actions">
-                <a class="rights-text-action" download="ucpea-holiday-time.ics">Save reminder</a>
+                <a class="rights-text-action" download="ucpea-holiday-time.ics">Save calendar reminder</a>
                 <button class="rights-text-action" type="button">Edit</button>
                 <button class="rights-text-action" type="button">Remove</button>
               </div>
@@ -472,7 +473,7 @@
       </article>
 
       <article class="rights-tool" id="discipline" data-view-guide aria-labelledby="discipline-title" tabindex="-1" hidden>
-        <h2 id="discipline-title">Discipline and investigations</h2>
+        <h2 id="discipline-title">Discipline &amp; Investigations</h2>
         <p>Article 22 requires just cause for discipline. Except for serious misconduct, dismissal comes only as the last step of progressive discipline and after a fair hearing. These protections apply once you’ve finished your initial probationary period.</p>
         <div class="rights-layout">
           <div class="rights-panel" id="discipline-check" hidden>
@@ -480,7 +481,7 @@
             <div class="deadline-field">
               <label for="discipline-stage">What did you receive?</label>
               <select id="discipline-stage" autocomplete="off">
-                <option value="">Choose one</option>
+                <option value="">Choose what you received</option>
                 <option value="interview">Notice of an investigatory or fact-finding interview</option>
                 <option value="leave">Placement on paid administrative leave</option>
                 <option value="hearing">Notice of a hearing on charges</option>
@@ -509,7 +510,7 @@
           <dl>
             <div>
               <dt>Deadline</dt>
-              <dd>Submit the grievance in writing to your immediate supervisor within 35 calendar days of the event. If you were on leave or couldn’t have known about it, you have 14 calendar days after returning to work. UConn doesn’t have to process a grievance filed more than 45 days after the event.</dd>
+              <dd>Submit the grievance in writing to your immediate supervisor within 35 calendar days of the event. If you were on leave or couldn’t have known about it, you have 14 calendar days after returning to work. The University doesn’t have to process a grievance filed more than 45 days after the event.</dd>
             </div>
             <div>
               <dt>Steps for a contract grievance</dt>
@@ -528,14 +529,14 @@
         <div class="rights-actions">
           <a class="button button-primary" href="https://ucpea.ct.aft.org/stewards">Find a steward</a>
           <a class="button button-secondary" href="mailto:ucpeaoffice@ucpea.org?subject=Question%20about%20discipline">Contact UCPEA</a>
-          <a class="button button-secondary" href="index.html?view=rights-benefits#personnel-file">Your personnel file</a>
+          <a class="button button-secondary" href="index.html?view=rights-benefits#personnel-file">Personnel file guide</a>
         </div>
         <p class="rights-sources"><a href="index.html?view=current-contract#article-22">Article 22</a> · <a href="index.html?view=current-contract#article-23">Article 23</a> · <a href="index.html?view=current-contract#section-19-5">Article 19.5</a></p>
       </article>
 
       <article class="rights-tool" id="representation" data-view-guide aria-labelledby="representation-title" tabindex="-1" hidden>
         <h2 id="representation-title">Your Right to a Union Representative</h2>
-        <p>If a manager calls you in to ask questions, and you reasonably believe your answers could lead to discipline, you can ask for a union representative before you answer. This is often called your Weingarten right. You have to ask for it yourself. For serious discipline, the contract goes further: UConn must tell you in writing, with a copy to UCPEA, and remind you of your right to representation.</p>
+        <p>If a manager calls you in to ask questions, and you reasonably believe your answers could lead to discipline, you can ask for a union representative before you answer. This is often called your Weingarten right. You have to ask for it yourself. For serious discipline, the contract goes further: the University must tell you in writing, with a copy to UCPEA, and remind you of your right to representation.</p>
         <dl class="benefit-facts">
           <div><dt>When it applies</dt><dd>An investigatory or fact-finding meeting, where management is gathering facts or asking you to explain what you did, and you reasonably believe discipline could follow. It doesn’t cover routine talks about how to do your work, or a meeting held only to hand you a decision that’s already been made.</dd></div>
           <div><dt>How to use it</dt><dd>Ask clearly, before or during the meeting. You can ask at any point, even partway through. Once you’ve asked, stop answering questions until a representative arrives or the meeting ends. You should still attend the meeting.</dd></div>
@@ -553,7 +554,7 @@
       </article>
 
       <article class="rights-tool" id="personnel-file" data-view-guide aria-labelledby="personnel-file-title" tabindex="-1" hidden>
-        <h2 id="personnel-file-title">Your personnel file</h2>
+        <h2 id="personnel-file-title">Your Personnel File</h2>
         <p>Your official, complete employee file is kept by Human Resources. Only material in that file, and negative judgments that were discussed with you, can be used in a promotion or disciplinary decision.</p>
         <dl class="benefit-facts">
           <div><dt>Reviewing your file</dt><dd>Ask HR to see your file. They must provide it, or an electronic copy, within five workdays. You can also get a copy of anything placed in it. Article 19.7 makes reviewing it your responsibility, so check it from time to time.</dd></div>
@@ -583,7 +584,7 @@
             <h3>Requesting removal</h3>
             <ol class="rights-steps">
               <li><strong>Wait out the period.</strong> You can ask after 12 months for a letter of warning or 24 months for a letter of reprimand, as long as you had no further discipline of any kind listed in Article 22.2, including verbal warnings.</li>
-              <li><strong>Request it in writing.</strong> Use the process UCPEA and UConn agreed on. Ask UCPEA for the current form or where to send it.</li>
+              <li><strong>Request it in writing.</strong> Use the process UCPEA and the University agreed on. Ask UCPEA for the current form or where to send it.</li>
               <li><strong>Labor Relations decides.</strong> You get a written response. The decision can’t be taken to arbitration.</li>
             </ol>
           </div>
@@ -598,14 +599,14 @@
 
       <article class="rights-tool" id="grievances" data-view-guide aria-labelledby="grievances-title" tabindex="-1" hidden>
         <h2 id="grievances-title">Grievances: Contract and Policy</h2>
-        <p>Article 23 has two grievance paths. A contractual grievance claims UConn broke a specific term of the contract. A non-contractual grievance is a dispute about a UConn practice or policy. Both start with the same deadline, and you can bring a UCPEA representative to every step.</p>
+        <p>Article 23 has two grievance paths. A contractual grievance claims the University broke a specific term of the contract. A non-contractual grievance is a dispute about a University practice or policy. Both start with the same deadline, and you can bring a UCPEA representative to every step.</p>
         <dl class="benefit-facts">
-          <div><dt>Deadline</dt><dd>File in writing with your immediate supervisor within 35 calendar days of the event, or within 14 days of returning from leave if you couldn’t have known sooner. UConn doesn’t have to process a grievance filed more than 45 days after the event.</dd></div>
+          <div><dt>Deadline</dt><dd>File in writing with your immediate supervisor within 35 calendar days of the event. If you were on leave or couldn’t have known about it, you have 14 calendar days after returning to work. The University doesn’t have to process a grievance filed more than 45 days after the event.</dd></div>
           <div><dt>Policy (non-contractual) path</dt><dd>Your supervisor meets with you within 14 days and answers in writing within 14 days of the meeting. Within 14 days of that answer, you can appeal to a two-person panel: one UCPEA member and one manager, neither from your department. The panel decides within 45 days, and a unanimous decision is final.</dd></div>
           <div><dt>If the panel splits</dt><dd>Within 14 days you can take it to the vice president, who holds a hearing and answers in writing within 28 days. That decision is final. Policy grievances can’t go to arbitration.</dd></div>
-          <div><dt>Contract path</dt><dd>Supervisor, then vice president, then arbitration filed by UCPEA. The discipline guide above has the timelines. To reach arbitration, the grievance must cite the specific article involved.</dd></div>
+          <div><dt>Contract path</dt><dd>Supervisor, then vice president, then arbitration filed by UCPEA. The <a href="index.html?view=rights-benefits#discipline">Discipline &amp; Investigations</a> guide has the timelines. To reach arbitration, the grievance must cite the specific article involved.</dd></div>
           <div><dt>Time and pay</dt><dd>Grievance meetings during work hours are paid, and you don’t make up the time. If management misses a deadline, the grievance can move to the next step. If you miss one, the last answer stands.</dd></div>
-          <div><dt>Before you file elsewhere</dt><dd>If you file a complaint with the CHRO or the EEOC about the same issue, UConn doesn’t have to continue the grievance. Talk with UCPEA before you choose.</dd></div>
+          <div><dt>Before you file elsewhere</dt><dd>If you file a complaint with the CHRO or the EEOC about the same issue, the University doesn’t have to continue the grievance. Talk with UCPEA before you choose.</dd></div>
         </dl>
         <div class="rights-actions">
           <a class="button button-primary" href="https://ucpea.ct.aft.org/stewards">Find a steward</a>
@@ -632,7 +633,7 @@
 
       <article class="rights-tool" id="schedule-changes" data-view-guide aria-labelledby="schedule-changes-title" tabindex="-1" hidden>
         <h2 id="schedule-changes-title">Schedule Changes</h2>
-        <p>UConn’s regular administrative hours are 8 a.m. to 5 p.m., and UCPEA schedules normally come to about 35 hours a week. Article 16 sets how schedules can be requested and changed.</p>
+        <p>The University’s regular administrative hours are 8 a.m. to 5 p.m., and UCPEA schedules normally come to about 35 hours a week. Article 16 sets how schedules can be requested and changed.</p>
         <dl class="benefit-facts">
           <div><dt>Asking for a flexible schedule</dt><dd>Make the request in writing. A denial must come in writing, with a reason, within 20 workdays, and can’t be arbitrary or without good business reason. Before grieving, you can ask for a UCPEA and an administration representative to try to resolve it.</dd></div>
           <div><dt>Changes within 8 to 5</dt><dd>Management asks for volunteers first. After that, you can be required to change your hours with 10 working days’ notice.</dd></div>
@@ -662,11 +663,11 @@
 
       <article class="rights-tool" id="higher-level-work" data-view-guide aria-labelledby="higher-level-work-title" tabindex="-1" hidden>
         <h2 id="higher-level-work-title">Higher-Level Work and Reclass Pay</h2>
-        <p>When UConn temporarily appoints you to a higher-level role or assigns higher-level duties, for example to cover a leave or during a search, Article 31.5 sets a minimum raise. UConn will make every effort to keep these assignments to 18 months or less.</p>
+        <p>When the University temporarily appoints you to a higher-level role or assigns higher-level duties, for example to cover a leave or during a search, Article 31.5 sets a minimum raise. The University will make every effort to keep these assignments to 18 months or less.</p>
         <dl class="benefit-facts">
           <div><dt>Temporary assignment pay</dt><dd>At least 3%, or the minimum of the pay band HR sets for the assignment, whichever is greater.</dd></div>
           <div><dt>Reclassification raise</dt><dd>If a position audit moves you to a higher level, your salary can rise up to 10%, capped at the new band’s maximum. It can’t be less than 3% or the new band’s minimum, whichever is greater.</dd></div>
-          <div><dt>Effective date</dt><dd>The raise takes effect on the reclassification’s effective date. The position audit guide above explains how that date is set.</dd></div>
+          <div><dt>Effective date</dt><dd>The raise takes effect on the reclassification’s effective date. The <a href="index.html?view=rights-benefits#position-audit">Position Audits</a> guide explains how that date is set.</dd></div>
         </dl>
         <div class="rights-actions">
           <a class="button button-secondary" href="mailto:ucpeaoffice@ucpea.org">Contact UCPEA</a>
@@ -675,7 +676,7 @@
       </article>
 
       <article class="rights-tool" id="job-postings" data-view-guide aria-labelledby="job-postings-title" tabindex="-1" hidden>
-        <h2 id="job-postings-title">Applying for UConn Jobs</h2>
+        <h2 id="job-postings-title">Applying for University Jobs</h2>
         <p>New and vacant UCPEA positions are posted on the HR website for two weeks. HR can tell you the projected salary range.</p>
         <dl class="benefit-facts">
           <div><dt>Guaranteed interview</dt><dd>If you meet the minimum qualifications and identify yourself as a UCPEA bargaining unit member on your vita, you must be granted an interview.</dd></div>
@@ -704,9 +705,9 @@
         <h2 id="layoff-title">Layoff and Recall</h2>
         <p>If layoffs happen, seniority is the main deciding factor within a unit, with limited exceptions. Seniority is total state service, prorated for part-time work. Before a layoff, the president or a designee must meet with UCPEA, which can propose alternatives.</p>
         <dl class="benefit-facts">
-          <div><dt>Notice</dt><dd>You keep working through a notice period based on UConn service: three months after one year, rising a month per year to 12 months after 10 years. You and UConn can agree to 50% of that salary as a lump sum instead.</dd></div>
+          <div><dt>Notice</dt><dd>You keep working through a notice period based on University service: three months after one year, rising a month per year to 12 months after 10 years. You and the University can agree to 50% of that salary as a lump sum instead.</dd></div>
           <div><dt>Recall</dt><dd>For 18 months you get notice of all UCPEA openings and an interview for any you’re qualified for and tell HR you’ve applied to. Recall offers must be accepted within 15 days.</dd></div>
-          <div><dt>Health coverage and support</dt><dd>You can buy group health coverage for 18 months under COBRA, and UConn provides counseling and outplacement help.</dd></div>
+          <div><dt>Health coverage and support</dt><dd>You can buy group health coverage for 18 months under COBRA, and the University provides counseling and outplacement help.</dd></div>
           <div><dt>Who’s covered</dt><dd>These rules don’t apply to probationary staff. Grant- and contract-funded positions follow Article 27.2.</dd></div>
         </dl>
         <div class="rights-actions">
@@ -719,9 +720,9 @@
         <h2 id="nondiscrimination-title">Discrimination and Retaliation</h2>
         <p>The contract bars unlawful discrimination and discriminatory harassment based on a long list of protected characteristics, and it bars retaliation against anyone who reports in good faith or takes part in a proceeding.</p>
         <dl class="benefit-facts">
-          <div><dt>Where to report</dt><dd>UConn’s Office of Institutional Equity (OIE) handles complaints of discrimination, harassment, and related conduct.</dd></div>
+          <div><dt>Where to report</dt><dd>The University’s Office of Institutional Equity (OIE) handles complaints of discrimination, harassment, and related conduct.</dd></div>
           <div><dt>Support person</dt><dd>You can bring one support person, who may be a UCPEA representative, to OIE meetings, whether you’re a complainant, a respondent, or a witness.</dd></div>
-          <div><dt>Choosing where to file</dt><dd>If you file with the CHRO or the EEOC, UConn doesn’t have to proceed with a grievance on the same matter. Talk with UCPEA first.</dd></div>
+          <div><dt>Choosing where to file</dt><dd>If you file with the CHRO or the EEOC, the University doesn’t have to proceed with a grievance on the same matter. Talk with UCPEA first.</dd></div>
         </dl>
         <div class="rights-actions">
           <a class="button button-primary" href="https://ucpea.ct.aft.org/stewards">Find a steward</a>
@@ -731,19 +732,19 @@
       </article>
 
       <article class="rights-tool" id="leaving" data-view-guide aria-labelledby="leaving-title" tabindex="-1" hidden>
-        <h2 id="leaving-title">Leaving UConn</h2>
+        <h2 id="leaving-title">Leaving the University</h2>
         <p>Give at least four weeks’ notice. After giving notice, you must work at least 10 workdays, or lose a paid vacation day for each day short. Your vice president or director can waive this.</p>
         <dl class="benefit-facts">
           <div><dt>Vacation payout</dt><dd>Unused vacation is paid out up to 60 days, normally by the second pay period after you leave.</dd></div>
           <div><dt>Other payouts</dt><dd>Unused holiday compensatory time is paid out. Non-exempt employees are also paid for unused comp time.</dd></div>
-          <div><dt>Longer notice</dt><dd>If you give more than four weeks, UConn can end your employment sooner only if you still get four weeks of work or pay.</dd></div>
+          <div><dt>Longer notice</dt><dd>If you give more than four weeks, the University can end your employment sooner only if you still get four weeks of work or pay.</dd></div>
         </dl>
         <p class="rights-sources"><a href="index.html?view=current-contract#article-7">Article 7</a> · <a href="index.html?view=current-contract#article-6">Article 6</a> · <a href="index.html?view=current-contract#article-8">Article 8</a></p>
       </article>
 
       <article class="rights-tool" id="sebac" data-view-guide aria-labelledby="sebac-title" tabindex="-1" hidden>
         <h2 id="sebac-title">SEBAC: Your Pension and Health Contract</h2>
-        <p>SEBAC is the coalition of Connecticut state employee unions, including UCPEA. It bargains one master agreement with the State on pensions and health care for every state employee, separate from UCPEA’s own contract with UConn.</p>
+        <p>SEBAC is the coalition of Connecticut state employee unions, including UCPEA. It bargains one master agreement with the State on pensions and health care for every state employee, separate from UCPEA’s own contract with the University.</p>
         <dl class="benefit-facts">
           <div><dt>What it covers</dt><dd>Your health plan and premiums, the HEP program, retirement plans and cost-of-living raises, and retiree health coverage. Wages and working conditions are in the UCPEA contract.</dd></div>
           <div><dt>Current agreement</dt><dd>The pension and health agreement runs through June 30, 2027. SEBAC and the State have since agreed that no changes to pension or health care will happen before June 30, 2028 unless both sides agree.</dd></div>
@@ -755,7 +756,7 @@
       </div>
 
       <div class="guide-group">
-      <nav class="guide-index" aria-labelledby="guide-group-benefits">
+      <section class="guide-index" aria-labelledby="guide-group-benefits">
         <h2 class="guide-group-title" id="guide-group-benefits">Benefits</h2>
         <ul class="guide-group-benefits" aria-labelledby="guide-group-benefits">
           <li><a href="index.html?view=rights-benefits#benefit-professional-development"><strong>Professional Development</strong><span>Funding for conferences, training, and memberships</span></a></li>
@@ -776,7 +777,7 @@
           <li><a href="index.html?view=rights-benefits#benefit-retirement-plans"><strong>Hybrid Plan or ARP</strong><span>The one-time retirement choice</span></a></li>
           <li><a href="index.html?view=rights-benefits#benefit-retiree-health"><strong>Health Coverage in Retirement</strong><span>Years of service and the 3% deduction</span></a></li>
         </ul>
-      </nav>
+      </section>
 
       <div>
         <article class="rights-tool" id="benefit-professional-development" data-view-guide aria-labelledby="benefit-pd-title" tabindex="-1" hidden>
@@ -848,15 +849,15 @@
 
         <article class="rights-tool" id="benefit-tuition" data-view-guide aria-labelledby="benefit-tuition-title" tabindex="-1" hidden>
           <h2 id="benefit-tuition-title">Tuition Benefits</h2>
-          <p>A waiver reduces eligible tuition charges. Reimbursement pays back eligible expenses after successful completion. UConn HR generally requires at least 50% employment for the options below.</p>
+          <p>A waiver reduces eligible tuition charges. Reimbursement pays back eligible expenses after successful completion. University HR generally requires at least 50% employment for the options below.</p>
           <dl class="benefit-facts">
-            <div><dt>Employee tuition waiver</dt><dd>Use for eligible UConn fall or spring courses, space permitting. Graduate coursework must be part of a degree program or work-related. Apply each semester by the tenth day of classes, subject to HR’s late-registration rules. <a href="https://uconn.kualibuild.com/app/6812658d8a5a19027d2238ef/run">Employee waiver form</a></dd></div>
-            <div><dt>Dependent child tuition waiver</dt><dd>Use for a child enrolled in a UConn undergraduate degree program who qualifies as your tax dependent and is under 24 throughout the calendar year. Apply each semester for each child. HR lists June 1 for fall and November 15 for spring. Have proof of age and dependency ready for the first request. <a href="https://eaforms.uconn.edu/dtwaewebweb/beginDtwProcess">Dependent child waiver form</a></dd></div>
+            <div><dt>Employee tuition waiver</dt><dd>Use for eligible University fall or spring courses, space permitting. Graduate coursework must be part of a degree program or work-related. Apply each semester by the tenth day of classes, subject to HR’s late-registration rules. <a href="https://uconn.kualibuild.com/app/6812658d8a5a19027d2238ef/run">Employee waiver form</a></dd></div>
+            <div><dt>Dependent child tuition waiver</dt><dd>Use for a child enrolled in a University undergraduate degree program who qualifies as your tax dependent and is under 24 throughout the calendar year. Apply each semester for each child. HR lists June 1 for fall and November 15 for spring. Have proof of age and dependency ready for the first request. <a href="https://eaforms.uconn.edu/dtwaewebweb/beginDtwProcess">Dependent child waiver form</a></dd></div>
             <div><dt>Employee tuition reimbursement</dt><dd>Use for eligible career-related coursework at an accredited institution when a waiver does not apply. Apply at the beginning of the term. Submit your paid fee bill and grade report by September 15 for summer, January 15 for fall, or June 1 for spring. <a href="https://uconn.kualibuild.com/app/661058ace5ddd1013b6bd8e9/run">Employee reimbursement form</a></dd></div>
-            <div><dt>Reciprocal tuition</dt><dd>Eligible dependent children enrolled at the University of Rhode Island or University of Maine at Orono may qualify for in-state tuition through UConn HR.</dd></div>
+            <div><dt>Reciprocal tuition</dt><dd>Eligible dependent children enrolled at the University of Rhode Island or University of Maine at Orono may qualify for in-state tuition through University HR.</dd></div>
           </dl>
           <div class="rights-actions">
-            <a class="button button-primary" href="https://hr.uconn.edu/benefits-leaves/benefits/tuition-benefits/">Review UConn HR instructions</a>
+            <a class="button button-primary" href="https://hr.uconn.edu/benefits-leaves/benefits/tuition-benefits/">View University HR instructions</a>
           </div>
           <p class="rights-sources"><a href="index.html?view=current-contract#article-34">Article 34</a> · <a href="index.html?view=current-contract#article-35">Article 35</a></p>
         </article>
@@ -866,12 +867,12 @@
           <p>UCPEA offers three $1,300 scholarships to dependent children of UCPEA members. These were the eligibility criteria for the latest round listed by UCPEA.</p>
           <dl class="benefit-facts">
             <div><dt>Sandy Schulte Memorial Scholarship</dt><dd>For high school seniors age 17 or older entering a four-year institution as full-time students. UCPEA considers academic achievement and school and community involvement.</dd></div>
-            <div><dt>Austin Leadership Scholarship</dt><dd>For full-time students enrolled in a UConn degree program. UCPEA considers academic achievement and leadership.</dd></div>
+            <div><dt>Austin Leadership Scholarship</dt><dd>For full-time students enrolled in a University degree program. UCPEA considers academic achievement and leadership.</dd></div>
             <div><dt>Roslyn Swift Scholarship</dt><dd>For high school seniors age 17 or older pursuing a credential, certificate, or two-year degree through a vocational or technical school, community college, or certification program.</dd></div>
           </dl>
           <p class="benefit-note">The latest published deadline was April 21, 2026, for the 2026–27 academic year. Check UCPEA’s page for the next round’s dates, required materials, and application links.</p>
           <div class="rights-actions">
-            <a class="button button-primary" href="https://ucpea.ct.aft.org/scholarships/ucpea-scholarships">Check UCPEA scholarship applications</a>
+            <a class="button button-primary" href="https://ucpea.ct.aft.org/scholarships/ucpea-scholarships">View scholarship dates and applications</a>
           </div>
         </article>
 
@@ -897,7 +898,7 @@
             <div><dt>How much time is available</dt><dd>Article 11.3 caps bank time at 75 days in a rolling two-year period, subject to the applicable leave entitlement.</dd></div>
           </dl>
           <div class="rights-actions">
-            <a class="button button-primary" href="https://ucpea.ct.aft.org/sick-bank">Open UCPEA’s forms page</a>
+            <a class="button button-primary" href="https://ucpea.ct.aft.org/sick-bank">Get sick leave bank forms</a>
             <a class="button button-secondary" href="mailto:ucpeaoffice@ucpea.org">Contact UCPEA</a>
           </div>
           <p class="rights-sources"><a href="index.html?view=current-contract#section-11-3">Article 11.3</a> · <a href="https://ucpea.ct.aft.org/union-wire/contract-corner-article-11-sick-leave">UCPEA explanation of the changes</a></p>
@@ -922,7 +923,7 @@
             <div><dt>Family illness or death</dt><dd>Up to five days a fiscal year, or up to 10 for the illness of a child, grandchild, spouse, or parent. Family is defined broadly and includes anyone living with you or whose close association is equivalent to family.</dd></div>
             <div><dt>Approval and notes</dt><dd>Sick leave is approved by the first supervisor outside the bargaining unit, who may ask for a medical certificate.</dd></div>
             <div><dt>Banked sick leave</dt><dd>Days you were allowed to bank stay banked, and you can never be forced to use them. If you need more than you’d have earned under an accrual system, you can choose to draw on them.</dd></div>
-            <div><dt>Longer illness</dt><dd>If you’ve used everything else and are on approved FMLA leave, see the Sick Leave Bank.</dd></div>
+            <div><dt>Longer illness</dt><dd>If you’ve used everything else and are on approved FMLA leave, see the <a href="index.html?view=rights-benefits#benefit-sick-leave-bank">Sick Leave Bank</a>.</dd></div>
           </dl>
           <p class="rights-sources"><a href="index.html?view=current-contract#article-11">Article 11</a></p>
         </article>
@@ -943,7 +944,7 @@
           <p>You get two personal days each fiscal year for emergencies or personal business. Tell your supervisor as early as you can. Personal days don’t carry over, and part-time staff receive a prorated amount.</p>
           <dl class="benefit-facts">
             <div><dt>Holidays</dt><dd>New Year’s Day, Martin Luther King Day, Lincoln’s Birthday, Washington’s Birthday, Good Friday, Memorial Day, Juneteenth, Independence Day, Labor Day, Indigenous People’s Day (Columbus Day in state law), Veterans Day, Thanksgiving, and Christmas. Saturday holidays move to Friday, Sunday holidays to Monday.</dd></div>
-            <div><dt>Working a holiday</dt><dd>You earn holiday comp time hour for hour. Use it within 365 days, and use the holiday tracker above to keep count.</dd></div>
+            <div><dt>Working a holiday</dt><dd>You earn holiday comp time hour for hour. Use it within 365 days. The <a href="index.html?view=rights-benefits#holiday-time">Holiday Time Tracker</a> keeps count.</dd></div>
             <div><dt>Religious and cultural holidays</dt><dd>A request to use holiday comp time for a religious or cultural holiday can’t be denied arbitrarily or without good business reason.</dd></div>
           </dl>
           <p class="rights-sources"><a href="index.html?view=current-contract#article-8">Article 8</a> · <a href="index.html?view=current-contract#article-9">Article 9</a></p>
@@ -951,9 +952,9 @@
 
         <article class="rights-tool" id="benefit-civic" data-view-guide aria-labelledby="benefit-civic-title" tabindex="-1" hidden>
           <h2 id="benefit-civic-title">Jury Duty and Civic Leave</h2>
-          <p>If you’re called for jury duty, or subpoenaed to court because of your UConn job, you get paid leave without using other time. Tell your department head within four days of getting the notice.</p>
+          <p>If you’re called for jury duty, or subpoenaed to court because of your University job, you get paid leave without using other time. Tell your department head within four days of getting the notice.</p>
           <dl class="benefit-facts">
-            <div><dt>Jury pay</dt><dd>Turn down jury pay or turn it over to UConn. Mileage and parking reimbursement are yours to keep.</dd></div>
+            <div><dt>Jury pay</dt><dd>Turn down jury pay or turn it over to the University. Mileage and parking reimbursement are yours to keep.</dd></div>
             <div><dt>Released early</dt><dd>If you’re released early and could still work at least half your scheduled hours after travel, return to work.</dd></div>
             <div><dt>Emergency responders</dt><dd>Volunteer firefighters, EMTs, and similar can request time for emergency duty. Approval is at your supervisor’s discretion, and up to five approved requests a year are paid.</dd></div>
             <div><dt>Legal obligations</dt><dd>You can use vacation, comp time, holiday comp time, or unpaid time for a legal obligation for yourself or family. These requests can’t be unreasonably denied.</dd></div>
@@ -963,11 +964,11 @@
 
         <article class="rights-tool" id="benefit-educational-leave" data-view-guide aria-labelledby="benefit-educational-leave-title" tabindex="-1" hidden>
           <h2 id="benefit-educational-leave-title">Educational Leave</h2>
-          <p>Up to four educational leaves can be granted across the unit each year for projects that benefit UConn. Staff with seven or more years of continuous service may be eligible. It’s a privilege, not a right, and the application process can’t be grieved.</p>
+          <p>Up to four educational leaves can be granted across the unit each year for projects that benefit the University. Staff with seven or more years of continuous service may be eligible. It’s a privilege, not a right, and the application process can’t be grieved.</p>
           <dl class="benefit-facts">
-            <div><dt>Apply early</dt><dd>Apply in writing through your chain of command at least one year before the leave would start, describing the project and its value to you and UConn.</dd></div>
+            <div><dt>Apply early</dt><dd>Apply in writing through your chain of command at least one year before the leave would start, describing the project and its value to you and the University.</dd></div>
             <div><dt>Pay options</dt><dd>Take a full year at half pay or half a year at full pay. Your tuition waiver continues during the leave.</dd></div>
-            <div><dt>Conditions</dt><dd>No other paid work during the leave, at least 10 years between leaves, and at least one year of service at UConn afterward.</dd></div>
+            <div><dt>Conditions</dt><dd>No other paid work during the leave, at least 10 years between leaves, and at least one year of service at the University afterward.</dd></div>
           </dl>
           <p class="rights-sources"><a href="index.html?view=current-contract#article-13">Article 13</a></p>
         </article>
@@ -978,16 +979,16 @@
           <dl class="benefit-facts">
             <div><dt>Fee waiver</dt><dd>If your salary qualifies you for the 50% Area 2 reduction, your Area 2 fee is waived at campuses other than Storrs.</dd></div>
             <div><dt>Using permits</dt><dd>University permits are honored at every campus. With an Area 2 permit and a state accessible-parking permit registered with Facilities Operations, you can use any accessible space in surface lots at no extra cost.</dd></div>
-            <div><dt>Notice</dt><dd>UConn gives advance notice of parking disruptions, except in emergencies.</dd></div>
+            <div><dt>Notice</dt><dd>The University gives advance notice of parking disruptions, except in emergencies.</dd></div>
           </dl>
           <p class="rights-sources"><a href="index.html?view=current-contract#article-30">Article 30</a></p>
         </article>
 
         <article class="rights-tool" id="benefit-insurance" data-view-guide aria-labelledby="benefit-insurance-title" tabindex="-1" hidden>
           <h2 id="benefit-insurance-title">Life Insurance, Disability, and Phased Retirement</h2>
-          <p>Group life insurance is available at the same rate and coverage as other state employees. Health care and pensions come from the SEBAC agreement and have their own guides here.</p>
+          <p>Group life insurance is available at the same rate and coverage as other state employees. Health care and pensions come from the SEBAC agreement: see <a href="index.html?view=rights-benefits#benefit-health-plan">Your Health Plan and HEP</a> and <a href="index.html?view=rights-benefits#benefit-retirement-plans">Hybrid Plan or ARP</a>.</p>
           <dl class="benefit-facts">
-            <div><dt>Disability coverage</dt><dd>If you’re in the Alternative Retirement Program, UConn provides a long-term disability policy at no cost to you.</dd></div>
+            <div><dt>Disability coverage</dt><dd>If you’re in the Alternative Retirement Program, the University provides a long-term disability policy at no cost to you.</dd></div>
             <div><dt>Phased retirement</dt><dd>With department approval, you can reduce your schedule by up to 50% for up to three years before a fixed retirement date. You keep subsidized health and life insurance and full credit toward retirement.</dd></div>
           </dl>
           <p class="rights-sources"><a href="index.html?view=current-contract#article-33">Article 33</a> · <a href="index.html?view=current-contract#article-47">Article 47</a></p>
@@ -1012,14 +1013,14 @@
 
         <article class="rights-tool" id="benefit-retirement-plans" data-view-guide aria-labelledby="benefit-retirement-plans-title" tabindex="-1" hidden>
           <h2 id="benefit-retirement-plans-title">Hybrid Plan or ARP</h2>
-          <p>New UConn professional staff choose between two retirement plans on their first day, and the choice is permanent. If you don’t choose, UConn staff are placed in the SERS Tier IV Hybrid Plan.</p>
+          <p>New University professional staff choose between two retirement plans on their first day, and the choice is permanent. If you don’t choose, University staff are placed in the SERS Tier IV Hybrid Plan.</p>
           <dl class="benefit-facts">
             <div><dt>Hybrid Plan</dt><dd>A pension based on your five highest-paid years and your years of service, plus a small savings account. You pay 8% toward the pension and 1% into savings, and the State adds 1%. You’re vested after 10 years and can retire at 63 with 25 years or 65 with 10, or earlier with a reduced pension from 58 with 10 years.</dd></div>
             <div><dt>ARP</dt><dd>A 401(a) savings account that you own from day one. You put in 6.5% (or 5% if you choose), the State adds 6.5%, and what you get depends on your investments. ARP members don’t pay into Social Security in this job.</dd></div>
             <div><dt>Retiree cost-of-living raises</dt><dd>Hybrid pensions get yearly raises tied to inflation, between 0% and 2%. For people retiring since July 2022, the first raise comes 30 months after retirement.</dd></div>
             <div><dt>Can’t switch</dt><dd>The choice can’t be changed later, so it’s worth comparing the two with HR or a financial planner before your start date.</dd></div>
           </dl>
-          <p class="rights-sources"><a href="https://hr.media.uconn.edu/wp-content/uploads/sites/4047/2024/11/RetPlnCmpChrtHEd.pdf">UConn plan comparison</a> · <a href="https://osc.ct.gov/retirement/higher-ed/new-hire/">Comptroller: new hires</a> · <a href="https://andr.ct.aft.org/sites/default/files/sebac_contract_agreement_2017_v2_0.pdf">SEBAC 2017</a></p>
+          <p class="rights-sources"><a href="https://hr.media.uconn.edu/wp-content/uploads/sites/4047/2024/11/RetPlnCmpChrtHEd.pdf">University plan comparison</a> · <a href="https://osc.ct.gov/retirement/higher-ed/new-hire/">Comptroller: new hires</a> · <a href="https://andr.ct.aft.org/sites/default/files/sebac_contract_agreement_2017_v2_0.pdf">SEBAC 2017</a></p>
         </article>
 
         <article class="rights-tool" id="benefit-retiree-health" data-view-guide aria-labelledby="benefit-retiree-health-title" tabindex="-1" hidden>

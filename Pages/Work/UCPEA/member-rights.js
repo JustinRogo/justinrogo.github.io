@@ -316,9 +316,9 @@
       expirationLabel.textContent = formatDate(date);
       const dueStatus = row.querySelector('.holiday-expiration-status');
       if (date < today) {
-        dueStatus.textContent = 'Past expiration date';
+        dueStatus.textContent = 'Expired';
       } else if (date <= upcoming) {
-        dueStatus.textContent = date.getTime() === today.getTime() ? 'Due today' : 'Due within 30 days';
+        dueStatus.textContent = date.getTime() === today.getTime() ? 'Last day to use' : 'Use within 30 days';
         dueStatus.classList.add('is-due');
       } else {
         dueStatus.textContent = 'Use by date';
@@ -345,7 +345,7 @@
       }]));
       reminderURLs.push(url);
       reminder.href = url;
-      reminder.setAttribute('aria-label', `Save reminder for time earned ${earnedLabel}`);
+      reminder.setAttribute('aria-label', `Save calendar reminder for time earned ${earnedLabel}`);
       edit.setAttribute('aria-label', `Edit time earned ${earnedLabel}`);
       edit.addEventListener('click', () => editEntry(entry));
       remove.setAttribute('aria-label', `Remove time earned ${earnedLabel}`);

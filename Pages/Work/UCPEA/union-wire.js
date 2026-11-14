@@ -22,9 +22,13 @@
   const lead = stories[0];
   let shown = 0;
 
+  // A malformed feed date is skipped rather than shown (or thrown by Intl).
   function setPublicationDate(time, publishedOn) {
+    const date = new Date(publishedOn);
+    if (Number.isNaN(date.getTime())) return false;
     time.dateTime = publishedOn;
-    time.textContent = dateFormat.format(new Date(publishedOn));
+    time.textContent = dateFormat.format(date);
+    return true;
   }
 
   function articleLink(story) {
@@ -40,8 +44,7 @@
       row.append(articleLink(story));
       if (story.publishedOn) {
         const date = document.createElement('time');
-        setPublicationDate(date, story.publishedOn);
-        row.append(date);
+        if (setPublicationDate(date, story.publishedOn)) row.append(date);
       }
       return row;
     });
@@ -52,10 +55,7 @@
   }
 
   heroTitle.replaceChildren(articleLink(lead));
-  if (lead.publishedOn) {
-    setPublicationDate(heroDate, lead.publishedOn);
-    heroDate.hidden = false;
-  }
+  if (lead.publishedOn && setPublicationDate(heroDate, lead.publishedOn)) heroDate.hidden = false;
   if (generatedAt) {
     status.textContent = `Feed refreshed ${refreshFormat.format(new Date(generatedAt))}`;
     status.hidden = false;

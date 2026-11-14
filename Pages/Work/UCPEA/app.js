@@ -98,8 +98,18 @@ function initDashboardNavigation() {
       title: element.querySelector('h1').textContent,
       dockLink: document.querySelector(`.mobile-dock a[href="index.html?view=${element.id}"]`),
       guides: Array.from(element.querySelectorAll('[data-view-guide]')),
-      guideLinks: Array.from(element.querySelectorAll('.guide-index a')),
+      guideLinks: Array.from(element.querySelectorAll('.guide-index > ul > li > a')),
       defaultGuide: element.querySelector('[data-default-guide]'),
+      // Rights & Benefits groups: each list gets one slot row that holds its open guide.
+      groups: Array.from(element.querySelectorAll('.guide-group'), group => {
+        const list = group.querySelector('.guide-index > ul');
+        const tiles = Array.from(list.children);
+        const slot = document.createElement('li');
+        slot.className = 'guide-slot';
+        slot.hidden = true;
+        list.append(slot);
+        return { title: group.querySelector('.guide-group-title'), list, tiles, slot };
+      }),
     },
   ]));
   const links = Array.from(sidebar.querySelectorAll('.primary-nav a[href^="index.html#"]'));
@@ -224,7 +234,128 @@ function initDashboardNavigation() {
     return { key, hash: url.hash };
   }
 
-  function showView({ focus = false, restoreScroll, scrollHome = false, animate = false } = {}) {
+  const siteHeader = document.querySelector('.site-header');
+  const mobileDock = document.querySelector('.mobile-dock');
+
+  // The tile link that opens a guide in a Rights & Benefits group.
+  function guideTile(localView, guide) {
+    if (!guide) return null;
+    return localView.guideLinks.find(link => link.hash === `#${guide.id}` && link.closest('.guide-group')) ?? null;
+  }
+
+  function openGuideIn(slot) {
+    return slot.hidden ? null : slot.querySelector(':scope > [data-view-guide]:not([hidden])');
+  }
+
+  // An open guide takes a full-width row in its group's list, directly under
+  // the row holding its tile, so reading and tab order follow what you see.
+  // Guides moved into a slot stay there, hidden, until they are opened again.
+  function placeGuide(group, guide, link) {
+    const { slot, tiles } = group;
+    const tile = link && group.list.contains(link) ? link.parentElement : null;
+    // A tile hidden by the search takes its open guide out of view with it.
+    if (!tile || !guide || tile.hidden) {
+      slot.hidden = true;
+      return;
+    }
+    if (guide.parentElement !== slot) slot.append(guide);
+    slot.hidden = true;
+    const rowEnd = tiles.filter(item => !item.hidden && item.offsetTop === tile.offsetTop).at(-1);
+    if (rowEnd.nextElementSibling !== slot) rowEnd.after(slot);
+    slot.hidden = false;
+    const slotBox = slot.getBoundingClientRect();
+    const tileBox = tile.getBoundingClientRect();
+    slot.style.setProperty('--notch-x', `${tileBox.left - slotBox.left + tileBox.width / 2}px`);
+  }
+
+  // Keep the tile being opened or closed where it was on screen. A guide that
+  // would open mostly out of sight, or under a tile hidden behind the header,
+  // brings its tile up under the header instead.
+  // While a guide is unfolding, that lift waits and glides once the fold settles,
+  // so the guide always opens against its tile.
+  let liftAfterFold = null;
+  function keepTile(link, before, opening, folding) {
+    const tile = link.parentElement;
+    const shift = tile.getBoundingClientRect().top - before;
+    let top = window.scrollY + shift;
+    const slot = tile.parentElement.querySelector(':scope > .guide-slot:not([hidden])');
+    const outOfSight = before < siteHeader.offsetHeight || slot?.getBoundingClientRect().top - shift > window.innerHeight * 0.6;
+    if (opening && slot && outOfSight) {
+      if (folding) liftAfterFold = tile;
+      else top = window.scrollY + tile.getBoundingClientRect().top - siteHeader.offsetHeight - 12;
+    }
+    window.scrollTo({ top, behavior: 'instant' });
+  }
+
+  // Rights & Benefits: a guide unfolds out of the tile that opened it and the
+  // tiles below ride its edge down; closing folds it back up into the tile.
+  // Without view transitions, or with reduced motion, the guide just appears.
+  const foldNamed = new Set();
+  let foldRun = 0;
+  function foldGuides(localView, update) {
+    if (!localView?.groups.length || !document.startViewTransition || UCPEAMotion.reduced || document.hidden) {
+      update(false);
+      return;
+    }
+    liftAfterFold = null;
+    const root = document.documentElement;
+    const name = (element, value) => {
+      if (!element) return;
+      element.style.viewTransitionName = value;
+      foldNamed.add(element);
+    };
+    // The panel's start or end shape: the width of its tile, along the tile's
+    // bottom edge. When the page cannot hold the tile still, the unfolding
+    // panel starts where the tile was and travels with it.
+    const tileTops = new Map(localView.guideLinks.map(link => [link, link.getBoundingClientRect().top]));
+    const tileEdges = (prefix, slot) => {
+      const link = guideTile(localView, openGuideIn(slot));
+      if (!link) return;
+      const slotBox = slot.getBoundingClientRect();
+      const tileBox = link.getBoundingClientRect();
+      root.style.setProperty(`--${prefix}-left`, `${Math.max(0, tileBox.left - slotBox.left)}px`);
+      root.style.setProperty(`--${prefix}-right`, `${Math.max(0, slotBox.right - tileBox.right)}px`);
+      root.style.setProperty(`--${prefix}-shift`, `${(tileTops.get(link) ?? tileBox.top) - tileBox.top}px`);
+    };
+
+    name(siteHeader, 'ucpea-header');
+    name(sidebar, 'ucpea-sidebar');
+    name(mobileDock, 'ucpea-dock');
+    name(footer, 'ucpea-footer');
+    localView.groups.forEach((group, groupIndex) => {
+      name(group.title, `guide-title-${groupIndex}`);
+      group.tiles.forEach((tile, tileIndex) => name(tile, `guide-tile-${groupIndex}-${tileIndex}`));
+    });
+    const closing = localView.groups.map(group => group.slot).find(slot => !slot.hidden);
+    if (closing) {
+      name(closing, 'guide-fold-out');
+      tileEdges('fold-out', closing);
+    }
+
+    const run = ++foldRun;
+    const viewTransition = UCPEAMotion.transition('guide', () => {
+      if (closing) closing.style.viewTransitionName = 'none';
+      update(true);
+      const opening = localView.groups.map(group => group.slot).find(slot => !slot.hidden);
+      if (opening) {
+        name(opening, 'guide-fold-in');
+        tileEdges('fold-in', opening);
+      }
+      // Switching guides: the old one hands off quickly instead of folding,
+      // so it never lingers over the page as it scrolls to the new tile.
+      root.toggleAttribute('data-guide-swap', Boolean(closing && opening));
+    });
+    viewTransition?.finished.finally(() => {
+      if (run !== foldRun) return;
+      root.removeAttribute('data-guide-swap');
+      for (const element of foldNamed) element.style.viewTransitionName = '';
+      foldNamed.clear();
+      liftAfterFold?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      liftAfterFold = null;
+    });
+  }
+
+  function showView({ focus = false, restoreScroll, scrollHome = false, animate = false, folding = false } = {}) {
     const url = new URL(location.href);
     const { key, hash, legacyLink } = readDestination(url);
     if (legacyLink) {
@@ -289,9 +420,19 @@ function initDashboardNavigation() {
       const target = document.getElementById(hash.slice(1));
       const selectedGuide = target?.closest('[data-view-guide]') ?? localView.defaultGuide;
       const guideOpening = Boolean(selectedGuide?.hidden);
+      const sameView = key === previousView;
+      // Rights & Benefits: note where the tile being opened, or the open tile
+      // being closed, sits on screen before its list reflows.
+      const selectedTile = guideTile(localView, selectedGuide);
+      const openTile = localView.guideLinks.find(link =>
+        link.getAttribute('aria-current') === 'location' && link.closest('.guide-group'));
+      const anchorTile = selectedGuide ? selectedTile : openTile;
+      const anchorTop = sameView ? anchorTile?.getBoundingClientRect().top : undefined;
       for (const guide of localView.guides) guide.hidden = guide !== selectedGuide;
-      // A guide opening under its list on the same page settles in from just above.
-      if (animate && key === previousView && guideOpening) UCPEAMotion.arrive(selectedGuide, { y: -6, duration: 220 });
+      for (const group of localView.groups) placeGuide(group, selectedGuide, selectedTile);
+      // A guide opening on the same page settles in from just above, unless it
+      // is already unfolding out of its tile.
+      if (animate && sameView && guideOpening && !folding) UCPEAMotion.arrive(selectedGuide, { y: -6, duration: 220 });
       for (const link of localView.guideLinks) {
         const open = link.hash === `#${selectedGuide?.id}`;
         link.setAttribute('aria-current', open ? 'location' : 'false');
@@ -300,18 +441,16 @@ function initDashboardNavigation() {
       }
       focusTarget = target && localView.element.contains(target) && !target.closest('[hidden]')
         ? target : localView.element;
-      // Guides in a labeled group (Rights & Benefits) open under their own list,
-      // and the page scrolls so that group's heading sits at the top.
-      const groupTitle = focusTarget === selectedGuide
-        ? selectedGuide?.closest('.guide-group')?.querySelector('.guide-group-title') : null;
       // Elsewhere, switching guides on the same page keeps the page still. It
       // only scrolls when the chosen guide would otherwise be off-screen (phones).
-      const switchingGuide = key === previousView && focusTarget === selectedGuide;
-      const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const switchingGuide = sameView && focusTarget === selectedGuide;
       if (typeof restoreScroll === 'number') {
         window.scrollTo({ top: restoreScroll, behavior: 'instant' });
-      } else if (groupTitle) {
-        groupTitle.scrollIntoView({ block: 'start', behavior: switchingGuide && !calm ? 'smooth' : 'instant' });
+      } else if (anchorTile && typeof anchorTop === 'number' && (!selectedGuide || focusTarget === selectedGuide)) {
+        keepTile(anchorTile, anchorTop, Boolean(selectedGuide), folding);
+      } else if (selectedTile && focusTarget === selectedGuide) {
+        // Arriving at a grouped guide from elsewhere: its tile sits under the header.
+        selectedTile.parentElement.scrollIntoView({ block: 'start', behavior: 'instant' });
       } else if (switchingGuide) {
         if (focusTarget.getBoundingClientRect().top > window.innerHeight - 96) {
           focusTarget.scrollIntoView({ block: 'start', behavior: 'smooth' });
@@ -350,7 +489,8 @@ function initDashboardNavigation() {
       history.pushState(null, '', destination);
     }
     setOpenMenu('');
-    showView({ focus: true, scrollHome: true, animate: true });
+    const guidePage = key && key === activeView ? localViews.get(key) : null;
+    foldGuides(guidePage, folding => showView({ focus: true, scrollHome: true, animate: true, folding }));
   }
 
   document.addEventListener('click', event => {
@@ -367,7 +507,8 @@ function initDashboardNavigation() {
     if (localView && !localView.defaultGuide && key === activeView &&
         localView.guideLinks.includes(link) && link.getAttribute('aria-current') === 'location') {
       history.pushState(null, '', UCPEAViews.dashboardURL(key));
-      showView({ restoreScroll: window.scrollY });
+      if (localView.groups.length) foldGuides(localView, folding => showView({ folding }));
+      else showView({ restoreScroll: window.scrollY });
       return;
     }
     navigate(key, hash);
@@ -381,8 +522,156 @@ function initDashboardNavigation() {
 
   window.addEventListener('popstate', event => {
     setOpenMenu('');
-    showView({ restoreScroll: event.state?.dashboardScroll, animate: true });
+    const { key } = readDestination(new URL(location.href));
+    const guidePage = key && key === activeView ? localViews.get(key) : null;
+    foldGuides(guidePage, folding => showView({ restoreScroll: event.state?.dashboardScroll, animate: true, folding }));
   });
+
+  // Escape inside an open Rights & Benefits guide folds it back into its tile.
+  // Form fields keep Escape for themselves.
+  document.addEventListener('keydown', event => {
+    if (event.key !== 'Escape' || event.defaultPrevented || body.dataset.menuOpen) return;
+    const slot = event.target.closest?.('.guide-slot');
+    if (!slot || event.target.matches('input, select, textarea, [contenteditable]')) return;
+    const link = guideTile(localViews.get(activeView), openGuideIn(slot));
+    if (!link) return;
+    event.preventDefault();
+    link.focus({ preventScroll: true });
+    link.click();
+  });
+
+  // When the columns change, an open guide moves to stay under its tile's row.
+  for (const view of localViews.values()) {
+    for (const group of view.groups) {
+      let width = 0;
+      new ResizeObserver(([entry]) => {
+        if (entry.contentRect.width === width) return;
+        width = entry.contentRect.width;
+        const guide = openGuideIn(group.slot);
+        if (guide) placeGuide(group, guide, guideTile(view, guide));
+      }).observe(group.list);
+    }
+  }
+
+  // Rights & Benefits search: narrows both guide lists as you type. Tiles
+  // match on their title and summary, their guide's full text, and the
+  // everyday words members use for each topic. A tile found only through
+  // its guide's text quotes the line that matched.
+  const guideSearch = document.getElementById('guide-search');
+  const searchPage = localViews.get('rights-benefits');
+  if (guideSearch && searchPage) {
+    const input = document.getElementById('guide-search-input');
+    const count = document.getElementById('guide-search-count');
+    const clear = document.getElementById('guide-search-clear');
+    const empty = document.getElementById('guide-search-empty');
+    const groupElements = Array.from(searchPage.element.querySelectorAll('.guide-group'));
+    const normalize = text => text.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .replace(/&/g, ' and ').replace(/[’']/g, '').replace(/[^a-z0-9%]+/g, ' ').trim();
+    const everydayWords = {
+      'telecommuting-appeals': 'remote work from home hybrid telework wfh denied',
+      'position-audit': 'reclassification reclass job description duties changed',
+      'holiday-time': 'holiday comp time expire',
+      discipline: 'fired firing terminated termination suspended suspension write up investigation hearing',
+      representation: 'weingarten union rep steward meeting questioning',
+      'personnel-file': 'records letter rebuttal remove warning reprimand',
+      grievances: 'complaint dispute arbitration grieve',
+      evaluation: 'performance review appraisal rating',
+      'schedule-changes': 'hours flex flexible shift',
+      'comp-time': 'overtime extra hours on call',
+      'higher-level-work': 'raise pay increase acting interim out of class',
+      'job-postings': 'hiring transfer apply interview promotion',
+      probation: 'new hire probationary',
+      layoff: 'laid off job loss recall seniority',
+      nondiscrimination: 'harassment retaliation oie equity discrimination',
+      leaving: 'resign resignation quit notice payout',
+      sebac: 'pension health care bargaining coalition',
+      'benefit-professional-development': 'conference training workshop award reimbursement',
+      'benefit-childcare': 'daycare day care camp kids children',
+      'benefit-tuition': 'classes courses school college degree waiver',
+      'benefit-scholarships': 'kids children college scholarship',
+      'benefit-hardship': 'emergency money financial help grant',
+      'benefit-sick-leave-bank': 'donated time fmla long illness',
+      'benefit-vacation': 'pto time off annual leave',
+      'benefit-sick-leave': 'sick days doctor illness family',
+      'benefit-parental': 'maternity paternity baby adoption birth foster bonding',
+      'benefit-personal-holidays': 'personal day holiday',
+      'benefit-civic': 'jury court subpoena firefighter emt',
+      'benefit-educational-leave': 'sabbatical study',
+      'benefit-parking': 'permit lot fee',
+      'benefit-insurance': 'life insurance disability phased retirement',
+      'benefit-health-plan': 'medical insurance doctor prescription copay deductible',
+      'benefit-retirement-plans': 'pension 401a retirement',
+      'benefit-retiree-health': 'retirement health insurance retiree',
+    };
+    const entries = searchPage.guideLinks.filter(link => link.closest('.guide-group')).map(link => {
+      const guide = document.getElementById(link.hash.slice(1));
+      const id = guide?.id ?? '';
+      // Sentences a match can quote: the guide's paragraphs, facts, and steps.
+      const lines = guide ? Array.from(guide.querySelectorAll(':scope > p, dd, .rights-steps li, .rights-checklist li'),
+        element => element.textContent.replace(/\s+/g, ' ').trim()).filter(Boolean) : [];
+      return {
+        link,
+        tile: link.parentElement,
+        head: normalize(`${link.textContent} ${everydayWords[id] ?? ''}`),
+        body: normalize(lines.join(' ')),
+        lines,
+      };
+    });
+
+    // The first line holding the first searched word, trimmed around it with the word marked.
+    function quote(lines, words) {
+      for (const line of lines) {
+        const match = new RegExp(words.map(word => word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'i').exec(line);
+        if (!match) continue;
+        const start = Math.max(0, line.lastIndexOf(' ', Math.max(0, match.index - 48)));
+        const end = line.indexOf(' ', Math.min(line.length, match.index + match[0].length + 72));
+        const before = (start > 0 ? '…' : '') + line.slice(start, match.index).trimStart();
+        const after = line.slice(match.index + match[0].length, end === -1 ? line.length : end) + (end === -1 ? '' : '…');
+        const small = document.createElement('small');
+        small.className = 'guide-match';
+        const mark = document.createElement('mark');
+        mark.textContent = match[0];
+        small.append(before, mark, after);
+        return small;
+      }
+      return null;
+    }
+
+    function filterGuides() {
+      const words = normalize(input.value).split(' ').filter(Boolean);
+      let matches = 0;
+      for (const entry of entries) {
+        entry.link.querySelector('.guide-match')?.remove();
+        const inHead = words.every(word => entry.head.includes(word));
+        const show = !words.length || inHead || words.every(word => entry.head.includes(word) || entry.body.includes(word));
+        entry.tile.hidden = !show;
+        if (!show) continue;
+        matches++;
+        if (words.length && !inHead) {
+          const line = quote(entry.lines, words.filter(word => !entry.head.includes(word)));
+          if (line) entry.link.append(line);
+        }
+      }
+      for (const group of groupElements) {
+        group.hidden = !group.querySelector('.guide-index > ul > li:not(.guide-slot):not([hidden])');
+      }
+      // An open guide follows its tile: out of view when it's filtered away,
+      // and back under its (possibly new) row when it returns.
+      const openGuide = searchPage.guides.find(guide => !guide.hidden);
+      for (const group of searchPage.groups) placeGuide(group, openGuide, guideTile(searchPage, openGuide));
+      count.textContent = words.length ? `${matches} of ${entries.length} guides` : '';
+      empty.hidden = !words.length || matches > 0;
+      clear.hidden = !input.value;
+    }
+
+    input.addEventListener('input', filterGuides);
+    clear.addEventListener('click', () => {
+      input.value = '';
+      filterGuides();
+      input.focus();
+    });
+    guideSearch.hidden = false;
+  }
 
   window.addEventListener('hashchange', () => {
     // Native fragment links can reach a legacy route without reloading.
@@ -415,7 +704,6 @@ function initDashboardNavigation() {
 
 const helpTopics = {
   workplace: {
-    eyebrow: 'Workplace support',
     title: 'Start with a steward or the UCPEA office',
     summary: 'You do not need to decide whether an issue is a formal grievance before asking for guidance. A union representative can help you understand the process and applicable timelines.',
     steps: [
@@ -430,7 +718,6 @@ const helpTopics = {
     ],
   },
   duties: {
-    eyebrow: 'Classification and duties',
     title: 'Document the work before starting a position audit',
     summary: 'A position audit may be appropriate when a majority of your duties and responsibilities have changed enough that your current classification no longer describes the work.',
     steps: [
@@ -445,7 +732,6 @@ const helpTopics = {
     ],
   },
   leave: {
-    eyebrow: 'Time away from work',
     title: 'Identify the kind of leave and check its notice rules',
     summary: 'Different rules apply to vacation, sick leave, parental benefits, educational leave, and unpaid leave. Start with the reason and likely duration, then confirm the procedure.',
     steps: [
@@ -460,7 +746,6 @@ const helpTopics = {
     ],
   },
   development: {
-    eyebrow: 'Career development',
     title: 'Check who should pay before applying',
     summary: 'UCPEA funding supports eligible self-directed development. If training is required for your departmental work, Article 34.3 says the University pays for it.',
     steps: [
@@ -474,13 +759,12 @@ const helpTopics = {
     ],
   },
   benefits: {
-    eyebrow: 'Member benefits',
     title: 'Go to the current benefit workflow',
     summary: 'Tuition and childcare programs have distinct eligibility, documentation, and filing rules. Use the official workflow for the benefit you need.',
     steps: [
       ['Review eligibility first', 'Confirm whether the benefit covers the employee, a dependent, or particular types of expenses.'],
       ['Collect the required records', 'Applications may require receipts, course information, or other supporting documentation.'],
-      ['Confirm the filing date', 'See the childcare guide for expense periods and UConn HR for tuition deadlines.'],
+      ['Confirm the filing date', 'See the childcare guide for expense periods and University HR for tuition deadlines.'],
     ],
     links: [
       ['Childcare reimbursement', 'index.html?view=rights-benefits#benefit-childcare', false],
@@ -489,7 +773,6 @@ const helpTopics = {
     ],
   },
   membership: {
-    eyebrow: 'Membership and participation',
     title: 'Add your voice to the union',
     summary: 'Membership provides a vote in union decisions and supports the organization that bargains and enforces workplace protections for professional employees.',
     steps: [
@@ -505,7 +788,6 @@ const helpTopics = {
 };
 
 const helpButtons = Array.from(document.querySelectorAll('[data-help-topic]'));
-const helpResultEyebrow = document.getElementById('help-result-eyebrow');
 const helpResultTitle = document.getElementById('help-result-title');
 const helpResultSummary = document.getElementById('help-result-summary');
 const helpResultSteps = document.getElementById('help-result-steps');
@@ -516,19 +798,23 @@ function showHelpTopic(topicKey) {
   if (!topic || !helpResultTitle || !helpResultSteps || !helpResultActions) return;
   const changed = !helpButtons.some(button => button.dataset.helpTopic === topicKey && button.classList.contains('is-active'));
 
+  // Topics are tabs over one shared panel: the selected tab is the only one
+  // in the tab order, and the arrow keys move between the others.
   helpButtons.forEach(button => {
     const active = button.dataset.helpTopic === topicKey;
     button.classList.toggle('is-active', active);
-    button.setAttribute('aria-pressed', String(active));
+    button.setAttribute('aria-selected', String(active));
+    button.tabIndex = active ? 0 : -1;
   });
 
-  helpResultEyebrow.textContent = topic.eyebrow;
   helpResultTitle.textContent = topic.title;
   helpResultSummary.textContent = topic.summary;
 
   helpResultSteps.replaceChildren(...topic.steps.map(([title, detail], index) => {
     const item = document.createElement('li');
+    // The list is an <ol>, so screen readers already announce the position.
     const number = document.createElement('span');
+    number.setAttribute('aria-hidden', 'true');
     number.textContent = String(index + 1);
     const copy = document.createElement('p');
     const strong = document.createElement('strong');
@@ -559,7 +845,7 @@ function showHelpTopic(topicKey) {
   // The answer is rewritten in place; a short rise shows that it changed.
   if (changed) {
     UCPEAMotion.arrive([
-      helpResultEyebrow, helpResultTitle, helpResultSummary,
+      helpResultTitle, helpResultSummary,
       ...helpResultSteps.children, helpResultActions,
     ], { y: 6, duration: 220, stagger: 24 });
   }
@@ -567,6 +853,25 @@ function showHelpTopic(topicKey) {
 
 helpButtons.forEach(button => {
   button.addEventListener('click', () => showHelpTopic(button.dataset.helpTopic));
+});
+
+// Arrow keys, Home, and End move between topics and show each as it's reached.
+document.querySelector('.help-topics[role="tablist"]')?.addEventListener('keydown', event => {
+  const current = helpButtons.indexOf(event.target);
+  if (current === -1) return;
+  const last = helpButtons.length - 1;
+  const next = {
+    ArrowDown: current === last ? 0 : current + 1,
+    ArrowRight: current === last ? 0 : current + 1,
+    ArrowUp: current === 0 ? last : current - 1,
+    ArrowLeft: current === 0 ? last : current - 1,
+    Home: 0,
+    End: last,
+  }[event.key];
+  if (next === undefined) return;
+  event.preventDefault();
+  helpButtons[next].focus();
+  showHelpTopic(helpButtons[next].dataset.helpTopic);
 });
 
 const activityStart = document.getElementById('activityStart');

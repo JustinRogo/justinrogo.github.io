@@ -426,7 +426,9 @@
     return figure;
   }
 
-  function card(post, urls = state.urls) {
+  // headingLevel follows the page: posts sit under the Board view's h1 (h2),
+  // but under the Overview's "Bulletin Board" h2 (h3).
+  function card(post, urls = state.urls, headingLevel = 2) {
     const item = el('li', 'board-post');
     item.dataset.category = post.category;
     item.dataset.status = post.status;
@@ -434,7 +436,7 @@
     const note = el('article', 'board-note');
 
     note.append(flagList(post));
-    const heading = el('h2', 'board-note-title');
+    const heading = el(`h${headingLevel}`, 'board-note-title');
     const link = el('a', null, post.title);
     link.href = `index.html?view=board#post-${post.id}`; // the dashboard router handles index.html links
     link.dataset.boardPost = post.id;
@@ -1069,7 +1071,7 @@
       const urls = new Map(posts
         .filter(post => post.image_path && post.image_bucket === 'board-public')
         .map(post => [post.id, `${url}/storage/v1/object/public/board-public/${post.image_path.split('/').map(encodeURIComponent).join('/')}`]));
-      overview.list.replaceChildren(...posts.map(post => card(post, urls)));
+      overview.list.replaceChildren(...posts.map(post => card(post, urls, 3)));
       overview.section.hidden = !posts.length;
       applyMotion(overview.list);
     } catch {
