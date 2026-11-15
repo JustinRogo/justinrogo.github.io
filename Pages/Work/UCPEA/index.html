@@ -1608,12 +1608,29 @@
           </div>
         </div>
         <label class="board-check"><input type="checkbox" id="post-pinned"> Pin to the top of the board</label>
+        <label class="board-check" id="post-notify-field"><input type="checkbox" id="post-notify"> Review notification after publishing</label>
         <div class="account-actions">
           <button class="account-primary" type="submit" value="published" id="post-publish">Publish</button>
           <button class="account-secondary" type="submit" value="draft" id="post-draft">Save as draft</button>
           <button class="rights-text-action" type="button" id="post-cancel">Cancel</button>
         </div>
       </form>
+      <dialog class="calendar-dialog board-push-dialog" id="board-push-dialog" aria-labelledby="board-push-title" aria-describedby="board-push-audience">
+        <h2 id="board-push-title">Notify subscribers</h2>
+        <p class="calendar-dialog-when" id="board-push-post"></p>
+        <dl class="calendar-dialog-location">
+          <dt>Audience</dt>
+          <dd id="board-push-audience"></dd>
+        </dl>
+        <div class="calendar-dialog-description">
+          <p>Devices show “New UCPEA bulletin board post.” Tapping the alert opens this post.</p>
+          <p id="board-push-status" role="status"></p>
+        </div>
+        <form class="account-actions" method="dialog">
+          <button class="account-primary" id="board-push-action" type="button" hidden>Send notification</button>
+          <button class="account-secondary" type="submit" autofocus>Close</button>
+        </form>
+      </dialog>
     </section>
 
     <section class="section-shell rights-section members-section" id="members" data-dashboard-view aria-labelledby="members-title" tabindex="-1" hidden>

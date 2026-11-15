@@ -4722,6 +4722,19 @@ html[data-theme="dark"] .board-post[data-category="announcement"] { --pin: color
   color: var(--ucpea-error-ink);
 }
 
+.board-push-dialog[open],
+.board-push-dialog::backdrop {
+  animation: none;
+}
+
+.board-push-dialog .calendar-dialog-description {
+  white-space: normal;
+}
+
+.board-push-dialog .account-actions {
+  margin-top: 18px;
+}
+
 /* Composer */
 .board-composer {
   max-width: 760px;

@@ -47,6 +47,13 @@
     publish: $('post-publish'),
     draft: $('post-draft'),
     cancel: $('post-cancel'),
+    notifyField: $('post-notify-field'),
+    notify: $('post-notify'),
+    pushDialog: $('board-push-dialog'),
+    pushPost: $('board-push-post'),
+    pushAudience: $('board-push-audience'),
+    pushStatus: $('board-push-status'),
+    pushAction: $('board-push-action'),
   };
 
   const COLUMNS = 'id, area_id, title, summary, body, category, image_bucket, image_path, image_alt, link_url, '
@@ -72,6 +79,7 @@
     flyer: { file: null, removeExisting: false },
     confirmTimer: 0,
     motionPaused: false,
+    push: null,
   };
 
   // ---------------------------------------------------------------------------
@@ -146,6 +154,11 @@
 
   function isPast(post) {
     return Boolean(post.expires_at) && new Date(post.expires_at) < new Date();
+  }
+
+  function canNotify(post) {
+    return els.pushDialog && post?.status === 'published' && !isPast(post) &&
+      !state.offline && access().canPostTo(post.area_id);
   }
 
   function isPdf(path) {
@@ -573,6 +586,13 @@
 
     if (access().canPostTo(post.area_id) && !state.offline) {
       const tools = el('div', 'account-actions board-detail-tools');
+      if (canNotify(post)) {
+        const notify = el('button', 'account-secondary', 'Notify subscribers');
+        notify.type = 'button';
+        notify.dataset.boardAction = 'notify';
+        notify.dataset.id = post.id;
+        tools.append(notify);
+      }
       const edit = el('button', 'account-secondary', 'Edit post');
       edit.type = 'button';
       edit.dataset.boardAction = 'edit';
@@ -586,10 +606,111 @@
     }
   }
 
+  // A post's delivery record lives on the server. This dialog advances one
+  // batch at a time and can resume the remaining devices after an interruption.
+  async function requestPush(post, action) {
+    const client = await UCPEAAccount.getClient();
+    const { data, error } = await client.functions.invoke('ucpea-board-push', {
+      body: { postId: post.id, version: post.updated_at, action },
+      signal: AbortSignal.timeout(25000),
+    });
+    if (error) {
+      const status = error.context?.status;
+      if ([401, 403, 404, 409, 429].includes(status) && error.context?.json) {
+        const response = await error.context.json().catch(() => null);
+        if (response?.error) throw Object.assign(new Error(response.error), { status });
+      }
+      throw error;
+    }
+    if (!data || !(data.closed || data.startedAt || Number.isInteger(data.eligible))) {
+      throw new Error('Notification status unavailable.');
+    }
+    return data;
+  }
+
+  function showPush(message, action, label) {
+    els.pushStatus.textContent = message;
+    els.pushAction.hidden = !action;
+    if (action) {
+      els.pushAction.dataset.action = action;
+      els.pushAction.textContent = label;
+    }
+  }
+
+  function showPushSummary(result) {
+    if (result.closed) {
+      showPush('An alert is already recorded for this post. Its board or publication changed.');
+      return;
+    }
+    if (Number.isInteger(result.eligible)) {
+      if (result.eligible === 0) showPush('There are no eligible devices subscribed to this board.');
+      else showPush(
+        `${result.eligible} subscribed ${result.eligible === 1 ? 'device is' : 'devices are'} eligible.`,
+        'start', 'Send notification',
+      );
+      return;
+    }
+    const messages = [`Push services accepted alerts for ${result.accepted} of ${result.total} devices.`];
+    if (result.failed) messages.push(`${result.failed} failed.`);
+    if (result.skipped) messages.push(`${result.skipped} no longer eligible.`);
+    if (result.unconfirmed) messages.push(`${result.unconfirmed} unconfirmed and excluded from resends.`);
+    if (result.pending || result.sending) {
+      messages.push(result.sending ? 'A batch is in progress.' : `${result.pending} still waiting to send.`);
+      showPush(messages.join(' '), 'resume', 'Resume send');
+    } else {
+      showPush(messages.join(' '));
+    }
+  }
+
+  async function advancePush(action) {
+    const current = state.push;
+    if (!current || current.busy) return;
+    const active = () => state.push === current && els.pushDialog.open &&
+      state.me?.id === current.userId && canNotify(current.post);
+    if (!active()) return;
+    current.busy = true;
+    showPush(action === 'status' ? 'Checking notification status…' : 'Sending notifications… Keep this dialog open.');
+    try {
+      let result = await requestPush(current.post, action);
+      while (action !== 'status' && active() && (result.pending || result.sending)) {
+        const finished = result.total - result.pending - result.sending;
+        showPush(`Processed ${finished} of ${result.total} devices. Keep this dialog open.`);
+        if (result.sending) await new Promise(resolve => setTimeout(resolve, 1500));
+        if (!active()) return;
+        result = await requestPush(current.post, 'resume');
+      }
+      if (active()) showPushSummary(result);
+    } catch (error) {
+      if (!active()) return;
+      if ([401, 403, 404, 409].includes(error.status)) showPush(error.message);
+      else showPush(
+        error.status === 429 ? error.message : 'Could not check the send. Check status to continue safely.',
+        'status', 'Check status',
+      );
+    } finally {
+      current.busy = false;
+    }
+  }
+
+  function openPushDialog(post) {
+    if (!canNotify(post) || els.pushDialog.open) return;
+    state.push = { post, userId: state.me.id, busy: false };
+    els.pushPost.textContent = post.title;
+    els.pushAudience.textContent = post.area_id == null
+      ? 'All approved members with notifications enabled'
+      : `Approved members of ${boardName(post.area_id)} with notifications enabled`;
+    els.pushDialog.showModal();
+    advancePush('status');
+  }
+
+  els.pushAction?.addEventListener('click', () => advancePush(els.pushAction.dataset.action));
+  els.pushDialog?.addEventListener('close', () => { state.push = null; });
+
   // ---------------------------------------------------------------------------
   // Modes and routing (index.html?view=board#post-<id>)
   // ---------------------------------------------------------------------------
   function setMode(mode) {
+    if (mode !== 'detail' && els.pushDialog?.open) els.pushDialog.close();
     state.mode = mode;
     els.browse.hidden = mode !== 'browse';
     els.detail.hidden = mode !== 'detail';
@@ -612,6 +733,7 @@
     if (state.mode === 'compose') return;
     const id = currentPostId();
     if (id) {
+      if (state.push && state.push.post.id !== id && els.pushDialog.open) els.pushDialog.close();
       renderDetail(id);
       setMode('detail');
       if (focus) ($('board-detail-title') || els.detail.querySelector('h2'))?.focus({ preventScroll: true });
@@ -627,7 +749,7 @@
     if (url.href !== location.href) history.pushState(null, '', url);
     showError('');
     showNotice('');
-    route({ focus: true });
+    return route({ focus: true });
   }
 
   // ---------------------------------------------------------------------------
@@ -688,6 +810,7 @@
     els.flyerOnly.checked = Boolean(post?.flyer_only);
     els.publish.textContent = post?.status === 'published' ? 'Update post' : 'Publish';
     els.draft.textContent = post?.status === 'published' ? 'Move to drafts' : 'Save as draft';
+    if (els.notifyField) els.notifyField.hidden = post?.status === 'published';
     updateFlyerUI();
     showError('');
     showNotice('');
@@ -886,6 +1009,7 @@
   els.composer.addEventListener('submit', async event => {
     event.preventDefault();
     const status = event.submitter?.value === 'draft' ? 'draft' : 'published';
+    const reviewNotification = status === 'published' && els.notifyField && !els.notifyField.hidden && els.notify.checked;
     const controls = els.composer.querySelectorAll('button, input, select, textarea');
     showError('');
     let id;
@@ -908,10 +1032,11 @@
     setMode('browse');
     await load();
     loadOverview();
-    go(id);
+    await go(id);
     showNotice(status === 'draft'
       ? 'Saved as a draft. Only people who can post to this board can see it.'
       : (wasEditing ? 'Your changes are published.' : 'Your post is published.'));
+    if (reviewNotification) openPushDialog(state.posts.find(post => post.id === id));
   });
 
   els.cancel.addEventListener('click', closeComposer);
@@ -997,6 +1122,8 @@
     if (!action || action.disabled) return;
     if (action.dataset.boardAction === 'edit') {
       openComposer(state.posts.find(post => post.id === action.dataset.id));
+    } else if (action.dataset.boardAction === 'notify') {
+      openPushDialog(state.posts.find(post => post.id === action.dataset.id));
     } else if (action.dataset.boardAction === 'delete') {
       deletePost(action);
     }
@@ -1037,14 +1164,19 @@
 
   new MutationObserver(() => {
     if (!view.hidden) route();
+    else if (els.pushDialog?.open) els.pushDialog.close();
   }).observe(view, { attributes: true, attributeFilter: ['hidden'] });
 
   document.addEventListener('ucpea-account', event => {
     const profile = event.detail.profile;
     const changed = (profile?.id || null) !== (state.me?.id || null)
       || profile?.status !== state.me?.status
+      || profile?.role !== state.me?.role
       || JSON.stringify(profile?.areas || []) !== JSON.stringify(state.me?.areas || []);
     state.me = profile;
+    if (state.push && (profile?.id !== state.push.userId || !canNotify(state.push.post)) && els.pushDialog.open) {
+      els.pushDialog.close();
+    }
     if (!profile) writeStorage(SNAPSHOT_KEY, null); // members-only posts leave with the person
     if (!changed) return;
     state.loadedFor = undefined;

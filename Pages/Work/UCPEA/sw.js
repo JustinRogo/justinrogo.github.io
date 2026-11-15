@@ -1,7 +1,7 @@
 'use strict';
 
 const CACHE_PREFIX = 'ucpea-dashboard-';
-const CACHE_NAME = CACHE_PREFIX + 'v32';
+const CACHE_NAME = CACHE_PREFIX + 'v33';
 const scope = new URL(self.registration.scope);
 const homeURL = new URL('index.html', scope).href;
 const offlineURLs = new Set([
@@ -92,21 +92,36 @@ self.addEventListener('fetch', event => {
   })());
 });
 
+const postIdPattern = /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i;
+
 self.addEventListener('push', event => {
-  let isTest = false;
-  try { isTest = event.data?.json().type === 'test'; } catch { /* Show a generic alert. */ }
+  let payload;
+  try { payload = event.data?.json(); } catch { /* Show a generic alert. */ }
+  const isTest = payload?.type === 'test';
+  const isBoardPost = payload?.type === 'board' && typeof payload.postId === 'string' && postIdPattern.test(payload.postId);
+  const type = isTest ? 'test' : isBoardPost ? 'board' : 'update';
+  const body = {
+    test: 'Test notification. Tap to open your account.',
+    board: 'New UCPEA bulletin board post. Tap to open it.',
+    update: 'Open the dashboard to see the latest updates.',
+  };
   event.waitUntil(self.registration.showNotification('UCPEA Member Dashboard', {
-    body: isTest ? 'Test notification. Tap to open your account.' : 'Open the dashboard to see the latest updates.',
+    body: body[type],
     icon: new URL('icons/icon-192.png', scope).href,
-    tag: isTest ? 'ucpea-test' : 'ucpea-update',
-    data: { type: isTest ? 'test' : 'update' },
+    tag: isBoardPost ? `ucpea-board-${payload.postId}` : `ucpea-${type}`,
+    data: isBoardPost ? { type, postId: payload.postId } : { type },
   }));
 });
 
 self.addEventListener('notificationclick', event => {
   event.notification.close();
   const url = new URL(homeURL);
-  if (event.notification.data?.type === 'test') url.searchParams.set('view', 'account');
+  const { type, postId } = event.notification.data || {};
+  if (type === 'test') url.searchParams.set('view', 'account');
+  else if (type === 'board' && typeof postId === 'string' && postIdPattern.test(postId)) {
+    url.searchParams.set('view', 'board');
+    url.hash = `post-${postId}`;
+  }
   event.waitUntil((async () => {
     const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
     const match = windows.find(client => client.url === url.href);
