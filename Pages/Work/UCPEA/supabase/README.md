@@ -15,6 +15,8 @@ the site build skips `.sql` and `.md` files.
 | `migrations/20261113000500_board_gifs.sql` | Lets the flyer buckets accept GIFs, which upload unchanged so they stay animated |
 | `migrations/20261113000600_flyer_only_posts.sql` | Adds `flyer_only`: the corkboard shows just the flyer image, and clicking it opens the full post |
 | `migrations/20261114000100_first_last_names.sql` | Stores first and last names separately (`first_name`, `last_name`). `display_name` is rebuilt from them automatically and is read-only to the app. Existing names are split at the last space |
+| `migrations/20261115000100_push_test_rate_limit.sql` | Checks subscription ownership and limits each approved account to one test notification per minute |
+| `functions/ucpea-push-test/index.ts` | Supplies the public VAPID key to approved members and sends a personal test to a subscription they own |
 | `tests/rls_check.sql` | A permissions check that signs in as eight test accounts and tries allowed and forbidden actions |
 
 ## Who can do what
@@ -88,11 +90,22 @@ UCPEA-owned account.
 - The **service_role / secret key** and the **VAPID private key** (for push) must
   never be committed or put in the website. They belong in Edge Function secrets.
 
+## Deploying personal test notifications
+
+1. Apply `20261113000300_push_subscriptions.sql` if it has not already been applied, then apply `20261115000100_push_test_rate_limit.sql` to the UCPEA Supabase project.
+2. Generate a Web Push VAPID key pair once with `npx web-push@3.6.7 generate-vapid-keys`. In Supabase **Edge Functions → Secrets**, set `UCPEA_VAPID_PUBLIC_KEY`, `UCPEA_VAPID_PRIVATE_KEY`, and `UCPEA_VAPID_SUBJECT` (a `mailto:` address for the project operator). Keep using the same key pair while these subscriptions are active.
+3. From `Pages/Work/UCPEA`, with the Supabase CLI signed into the UCPEA project, deploy the function:
+
+   ```sh
+   supabase functions deploy ucpea-push-test --project-ref <ucpea-project-ref> --no-verify-jwt
+   ```
+
+   The function verifies the caller’s Supabase access token itself with `auth.getUser()` and checks the member’s current status before issuing the public key or sending a test.
+4. Publish the updated dashboard. Sign in as an approved test member in a supported browser, then use **Account → Notifications** to enable alerts and send a test. Verify that tapping the alert opens Account, and that turning alerts off or signing out removes the device subscription. On iPhone or iPad, add the dashboard to the Home Screen and open it from its icon before enabling alerts.
+
 ## Not built yet
 
-- The website side: sign-in screens, the board UI, the approval screens and
-  the staff FYI list.
-- The Edge Function that sends push notifications, with per-steward rate limits.
+- Bulletin Board alerts with per-steward rate limits.
 - Per-area alert preferences (mute an area without turning alerts off).
 - A steward roster screen. The data access is in place: stewards can read the
   profiles of everyone in their areas and of pending sign-ups asking to join.

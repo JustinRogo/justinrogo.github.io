@@ -47,6 +47,7 @@
   <script src="calendar-events.js" defer></script>
   <script src="calendar.js" defer></script>
   <script src="account.js" defer></script>
+  <script src="account-notifications.js" defer></script>
   <script src="members.js" defer></script>
   <script src="board.js" defer></script>
 </head>
@@ -1487,6 +1488,17 @@
             <button class="account-primary" type="submit">Save changes</button>
           </div>
         </form>
+
+        <section class="account-card" id="account-notifications" aria-labelledby="account-notifications-title" hidden>
+          <h2 id="account-notifications-title">Notifications</h2>
+          <p class="account-lede" id="account-notifications-status" role="status"></p>
+          <div class="account-actions">
+            <button class="account-primary" type="button" id="account-notifications-enable" hidden>Enable on this device</button>
+            <button class="account-primary" type="button" id="account-notifications-test" hidden>Send me a test</button>
+            <button class="account-secondary" type="button" id="account-notifications-disable" hidden>Turn off on this device</button>
+            <button class="account-secondary" type="button" id="account-notifications-retry" hidden>Try again</button>
+          </div>
+        </section>
 
         <div class="account-actions account-sign-out">
           <button class="account-secondary" type="button" id="account-sign-out">Sign out on this device</button>

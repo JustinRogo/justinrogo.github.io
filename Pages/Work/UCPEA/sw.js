@@ -1,7 +1,7 @@
 'use strict';
 
 const CACHE_PREFIX = 'ucpea-dashboard-';
-const CACHE_NAME = CACHE_PREFIX + 'v31';
+const CACHE_NAME = CACHE_PREFIX + 'v32';
 const scope = new URL(self.registration.scope);
 const homeURL = new URL('index.html', scope).href;
 const offlineURLs = new Set([
@@ -17,6 +17,7 @@ const offlineURLs = new Set([
   'calendar.js',
   'calendar-events.js',
   'account.js',
+  'account-notifications.js',
   'members.js',
   'board.js',
   'union-wire-feed.js',
@@ -45,6 +46,8 @@ self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(async cache => {
     await cache.addAll(coreURLs);
     await cache.add(supabaseURL).catch(() => {});
+    // An open Account view can use the new push handler as soon as installation finishes.
+    await self.skipWaiting();
   }));
 });
 
@@ -86,5 +89,28 @@ self.addEventListener('fetch', event => {
     if (response && response.status < 500) return response;
     const cached = await caches.match(key, { cacheName: CACHE_NAME }).catch(() => null);
     return cached || response || Response.error();
+  })());
+});
+
+self.addEventListener('push', event => {
+  let isTest = false;
+  try { isTest = event.data?.json().type === 'test'; } catch { /* Show a generic alert. */ }
+  event.waitUntil(self.registration.showNotification('UCPEA Member Dashboard', {
+    body: isTest ? 'Test notification. Tap to open your account.' : 'Open the dashboard to see the latest updates.',
+    icon: new URL('icons/icon-192.png', scope).href,
+    tag: isTest ? 'ucpea-test' : 'ucpea-update',
+    data: { type: isTest ? 'test' : 'update' },
+  }));
+});
+
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  const url = new URL(homeURL);
+  if (event.notification.data?.type === 'test') url.searchParams.set('view', 'account');
+  event.waitUntil((async () => {
+    const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    const match = windows.find(client => client.url === url.href);
+    if (match) await match.focus();
+    else await self.clients.openWindow(url.href);
   })());
 });

@@ -740,10 +740,11 @@
   async function signOut() {
     els.signOut.disabled = true;
     clearMessages();
+    const client = await getClient().catch(() => null);
+    await window.UCPEANotifications?.disconnect(client);
     try {
-      const client = await getClient();
       // Local scope: signs out this device only, and works offline.
-      await client.auth.signOut({ scope: 'local' });
+      await client?.auth.signOut({ scope: 'local' });
     } catch {
       // Even if the library can't load, forget the session on this device.
     }
