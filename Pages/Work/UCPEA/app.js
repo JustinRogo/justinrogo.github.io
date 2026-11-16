@@ -1372,7 +1372,6 @@ if (salaryCalculator) {
   // the planner models only the next scheduled one.
   const MODELED_YEAR = 2027;
   const salaryLevelInput = salaryCalculator.querySelector('#salaryLevel');
-  const meritAmountInput = salaryCalculator.querySelector('#meritAmount');
   const reclassToggle = salaryCalculator.querySelector('#reclassToggle');
   const reclassDetails = salaryCalculator.querySelector('#reclassDetails');
   const reclassOffHint = salaryCalculator.querySelector('#reclassOffHint');
@@ -1473,7 +1472,6 @@ if (salaryCalculator) {
 
     const baseSalary = getNumber(baseSalaryInput);
     const salaryLevel = Number(salaryLevelInput.value) || 0;
-    const meritAmount = getNumber(meritAmountInput);
     // A reclassification counts only while its switch is on.
     const reclassPercent = reclassToggle.checked ? getNumber(reclassPercentInput) : 0;
     const meetsCoreConditions = membershipEligibleInput.checked && satisfactoryPerformanceInput.checked;
@@ -1481,11 +1479,6 @@ if (salaryCalculator) {
 
     if (baseSalary <= 0) {
       showSalaryError('Please enter an annual base salary greater than $0.');
-      return;
-    }
-
-    if (meritAmount < 0) {
-      showSalaryError('Please enter a 2027 discretionary merit estimate of $0 or more.');
       return;
     }
 
@@ -1552,28 +1545,6 @@ if (salaryCalculator) {
 
       const pbcRate = year === 2027 ? 0.015 : 0.02;
       applyPbc(year, yearOpeningSalary, pbcRate, `${formatPercent(pbcRate * 100)} performance-based compensation`);
-
-      if (year === 2027 && meritAmount > 0 && receivesPbc) {
-        let baseMerit = meritAmount;
-        let meritLumpSum = 0;
-        const bandMaximum = salaryLevel ? SALARY_BANDS[2027][salaryLevel][2] : 0;
-        if (bandMaximum) {
-          baseMerit = Math.min(meritAmount, Math.max(0, bandMaximum - salary));
-          meritLumpSum = meritAmount - baseMerit;
-        }
-        const salaryBefore = salary;
-        salary += baseMerit;
-        estimatedLumpSum += meritLumpSum;
-        addSalaryRow(
-          'July 1, 2027',
-          meritLumpSum > 0
-            ? `Discretionary merit estimate; ${currency.format(meritLumpSum)} estimated non-base lump sum`
-            : 'Discretionary merit estimate',
-          salaryBefore,
-          baseMerit,
-          salary,
-        );
-      }
     }
 
     const increaseTotal = salary - baseSalary;
@@ -1594,7 +1565,6 @@ if (salaryCalculator) {
       if (!satisfactoryPerformanceInput.checked) missing.push('the satisfactory-performance condition');
       eligibilityNotes.push(`Scheduled Article 32 increases are not modeled because the estimate does not meet ${missing.join(' and ')}.`);
     }
-    if (meritAmount > 0 && !receivesPbc) eligibilityNotes.push('The discretionary merit estimate was omitted because the PBC conditions are not met.');
     if (estimatedLumpSum > 0) eligibilityNotes.push(`${currency.format(estimatedLumpSum)} is shown as an estimated non-base lump sum because the selected band maximum was reached.`);
     if (reclassPercent > 0) eligibilityNotes.push('The reclassification amount is only an estimate; Article 31 may also require movement to the new band minimum.');
     salaryEligibility.textContent = eligibilityNotes.join(' ');
@@ -1606,7 +1576,6 @@ if (salaryCalculator) {
     clearSalaryError();
     baseSalaryInput.value = '';
     salaryLevelInput.value = '';
-    meritAmountInput.value = '';
     reclassPercentInput.value = '';
     reclassToggle.checked = false;
     showReclassification();
@@ -1650,7 +1619,7 @@ if (salaryCalculator) {
   calculateButton.addEventListener('click', calculateSalary);
   resetButton.addEventListener('click', resetSalary);
 
-  [baseSalaryInput, salaryLevelInput, meritAmountInput, reclassPercentInput].forEach(input => {
+  [baseSalaryInput, salaryLevelInput, reclassPercentInput].forEach(input => {
     input.addEventListener('keydown', event => {
       if (event.key === 'Enter') calculateSalary();
     });
