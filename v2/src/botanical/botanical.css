@@ -320,6 +320,9 @@
   border-radius: var(--glass-radius);
   box-shadow: var(--panel-shadow), var(--glass-rim);
 }
+:root[data-style="botanical"] .about-greeting em {
+  color: var(--orange);
+}
 /* A printed plate's inner rule on the most important pages. */
 :root[data-style="botanical"] .glass-hero > .glass-layer::after {
   content: "";
@@ -485,10 +488,6 @@
 :root[data-style="botanical"] .tool-nav > a[aria-current] {
   background: var(--accent-fill);
   color: var(--accent-ink);
-}
-:root[data-style="botanical"] .technology-list > span {
-  border-radius: 999px;
-  background: var(--paper);
 }
 :root[data-style="botanical"] .strength-rank {
   color: var(--orange);
@@ -937,6 +936,14 @@
 .hero-portrait .portrait-wreath {
   z-index: 0;
 }
+.about-portrait .portrait-wreath {
+  width: 124%;
+}
+.tradescantia-wreath {
+  --tradescantia-band: #e0e6d8;
+  --tradescantia-vein: #483247;
+  color: var(--leaf-light);
+}
 .flourish {
   overflow: visible;
 }
@@ -1347,7 +1354,7 @@
       stroke-dasharray: 1 2;
       animation: botanical-draw 1.4s ease-out 0.3s both;
     }
-    & .portrait-wreath :is(.wreath-leaf, .wreath-berry) {
+    & .portrait-wreath :is(.wreath-leaf, .wreath-berry, .tradescantia-wreath-growth) {
       animation: botanical-unfurl 0.7s cubic-bezier(0.34, 1.5, 0.64, 1) both;
       animation-delay: calc(0.4s + var(--i) * 70ms);
     }

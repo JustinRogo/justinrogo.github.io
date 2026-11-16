@@ -56,8 +56,8 @@ const cubicTangent = (p, t) => {
   );
   return Math.atan2(d[1], d[0]);
 };
-const cubicD = (p) =>
-  `M${p[0].map(r1)}C${p[1].map(r1)} ${p[2].map(r1)} ${p[3].map(r1)}`;
+const cubicD = (p, move = true) =>
+  `${move ? `M${p[0].map(r1)}` : ""}C${p[1].map(r1)} ${p[2].map(r1)} ${p[3].map(r1)}`;
 // A transform that points a leaf drawn toward -y in `direction` (radians).
 const place = ([x, y], direction) =>
   `translate(${r1(x)} ${r1(y)}) rotate(${r1(deg(direction) + 90)})`;
@@ -347,10 +347,10 @@ export function HeroFlora() {
   );
 }
 
-export function PortraitWreath() {
+export function PortraitWreath({ variety = "laurel" }) {
   return (
     <svg className="portrait-wreath" viewBox="-130 -130 260 260" aria-hidden="true" focusable="false">
-      <Wreath r={112} />
+      {variety === "tradescantia" ? <TradescantiaWreath /> : <Wreath r={112} />}
     </svg>
   );
 }
@@ -392,6 +392,104 @@ export function Sprout({ className = "" }) {
 // `bend` sweeps the tip sideways so the leaf arches away from the stem.
 const spiderwortLeaf = (len, w, bend = 0) =>
   `M0 0C${r1(w * 1.2)} ${r1(-len * 0.1)} ${r1(w * 0.9 + bend * 0.45)} ${r1(-len * 0.6)} ${r1(bend)} ${r1(-len)}C${r1(-w * 0.9 + bend * 0.45)} ${r1(-len * 0.6)} ${r1(-w * 1.2)} ${r1(-len * 0.1)} 0 0Z`;
+
+function TradescantiaLeaf({ len, bend }) {
+  return (
+    <>
+      <path d={spiderwortLeaf(len, 2.45, bend)} fill="currentColor" />
+      <path
+        d={`M-0.8 -1.2Q${r1(-1.2 + bend * 0.4)} ${r1(-len * 0.45)} ${r1(bend * 0.8 - 0.2)} ${r1(-len * 0.84)}M0.8 -1.2Q${r1(1.2 + bend * 0.4)} ${r1(-len * 0.45)} ${r1(bend * 0.8 + 0.2)} ${r1(-len * 0.84)}`}
+        fill="none"
+        stroke="var(--tradescantia-band, var(--rail-ink, #f3ecdb))"
+        strokeWidth="0.7"
+        strokeLinecap="round"
+        opacity="0.55"
+      />
+      <path
+        d={`M0 -0.6Q${r1(bend * 0.3)} ${r1(-len * 0.5)} ${r1(bend * 0.85)} ${r1(-len * 0.88)}`}
+        fill="none"
+        stroke="var(--tradescantia-vein, var(--rail-bg, #18392b))"
+        strokeWidth="0.55"
+        strokeLinecap="round"
+        opacity="0.5"
+      />
+    </>
+  );
+}
+
+function TradescantiaFlower() {
+  return (
+    <>
+      {[0, 120, 240].map((angle) => (
+        <path
+          key={angle}
+          transform={`rotate(${angle - 20})`}
+          d="M0 0C1.9 -0.4 2 -2.9 0 -3.4C-2 -2.9 -1.9 -0.4 0 0Z"
+          fill="var(--berry, #c98a6b)"
+        />
+      ))}
+      <circle r="0.7" fill="var(--rail-accent, #e2c48c)" />
+    </>
+  );
+}
+
+// Two vines descend around the portrait and turn inward at different heights.
+// Each segment pairs its Bézier points with the number of leaf nodes it carries.
+const portraitTrails = [
+  [
+    [[[-71, -91], [-124, -59], [-130, 38], [-88, 78]], 7],
+    [[[-88, 78], [-65, 103], [-48, 110], [-35, 122]], 4],
+  ],
+  [
+    [[[66, -96], [115, -75], [137, 4], [101, 53]], 6],
+    [[[101, 53], [77, 92], [47, 101], [16, 119]], 5],
+  ],
+];
+
+function TradescantiaWreath() {
+  return (
+    <g className="tradescantia-wreath">
+      {portraitTrails.map((trail, vineIndex) => {
+        const nodes = trail.flatMap(([curve, count]) =>
+          Array.from({ length: count }, (_, index) => {
+            const t = (index + 0.45) / count;
+            return { point: cubic(curve, t), tangent: cubicTangent(curve, t) };
+          }),
+        );
+        const tip = trail.at(-1)[0][3];
+        return (
+          <g key={vineIndex}>
+            <path
+              className="wreath-stem"
+              pathLength="1"
+              d={trail.map(([curve], index) => cubicD(curve, index === 0)).join(" ")}
+            />
+            {nodes.map(({ point, tangent }, index) => {
+              const side = (index + vineIndex) % 2 === 0 ? 1 : -1;
+              const size = r1(2.5 - 0.09 * index);
+              return (
+                <g key={index} transform={place(point, tangent + side * rad(48))}>
+                  <g className="tradescantia-wreath-growth" style={{ "--i": index }}>
+                    <circle r="1.4" fill="currentColor" />
+                    <g transform={`scale(${size})`}>
+                      <TradescantiaLeaf len={9.4} bend={side * 1.4} />
+                    </g>
+                  </g>
+                </g>
+              );
+            })}
+            <g transform={`translate(${tip.join(" ")}) scale(1.6)`}>
+              <g className="tradescantia-wreath-growth" style={{ "--i": nodes.length }}>
+                <TradescantiaFlower />
+              </g>
+            </g>
+          </g>
+        );
+      })}
+    </g>
+  );
+}
+
 // Leaves along the trailing stem: node position, angle, length, bend. They alternate sides.
 const wordmarkLeaves = [
   [8.2, 16, -22, 9.4, -1.4],
@@ -409,21 +507,14 @@ export function WordmarkSprig({ size = 28 }) {
       {wordmarkLeaves.map(([x, y, angle, len, bend]) => (
         <g key={`${x}-${y}`} transform={`translate(${x} ${y}) rotate(${angle})`}>
           <g className="wordmark-sprig-leaf">
-            <path d={spiderwortLeaf(len, 2.45, bend)} fill="currentColor" />
-            <path d={`M-0.8 -1.2Q${r1(-1.2 + bend * 0.4)} ${r1(-len * 0.45)} ${r1(bend * 0.8 - 0.2)} ${r1(-len * 0.84)}M0.8 -1.2Q${r1(1.2 + bend * 0.4)} ${r1(-len * 0.45)} ${r1(bend * 0.8 + 0.2)} ${r1(-len * 0.84)}`}
-              fill="none" stroke="var(--rail-ink, #f3ecdb)" strokeWidth="0.7" strokeLinecap="round" opacity="0.55" />
-            <path d={`M0 -0.6Q${r1(bend * 0.3)} ${r1(-len * 0.5)} ${r1(bend * 0.85)} ${r1(-len * 0.88)}`} fill="none" stroke="var(--rail-bg, #18392b)" strokeWidth="0.55" strokeLinecap="round" opacity="0.5" />
+            <TradescantiaLeaf len={len} bend={bend} />
           </g>
           <circle r="0.9" fill="currentColor" />
         </g>
       ))}
       <g transform="translate(19.6 5.6)">
         <g className="wordmark-sprig-bud">
-          {[0, 120, 240].map((angle) => (
-            <path key={angle} transform={`rotate(${angle - 20})`} d="M0 0C1.9 -0.4 2 -2.9 0 -3.4C-2 -2.9 -1.9 -0.4 0 0Z"
-              fill="var(--berry, #c98a6b)" />
-          ))}
-          <circle r="0.7" fill="var(--rail-accent, #e2c48c)" />
+          <TradescantiaFlower />
         </g>
       </g>
     </svg>

@@ -17,8 +17,9 @@ import AiCorner from "../components/AiCorner.jsx";
 import LawEvents from "../components/LawEvents.jsx";
 import PocketPart from "../components/PocketPart.jsx";
 import { ProjectPreview } from "../components/Project.jsx";
+import ProfilePortrait from "../components/ProfilePortrait.jsx";
 import { useBotanical } from "../botanical/siteStyle.js";
-import { HeroFlora, PortraitWreath } from "../botanical/Flora.jsx";
+import { HeroFlora } from "../botanical/Flora.jsx";
 import "./Home.css";
 
 const helpLinks = [
@@ -179,19 +180,7 @@ export default function Home({ projects, effects, theme, fine }) {
           </div>
           <AssembleReveal id="portrait">
             <div className="hero-portrait">
-              <div className="portrait-stage">
-                <div className="portrait-orbit orbit-one" />
-                <div className="portrait-orbit orbit-two" />
-                {botanical && <PortraitWreath />}
-                <div className="portrait-photo">
-                  <img
-                    src="/v2/assets/justin.webp"
-                    alt="Justin Rogowski"
-                    width="240"
-                    height="240"
-                  />
-                </div>
-              </div>
+              <ProfilePortrait orbits />
               <div className="portrait-contact-actions">
                 <a
                   href="#/tools?panel=booking"

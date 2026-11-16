@@ -6,9 +6,9 @@ export const profile = {
     "Hi! I’m Justin. I build dashboards, organize information, and make tools for everyday work. I’m drawn to complicated, repetitive, or mildly annoying problems that could use a better process. Outside of work, I’m usually experimenting with code, starting another side project, or tending to an entirely reasonable number of houseplants.",
   bio: "I’ve worked in academic libraries for more than a decade. My current role spans technology, data, communications, administration, and knowledge management, along with the unexpected problems that resist tidy categories.",
   approach:
-    "I want the systems I build to make information easier to find, remove unnecessary work, and be straightforward for people to use and maintain.",
+    "I build tools to make information easier to find and cut down on repetitive work. I want those tools to be easy to use and maintain.",
   personal:
-    "Outside of work, I’m usually experimenting with code, starting another side project, or tending to an entirely reasonable number of houseplants.",
+    "I tinker with code, play video games, and keep an entirely reasonable number of houseplants. I’m curious about what people are making with AI.",
 };
 export const contacts = [
   ["Email me", "mailto:justin.rogowski@uconn.edu", "mail"],

@@ -2,51 +2,59 @@ import { contacts, experience, profile, technologies } from "../content.js";
 import { ExternalLink, LinkRow, SectionTitle } from "../components/UI.jsx";
 import { GlassLayer } from "../components/Glass.jsx";
 import Icon from "../components/Icon.jsx";
+import ProfilePortrait from "../components/ProfilePortrait.jsx";
 import Strengths from "../components/Strengths.jsx";
 
 export default function About({ effects, fine }) {
   return (
     <>
-      <div className="page-heading">
-        <h1 tabIndex={-1}>
-          A little about me<span className="title-dot">.</span>
-        </h1>
-        <p>
-          Libraries, systems, people. And an alarming number of browser tabs.
-        </p>
-      </div>
-      <div className="about-intro">
-        <img
-          src="/v2/assets/justin.webp"
-          width="240"
-          height="240"
-          alt="Justin Rogowski"
-        />
-        <div>
-          <h2>Hi, I’m Justin.</h2>
-          <p className="large-copy">{profile.bio}</p>
-          <p>{profile.approach}</p>
-          <p>{profile.personal}</p>
+      <header className="about-intro">
+        <div className="about-greeting">
+          <h1 tabIndex={-1}>
+            Hi, I’m <em>Justin</em><span className="title-dot">.</span>
+          </h1>
+          <p>Libraries, systems, people. And an alarming number of browser tabs.</p>
+        </div>
+        <ProfilePortrait className="about-portrait" wreath="tradescantia" />
+        <div className="about-intro-copy">
+          <p className="large-copy">{profile.approach}</p>
           <div
             className="button-row about-social"
             role="group"
-            aria-label="Social profiles"
+            aria-label="Contact and profiles"
           >
             {contacts
-              .filter(([title]) => ["LinkedIn", "GitHub"].includes(title))
+              .filter(([title]) => ["Email me", "LinkedIn", "GitHub"].includes(title))
               .map(([title, href, icon]) => (
-                <ExternalLink key={title} href={href} className="button">
-                  {title} <Icon name={icon} size={18} />
+                <ExternalLink
+                  key={title}
+                  href={href}
+                  className={icon === "mail" ? "button" : "text-link"}
+                >
+                  {title} <Icon name={icon} size={16} />
                 </ExternalLink>
               ))}
           </div>
         </div>
-      </div>
+      </header>
+      <section
+        className="about-interests"
+        aria-labelledby="about-interests-heading"
+      >
+        <h2 id="about-interests-heading">Away from my desk</h2>
+        <div>
+          <p>{profile.personal}</p>
+          <a className="text-link" href="#/projects?group=For+Fun">
+            See my side projects <Icon name="arrow" size={16} />
+          </a>
+        </div>
+      </section>
       <section className="about-experience glass-host" aria-labelledby="experience-heading">
         <GlassLayer />
         <SectionTitle headingProps={{ id: "experience-heading" }}>
           Making complicated work easier
         </SectionTitle>
+        <p className="about-work-intro">{profile.bio}</p>
         <div className="experience-list">
           {experience.map(([title, text]) => (
             <article key={title}>
@@ -93,11 +101,7 @@ export default function About({ effects, fine }) {
       </div>
       <section className="technology">
         <SectionTitle>Tools I reach for</SectionTitle>
-        <div className="technology-list">
-          {technologies.map((t) => (
-            <span key={t}>{t}</span>
-          ))}
-        </div>
+        <p className="technology-list">{technologies.join(", ")}</p>
       </section>
       <Strengths effects={effects} fine={fine} />
       <section

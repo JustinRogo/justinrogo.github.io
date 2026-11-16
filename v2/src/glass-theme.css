@@ -721,7 +721,7 @@ main {
 }
 .about-intro {
   background: var(--glass-fill);
-  padding: 30px;
+  padding: clamp(24px, 4vw, 52px);
   border-radius: 12px;
   backdrop-filter: blur(16px);
 }
@@ -737,10 +737,6 @@ main {
   padding: 27px;
   background: var(--glass-fill);
   backdrop-filter: blur(14px);
-}
-.technology-list > span {
-  background: var(--glass-fill);
-  border: 1px solid var(--line);
 }
 .strength-rank {
   color: var(--blue);
@@ -1186,7 +1182,7 @@ main {
     border-radius: 6.5px;
   }
   .about-intro {
-    padding: 25px;
+    padding: 20px;
   }
   .about-columns {
     padding: 24px;

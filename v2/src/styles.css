@@ -1100,38 +1100,67 @@ textarea {
 .request-panel form[aria-busy="true"] .button {
   cursor: progress;
 }
-/* About gives professional history room to be read. */
-.about-intro {
+/* About’s greeting and personal note share an editorial column. */
+.about-intro,
+.about-interests {
   display: grid;
-  grid-template-columns: 190px 1fr;
-  gap: 42px;
-  padding: 15px 0 35px;
-  align-items: start;
+  grid-template-columns: clamp(9.5rem, 18vw, 14rem) minmax(0, 1fr);
+  gap: 16px clamp(24px, 4vw, 56px);
 }
-.about-intro img {
+.about-intro {
+  grid-template-areas: "portrait greeting" "portrait copy";
+}
+.about-intro > .about-portrait {
+  grid-area: portrait;
+  align-self: center;
   width: 100%;
-  height: auto;
-  border-radius: 7px;
-  filter: saturate(0.8);
 }
-.about-intro h2 {
-  font-size: 2.2rem;
-  margin: 0 0 20px;
+.about-intro .about-portrait .portrait-photo {
+  width: 94%;
 }
-.about-intro p {
-  font-size: 0.91rem;
+.about-greeting {
+  grid-area: greeting;
+  align-self: end;
+}
+.about-greeting p {
+  margin-top: 10px;
   color: var(--muted);
+}
+.about-intro-copy {
+  grid-area: copy;
 }
 .about-intro .large-copy {
   font-size: 1.12rem;
-  color: var(--ink);
+  max-width: 58ch;
+}
+.about-social {
+  gap: 6px 16px;
+  margin-top: 16px;
+}
+.about-social > a,
+.about-interests .text-link {
+  min-height: 44px;
+}
+.about-interests {
+  margin-top: 32px;
+  padding: 24px clamp(24px, 4vw, 52px);
+  border-block: 1px solid var(--line);
+  align-items: baseline;
+}
+.about-interests .text-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.22em;
 }
 .about-experience {
   margin-top: 32px;
   padding: clamp(16px, 3vw, 28px);
 }
 .about-experience > .section-title {
-  margin: 0 0 16px;
+  margin: 0 0 12px;
+}
+.about-work-intro {
+  color: var(--muted);
+  margin-bottom: 20px;
 }
 .experience-list {
   border-top: 1px solid var(--line);
@@ -1184,15 +1213,7 @@ textarea {
   margin-top: 4px;
 }
 .technology-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.technology-list > span {
-  font-size: 0.79rem;
-  padding: 8px 13px;
-  background: var(--surface);
-  border-radius: 3px;
+  color: var(--muted);
 }
 .strengths {
   margin-top: 52px;
@@ -1560,10 +1581,6 @@ textarea {
   .experience-list article {
     grid-template-columns: 170px 1fr;
   }
-  .about-intro {
-    grid-template-columns: 150px 1fr;
-    gap: 28px;
-  }
   .topbar-title {
     font-size: 0.7rem;
   }
@@ -1702,9 +1719,6 @@ textarea {
   }
   .about-columns {
     gap: 28px;
-  }
-  .about-intro {
-    grid-template-columns: 125px 1fr;
   }
   .experience-list article {
     grid-template-columns: 140px 1fr;
@@ -2082,23 +2096,32 @@ textarea {
     font-size: 0.8rem;
   }
   .about-intro {
-    grid-template-columns: 1fr;
-    gap: 24px;
-    padding-top: 3px;
+    grid-template-areas: "portrait greeting" "copy copy";
+    grid-template-columns: clamp(64px, 20vw, 110px) minmax(0, 1fr);
+    gap: 16px;
   }
-  .about-intro img {
-    width: 116px;
-    border-radius: 6px;
+  .about-greeting {
+    align-self: center;
   }
-  .about-intro h2 {
-    font-size: 2rem;
-    margin-bottom: 16px;
+  .about-greeting h1 {
+    font-size: clamp(1.75rem, 8.2vw, 2rem);
+    text-wrap: wrap;
+  }
+  .about-greeting p {
+    font-size: 0.875rem;
+    margin-top: 6px;
   }
   .about-intro .large-copy {
-    font-size: 1.08rem;
+    font-size: 1rem;
   }
-  .about-intro p {
-    font-size: 0.87rem;
+  .about-interests {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    padding: 20px 8px 12px;
+    margin-top: 24px;
+  }
+  .about-experience {
+    margin-top: 24px;
   }
   .experience-list article {
     grid-template-columns: 1fr;
@@ -2119,13 +2142,6 @@ textarea {
   }
   .about-columns p {
     font-size: 0.85rem;
-  }
-  .technology-list {
-    gap: 6px;
-  }
-  .technology-list > span {
-    font-size: 0.74rem;
-    padding: 7px 10px;
   }
   .strengths {
     margin-top: 37px;
@@ -2241,6 +2257,14 @@ textarea {
   }
   .sheet > .muted {
     font-size: 0.85rem;
+  }
+}
+@media (max-width: 360px) {
+  .about-social {
+    column-gap: 12px;
+  }
+  .about-social .text-link svg {
+    display: none;
   }
 }
 @media (prefers-reduced-motion: reduce) {
