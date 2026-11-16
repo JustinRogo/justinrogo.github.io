@@ -63,33 +63,52 @@ function UCPEAWatchClose(onClose) {
 
 const themeToggle = document.getElementById('theme-toggle');
 const themeColor = document.querySelector('meta[name="theme-color"]');
+const textSizeOutput = document.getElementById('dashboard-text-size');
+const decreaseTextSize = document.getElementById('dashboard-text-smaller');
+const increaseTextSize = document.getElementById('dashboard-text-larger');
+const { textSizes } = UCPEAViews;
+
+function saveAppearance(key, value) {
+  try {
+    localStorage.setItem(key, value);
+  } catch (error) {
+    // Appearance settings still work when local storage is unavailable.
+  }
+}
 
 function setTheme(theme, persist = true) {
   document.documentElement.dataset.theme = theme;
   themeColor.content = getComputedStyle(document.documentElement).getPropertyValue('--ucpea-surface').trim();
   UCPEAViews.messageTo(document.querySelector('#tool-view iframe')?.contentWindow, 'theme', { theme });
 
-  if (themeToggle) {
-    const isDark = theme === 'dark';
-    themeToggle.setAttribute('aria-pressed', String(isDark));
-    themeToggle.setAttribute('aria-label', `Switch to ${isDark ? 'light' : 'dark'} mode`);
-    themeToggle.title = `Switch to ${isDark ? 'light' : 'dark'} mode`;
-  }
+  themeToggle.setAttribute('aria-checked', String(theme === 'dark'));
+  if (persist) saveAppearance('ucpea-dashboard-theme', theme);
+}
 
-  if (persist) {
-    try {
-      localStorage.setItem('ucpea-dashboard-theme', theme);
-    } catch (error) {
-      // Theme persistence is optional.
-    }
-  }
+function setTextSize(size, persist = true) {
+  const textSize = UCPEAViews.isTextSize(size) ? size : '100';
+  document.documentElement.dataset.textSize = textSize;
+  textSizeOutput.value = `${textSize}%`;
+  decreaseTextSize.disabled = textSize === textSizes[0];
+  increaseTextSize.disabled = textSize === textSizes.at(-1);
+  UCPEAViews.messageTo(document.querySelector('#tool-view iframe')?.contentWindow, 'text-size', { textSize });
+  if (persist) saveAppearance('ucpea-dashboard-text-size', textSize);
+}
+
+function changeTextSize(step) {
+  const index = textSizes.indexOf(document.documentElement.dataset.textSize);
+  const next = textSizes[index + step];
+  if (next) setTextSize(next);
 }
 
 setTheme(document.documentElement.dataset.theme || 'light', false);
+setTextSize(document.documentElement.dataset.textSize, false);
 
-themeToggle?.addEventListener('click', () => {
+themeToggle.addEventListener('click', () => {
   setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
 });
+decreaseTextSize.addEventListener('click', () => changeTextSize(-1));
+increaseTextSize.addEventListener('click', () => changeTextSize(1));
 
 function initDashboardNavigation() {
   const { body, documentElement } = document;
@@ -427,6 +446,7 @@ function initDashboardNavigation() {
       if (key !== previousView || (!hash && frameHash)) {
         const source = new URL(tool.file, location.href);
         source.searchParams.set('dashboard', documentElement.dataset.theme);
+        source.searchParams.set('text-size', documentElement.dataset.textSize);
         source.hash = hash;
 
         const nextFrame = document.createElement('iframe');
@@ -436,6 +456,7 @@ function initDashboardNavigation() {
         nextFrame.addEventListener('load', () => {
           if (nextFrame !== frame) return;
           UCPEAViews.messageTo(frame.contentWindow, 'theme', { theme: documentElement.dataset.theme });
+          UCPEAViews.messageTo(frame.contentWindow, 'text-size', { textSize: documentElement.dataset.textSize });
           UCPEAViews.messageTo(frame.contentWindow, 'show-hash', { hash: frameHash });
         });
         frame = nextFrame;
@@ -743,6 +764,14 @@ function initDashboardNavigation() {
   body.setAttribute('data-navigation-ready', '');
   // The phone home's entrance plays once; coming back to it later is instant.
   window.setTimeout(() => { documentElement.dataset.homeSettled = ''; }, 900);
+
+  return {
+    showTutorialPage(url, state, scroll = 0) {
+      history.replaceState(state, '', url);
+      setOpenMenu('');
+      showView({ restoreScroll: scroll });
+    },
+  };
 }
 
 const helpTopics = {
@@ -1385,7 +1414,7 @@ resetDeadlineButton?.addEventListener('click', () => {
   });
 });
 
-initDashboardNavigation();
+const UCPEADashboard = initDashboardNavigation();
 
 const SALARY_BANDS = {
   2025: {

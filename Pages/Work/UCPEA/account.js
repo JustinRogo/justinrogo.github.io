@@ -25,7 +25,6 @@
     steps: Array.from(view.querySelectorAll('[data-account-step]')),
     notice: $('account-notice'),
     error: $('account-error'),
-    headerButton: $('account-button'),
     menu: $('account-menu'),
     menuButton: $('account-menu-button'),
     menuPanel: $('account-menu-panel'),
@@ -33,6 +32,7 @@
     menuFullName: $('account-menu-full-name'),
     menuEmail: $('account-menu-email'),
     menuView: $('account-menu-view'),
+    menuViewLabel: $('account-menu-view-label'),
     menuSignOut: $('account-menu-sign-out'),
     sidebarLink: $('sidebar-account'),
     signInForm: $('account-sign-in'),
@@ -195,32 +195,23 @@
     const status = profile ? profile.status : 'signed-out';
     const label = profile ? 'Your account' : 'Sign in';
     document.body.dataset.account = status;
-    els.headerButton?.setAttribute('aria-label', label);
-    if (els.headerButton) els.headerButton.title = label;
     if (els.sidebarLink) {
       els.sidebarLink.title = profile ? 'Account' : 'Sign in';
       els.sidebarLink.querySelector('.sidebar-label').textContent = profile ? 'Account' : 'Sign in';
     }
-    // Signed in: the header shows the account menu (icon and first name) in
-    // place of the plain sign-in link.
     if (els.menu) {
-      const signedIn = Boolean(profile);
-      if (!signedIn) setMenuOpen(false);
-      els.menu.hidden = !signedIn;
-      els.headerButton.hidden = signedIn;
-      if (signedIn) {
-        const firstName = (profile.firstName ?? splitName(profile.displayName).firstName) || '';
-        els.menuFirstName.textContent = firstName || 'Account';
-        els.menuButton.setAttribute('aria-label', firstName ? `Account menu for ${firstName}` : 'Account menu');
-        els.menuFullName.textContent = profile.displayName || firstName || 'Your account';
-        els.menuEmail.textContent = profile.email || '';
-      }
+      const firstName = profile?.firstName ?? splitName(profile?.displayName).firstName;
+      els.menuFirstName.textContent = profile ? firstName || 'Account' : '';
+      els.menuButton.setAttribute('aria-label', firstName ? `Account menu for ${firstName}` : 'Account menu');
+      els.menuFullName.textContent = profile?.displayName || firstName || 'Your account';
+      els.menuEmail.textContent = profile?.email || '';
+      els.menuViewLabel.textContent = profile ? 'View Account' : 'Sign in';
     }
     document.dispatchEvent(new CustomEvent('ucpea-account', { detail: { profile } }));
   }
 
   // ---------------------------------------------------------------------------
-  // Header account menu: View Account and Sign Out
+  // Header account menu
   // ---------------------------------------------------------------------------
   let menuWatcher = null;
 
@@ -250,12 +241,12 @@
   });
 
   els.menuView?.addEventListener('click', () => setMenuOpen(false));
+  $('account-menu-tutorial')?.addEventListener('click', () => setMenuOpen(false));
 
   els.menuSignOut?.addEventListener('click', async () => {
     setMenuOpen(false);
     await signOut();
-    // The plain sign-in icon is back in the menu's place; keep focus there.
-    els.headerButton.focus({ preventScroll: true });
+    els.menuButton.focus({ preventScroll: true });
   });
 
   // Close on Escape (focus back to the button), a click elsewhere, or tabbing out.

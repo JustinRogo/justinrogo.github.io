@@ -231,7 +231,7 @@
 
   function setSize(next) {
     size = (next + SIZES.length) % SIZES.length;
-    root.style.setProperty('--reader-size', `${SIZES[size].px}px`);
+    root.style.setProperty('--reader-size', `${SIZES[size].px / 16}rem`);
     $('reader-size').setAttribute('aria-label', `Text size: ${SIZES[size].name}. Change text size`);
     store.set('ucpea-contract-reader-size', String(size));
   }

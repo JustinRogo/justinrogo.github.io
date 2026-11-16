@@ -61,7 +61,7 @@ html[data-dashboard-tool] .hero-links a {
 html[data-dashboard-tool] .hero-inner h1 {
   margin: 0 0 12px;
   color: var(--ucpea-ink);
-  font-size: clamp(1.8rem, 4.5vw, 3rem);
+  font-size: clamp(1.8rem, calc(4.5vw * var(--ucpea-text-scale, 1)), 3rem);
   font-weight: 800;
   line-height: 1.08;
   letter-spacing: -.04em;

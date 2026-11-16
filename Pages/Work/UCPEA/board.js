@@ -519,7 +519,7 @@
       const pastHidden = !els.past.checked && state.posts.some(isPast);
       els.status.textContent = state.posts.length
         ? (pastHidden ? 'No current posts on this board. Turn on "Show past posts" to see older ones.' : 'No posts on this board yet.')
-        : (active || !state.me ? 'Nothing has been posted yet.' : 'Nothing to show yet. Members-only posts appear once your account is approved.');
+        : (access().active || !state.me ? 'Nothing has been posted yet.' : 'Nothing to show yet. Members-only posts appear once your account is approved.');
     } else {
       els.status.textContent = `${posts.length} ${posts.length === 1 ? 'post' : 'posts'}`;
     }

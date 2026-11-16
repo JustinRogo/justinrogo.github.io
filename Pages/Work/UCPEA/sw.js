@@ -1,7 +1,7 @@
 'use strict';
 
 const CACHE_PREFIX = 'ucpea-dashboard-';
-const CACHE_NAME = CACHE_PREFIX + 'v42';
+const CACHE_NAME = CACHE_PREFIX + 'v46';
 const scope = new URL(self.registration.scope);
 const homeURL = new URL('index.html', scope).href;
 // How long a request waits for the network before a saved copy is used.
@@ -19,6 +19,7 @@ const offlineURLs = new Set([
   'calendar.js',
   'calendar-events.js',
   'account.js',
+  'tutorial.js',
   'account-notifications.js',
   'members.js',
   'board.js',

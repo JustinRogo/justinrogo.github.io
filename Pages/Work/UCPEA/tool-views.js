@@ -15,10 +15,15 @@ const UCPEAViews = (() => {
   const targetOrigin = localFile ? '*' : origin;
   const initialTheme = url.searchParams.get('dashboard');
   const embedded = window.parent !== window && view && isTheme(initialTheme);
+  const textSizes = Object.freeze(['80', '90', '100', '110', '120']);
   let applyToolTheme = theme => { document.documentElement.dataset.theme = theme; };
 
   function isTheme(value) {
     return value === 'light' || value === 'dark';
+  }
+
+  function isTextSize(value) {
+    return textSizes.includes(value);
   }
 
   function dashboardURL(key, hash = '') {
@@ -68,12 +73,17 @@ const UCPEAViews = (() => {
   if (embedded) {
     document.documentElement.dataset.dashboardTool = view;
     applyToolTheme(initialTheme);
+    const initialTextSize = url.searchParams.get('text-size');
+    if (isTextSize(initialTextSize)) document.documentElement.dataset.textSize = initialTextSize;
 
     window.addEventListener('message', event => {
       if (!isFrom(event, parent)) return;
-      const { type, theme, hash } = event.data || {};
+      const { type, theme, textSize, hash } = event.data || {};
       if (type === 'ucpea-theme' && isTheme(theme) && theme !== document.documentElement.dataset.theme) {
         applyToolTheme(theme);
+      }
+      if (type === 'ucpea-text-size' && isTextSize(textSize)) {
+        document.documentElement.dataset.textSize = textSize;
       }
       if (type === 'ucpea-scroll-top') {
         window.scrollTo({ top: 0, behavior: event.data.behavior === 'instant' ? 'instant' : 'smooth' });
@@ -117,6 +127,8 @@ const UCPEAViews = (() => {
     embedded,
     isFrom,
     isPlainClick,
+    isTextSize,
+    textSizes,
     messageTo,
     setHash,
     shareURL,

@@ -1,4 +1,5 @@
 :root {
+  --ucpea-text-scale: 1;
   --ucpea-brand: #002d62;
   --ucpea-slate: #6578a2;
   --ucpea-dark-navy: #002159;
@@ -23,7 +24,13 @@
   --ucpea-body-font: Arial, Helvetica, sans-serif;
   --ucpea-heading-font: Montserrat, Arial, Helvetica, sans-serif;
   color-scheme: light;
+  font-size: calc(100% * var(--ucpea-text-scale));
 }
+
+:root[data-text-size="80"] { --ucpea-text-scale: .8; }
+:root[data-text-size="90"] { --ucpea-text-scale: .9; }
+:root[data-text-size="110"] { --ucpea-text-scale: 1.1; }
+:root[data-text-size="120"] { --ucpea-text-scale: 1.2; }
 
 :root[data-theme="dark"] {
   --ucpea-accent: var(--ucpea-on-navy);
