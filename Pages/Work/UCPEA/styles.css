@@ -6265,3 +6265,213 @@ html[data-transition="help-sheet"]::view-transition-group(root) {
     transform: none;
   }
 }
+
+/* Committees: the Executive Board first, then each committee with its
+   description from the Constitution above its roster. */
+.committees-lede {
+  max-width: 72ch;
+  margin: 0 0 24px;
+  color: var(--muted);
+}
+
+.committee-jump ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.committee-jump a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+@media (hover: hover) {
+  .committee-jump a:hover {
+    background: var(--surface-soft);
+  }
+}
+
+.committee {
+  margin-top: 32px;
+  padding-top: 28px;
+  border-top: 1px solid var(--border);
+  scroll-margin-top: calc(var(--topbar-height) + 16px);
+}
+
+.committee h2 {
+  margin: 0;
+  font-size: clamp(22px, 2.6cqw, 28px);
+  line-height: 1.2;
+}
+
+.committee-meta {
+  margin: 4px 0 14px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.committee-description {
+  max-width: 76ch;
+}
+
+.committee-description :is(p, ol) {
+  margin: 0 0 16px;
+}
+
+.committee-description ol {
+  padding-left: 1.4em;
+}
+
+.committee-description li + li {
+  margin-top: 4px;
+}
+
+.committee-chair {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  margin: 0 0 8px;
+  font-weight: 700;
+}
+
+.committee-chair span {
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--ucpea-selection);
+  color: var(--shell-accent);
+  font-size: 12px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.committee-chair--vacant {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.committee-roster {
+  columns: 4 11em;
+  column-gap: 32px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.committee-roster li {
+  break-inside: avoid;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.officer-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.officer-list li {
+  display: grid;
+  align-content: start;
+  gap: 2px;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.officer-title {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.officer-list strong {
+  font-size: 17px;
+  line-height: 1.3;
+}
+
+.officer-list a {
+  color: var(--shell-accent);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.committee-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  margin: 16px 0 0;
+}
+
+.committees-footer {
+  max-width: 76ch;
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+}
+
+.committees-footer > p:first-child {
+  margin-top: 0;
+}
+
+/* Phones: the jump list is one swipeable row instead of a tall block of
+   chips, and rosters sit in two columns. */
+@media (max-width: 800px) {
+  .committee-jump ul {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    margin-inline: calc(-1 * var(--content-gutter));
+    padding: 2px var(--content-gutter) 6px;
+    scrollbar-width: none;
+  }
+
+  .committee-jump ul::-webkit-scrollbar {
+    display: none;
+  }
+
+  .committee-roster {
+    columns: 2;
+    column-gap: 20px;
+  }
+
+  /* Officers read as one grouped list, like a phone's settings rows. */
+  .officer-list {
+    gap: 0;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+  }
+
+  .officer-list li {
+    gap: 1px;
+    padding: 10px 16px;
+    line-height: 1.35;
+    border: 0;
+    border-radius: 0;
+    background: none;
+  }
+
+  .officer-list li + li {
+    border-top: 1px solid var(--border);
+  }
+}
