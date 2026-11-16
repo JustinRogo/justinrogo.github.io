@@ -3,6 +3,8 @@
 Backend setup for UCPEA member accounts, area bulletin boards, flyer storage and
 push notifications. The static site build excludes this folder.
 
+See the [UCPEA Dashboard README](../README.md) for the app and its role-based workflows.
+
 ## Files
 
 | File | What it sets up |
@@ -31,9 +33,9 @@ push notifications. The static site build excludes this folder.
 | Post to the union-wide board | | | | | Yes | Yes |
 | See member profiles (name, email) | | Own | Own | Own + everyone in their areas | Everyone | Everyone |
 | See pending sign-ups | | | | Those asking to join their areas | All | All |
-| Edit member profiles | | Own name | Own name | Own name | Everyone's | Everyone's |
-| Approve sign-ups | | | | For their areas (staff get an FYI) | Any, into any area | Any |
-| Suspend members | | | | | Yes (not staff/admins) | Yes |
+| Edit profile names | | Own | Own | Own | Everyone's | Everyone's |
+| Approve sign-ups | | | | For their areas (staff get an FYI) | Member sign-ups, into any area | Any, into any area |
+| Decline sign-ups, pause or reactivate accounts | | | | | Other member accounts | Other accounts |
 | Add people to areas, appoint stewards | | | | | Yes | Yes |
 | Change member / staff / admin roles | | | | | | Yes (not own) |
 | Turn on alerts | | | Yes | Yes | Yes | Yes |
@@ -51,7 +53,7 @@ await supabase.rpc('approve_signup', { p_user: userId, p_area: 12 });  // staff 
 
 - **Stewards** can approve pending sign-ups that asked to join one of their
   areas, and only into that area.
-- **Staff** can approve anyone pending, into any area.
+- **Staff** can approve pending member accounts into any area. Administrators can also approve pending staff and admin accounts.
 - **Steward approvals are an FYI for staff**, not a to-do. They are marked
   `approved_via = 'steward'` and stay in staff's FYI list until a staff member
   sets `staff_acknowledged_at`. The member is fully active either way. To list them:
@@ -121,8 +123,4 @@ Stewards can start one alert every five minutes. Each post has a single send his
 ## Not built yet
 
 - Per-area alert preferences (mute an area without turning alerts off).
-- A steward roster screen. The data access is in place: stewards can read the
-  profiles of everyone in their areas and of pending sign-ups asking to join.
-- Declining a sign-up. Today a request that should not be approved just stays
-  pending; staff can suspend it.
 - Area discussion or comments.
