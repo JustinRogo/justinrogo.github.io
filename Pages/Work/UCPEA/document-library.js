@@ -16,10 +16,12 @@
 
   function updateResults() {
     const words = normalize(search.value).split(' ').filter(Boolean);
+    const signedIn = Boolean(window.UCPEAAccount?.profile);
     let matches = 0;
     for (const { row, keywords } of documents) {
       const categoryMatches = !category.value || row.dataset.libraryCategory === category.value;
-      const show = categoryMatches && words.every(word => keywords.includes(word));
+      const visibleToAccount = signedIn || !row.hasAttribute('data-signed-in-only');
+      const show = visibleToAccount && categoryMatches && words.every(word => keywords.includes(word));
       row.hidden = !show;
       if (show) matches++;
     }
@@ -30,6 +32,7 @@
 
   search.addEventListener('input', updateResults);
   category.addEventListener('change', updateResults);
+  document.addEventListener('ucpea-account', updateResults);
   clear.addEventListener('click', () => {
     search.value = '';
     category.value = '';

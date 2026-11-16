@@ -68,6 +68,13 @@
       <span class="header-context">Member dashboard</span>
     </p>
     <div class="header-actions">
+      <button class="shell-button header-pwa-action" id="header-pwa-action" type="button" aria-label="Install UCPEA" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path class="pwa-install-icon" d="M12 3v12m-4-4 4 4 4-4M5 16v4h14v-4"/>
+          <path class="pwa-update-icon" d="M20 5v6h-6m5.8 0a8 8 0 1 0-1.5 6"/>
+        </svg>
+        <span class="pwa-action-label">Install</span>
+      </button>
       <a class="shell-button account-button" id="account-button" href="index.html?view=account" aria-label="Sign in" title="Sign in">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 9a7 7 0 0 1 14 0"/></svg>
       </a>
@@ -130,6 +137,10 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 6v5c0 5 3 8 8 10 5-2 8-5 8-10V6l-8-3Zm-4 9 3 3 5-5"/></svg>
           <span class="sidebar-label">Rights &amp; Benefits</span>
         </a>
+        <a href="index.html?view=board" title="Bulletin Board">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6l-1 6 4 4H6l4-4-1-6Zm3 10v8"/></svg>
+          <span class="sidebar-label">Bulletin Board</span>
+        </a>
         <a href="index.html#calendar" title="Calendar">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v16H4zM8 2v6m8-6v6M4 11h16"/></svg>
           <span class="sidebar-label">Calendar</span>
@@ -138,11 +149,11 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5C8 2 3 3 2 4v16c3-1 7-1 10 1 3-2 7-2 10-1V4c-1-1-6-2-10 1Zm0 0v16"/></svg>
           <span class="sidebar-label">Current contract</span>
         </a>
-        <a href="index.html?view=contract-history" title="Contract history">
+        <a href="index.html?view=contract-history" title="Contract history" data-signed-in-only>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4v5h5M3.6 9A9 9 0 1 1 3 15m9-8v5l3 2"/></svg>
           <span class="sidebar-label">Contract history</span>
         </a>
-        <a href="index.html?view=compare-contracts" title="Compare contracts">
+        <a href="index.html?view=compare-contracts" title="Compare contracts" data-signed-in-only>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h17m-4-4 4 4-4 4M21 17H4m4-4-4 4 4 4"/></svg>
           <span class="sidebar-label">Compare contracts</span>
         </a>
@@ -158,11 +169,6 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h13v16H6a2 2 0 0 1-2-2zm13 4h3v10a2 2 0 0 1-2 2h-1M8 8h5m-5 4h5m-5 4h5"/></svg>
           <span class="sidebar-label">Union Wire</span>
         </a>
-        <a href="index.html?view=board" title="Bulletin Board">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6l-1 6 4 4H6l4-4-1-6Zm3 10v8"/></svg>
-          <span class="sidebar-label">Bulletin Board</span>
-        </a>
-
         <div class="sidebar-branches">
           <h2 class="resources-heading">Member resources</h2>
           <details id="member-resources">
@@ -183,8 +189,11 @@
           </details>
         </div>
         <button class="sidebar-install" id="install-ucpea" type="button" title="Install UCPEA" hidden>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M5 16v4h14v-4"/></svg>
-          <span class="sidebar-label">Install UCPEA</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path class="pwa-install-icon" d="M12 3v12m-4-4 4 4 4-4M5 16v4h14v-4"/>
+            <path class="pwa-update-icon" d="M20 5v6h-6m5.8 0a8 8 0 1 0-1.5 6"/>
+          </svg>
+          <span class="sidebar-label pwa-action-label">Install UCPEA</span>
         </button>
       </div>
       <div class="sidebar-contact">
@@ -245,7 +254,7 @@
             <a class="button button-primary" href="index.html?view=current-contract">
               Open the Contract <span aria-hidden="true">→</span>
             </a>
-            <a class="button button-secondary" href="index.html?view=compare-contracts">
+            <a class="button button-secondary" href="index.html?view=compare-contracts" data-signed-in-only>
               Compare Agreement Changes <span aria-hidden="true">→</span>
             </a>
           </div>
@@ -301,7 +310,7 @@
         </div>
         <div class="home-contract__actions">
           <a class="button button-primary" href="index.html?view=current-contract">Open the Contract</a>
-          <a class="button button-secondary" href="index.html?view=compare-contracts">Compare changes</a>
+          <a class="button button-secondary" href="index.html?view=compare-contracts" data-signed-in-only>Compare changes</a>
         </div>
       </article>
 
@@ -326,7 +335,7 @@
           <span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 6h5v15H3zm5-3h5v18H8zm5 3 5-2 4 15-5 2z"/></svg></span>
           Documents
         </a>
-        <a href="index.html?view=contract-history">
+        <a href="index.html?view=contract-history" data-signed-in-only>
           <span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 4v5h5M3.6 9A9 9 0 1 1 3 15m9-8v5l3 2"/></svg></span>
           Contract history
         </a>
@@ -1202,12 +1211,12 @@
             <td>Contracts and agreements</td>
             <td><span class="library-type" role="img" aria-label="Google Drive" title="Google Drive"><svg aria-hidden="true"><use href="#library-icon-drive"/></svg></span></td>
           </tr>
-          <tr data-library-category="agreements" data-search-terms="historical agreements archive">
+          <tr data-library-category="agreements" data-search-terms="historical agreements archive" data-signed-in-only>
             <td><a href="index.html?view=contract-history">Contract History</a></td>
             <td>Contracts and agreements</td>
             <td><span class="library-type" role="img" aria-label="Dashboard tool" title="Dashboard tool"><svg aria-hidden="true"><use href="#library-icon-tool"/></svg></span></td>
           </tr>
-          <tr data-library-category="agreements" data-search-terms="compare changes">
+          <tr data-library-category="agreements" data-search-terms="compare changes" data-signed-in-only>
             <td><a href="index.html?view=compare-contracts">Contract Comparison</a></td>
             <td>Contracts and agreements</td>
             <td><span class="library-type" role="img" aria-label="Dashboard tool" title="Dashboard tool"><svg aria-hidden="true"><use href="#library-icon-tool"/></svg></span></td>
@@ -1515,19 +1524,31 @@
 
       <div class="board-browse" id="board-browse">
         <div class="board-toolbar">
-          <div class="deadline-field board-filter-field">
-            <label for="board-filter">Board</label>
-            <select id="board-filter">
-              <option value="">All boards</option>
-            </select>
+          <div class="board-filters" id="board-filters" role="group" aria-label="Filter posts" hidden>
+            <div class="deadline-field board-filter-field">
+              <label for="board-filter">Board</label>
+              <select id="board-filter">
+                <option value="">All boards</option>
+              </select>
+            </div>
+            <label class="board-check"><input type="checkbox" id="board-past"> Show past posts</label>
           </div>
-          <label class="board-check"><input type="checkbox" id="board-past"> Show past posts</label>
-          <div class="board-layout-toggle" role="group" aria-label="Layout">
-            <button type="button" data-board-layout="board" aria-pressed="true">Board</button>
-            <button type="button" data-board-layout="list" aria-pressed="false">List</button>
+          <div class="board-toolbar-actions">
+            <div class="board-display-tools" role="group" aria-label="Display options">
+              <div class="board-layout-toggle" role="group" aria-label="Post layout">
+                <button type="button" data-board-layout="board" aria-pressed="true">Board</button>
+                <button type="button" data-board-layout="list" aria-pressed="false">List</button>
+              </div>
+              <button class="board-toolbar-motion" type="button" data-board-motion aria-label="Pause GIFs" title="Pause GIFs" hidden>
+                <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+                  <path class="board-gif-pause" d="M5.5 3.5v9m5-9v9" />
+                  <path class="board-gif-play" d="m5.5 3.5 6 4.5-6 4.5z" />
+                </svg>
+                <span class="board-toolbar-motion-label">Pause GIFs</span>
+              </button>
+            </div>
+            <button class="account-primary board-new" type="button" id="board-new" hidden>New post</button>
           </div>
-          <button class="account-secondary board-motion" type="button" data-board-motion aria-pressed="false" hidden>Pause animations</button>
-          <button class="account-primary board-new" type="button" id="board-new" hidden>New post</button>
         </div>
         <p class="board-hint" id="board-signin" hidden>Members-only posts appear here after you <a href="index.html?view=account">sign in</a>.</p>
         <p class="board-hint" id="board-offline" hidden>You're offline. These are the posts saved on this device.</p>
@@ -1759,8 +1780,8 @@
           <p>Read the 2025–2029 agreement, compare it with the prior contract, or trace UCPEA contracts back to 1977.</p>
           <div class="contract-actions">
             <a class="button button-primary" href="index.html?view=current-contract">Open the Contract <span aria-hidden="true">→</span></a>
-            <a class="button button-secondary" href="index.html?view=compare-contracts">Compare Changes <span aria-hidden="true">→</span></a>
-            <a class="button button-secondary" href="index.html?view=contract-history">Contract History <span aria-hidden="true">→</span></a>
+            <a class="button button-secondary" href="index.html?view=compare-contracts" data-signed-in-only>Compare Changes <span aria-hidden="true">→</span></a>
+            <a class="button button-secondary" href="index.html?view=contract-history" data-signed-in-only>Contract History <span aria-hidden="true">→</span></a>
           </div>
         </div>
 
@@ -1954,7 +1975,7 @@
           <li>
             <h3><a href="https://ucpea.ct.aft.org/union-wire/contract-corner-contractual-gains">Highlights of the 2025–2029 agreement</a></h3>
             <p>Read UCPEA’s overview of changes to pay, leave, benefits, and working conditions.</p>
-            <a class="text-link" href="index.html?view=compare-contracts">Compare the agreements</a>
+            <a class="text-link" href="index.html?view=compare-contracts" data-signed-in-only>Compare the agreements</a>
           </li>
           <li>
             <h3><a href="https://ucpea.ct.aft.org/union-wire/contract-corner-understanding-article-32">Salary and performance increases</a></h3>
@@ -1983,6 +2004,18 @@
       </div>
     </section>
   </main>
+
+  <dialog class="calendar-dialog" id="pwa-install-help" aria-labelledby="pwa-install-title" aria-describedby="pwa-install-steps">
+    <div class="calendar-dialog-heading">
+      <h2 id="pwa-install-title">Install UCPEA</h2>
+      <form method="dialog">
+        <button class="calendar-dialog-close" type="submit" aria-label="Close installation instructions" autofocus>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+        </button>
+      </form>
+    </div>
+    <p class="calendar-dialog-when" id="pwa-install-steps"></p>
+  </dialog>
 
   <dialog class="calendar-dialog" id="calendar-event-dialog" aria-labelledby="calendar-event-title" aria-describedby="calendar-event-when">
     <div class="calendar-dialog-heading">

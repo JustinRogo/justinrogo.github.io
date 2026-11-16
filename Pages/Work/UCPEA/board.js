@@ -16,6 +16,7 @@
     notice: $('board-notice'),
     error: $('board-error'),
     browse: $('board-browse'),
+    filters: $('board-filters'),
     filter: $('board-filter'),
     past: $('board-past'),
     layoutButtons: Array.from(view.querySelectorAll('[data-board-layout]')),
@@ -25,6 +26,7 @@
     status: $('board-status'),
     posts: $('board-posts'),
     detail: $('board-detail'),
+    sheet: $('help-sheet'),
     composer: $('board-composer'),
     composerTitle: $('board-composer-title'),
     board: $('post-board'),
@@ -79,6 +81,8 @@
     flyer: { file: null, removeExisting: false },
     confirmTimer: 0,
     motionPaused: false,
+    filterFeedback: null,
+    drawer: null,
     push: null,
   };
 
@@ -105,9 +109,9 @@
     return node;
   }
 
-  function showError(message) {
-    els.error.textContent = message || '';
-    els.error.hidden = !message;
+  function showError(message, output = els.error) {
+    output.textContent = message || '';
+    output.hidden = !message;
   }
 
   function showNotice(message) {
@@ -259,6 +263,16 @@
     }
     // The sheet on phones lives outside the Board view, so look in both.
     for (const button of new Set([...view.querySelectorAll('[data-board-motion]'), ...root.querySelectorAll('[data-board-motion]')])) {
+      const label = button.querySelector('.board-toolbar-motion-label');
+      if (label) {
+        const action = state.motionPaused ? 'Play GIFs' : 'Pause GIFs';
+        label.textContent = action;
+        button.setAttribute('aria-label', action);
+        button.title = action;
+        button.toggleAttribute('data-paused', state.motionPaused);
+        button.hidden = !els.posts.querySelector('img[data-gif]');
+        continue;
+      }
       button.setAttribute('aria-pressed', String(state.motionPaused));
       button.textContent = state.motionPaused ? 'Play animations' : 'Pause animations';
       if (button.closest('.board-toolbar')) button.hidden = !view.querySelector('#board-posts img[data-gif]');
@@ -478,8 +492,11 @@
     fillFilter();
     // Without an approved account there are only a few public posts, so the
     // board filter and past-posts toggle would do nothing useful.
-    els.filter.closest('.board-filter-field').hidden = !active;
-    els.past.closest('.board-check').hidden = !active;
+    if (els.filters) els.filters.hidden = !active;
+    else {
+      els.filter.closest('.board-filter-field').hidden = !active;
+      els.past.closest('.board-check').hidden = !active;
+    }
     if (!active) {
       els.filter.value = '';
       els.past.checked = false;
@@ -487,7 +504,12 @@
     els.newPost.hidden = !canPostAnywhere || state.offline;
     els.signin.hidden = Boolean(state.me);
     els.offline.hidden = !state.offline;
+    renderPosts();
+  }
 
+  function renderPosts() {
+    state.filterFeedback?.cancel();
+    state.filterFeedback = null;
     const posts = visiblePosts();
     els.posts.replaceChildren(...posts.map(post => card(post)));
     els.posts.hidden = !posts.length;
@@ -502,6 +524,16 @@
       els.status.textContent = `${posts.length} ${posts.length === 1 ? 'post' : 'posts'}`;
     }
     applyMotion();
+  }
+
+  function filterPosts() {
+    renderPosts();
+    if (UCPEAMotion.reduced || document.hidden || !Element.prototype.animate) return;
+    const results = els.posts.hidden ? els.status : els.posts;
+    state.filterFeedback = results.animate([{ opacity: .78 }, { opacity: 1 }], {
+      duration: 180,
+      easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+    });
   }
 
   // ---------------------------------------------------------------------------
@@ -521,8 +553,7 @@
     return fragment;
   }
 
-  // A post's full contents: used by the Board view's detail page and by the
-  // phone sheet that opens from the Overview.
+  // The detail page and both mobile drawers share the same post content.
   function detailNodes(post, { titleId, urls = state.urls }) {
     const nodes = [flagList(post)];
     const title = el('h2', 'board-detail-title', post.title);
@@ -565,6 +596,24 @@
     return nodes;
   }
 
+  function postTools(post) {
+    if (!access().canPostTo(post.area_id) || state.offline) return null;
+    const tools = el('div', 'account-actions board-detail-tools');
+    const actions = [
+      ['edit', 'Edit post', 'account-secondary'],
+      ['delete', 'Delete post', 'account-secondary board-danger'],
+    ];
+    if (canNotify(post)) actions.unshift(['notify', 'Notify subscribers', 'account-secondary']);
+    for (const [action, label, className] of actions) {
+      const button = el('button', className, label);
+      button.type = 'button';
+      button.dataset.boardAction = action;
+      button.dataset.id = post.id;
+      tools.append(button);
+    }
+    return tools;
+  }
+
   function renderDetail(id) {
     const post = state.posts.find(item => item.id === id);
     els.detail.replaceChildren();
@@ -582,29 +631,49 @@
     }
 
     els.detail.append(...detailNodes(post, { titleId: 'board-detail-title' }));
+    const tools = postTools(post);
+    if (tools) els.detail.append(tools);
     applyMotion();
-
-    if (access().canPostTo(post.area_id) && !state.offline) {
-      const tools = el('div', 'account-actions board-detail-tools');
-      if (canNotify(post)) {
-        const notify = el('button', 'account-secondary', 'Notify subscribers');
-        notify.type = 'button';
-        notify.dataset.boardAction = 'notify';
-        notify.dataset.id = post.id;
-        tools.append(notify);
-      }
-      const edit = el('button', 'account-secondary', 'Edit post');
-      edit.type = 'button';
-      edit.dataset.boardAction = 'edit';
-      edit.dataset.id = post.id;
-      const remove = el('button', 'account-secondary board-danger', 'Delete post');
-      remove.type = 'button';
-      remove.dataset.boardAction = 'delete';
-      remove.dataset.id = post.id;
-      tools.append(edit, remove);
-      els.detail.append(tools);
-    }
   }
+
+  function openPostDrawer(link, post, { urls = state.urls, fromOverview = false } = {}) {
+    const content = el('div', 'board-detail board-sheet');
+    content.append(...detailNodes(post, { titleId: 'board-sheet-title', urls }));
+    if (fromOverview) {
+      const more = el('a', 'board-sheet-more', 'See it on the Bulletin Board');
+      more.href = `index.html?view=board#post-${post.id}`;
+      more.dataset.boardSheetMore = '';
+      content.append(more);
+    } else {
+      content.dataset.postId = post.id;
+      const tools = postTools(post);
+      if (tools) {
+        const error = el('p', 'deadline-error account-error');
+        error.dataset.boardSheetError = '';
+        error.setAttribute('role', 'alert');
+        error.hidden = true;
+        content.append(tools, error);
+      }
+      state.drawer = content;
+    }
+    applyMotion(content);
+    UCPEASheet.open(link.closest('.board-note'), { content, labelledBy: 'board-sheet-title', focus: link });
+  }
+
+  function clearBoardDrawer() {
+    state.drawer?.remove();
+    state.drawer = null;
+  }
+
+  function closeBoardDrawer() {
+    if (!state.drawer) return;
+    if (els.sheet?.open && els.sheet.contains(state.drawer)) UCPEASheet.close({ instant: true });
+    clearBoardDrawer();
+  }
+
+  els.sheet?.addEventListener('close', () => {
+    if (!els.sheet.open) clearBoardDrawer();
+  });
 
   // A post's delivery record lives on the server. This dialog advances one
   // batch at a time and can resume the remaining devices after an interruption.
@@ -1087,8 +1156,9 @@
     clearTimeout(state.confirmTimer);
     const post = state.posts.find(item => item.id === target.dataset.id);
     if (!post) return;
+    const drawerError = target.closest('.board-sheet')?.querySelector('[data-board-sheet-error]');
     target.disabled = true;
-    showError('');
+    showError('', drawerError || els.error);
     try {
       const client = await UCPEAAccount.getClient();
       const { data, error } = await client.from('posts').delete().eq('id', post.id).select('id');
@@ -1097,11 +1167,31 @@
       await removeFile(client, post.image_path ? { bucket: post.image_bucket, path: post.image_path } : null);
       await load();
       loadOverview();
-      go(null);
+      if (state.drawer?.dataset.postId === post.id) closeBoardDrawer();
+      if (!view.hidden) {
+        await go(null);
+        if (drawerError && !els.sheet?.open) {
+          (els.posts.querySelector('a[data-board-post]') || els.layoutButtons[0])?.focus({ preventScroll: true });
+        }
+      }
       showNotice(`"${post.title}" was deleted.`);
     } catch (error) {
-      showError(friendlyError(error));
+      showError(friendlyError(error), drawerError?.isConnected ? drawerError : els.error);
       target.disabled = false;
+    }
+  }
+
+  function handlePostAction(action, { inDrawer = false } = {}) {
+    if (!action || action.disabled) return;
+    const post = state.posts.find(item => item.id === action.dataset.id);
+    if (!post || !access().canPostTo(post.area_id) || state.offline) return;
+    if (action.dataset.boardAction === 'edit') {
+      if (inDrawer) closeBoardDrawer();
+      openComposer(post);
+    } else if (action.dataset.boardAction === 'notify') {
+      openPushDialog(post);
+    } else if (action.dataset.boardAction === 'delete') {
+      deletePost(action);
     }
   }
 
@@ -1111,27 +1201,22 @@
       // Handled here so the dashboard's own router doesn't reload the view.
       event.preventDefault();
       event.stopPropagation();
-      go(postLink.dataset.boardPost || null);
+      const id = postLink.dataset.boardPost;
+      const post = window.UCPEASheet?.phone && state.mode === 'browse' && state.posts.find(item => item.id === id);
+      if (post) openPostDrawer(postLink, post);
+      else go(id || null);
       return;
     }
     if (event.target.closest('button[data-board-motion]')) {
       toggleMotion();
       return;
     }
-    const action = event.target.closest('button[data-board-action]');
-    if (!action || action.disabled) return;
-    if (action.dataset.boardAction === 'edit') {
-      openComposer(state.posts.find(post => post.id === action.dataset.id));
-    } else if (action.dataset.boardAction === 'notify') {
-      openPushDialog(state.posts.find(post => post.id === action.dataset.id));
-    } else if (action.dataset.boardAction === 'delete') {
-      deletePost(action);
-    }
+    handlePostAction(event.target.closest('button[data-board-action]'));
   });
 
   els.newPost.addEventListener('click', () => openComposer());
-  els.filter.addEventListener('change', renderBrowse);
-  els.past.addEventListener('change', renderBrowse);
+  els.filter.addEventListener('change', filterPosts);
+  els.past.addEventListener('change', filterPosts);
   for (const button of els.layoutButtons) {
     button.addEventListener('click', () => switchLayout(button.dataset.boardLayout));
   }
@@ -1154,6 +1239,7 @@
   // Start-up
   // ---------------------------------------------------------------------------
   window.addEventListener('popstate', () => {
+    closeBoardDrawer();
     if (view.hidden) return;
     if (state.mode === 'compose') {
       state.editing = null;
@@ -1164,7 +1250,10 @@
 
   new MutationObserver(() => {
     if (!view.hidden) route();
-    else if (els.pushDialog?.open) els.pushDialog.close();
+    else {
+      closeBoardDrawer();
+      if (els.pushDialog?.open) els.pushDialog.close();
+    }
   }).observe(view, { attributes: true, attributeFilter: ['hidden'] });
 
   document.addEventListener('ucpea-account', event => {
@@ -1179,6 +1268,7 @@
     }
     if (!profile) writeStorage(SNAPSHOT_KEY, null); // members-only posts leave with the person
     if (!changed) return;
+    closeBoardDrawer();
     state.loadedFor = undefined;
     if (!view.hidden) {
       if (state.mode === 'compose' && !access().canPostAnywhere) setMode('browse');
@@ -1202,19 +1292,11 @@
     event.preventDefault();
     event.stopPropagation();
 
-    const content = el('div', 'board-detail board-sheet');
-    content.append(...detailNodes(post, { titleId: 'board-sheet-title', urls: overview.urls }));
-    const more = el('a', 'board-sheet-more', 'See it on the Bulletin Board');
-    more.href = `index.html?view=board#post-${post.id}`; // relative, so the dashboard router switches views in place
-    more.dataset.boardSheetMore = '';
-    content.append(more);
-    applyMotion(content);
-
-    UCPEASheet.open(link.closest('.board-note'), { content, labelledBy: 'board-sheet-title', focus: link });
+    openPostDrawer(link, post, { urls: overview.urls, fromOverview: true });
   });
 
-  // Inside the sheet: "See it on the Bulletin Board" closes the sheet as the
-  // dashboard switches views, and a GIF flyer's pause button still works.
+  // The shared sheet sits outside the Board view, so it delegates its own
+  // navigation, flyer controls, and post actions.
   document.addEventListener('click', event => {
     const sheetContent = event.target.closest?.('.board-sheet');
     if (!sheetContent) return;
@@ -1223,6 +1305,8 @@
     } else if (event.target.closest('button[data-board-motion]')) {
       toggleMotion();
       applyMotion(sheetContent);
+    } else if (sheetContent === state.drawer) {
+      handlePostAction(event.target.closest('button[data-board-action]'), { inDrawer: true });
     }
   });
 

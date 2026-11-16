@@ -115,7 +115,7 @@
         <div class="reader-search" role="search">
           ${icons.search}
           <label class="reader-visually-hidden" for="reader-q">Search the contract</label>
-          <input id="reader-q" type="search" placeholder="Search, e.g. sick leave for my child" autocomplete="off" enterkeyhint="search">
+          <input id="reader-q" type="search" placeholder="Search" autocomplete="off" enterkeyhint="search">
           <button type="button" class="reader-clear" id="reader-clear" aria-label="Clear search" hidden>${icons.clear}</button>
         </div>
         <div id="reader-results" hidden>

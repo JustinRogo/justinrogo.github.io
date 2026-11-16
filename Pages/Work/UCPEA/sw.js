@@ -1,7 +1,7 @@
 'use strict';
 
 const CACHE_PREFIX = 'ucpea-dashboard-';
-const CACHE_NAME = CACHE_PREFIX + 'v33';
+const CACHE_NAME = CACHE_PREFIX + 'v36';
 const scope = new URL(self.registration.scope);
 const homeURL = new URL('index.html', scope).href;
 const offlineURLs = new Set([
@@ -46,9 +46,11 @@ self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(async cache => {
     await cache.addAll(coreURLs);
     await cache.add(supabaseURL).catch(() => {});
-    // An open Account view can use the new push handler as soon as installation finishes.
-    await self.skipWaiting();
   }));
+});
+
+self.addEventListener('message', event => {
+  if (event.data?.type === 'SKIP_WAITING') event.waitUntil(self.skipWaiting());
 });
 
 self.addEventListener('activate', event => {
