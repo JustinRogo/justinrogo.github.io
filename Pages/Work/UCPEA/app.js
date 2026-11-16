@@ -1442,6 +1442,7 @@ if (salaryCalculator) {
   // the planner models only the next scheduled one.
   const MODELED_YEAR = 2027;
   const salaryLevelInput = salaryCalculator.querySelector('#salaryLevel');
+  const meritAmountInput = salaryCalculator.querySelector('#meritAmount');
   const reclassToggle = salaryCalculator.querySelector('#reclassToggle');
   const reclassDetails = salaryCalculator.querySelector('#reclassDetails');
   const reclassOffHint = salaryCalculator.querySelector('#reclassOffHint');
@@ -1542,13 +1543,23 @@ if (salaryCalculator) {
 
     const baseSalary = getNumber(baseSalaryInput);
     const salaryLevel = Number(salaryLevelInput.value) || 0;
+    const meritAmount = getNumber(meritAmountInput);
     // A reclassification counts only while its switch is on.
     const reclassPercent = reclassToggle.checked ? getNumber(reclassPercentInput) : 0;
     const meetsCoreConditions = membershipEligibleInput.checked && satisfactoryPerformanceInput.checked;
     const receivesPbc = meetsCoreConditions && probationCompleteInput.checked;
+    // The discretionary pool in Article 32.2(d) covers current members.
+    // The January 1 cutoff in 32.2(c) applies to the scheduled increase.
+    const eligibleForMeritEstimate = satisfactoryPerformanceInput.checked && probationCompleteInput.checked;
 
     if (baseSalary <= 0) {
       showSalaryError('Please enter an annual base salary greater than $0.');
+      return;
+    }
+
+    if (!meritAmountInput.validity.valid) {
+      showSalaryError('Enter a merit estimate of $0 or more, with up to two decimal places.');
+      meritAmountInput.focus();
       return;
     }
 
@@ -1576,9 +1587,7 @@ if (salaryCalculator) {
       );
     }
 
-    function applyPbc(year, yearOpeningSalary, rate, label) {
-      if (!receivesPbc) return;
-      const fullAmount = yearOpeningSalary * rate;
+    function applyPbc(year, fullAmount, label) {
       let baseAmount = fullAmount;
       let lumpSum = 0;
       const bandMaximum = salaryLevel ? SALARY_BANDS[year][salaryLevel][2] : 0;
@@ -1614,7 +1623,12 @@ if (salaryCalculator) {
       }
 
       const pbcRate = year === 2027 ? 0.015 : 0.02;
-      applyPbc(year, yearOpeningSalary, pbcRate, `${formatPercent(pbcRate * 100)} performance-based compensation`);
+      if (receivesPbc) {
+        applyPbc(year, yearOpeningSalary * pbcRate, `${formatPercent(pbcRate * 100)} performance-based compensation`);
+      }
+      if (meritAmount > 0 && eligibleForMeritEstimate) {
+        applyPbc(year, meritAmount, 'Discretionary merit estimate');
+      }
     }
 
     const increaseTotal = salary - baseSalary;
@@ -1635,6 +1649,9 @@ if (salaryCalculator) {
       if (!satisfactoryPerformanceInput.checked) missing.push('the satisfactory-performance condition');
       eligibilityNotes.push(`Scheduled Article 32 increases are not modeled because the estimate does not meet ${missing.join(' and ')}.`);
     }
+    if (meritAmount > 0 && !eligibleForMeritEstimate) {
+      eligibilityNotes.push('The merit estimate requires a Good or higher evaluation and completion of the initial probationary period.');
+    }
     if (estimatedLumpSum > 0) eligibilityNotes.push(`${currency.format(estimatedLumpSum)} is shown as an estimated non-base lump sum because the selected band maximum was reached.`);
     if (reclassPercent > 0) eligibilityNotes.push('The reclassification amount is only an estimate; Article 31 may also require movement to the new band minimum.');
     salaryEligibility.textContent = eligibilityNotes.join(' ');
@@ -1646,6 +1663,7 @@ if (salaryCalculator) {
     clearSalaryError();
     baseSalaryInput.value = '';
     salaryLevelInput.value = '';
+    meritAmountInput.value = '';
     reclassPercentInput.value = '';
     reclassToggle.checked = false;
     showReclassification();
@@ -1689,7 +1707,7 @@ if (salaryCalculator) {
   calculateButton.addEventListener('click', calculateSalary);
   resetButton.addEventListener('click', resetSalary);
 
-  [baseSalaryInput, salaryLevelInput, reclassPercentInput].forEach(input => {
+  [baseSalaryInput, salaryLevelInput, meritAmountInput, reclassPercentInput].forEach(input => {
     input.addEventListener('keydown', event => {
       if (event.key === 'Enter') calculateSalary();
     });
