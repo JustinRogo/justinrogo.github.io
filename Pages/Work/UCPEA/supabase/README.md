@@ -102,7 +102,7 @@ UCPEA-owned account.
    ```
 
    The function verifies the caller’s Supabase access token itself with `auth.getUser()` and checks the member’s current status before issuing the public key or sending a test.
-4. Publish the updated dashboard. Sign in as an approved test member in a supported browser, then use **Account → Notifications** to enable alerts and send a test. Verify that tapping the alert opens Account, and that turning alerts off or signing out removes the device subscription. On iPhone or iPad, add the dashboard to the Home Screen and open it from its icon before enabling alerts.
+4. Publish the updated dashboard. Sign in as an approved test member in a supported browser, then open the header account menu, turn on **Show notifications**, and select **Send me a test**. Verify that tapping the alert opens Account, and that turning alerts off or signing out removes the device subscription. On iPhone or iPad, add the dashboard to the Home Screen and open it from its icon before enabling alerts.
 
 ## Deploying Bulletin Board notifications
 

@@ -2154,7 +2154,7 @@ html[data-theme="dark"] .guide-group .guide-index > ul > li > a[aria-current="lo
   transform: translateX(4px);
 }
 
-:is(.help-topic.is-active, .salary-calculator__header):focus-visible {
+.help-topic.is-active:focus-visible {
   outline-color: var(--ucpea-on-navy);
   outline-offset: -4px;
 }
@@ -2475,11 +2475,14 @@ html[data-theme="dark"] .help-topic.is-active:focus-visible {
   justify-content: space-between;
   gap: 24px;
   padding: 30px 34px;
-  border-bottom: 1px solid var(--ucpea-slate);
-  background: var(--ucpea-brand);
-  color: #fff;
+  background: var(--surface);
+  color: var(--ink);
   cursor: pointer;
   list-style: none;
+}
+
+.salary-calculator__header:focus-visible {
+  outline-offset: -4px;
 }
 
 .salary-calculator__header::-webkit-details-marker {
@@ -2498,7 +2501,7 @@ html[data-theme="dark"] .help-topic.is-active:focus-visible {
 }
 
 .salary-calculator__header small {
-  color: var(--ucpea-on-navy);
+  color: var(--muted);
   font-size: 14px;
 }
 
@@ -2507,8 +2510,9 @@ html[data-theme="dark"] .help-topic.is-active:focus-visible {
   flex: 0 0 38px;
   width: 38px;
   height: 38px;
-  border: 1px solid rgba(255, 255, 255, .3);
+  border: 1px solid var(--border);
   border-radius: 25%;
+  background: var(--surface-soft);
 }
 
 .salary-calculator__toggle::before,
@@ -2519,7 +2523,7 @@ html[data-theme="dark"] .help-topic.is-active:focus-visible {
   width: 14px;
   height: 2px;
   border-radius: 2px;
-  background: #fff;
+  background: currentColor;
   content: "";
   transform: translate(-50%, -50%);
   transition: transform .18s ease;
@@ -2535,6 +2539,7 @@ html[data-theme="dark"] .help-topic.is-active:focus-visible {
 
 .salary-calculator__body {
   padding: 32px 34px 36px;
+  border-top: 1px solid var(--border);
   background: var(--surface-soft);
 }
 
@@ -2757,8 +2762,8 @@ html[data-theme="dark"] .help-topic.is-active:focus-visible {
 }
 
 .salary-calculator th {
-  background: var(--ucpea-brand);
-  color: #fff;
+  background: var(--surface-soft);
+  color: var(--ink);
   font-weight: 800;
   white-space: nowrap;
 }
@@ -3676,7 +3681,7 @@ body:is([data-account="active"], [data-account="pending"], [data-account="suspen
   font-size: 13px;
 }
 
-/* Header account menu: icon, first name and a caret; opens View Account and Sign Out. */
+/* Signed-in account menu in the dashboard header. */
 .account-menu:not([hidden]) {
   position: relative;
   display: flex;
@@ -3732,9 +3737,7 @@ body:is(:not([data-account]), [data-account="signed-out"]) [data-signed-in-only]
   right: 0;
   z-index: 40;
   display: grid;
-  width: max-content;
-  min-width: 220px;
-  max-width: min(300px, calc(100vw - 24px));
+  width: min(248px, calc(100vw - 84px));
   padding: 6px;
   border: 1px solid var(--border);
   border-radius: 14px;
@@ -3795,6 +3798,7 @@ body:is(:not([data-account]), [data-account="signed-out"]) [data-signed-in-only]
 }
 
 .account-menu__item svg {
+  flex: none;
   width: 18px;
   height: 18px;
   fill: none;
@@ -3802,6 +3806,65 @@ body:is(:not([data-account]), [data-account="signed-out"]) [data-signed-in-only]
   stroke-width: 1.7;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.account-menu__switch {
+  width: 100%;
+}
+
+.account-menu__switch-track {
+  display: flex;
+  flex: none;
+  align-items: center;
+  width: 36px;
+  height: 22px;
+  margin-inline-start: auto;
+  padding: 2px;
+  border: 1px solid var(--muted);
+  border-radius: 999px;
+  background: var(--surface-soft);
+}
+
+.account-menu__switch-track::before {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--muted);
+  content: "";
+}
+
+.account-menu__switch[aria-checked="true"] .account-menu__switch-track {
+  justify-content: flex-end;
+  border-color: var(--ucpea-primary);
+  background: var(--ucpea-primary);
+}
+
+.account-menu__switch[aria-checked="true"] .account-menu__switch-track::before {
+  background: var(--ucpea-primary-ink);
+}
+
+.account-menu__item[aria-disabled="true"] {
+  background: transparent;
+  color: var(--muted);
+  cursor: default;
+}
+
+.account-menu__status {
+  margin: -2px 10px 6px 38px;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+
+.account-menu__support {
+  margin-inline-start: 28px;
+  font-size: 12.5px;
+  text-decoration: underline;
+  text-underline-offset: .16em;
+}
+
+.account-menu__support[hidden] {
+  display: none;
 }
 
 @media (max-width: 480px) {
@@ -6268,10 +6331,13 @@ html[data-transition="help-sheet"]::view-transition-group(root) {
 
 /* Committees: the Executive Board first, then each committee with its
    description from the Constitution above its roster. */
-.committees-lede {
-  max-width: 72ch;
-  margin: 0 0 24px;
-  color: var(--muted);
+.committees-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+  margin-bottom: 24px;
 }
 
 .committee-jump ul {
@@ -6428,7 +6494,7 @@ html[data-transition="help-sheet"]::view-transition-group(root) {
   color: var(--muted);
 }
 
-.committees-footer > p:first-child {
+.committees-footer .committee-links {
   margin-top: 0;
 }
 
