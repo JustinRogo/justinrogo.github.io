@@ -75,6 +75,9 @@ const UCPEAViews = (() => {
       if (type === 'ucpea-theme' && isTheme(theme) && theme !== document.documentElement.dataset.theme) {
         applyToolTheme(theme);
       }
+      if (type === 'ucpea-scroll-top') {
+        window.scrollTo({ top: 0, behavior: event.data.behavior === 'instant' ? 'instant' : 'smooth' });
+      }
       if (type === 'ucpea-show-hash' && typeof hash === 'string' && hash.startsWith('#') && hash !== location.hash) {
         const previousURL = location.href;
         history.replaceState(null, '', hash);

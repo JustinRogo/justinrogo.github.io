@@ -324,3 +324,10 @@ html[data-dashboard-tool="area-explorer"] .workspace {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* Touch, matching the dashboard around it: controls answer a tap at once
+   (no double-tap zoom wait) and flash no grey tap box. Text stays selectable. */
+html[data-dashboard-tool] :where(a, button, summary, label, select, [role="button"]) {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}

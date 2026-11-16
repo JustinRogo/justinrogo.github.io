@@ -222,10 +222,24 @@
   // ---------------------------------------------------------------------------
   // Header account menu: View Account and Sign Out
   // ---------------------------------------------------------------------------
+  let menuWatcher = null;
+
   function setMenuOpen(open, { focus = false } = {}) {
     if (!els.menu) return;
     els.menuPanel.hidden = !open;
     els.menuButton.setAttribute('aria-expanded', String(open));
+    // Android back closes the menu instead of leaving the page.
+    if (!open) {
+      menuWatcher?.destroy();
+      menuWatcher = null;
+    } else if (!menuWatcher && typeof UCPEAWatchClose === 'function') {
+      menuWatcher = UCPEAWatchClose(() => {
+        menuWatcher = null;
+        if (els.menuPanel.hidden) return;
+        setMenuOpen(false);
+        els.menuButton.focus({ preventScroll: true });
+      });
+    }
     if (open && focus) els.menuView.focus();
   }
 

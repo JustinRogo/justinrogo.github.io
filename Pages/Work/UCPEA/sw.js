@@ -1,9 +1,11 @@
 'use strict';
 
 const CACHE_PREFIX = 'ucpea-dashboard-';
-const CACHE_NAME = CACHE_PREFIX + 'v37';
+const CACHE_NAME = CACHE_PREFIX + 'v38';
 const scope = new URL(self.registration.scope);
 const homeURL = new URL('index.html', scope).href;
+// How long a request waits for the network before a saved copy is used.
+const NETWORK_WAIT = 3000;
 const offlineURLs = new Set([
   'index.html',
   'styles.css',
@@ -86,11 +88,17 @@ self.addEventListener('fetch', event => {
     return caches.open(CACHE_NAME).then(cache => cache.put(key, copy));
   }).catch(() => {}));
 
+  // On a weak signal, open from the saved copy after a short wait instead of
+  // showing a blank screen. The download above still finishes and refreshes it.
   event.respondWith((async () => {
-    const response = await network.catch(() => null);
-    if (response && response.status < 500) return response;
+    const fromNetwork = network.catch(() => null);
+    const slow = new Promise(resolve => setTimeout(resolve, NETWORK_WAIT, 'slow'));
+    const response = await Promise.race([fromNetwork, slow]);
+    if (response && response !== 'slow' && response.status < 500) return response;
     const cached = await caches.match(key, { cacheName: CACHE_NAME }).catch(() => null);
-    return cached || response || Response.error();
+    if (cached) return cached;
+    const late = response === 'slow' ? await fromNetwork : response;
+    return late || Response.error();
   })());
 });
 
@@ -127,7 +135,19 @@ self.addEventListener('notificationclick', event => {
   event.waitUntil((async () => {
     const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
     const match = windows.find(client => client.url === url.href);
-    if (match) await match.focus();
-    else await self.clients.openWindow(url.href);
+    if (match) {
+      await match.focus();
+      return;
+    }
+    // The app is already open on another view: bring it forward and switch
+    // views in place, instead of opening a second copy.
+    const dashboard = windows.find(client => client.frameType !== 'nested' &&
+      [scope.href, homeURL].includes(client.url.split(/[?#]/)[0]));
+    if (dashboard) {
+      await dashboard.focus();
+      dashboard.postMessage({ type: 'ucpea-open', url: url.href });
+    } else {
+      await self.clients.openWindow(url.href);
+    }
   })());
 });

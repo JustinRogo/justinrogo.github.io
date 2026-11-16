@@ -166,4 +166,24 @@ test('board notification text is generic and opens the correct post within the d
   assert.equal(opened.pop(), scope + 'index.html');
   await dispatch('notificationclick', { notification: { data: { type: 'test' }, close() {} } });
   assert.equal(opened.pop(), scope + 'index.html?view=account');
+
+  // With the dashboard already open on another view, it switches in place.
+  const messages = [];
+  const focused = [];
+  const open = (url, frameType = 'top-level') => ({
+    url, frameType,
+    async focus() { focused.push(url); },
+    postMessage(message) { messages.push({ url, message }); },
+  });
+  self.clients.matchAll = async () => [
+    open(scope + 'UCPEAContract.html?dashboard=dark', 'nested'),
+    open(scope + 'index.html?view=current-contract#article-11'),
+  ];
+  await dispatch('notificationclick', { notification: { ...board, close() {} } });
+  assert.equal(opened.length, 0);
+  assert.deepEqual(focused, [scope + 'index.html?view=current-contract#article-11']);
+  // The worker runs in its own context, so compare its message as plain data.
+  assert.deepEqual(messages.map(({ message }) => ({ ...message })), [
+    { type: 'ucpea-open', url: scope + `index.html?view=board#post-${postId}` },
+  ]);
 });

@@ -549,9 +549,12 @@ body[data-local-view] #main-content > :not([data-dashboard-view]) {
     cursor: pointer;
   }
 
-  .mobile-dock :is(a, button):hover {
-    background: var(--surface-soft);
-    color: var(--ink);
+  /* Touch screens skip hover, so a tapped tab doesn't stay lit afterwards. */
+  @media (hover: hover) {
+    .mobile-dock :is(a, button):hover {
+      background: var(--surface-soft);
+      color: var(--ink);
+    }
   }
 
   body:not([data-menu-open="resources"]) .mobile-dock :is([aria-current="page"], [aria-current="location"]),
@@ -6218,6 +6221,46 @@ html[data-transition="help-sheet"]::view-transition-group(root) {
   }
 
   .home-tiles a:active > span {
+    transform: none;
+  }
+}
+
+/* Touch: controls answer a tap at once, without waiting to see whether it
+   was a double-tap zoom. The app's own chrome (header, dock, navigation,
+   home tiles) isn't selectable text and opens no link preview on a long
+   press. Reading text everywhere else stays selectable. */
+/* :where() adds no weight, so drag handles that set touch-action: none keep it. */
+:where(a, button, summary, label, select, [role="button"]) {
+  touch-action: manipulation;
+}
+
+:is(.site-header, .mobile-dock, .primary-nav, .home-tiles) {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Phones: a dock tab dips under the finger as it is pressed. */
+@media (max-width: 800px) {
+  .mobile-dock :is(a, button) {
+    transition: background-color .15s ease, color .15s ease;
+  }
+
+  .mobile-dock :is(a, button) svg {
+    transition: transform .2s var(--ease-out);
+  }
+
+  .mobile-dock :is(a, button):active {
+    background: var(--surface-soft);
+  }
+
+  .mobile-dock :is(a, button):active svg {
+    transform: scale(.86);
+  }
+}
+
+@media (max-width: 800px) and (prefers-reduced-motion: reduce) {
+  .mobile-dock :is(a, button):active svg {
     transform: none;
   }
 }

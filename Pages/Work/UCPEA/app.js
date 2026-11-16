@@ -47,6 +47,20 @@ const UCPEAMotion = (() => {
   };
 })();
 
+// Phones: Android's back button (and Escape) closes an open menu before it
+// leaves the page, as in a native app. Native dialogs already do this. Other
+// browsers return null here and keep their Escape and tap-outside handling.
+function UCPEAWatchClose(onClose) {
+  if (typeof CloseWatcher !== 'function') return null;
+  try {
+    const watcher = new CloseWatcher();
+    watcher.onclose = onClose;
+    return watcher;
+  } catch {
+    return null;
+  }
+}
+
 const themeToggle = document.getElementById('theme-toggle');
 const themeColor = document.querySelector('meta[name="theme-color"]');
 
@@ -122,9 +136,24 @@ function initDashboardNavigation() {
   let activeView = '';
   let frameHash = '';
 
+  let menuWatcher = null;
+
   function setOpenMenu(menu) {
     if (menu) body.dataset.menuOpen = menu;
     else delete body.dataset.menuOpen;
+
+    if (!menu) {
+      menuWatcher?.destroy();
+      menuWatcher = null;
+    } else if (!menuWatcher) {
+      menuWatcher = UCPEAWatchClose(() => {
+        menuWatcher = null;
+        const open = body.dataset.menuOpen;
+        if (!open) return;
+        setOpenMenu('');
+        (open === 'resources' ? resourcesToggle : menuToggle).focus({ preventScroll: true });
+      });
+    }
 
     const navigationOpen = menu === 'navigation';
     const resourcesOpen = menu === 'resources';
@@ -501,6 +530,18 @@ function initDashboardNavigation() {
     const { key, hash } = readDestination(destination);
     if (!link.getAttribute('href').startsWith('index.html') || (key && !isDashboardView(key))) return;
     event.preventDefault();
+    // Phones: tapping the dock tab you're already on scrolls back to its top,
+    // as in a native app. Deeper in a tab (an open article or section), it
+    // returns to the tab's first page instead, through the usual route.
+    const here = new URL(location.href);
+    const onTabTop = destination.href === here.href ||
+      (!key && !here.searchParams.has('view') && ['', '#main-content'].includes(here.hash));
+    if (link.closest('.mobile-dock') && onTabTop) {
+      const behavior = UCPEAMotion.reduced ? 'instant' : 'smooth';
+      if (frame && UCPEAViews.views[activeView]) UCPEAViews.messageTo(frame.contentWindow, 'scroll-top', { behavior });
+      window.scrollTo({ top: 0, behavior });
+      return;
+    }
     // Selecting the open guide again closes it, where the page has no default
     // guide to fall back to. The page stays where it is.
     const localView = localViews.get(key);

@@ -793,14 +793,19 @@
 
   async function route({ focus = false } = {}) {
     const profileId = state.me?.id || null;
+    let fresh = false;
     if (state.loadedFor !== profileId && !state.loading) {
       els.status.textContent = 'Loading posts…';
       await load();
+      fresh = true;
     } else if (state.loading) {
       await state.loading;
+      fresh = true;
     }
     if (state.mode === 'compose') return;
     const id = currentPostId();
+    // A post opened from its notification can be newer than the loaded list.
+    if (id && !fresh && !state.loading && !state.posts.some(post => post.id === id)) await load();
     if (id) {
       if (state.push && state.push.post.id !== id && els.pushDialog.open) els.pushDialog.close();
       renderDetail(id);

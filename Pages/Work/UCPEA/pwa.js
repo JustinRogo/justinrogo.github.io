@@ -119,6 +119,17 @@
     controller = next;
     render();
   });
+  // A tapped notification switches the already open app to its post or page,
+  // through the same routing as the back and forward buttons.
+  workers.addEventListener('message', event => {
+    const { type, url } = event.data || {};
+    if (type !== 'ucpea-open' || typeof url !== 'string') return;
+    const destination = new URL(url, location.href);
+    if (destination.origin !== location.origin) return;
+    for (const dialog of document.querySelectorAll('dialog[open]')) dialog.close();
+    if (destination.href !== location.href) history.pushState(null, '', destination);
+    window.dispatchEvent(new PopStateEvent('popstate', { state: null }));
+  });
   for (const query of [mobile, standalone]) query.addEventListener('change', render);
   render();
 
