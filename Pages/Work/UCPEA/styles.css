@@ -695,10 +695,11 @@ body[data-local-view] #main-content > :not([data-dashboard-view]) {
 }
 
 html[data-theme="dark"] .hero {
-  --hero-base: var(--ucpea-dark-navy);
-  --hero-glow: color-mix(in srgb, var(--ucpea-slate) 35%, transparent);
-  --hero-wash: color-mix(in srgb, var(--ucpea-brand) 75%, transparent);
-  --hero-card: color-mix(in srgb, var(--ucpea-slate) 18%, var(--ucpea-dark-navy));
+  /* A hint of brand navy over the dark slate, not a full navy band. */
+  --hero-base: color-mix(in srgb, var(--ucpea-brand) 30%, var(--ucpea-surface));
+  --hero-glow: color-mix(in srgb, var(--ucpea-slate) 22%, transparent);
+  --hero-wash: color-mix(in srgb, var(--ucpea-brand) 35%, transparent);
+  --hero-card: color-mix(in srgb, var(--ucpea-slate) 10%, var(--ucpea-surface));
   --hero-border: rgba(255, 255, 255, .18);
   --hero-shadow: 0 30px 70px rgba(0, 0, 0, .23);
   color: #fff;
@@ -5333,8 +5334,8 @@ html[data-transition="guide"][data-guide-swap]::view-transition-old(guide-fold-o
 
   html[data-theme="dark"] .hero {
     background:
-      radial-gradient(120% 90% at 100% 0%, color-mix(in srgb, var(--ucpea-slate) 24%, transparent), transparent 64%),
-      var(--ucpea-dark-navy);
+      radial-gradient(120% 90% at 100% 0%, color-mix(in srgb, var(--ucpea-slate) 18%, transparent), transparent 64%),
+      color-mix(in srgb, var(--ucpea-brand) 30%, var(--ucpea-surface));
   }
 
   .hero .hero-grid {

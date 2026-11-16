@@ -9,11 +9,13 @@
   --ucpea-accent: var(--ucpea-brand);
   --ucpea-ink: var(--ucpea-dark-navy);
   --ucpea-muted: color-mix(in srgb, var(--ucpea-slate) 68%, var(--ucpea-dark-navy));
-  --ucpea-paper: color-mix(in srgb, var(--ucpea-slate) 5%, var(--ucpea-white));
-  --ucpea-surface: var(--ucpea-white);
-  --ucpea-surface-soft: color-mix(in srgb, var(--ucpea-slate) 11%, var(--ucpea-white));
-  --ucpea-border: color-mix(in srgb, var(--ucpea-slate) 25%, var(--ucpea-white));
-  --ucpea-selection: color-mix(in srgb, var(--ucpea-brand) 12%, var(--ucpea-white));
+  /* Light: a soft grey page so near-white cards lift off it without glare.
+     Surface stays a plain hex: it is copied into the browser's theme-color. */
+  --ucpea-paper: #eceff3;
+  --ucpea-surface: #fcfcfd;
+  --ucpea-surface-soft: #eef1f5;
+  --ucpea-border: #d3d9e2;
+  --ucpea-selection: color-mix(in srgb, var(--ucpea-brand) 12%, var(--ucpea-surface));
   --ucpea-primary: var(--ucpea-brand);
   --ucpea-primary-ink: var(--ucpea-white);
   --ucpea-error-bg: color-mix(in srgb, var(--ucpea-red) 7%, var(--ucpea-white));
@@ -26,12 +28,14 @@
 :root[data-theme="dark"] {
   --ucpea-accent: var(--ucpea-on-navy);
   --ucpea-ink: var(--ucpea-white);
-  --ucpea-muted: color-mix(in srgb, var(--ucpea-slate) 48%, var(--ucpea-white));
-  --ucpea-paper: color-mix(in srgb, var(--ucpea-dark-navy) 35%, #080f1e);
-  --ucpea-surface: #10203f;
-  --ucpea-surface-soft: color-mix(in srgb, var(--ucpea-slate) 20%, var(--ucpea-paper));
-  --ucpea-border: color-mix(in srgb, var(--ucpea-slate) 35%, var(--ucpea-paper));
-  --ucpea-selection: color-mix(in srgb, var(--ucpea-slate) 38%, var(--ucpea-paper));
+  --ucpea-muted: color-mix(in srgb, var(--ucpea-slate) 40%, var(--ucpea-white));
+  /* Dark: blue-grey slate rather than saturated navy. The navy hue stays,
+     at low saturation, so it still reads as UCPEA. */
+  --ucpea-paper: #14181f;
+  --ucpea-surface: #1d222a;
+  --ucpea-surface-soft: #262c36;
+  --ucpea-border: #363d49;
+  --ucpea-selection: #343f51;
   --ucpea-primary: var(--ucpea-on-navy);
   --ucpea-primary-ink: var(--ucpea-dark-navy);
   --ucpea-error-bg: color-mix(in srgb, var(--ucpea-red) 9%, var(--ucpea-paper));
