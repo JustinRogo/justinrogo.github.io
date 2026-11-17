@@ -6,6 +6,16 @@
     <meta name="robots" content="noindex" />
     <meta name="theme-color" content="#e6efff" />
     <title>Page not found · Justin Rogowski</title>
+    <script>
+      // The UCPEA Member Dashboard moved from /Pages/Work/UCPEA/ to /UCPEA/ in
+      // November 2026. Keep the page, view, query string and hash.
+      if (/^\/Pages\/Work\/UCPEA(?:\/|$)/.test(location.pathname))
+        location.replace(
+          location.pathname.replace(/^\/Pages\/Work\/UCPEA\/?/, "/UCPEA/") +
+            location.search +
+            location.hash,
+        );
+    </script>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <script>
       try {
