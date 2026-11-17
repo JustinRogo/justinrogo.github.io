@@ -32,10 +32,10 @@ export const PAGE_TREE_FALLBACK = [
       {
         title: 'UCPEA',
         children: [
-          { title: 'UCPEA Member Dashboard', href: 'Pages/Work/UCPEA/index.html' },
-          { title: 'UCPEA Contract Comparison', href: 'Pages/Work/UCPEA/UCPEA_Contract_Comparison.html' },
-          { title: 'UCPEA Collective Bargaining Agreement, 2025-2029', href: 'Pages/Work/UCPEA/UCPEAContract.html' },
-          { title: 'UCPEA Contract History', href: 'Pages/Work/UCPEA/UCPEA_Contract_History.html' },
+          { title: 'UCPEA Member Dashboard', href: 'https://justinrogo.github.io/UCPEA/' },
+          { title: 'UCPEA Contract Comparison', href: 'https://justinrogo.github.io/UCPEA/UCPEA_Contract_Comparison.html' },
+          { title: 'UCPEA Collective Bargaining Agreement, 2025-2029', href: 'https://justinrogo.github.io/UCPEA/UCPEAContract.html' },
+          { title: 'UCPEA Contract History', href: 'https://justinrogo.github.io/UCPEA/UCPEA_Contract_History.html' },
         ],
       },
     ],

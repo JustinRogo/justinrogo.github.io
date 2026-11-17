@@ -1,106 +1,42 @@
 'use strict';
 
-const CACHE_PREFIX = 'ucpea-dashboard-';
-const CACHE_NAME = CACHE_PREFIX + 'v48';
-const scope = new URL(self.registration.scope);
+// The UCPEA Member Dashboard moved to /UCPEA/ (github.com/JustinRogo/UCPEA) in
+// November 2026. This worker replaces the old one at /Pages/Work/UCPEA/ on
+// devices that installed it. It:
+// - clears the old dashboard caches,
+// - sends every page load to the same page, query string and hash at /UCPEA/,
+// - keeps showing alerts sent to subscriptions made at the old address, and
+//   opens them at the new one, until the new app moves the subscription over
+//   (account-notifications.js in the new repository). A push that shows no
+//   notification can get a subscription revoked, so the handlers stay.
+// Remove after May 2027, together with the redirect pages next to it.
+
+const OLD_CACHE_PREFIX = 'ucpea-dashboard-';
+const oldScope = new URL(self.registration.scope);
+const scope = new URL('/UCPEA/', oldScope.origin);
 const homeURL = new URL('index.html', scope).href;
-// How long a request waits for the network before a saved copy is used.
-const NETWORK_WAIT = 3000;
-const offlineURLs = new Set([
-  'index.html',
-  'styles.css',
-  'theme.css',
-  'tool-theme.css',
-  'app.js',
-  'contract-sheet.js',
-  'member-rights.js',
-  'document-library.js',
-  'tool-views.js',
-  'calendar.js',
-  'calendar-events.js',
-  'account.js',
-  'tutorial.js',
-  'account-notifications.js',
-  'members.js',
-  'board.js',
-  'union-wire-feed.js',
-  'union-wire.js',
-  'UCPEAContract.html',
-  'contract-reader.js',
-  'contract-reader.css',
-  'UCPEA_Contract_History.html',
-  'UCPEA_Contract_Comparison.html',
-  'UCPEA-Area-Explorer.html',
-  'ucpea-logo.png',
-  'manifest.webmanifest',
-  'pwa.js',
-  'icons/icon-192.png',
-  'icons/icon-512.png',
-  'icons/apple-touch-icon.png',
-].map(path => new URL(path, scope).href));
 
-// The sign-in library is shared with the Updates page (the site build copies it
-// there). It is cached too, but separately, so a missing copy never breaks the install.
-const supabaseURL = new URL('../../Updates/vendor/supabase.js', scope).href;
-const coreURLs = [...offlineURLs];
-offlineURLs.add(supabaseURL);
+function newAddress(url) {
+  const next = new URL(url);
+  if (next.origin === oldScope.origin && next.pathname.startsWith(oldScope.pathname)) {
+    next.pathname = scope.pathname + next.pathname.slice(oldScope.pathname.length);
+  }
+  return next.href;
+}
 
-self.addEventListener('install', event => {
-  event.waitUntil(caches.open(CACHE_NAME).then(async cache => {
-    await cache.addAll(coreURLs);
-    await cache.add(supabaseURL).catch(() => {});
-  }));
-});
-
-self.addEventListener('message', event => {
-  if (event.data?.type === 'SKIP_WAITING') event.waitUntil(self.skipWaiting());
-});
+self.addEventListener('install', () => self.skipWaiting());
 
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     const names = await caches.keys();
-    await Promise.all(names
-      .filter(name => name.startsWith(CACHE_PREFIX) && name !== CACHE_NAME)
-      .map(name => caches.delete(name)));
+    await Promise.all(names.filter(name => name.startsWith(OLD_CACHE_PREFIX)).map(name => caches.delete(name)));
     await self.clients.claim();
   })());
 });
 
-function offlineKey(request) {
-  const url = new URL(request.url);
-  if (url.origin !== scope.origin) return null;
-  if (url.pathname === scope.pathname) return homeURL;
-  // Dashboard routes and embedded theme variants all serve the same static files.
-  url.search = '';
-  url.hash = '';
-  return offlineURLs.has(url.href) ? url.href : null;
-}
-
 self.addEventListener('fetch', event => {
-  if (event.request.method !== 'GET') return;
-  const key = offlineKey(event.request);
-  if (!key) return;
-
-  // Use the current deployment when reachable, with a saved copy for offline use.
-  const network = fetch(event.request);
-  event.waitUntil(network.then(response => {
-    if (!response.ok || response.redirected) return;
-    const copy = response.clone();
-    return caches.open(CACHE_NAME).then(cache => cache.put(key, copy));
-  }).catch(() => {}));
-
-  // On a weak signal, open from the saved copy after a short wait instead of
-  // showing a blank screen. The download above still finishes and refreshes it.
-  event.respondWith((async () => {
-    const fromNetwork = network.catch(() => null);
-    const slow = new Promise(resolve => setTimeout(resolve, NETWORK_WAIT, 'slow'));
-    const response = await Promise.race([fromNetwork, slow]);
-    if (response && response !== 'slow' && response.status < 500) return response;
-    const cached = await caches.match(key, { cacheName: CACHE_NAME }).catch(() => null);
-    if (cached) return cached;
-    const late = response === 'slow' ? await fromNetwork : response;
-    return late || Response.error();
-  })());
+  if (event.request.mode !== 'navigate') return;
+  event.respondWith(Response.redirect(newAddress(event.request.url), 302));
 });
 
 const postIdPattern = /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i;
@@ -123,7 +59,6 @@ self.addEventListener('push', event => {
     body: body[type],
     icon: new URL('icons/icon-192.png', scope).href,
     tag: isBoardPost ? `ucpea-board-${payload.postId}` : `ucpea-${type}`,
-    // Several sign-ups share one alert, but each new one still sounds.
     renotify: isSignup,
     data: isBoardPost ? { type, postId: payload.postId } : { type },
   }));
@@ -146,8 +81,7 @@ self.addEventListener('notificationclick', event => {
       await match.focus();
       return;
     }
-    // The app is already open on another view: bring it forward and switch
-    // views in place, instead of opening a second copy.
+    // The new app is already open: bring it forward and switch views in place.
     const dashboard = windows.find(client => client.frameType !== 'nested' &&
       [scope.href, homeURL].includes(client.url.split(/[?#]/)[0]));
     if (dashboard) {

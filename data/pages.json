@@ -73,25 +73,29 @@
       "path": "Pages/Work/UCPEA/index.html",
       "title": "UCPEA Member Dashboard",
       "category": "Member Dashboard",
-      "description": "Access union updates, contract tools, benefits, and the salary calculator."
+      "description": "Access union updates, contract tools, benefits, and the salary calculator.",
+      "href": "https://justinrogo.github.io/UCPEA/"
     },
     {
       "path": "Pages/Work/UCPEA/UCPEA_Contract_Comparison.html",
       "title": "UCPEA Contract Comparison: 2022–2025 and 2025–2029",
       "category": "Reference",
-      "description": "Compare changes between the 2022–2025 and 2025–2029 agreements."
+      "description": "Compare changes between the 2022–2025 and 2025–2029 agreements.",
+      "href": "https://justinrogo.github.io/UCPEA/UCPEA_Contract_Comparison.html"
     },
     {
       "path": "Pages/Work/UCPEA/UCPEAContract.html",
       "title": "UCPEA Collective Bargaining Agreement, 2025-2029",
       "category": "Reference",
-      "description": "Search and browse the 2025–2029 collective bargaining agreement."
+      "description": "Search and browse the 2025–2029 collective bargaining agreement.",
+      "href": "https://justinrogo.github.io/UCPEA/UCPEAContract.html"
     },
     {
       "path": "Pages/Work/UCPEA/UCPEA_Contract_History.html",
       "title": "UCPEA Contract History",
       "category": "Contract Archive",
-      "description": "Explore UCPEA's history and summaries of every contract from 1977 to 2029."
+      "description": "Explore UCPEA's history and summaries of every contract from 1977 to 2029.",
+      "href": "https://justinrogo.github.io/UCPEA/UCPEA_Contract_History.html"
     },
     {
       "path": "Pages/Work/cgs/index.html",
