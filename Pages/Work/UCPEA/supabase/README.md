@@ -20,6 +20,8 @@ See the [UCPEA Dashboard README](../README.md) for the app and its role-based wo
 | `functions/ucpea-push-test/index.ts` | Supplies the public VAPID key to approved members and sends a personal test to a subscription they own |
 | `migrations/20261115000200_board_push.sql` | Tracks one notification send per published post and checks device eligibility before each batch |
 | `functions/ucpea-board-push/index.ts` | Sends Bulletin Board notifications in batches using the same VAPID keys |
+| `migrations/20261117000100_signup_push.sql` | Records one sign-up alert per account, caps them at ten per hour, and lists the devices of active staff, admins, and stewards of the requested area |
+| `functions/ucpea-signup-push/index.ts` | Alerts those devices when a confirmed sign-up is waiting for approval |
 | `tests/rls_check.sql` | A permissions check that signs in as eight test accounts and tries allowed and forbidden actions |
 
 ## Who can do what
@@ -119,6 +121,22 @@ UCPEA-owned account.
 4. With subscribed test accounts in two areas, use **Notify subscribers** on a current area post. Verify that only the intended area's active subscribers receive it, that the alert contains generic text, and that tapping opens the post. Test a union-wide post with a staff or admin account.
 
 Stewards can start one alert every five minutes. Each post has a single send history. Leave the confirmation dialog open to process all devices. If it is interrupted, reopen **Notify subscribers** and select **Resume send** for the remaining devices. An interrupted batch whose outcome is unknown is recorded as unconfirmed and excluded from retries. Counts distinguish push-service acceptance from devices that were skipped or whose send failed.
+
+## Deploying sign-up alerts
+
+Staff and admins with notifications turned on get an alert when someone asks to join. Stewards get it for sign-ups that chose one of their areas; a sign-up with no area goes to staff and admins only. The area is read when the alert is sent, so changing it later does not send another. After a new member enters their email code, their dashboard calls `ucpea-signup-push`. The function checks the email is confirmed and the account is still pending. It then sends a generic alert ("New member sign-up waiting for approval") that opens **Members** when tapped. If that first call fails, the pending member's dashboard tries again on its next load.
+
+Each account can trigger one alert, ever. At most ten go out per hour across the union, so a burst of fake sign-ups cannot flood staff phones. Requests over the limit still appear under **Waiting for approval**.
+
+1. Apply [`20261117000100_signup_push.sql`](migrations/20261117000100_signup_push.sql) in the UCPEA SQL Editor after the push subscription migration.
+2. From `Pages/Work/UCPEA`, deploy the function. It uses the three existing `UCPEA_VAPID_*` secrets.
+
+   ```sh
+   supabase functions deploy ucpea-signup-push --project-ref <ucpea-project-ref> --use-api --no-verify-jwt
+   ```
+
+3. Publish the updated dashboard. Reopen it on steward, staff, and admin devices so their service workers pick up the sign-up alert handler.
+4. Subscribe a staff test account and a steward test account for one area, each on its own device. Sign up with a new test email in another browser, choose the steward's area, and enter the code. Verify both devices get the alert and that tapping it opens **Members** with the request listed. Repeat choosing a different area: only the staff device should get it.
 
 ## Not built yet
 

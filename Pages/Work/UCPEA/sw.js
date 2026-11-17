@@ -1,7 +1,7 @@
 'use strict';
 
 const CACHE_PREFIX = 'ucpea-dashboard-';
-const CACHE_NAME = CACHE_PREFIX + 'v47';
+const CACHE_NAME = CACHE_PREFIX + 'v48';
 const scope = new URL(self.registration.scope);
 const homeURL = new URL('index.html', scope).href;
 // How long a request waits for the network before a saved copy is used.
@@ -110,16 +110,21 @@ self.addEventListener('push', event => {
   try { payload = event.data?.json(); } catch { /* Show a generic alert. */ }
   const isTest = payload?.type === 'test';
   const isBoardPost = payload?.type === 'board' && typeof payload.postId === 'string' && postIdPattern.test(payload.postId);
-  const type = isTest ? 'test' : isBoardPost ? 'board' : 'update';
+  const isSignup = payload?.type === 'signup';
+  const type = isTest ? 'test' : isBoardPost ? 'board' : isSignup ? 'signup' : 'update';
+  // Sign-ups come from the public: never show a name or email on a lock screen.
   const body = {
     test: 'Test notification. Tap to open your account.',
     board: 'New UCPEA bulletin board post. Tap to open it.',
+    signup: 'New member sign-up waiting for approval. Tap to review it.',
     update: 'Open the dashboard to see the latest updates.',
   };
   event.waitUntil(self.registration.showNotification('UCPEA Member Dashboard', {
     body: body[type],
     icon: new URL('icons/icon-192.png', scope).href,
     tag: isBoardPost ? `ucpea-board-${payload.postId}` : `ucpea-${type}`,
+    // Several sign-ups share one alert, but each new one still sounds.
+    renotify: isSignup,
     data: isBoardPost ? { type, postId: payload.postId } : { type },
   }));
 });
@@ -129,6 +134,7 @@ self.addEventListener('notificationclick', event => {
   const url = new URL(homeURL);
   const { type, postId } = event.notification.data || {};
   if (type === 'test') url.searchParams.set('view', 'account');
+  else if (type === 'signup') url.searchParams.set('view', 'members');
   else if (type === 'board' && typeof postId === 'string' && postIdPattern.test(postId)) {
     url.searchParams.set('view', 'board');
     url.hash = `post-${postId}`;

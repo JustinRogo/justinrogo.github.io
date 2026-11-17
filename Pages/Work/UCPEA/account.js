@@ -391,9 +391,27 @@
     setIndicator(profile);
   }
 
+  // Let staff and admins know a sign-up is waiting. The server sends at most one
+  // alert per account, so retrying on a later visit after a failure is safe;
+  // the stored flag only saves a request once it has gone through.
+  const signupAlertsAsked = new Set();
+
+  function requestSignupAlert(client, profile) {
+    const key = `ucpea-signup-alert:${profile.id}`;
+    if (profile.status !== 'pending' || signupAlertsAsked.has(profile.id) || readStorage(key)) return;
+    signupAlertsAsked.add(profile.id);
+    client.functions.invoke('ucpea-signup-push', { method: 'POST', signal: AbortSignal.timeout(15000) })
+      .then(({ data, error }) => {
+        if (!error && data?.status) writeStorage(key, '1');
+        else signupAlertsAsked.delete(profile.id);
+      })
+      .catch(() => signupAlertsAsked.delete(profile.id));
+  }
+
   async function refreshProfile(client, user) {
     const profile = await fetchProfile(client, user);
     setProfile(profile);
+    requestSignupAlert(client, profile);
     if (!view.hidden && ['loading', 'profile', 'code'].includes(state.step)) renderProfile({ offline: false });
     return profile;
   }

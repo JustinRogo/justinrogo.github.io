@@ -50,12 +50,14 @@ The dashboard is an independent resource based on public UCPEA information. Conf
 
 - Open **Members**, then review **Waiting for approval**. You can approve applicants into the Area they requested when you steward that Area. Approval activates the account and adds the Area membership together.
 - Use **Members in your areas** to look up the profiles you’re authorized to see. A steward’s account-management action is approving sign-ups for their Areas. Request broader account or assignment changes through staff.
+- With **Show notifications** on, you get an alert when someone confirms their email and asks to join an Area you steward. Tapping it opens **Members**. The alert never shows the applicant’s name or email.
 - Use **New post** on the Bulletin Board to publish to an Area you steward. Your posting permissions cover that Area’s board, including posts by its other stewards.
 - A steward approval appears under **Approved by stewards** for staff. The member’s access is active as soon as the steward approves them.
 
 ### UCPEA staff
 
 - Review sign-ups across Areas in **Members**. Choose the appropriate Area when approving. **Decline** puts the account into a paused state, which can be reviewed later.
+- With **Show notifications** on, staff and admin devices get an alert when someone confirms their email and asks to join, whatever Area they chose. Stewards of the requested Area get the same alert. Tapping it opens **Members**. The alert never shows the applicant’s name or email. Each account sends one alert, and no more than ten go out per hour; requests beyond that still appear under **Waiting for approval**. [Sign-up alert setup](supabase/README.md#deploying-sign-up-alerts)
 - Use **Manage** to add or remove Area memberships and switch an Area assignment between **Member** and **Steward**. Staff can appoint others as stewards. Self-appointment as a steward requires admin authority.
 - Pause or reactivate member accounts and mark steward approvals as seen. When reactivating a declined account, review its Area assignments as part of the same workflow.
 - Manage posts and alerts on the Union-wide board and on any Area board.
@@ -77,7 +79,7 @@ Each Area alert targets subscribed devices belonging to approved members assigne
 
 ### Notifications on your device
 
-Push requires a supported browser, an approved account, and permission on that device. On iPhone or iPad, add the dashboard to your Home Screen and open it from its icon before turning on **Show notifications**. To stop receiving alerts on the device, turn off the switch. Signing out also attempts to disconnect notifications on that device. The setting covers both Area and Union-wide alerts.
+Push requires a supported browser, an approved account, and permission on that device. On iPhone or iPad, add the dashboard to your Home Screen and open it from its icon before turning on **Show notifications**. To stop receiving alerts on the device, turn off the switch. Signing out also attempts to disconnect notifications on that device. The setting covers Area and Union-wide alerts, and for stewards, staff, and admins, sign-up alerts.
 
 Use **Install** or your browser’s **Add to Home Screen** option to open the dashboard as an app when supported. Select **Update** if the dashboard offers a newer version.
 
@@ -85,7 +87,7 @@ Use **Install** or your browser’s **Add to Home Screen** option to open the da
 
 - **Frontend.** The dashboard is a static HTML, CSS, and JavaScript app published through GitHub Pages. Navigation uses shareable URLs such as `index.html?view=board`. The dashboard opens the contract tools and Area Explorer in embedded pages. [Dashboard markup](index.html) · [Routing](app.js) · [Embedded views](tool-views.js)
 - **Accounts and permissions.** Supabase Auth sends email codes. Postgres stores profiles, Area assignments, posts, and subscriptions. Row-level security and database functions enforce access independently of what the interface displays. The contract files are part of the public static build. Sign-in controls whether the history and comparison links appear in navigation. [Profiles and roles](supabase/migrations/20261113000100_roles_and_profiles.sql) · [Board policies](supabase/migrations/20261113000200_bulletin_board.sql)
-- **Flyers and push.** Supabase Storage uses separate public and members-only buckets. The app requests temporary links for protected flyers. Edge Functions check account access and handle test notifications and batched board alerts. [Backend setup and function deployment](supabase/README.md)
+- **Flyers and push.** Supabase Storage uses separate public and members-only buckets. The app requests temporary links for protected flyers. Edge Functions check account access and handle test notifications, batched board alerts, and sign-up alerts to stewards and staff. [Backend setup and function deployment](supabase/README.md)
 - **Public sources.** The Pages workflow refreshes the public UCPEA calendar and Union Wire snapshots. When a refresh fails, the build can use the saved snapshot. The Area Explorer uses the published map data and can fall back to the locations bundled in its page. [Calendar refresh](update-calendar.mjs) · [Union Wire refresh](update-union-wire.mjs) · [Pages workflow](../../../.github/workflows/deploy.yml)
 - **Offline and device data.** The installable web app caches the dashboard and bundled resources with a service worker. The Board can show its last saved snapshot for the same account when offline. Sign-in, account management, posting, sending alerts, and external resources require a connection. Appearance and board layout preferences stay in the browser. The holiday time tracker saves entries in the browser only when you select **Remember on this browser**. [Manifest](manifest.webmanifest) · [Service worker](sw.js) · [Holiday tracker](member-rights.js)
 
@@ -104,7 +106,7 @@ Open the [local dashboard](http://127.0.0.1:4391/Pages/Work/UCPEA/index.html). T
 Run the push and permission checks from the repository root.
 
 ```sh
-node --test tests/ucpea-board-push.test.mjs tests/ucpea-push-permissions.test.mjs
+node --test tests/ucpea-board-push.test.mjs tests/ucpea-push-permissions.test.mjs tests/ucpea-signup-push.test.mjs
 ```
 
 The GitHub Pages workflow publishes the static build from `main` and runs feed refreshes on its configured schedule. Apply Supabase migrations and deploy Edge Functions separately when the backend changes. Update the service worker’s cache version when changing cached dashboard files and list new core assets in its precache manifest. [Pages workflow](../../../.github/workflows/deploy.yml) · [Supabase setup](supabase/README.md) · [Service worker](sw.js)
