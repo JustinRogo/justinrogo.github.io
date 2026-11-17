@@ -41,9 +41,7 @@ The site includes:
         ├── Library/
         │   ├── heatmap.html
         │   └── Timeline_LawLib.html
-        └── UCPEA/
-            ├── index.html
-            └── UCPEAContract.html
+        └── UCPEA/          (redirects to /UCPEA/, see below)
 ```
 
 ## Main site features
@@ -69,7 +67,7 @@ Key homepage areas include:
 
 The site builds its page tree from `data/pages.json`, which defines each page's title, category, short description, source path, and optional external destination. This keeps navigation content, ordering, and external links independent of the repository API.
 
-Folder index pages are automatically treated as parents of the other pages in the same folder. For example, the UCPEA member dashboard is the parent of the UCPEA contract and salary tools.
+Folder index pages are automatically treated as parents of the other pages in the same folder. For example, the UCPEA member dashboard is the parent of the UCPEA contract pages. An entry with an `href` keeps its `path` as its place in the tree and its ID for previews and saved projects, and links to the `href`.
 
 ### UConn Law Library search widget
 
@@ -194,15 +192,11 @@ An interactive timeline page for the UConn School of Law Library’s centennial 
 
 ### UCPEA Member Dashboard
 
-Path: `Pages/Work/UCPEA/index.html`
+Address: [justinrogo.github.io/UCPEA/](https://justinrogo.github.io/UCPEA/) · Repository: [JustinRogo/UCPEA](https://github.com/JustinRogo/UCPEA)
 
-A member-focused dashboard with current UCPEA updates, a searchable contract, benefits guides, a salary planner, Area bulletin boards, and member management. See the [UCPEA Dashboard README](Pages/Work/UCPEA/README.md) for member, steward, staff, and admin workflows and technical setup.
+A member-focused dashboard with current UCPEA updates, a searchable contract, contract history and comparison, benefits guides, a salary planner, Area bulletin boards, and member management. It has its own repository, build, Pages workflow, and Supabase backend. See its README for member, steward, staff, and admin workflows and technical setup.
 
-### UCPEA Contract Page
-
-Path: `Pages/Work/UCPEA/UCPEAContract.html`
-
-A web version or reference page for UCPEA contract information.
+The dashboard lived at `Pages/Work/UCPEA/` until November 2026. That folder now holds only redirect stubs: each HTML page forwards to the same page, query string, and hash under `/UCPEA/`, and `sw.js` replaces the old service worker to clear its caches, redirect page loads, and keep showing alerts sent to old subscriptions until the new app moves them. Remove the folder after May 2027.
 
 ### Murmuration
 

@@ -5,7 +5,6 @@ import { buildSanitizer } from './build-sanitizer.mjs';
 import { refreshPocketPart } from './update-pocket-part.mjs';
 import { refreshAiCorner } from './update-ai-corner.mjs';
 import { refreshOutlookAvailability } from './update-outlook-availability.mjs';
-import { refreshUCPEACalendar } from '../Pages/Work/UCPEA/update-calendar.mjs';
 import { buildHomepage } from './build-homepage.mjs';
 import { buildV2 } from '../v2/build.mjs';
 
@@ -42,7 +41,7 @@ ${urls.map(url => `  <url><loc>${siteOrigin}${url}</loc></url>`).join('\n')}
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   // Local/reproducible builds can retain the existing feed without modifying it.
   if (!process.argv.includes('--skip-feed')) {
-    await Promise.all([refreshPocketPart(), refreshAiCorner(), refreshOutlookAvailability(), refreshUCPEACalendar()]);
+    await Promise.all([refreshPocketPart(), refreshAiCorner(), refreshOutlookAvailability()]);
   }
   await buildHomepage();
   await buildV2();
@@ -54,14 +53,13 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   await mkdir(dist, { recursive: true });
   // Match the existing site's public roots, without exposing source, SQL, or env files.
   const excluded = new Set(['node_modules', '.git', '.claude', '.agents', '.codex', '.openai', '.impeccable']);
-  const ucpeaBackend = path.join(root, 'Pages/Work/UCPEA/supabase');
   for (const entry of ['assets', 'data', 'Maps', 'Pages', 'favicon.svg', 'index.html', '404.html', 'original.html', 'main.js', 'style.css']) {
     await access(path.join(root, entry));
     await cp(path.join(root, entry), path.join(dist, entry), {
       recursive: true,
       filter: source => {
         const name = path.basename(source);
-        return source !== ucpeaBackend && !excluded.has(name) && !/\.(?:bak(?:\.html)?|sql|md|mjs)$/i.test(name);
+        return !excluded.has(name) && !/\.(?:bak(?:\.html)?|sql|md|mjs)$/i.test(name);
       }
     });
   }
