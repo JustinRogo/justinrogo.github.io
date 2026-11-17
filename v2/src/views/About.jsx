@@ -3,19 +3,25 @@ import { ExternalLink, LinkRow, SectionTitle } from "../components/UI.jsx";
 import { GlassLayer } from "../components/Glass.jsx";
 import Icon from "../components/Icon.jsx";
 import ProfilePortrait from "../components/ProfilePortrait.jsx";
+import { useRef } from "react";
 import Strengths from "../components/Strengths.jsx";
+import { AboutVine } from "../botanical/Flora.jsx";
+import { useBotanical } from "../botanical/siteStyle.js";
 
 export default function About({ effects, fine }) {
+  const botanical = useBotanical();
+  const intro = useRef(null);
   return (
     <>
-      <header className="about-intro">
+      <header className="about-intro" ref={intro}>
+        {botanical && <AboutVine hostRef={intro} />}
         <div className="about-greeting">
           <h1 tabIndex={-1}>
             Hi, I’m <em>Justin</em><span className="title-dot">.</span>
           </h1>
           <p>Libraries, systems, people. And an alarming number of browser tabs.</p>
         </div>
-        <ProfilePortrait className="about-portrait" wreath="tradescantia" />
+        <ProfilePortrait className="about-portrait" wreath={false} />
         <div className="about-intro-copy">
           <p className="large-copy">{profile.approach}</p>
           <div

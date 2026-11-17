@@ -2,7 +2,7 @@ import { profile } from "../content.js";
 import { PortraitWreath } from "../botanical/Flora.jsx";
 import { useBotanical } from "../botanical/siteStyle.js";
 
-export default function ProfilePortrait({ className = "", orbits = false, wreath }) {
+export default function ProfilePortrait({ className = "", orbits = false, wreath = true }) {
   const botanical = useBotanical();
   return (
     <div className={`portrait-stage ${className}`.trimEnd()}>
@@ -12,7 +12,7 @@ export default function ProfilePortrait({ className = "", orbits = false, wreath
           <div className="portrait-orbit orbit-two" />
         </>
       )}
-      {botanical && <PortraitWreath variety={wreath} />}
+      {botanical && wreath && <PortraitWreath />}
       <div className="portrait-photo">
         <img
           src="/v2/assets/justin.webp"

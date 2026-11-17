@@ -936,8 +936,21 @@
 .hero-portrait .portrait-wreath {
   z-index: 0;
 }
-.about-portrait .portrait-wreath {
-  width: 124%;
+/* About's tradescantia: winds round the portrait and trails along the card, behind its content. */
+:root[data-style="botanical"] .about-intro {
+  position: relative;
+  isolation: isolate;
+}
+:root[data-style="botanical"] .about-intro > :not(.about-vine) {
+  position: relative;
+  z-index: 1;
+}
+.about-vine {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: visible;
+  pointer-events: none;
 }
 .tradescantia-wreath {
   --tradescantia-band: #e0e6d8;
@@ -1358,6 +1371,14 @@
       animation: botanical-unfurl 0.7s cubic-bezier(0.34, 1.5, 0.64, 1) both;
       animation-delay: calc(0.4s + var(--i) * 70ms);
     }
+    & .about-vine:not([data-settled]) .about-vine-stem {
+      stroke-dasharray: 1 2;
+      animation: botanical-draw 2.6s linear 0.3s both;
+    }
+    & .about-vine:not([data-settled]) .tradescantia-wreath-growth {
+      animation: botanical-unfurl 0.7s cubic-bezier(0.34, 1.5, 0.64, 1) both;
+      animation-delay: var(--d, 0.3s);
+    }
     & .hero-portrait:hover .wreath-leaf {
       animation: botanical-rustle 0.9s ease-in-out;
       animation-delay: calc(var(--i) * 25ms);
@@ -1554,7 +1575,7 @@
   }
 }
 @media (prefers-contrast: more), (forced-colors: active) {
-  :root[data-style="botanical"] :is(.hero-flora, .portrait-wreath, .section-flourish, .sheet-fern, .living-pothos, .load-sprout) {
+  :root[data-style="botanical"] :is(.hero-flora, .portrait-wreath, .about-vine, .section-flourish, .sheet-fern, .living-pothos, .load-sprout) {
     display: none;
   }
   :root[data-style="botanical"] .page-heading > h1::after {

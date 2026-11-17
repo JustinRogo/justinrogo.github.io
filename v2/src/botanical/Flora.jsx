@@ -1,7 +1,7 @@
 // Hand-tuned, procedurally drawn botanical illustrations. Everything is inline SVG:
 // no images, no dependencies, and every plant is deterministic so it never
 // "reshuffles" between renders.
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 
 const r1 = (n) => Math.round(n * 10) / 10;
 const rad = (deg) => (deg * Math.PI) / 180;
@@ -347,10 +347,10 @@ export function HeroFlora() {
   );
 }
 
-export function PortraitWreath({ variety = "laurel" }) {
+export function PortraitWreath() {
   return (
     <svg className="portrait-wreath" viewBox="-130 -130 260 260" aria-hidden="true" focusable="false">
-      {variety === "tradescantia" ? <TradescantiaWreath /> : <Wreath r={112} />}
+      <Wreath r={112} />
     </svg>
   );
 }
@@ -433,60 +433,118 @@ function TradescantiaFlower() {
   );
 }
 
-// Two vines descend around the portrait and turn inward at different heights.
-// Each segment pairs its Bézier points with the number of leaf nodes it carries.
-const portraitTrails = [
-  [
-    [[[-71, -91], [-124, -59], [-130, 38], [-88, 78]], 7],
-    [[[-88, 78], [-65, 103], [-48, 110], [-35, 122]], 4],
-  ],
-  [
-    [[[66, -96], [115, -75], [137, 4], [101, 53]], 6],
-    [[[101, 53], [77, 92], [47, 101], [16, 119]], 5],
-  ],
-];
+// A tradescantia for the About card: one stem trails along the card's bottom
+// border, left to right. It is laid out in the card's own pixels, so the leaves
+// keep their shape at every width.
+const VINE_DRAW = 2.6; // seconds for the stem to reach its tip
 
-function TradescantiaWreath() {
+function growVine({ w, h }) {
+  // Slightly smaller leaves on a phone-width card.
+  const k = w < 520 ? 0.8 : 1;
+  const floor = h - 1;
+  const x0 = 22;
+  const x1 = w - 22;
+  const points = [];
+  for (let x = x0; x <= x1; x += 6) points.push([x, floor + Math.sin((x - x0) / 40) * 2.5]);
+  if (points.at(-1)[0] < x1) points.push([x1, floor + Math.sin((x1 - x0) / 40) * 2.5]);
+  // A smooth stem through the samples: quadratic curves between midpoints.
+  let d = `M${points[0].map(r1)}`;
+  for (let i = 1; i < points.length - 1; i++) {
+    const mid = [(points[i][0] + points[i + 1][0]) / 2, (points[i][1] + points[i + 1][1]) / 2];
+    d += `Q${points[i].map(r1)} ${mid.map(r1)}`;
+  }
+  d += `L${points.at(-1).map(r1)}`;
+  // Leaf nodes along the stem, alternating sides. A seeded wobble in spacing,
+  // angle and size keeps the trail from reading as a printed garland.
+  const lengths = [0];
+  for (let i = 1; i < points.length; i++)
+    lengths.push(
+      lengths[i - 1] + Math.hypot(points[i][0] - points[i - 1][0], points[i][1] - points[i - 1][1]),
+    );
+  const total = lengths.at(-1);
+  const random = seeded(17);
+  const nodes = [];
+  for (let s = 10 * k, i = 1, index = 0; s < total - 8; index++) {
+    while (lengths[i] < s) i++;
+    const [a, b] = [points[i - 1], points[i]];
+    const t = (s - lengths[i - 1]) / (lengths[i] - lengths[i - 1] || 1);
+    const side = index % 2 === 0 ? 1 : -1;
+    const progress = s / total;
+    nodes.push({
+      point: [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t],
+      angle: Math.atan2(b[1] - a[1], b[0] - a[0]) + side * rad(40 + (random() - 0.5) * 18),
+      side,
+      size: r1(k * (2.5 - 0.8 * progress ** 1.5) * (0.88 + random() * 0.22)),
+      flower: index % 13 === 6,
+      progress,
+    });
+    s += 22 * k * (0.85 + random() * 0.3);
+  }
+  return { d, nodes, tip: points.at(-1), k };
+}
+
+// Each leaf opens as the growing stem reaches it.
+const growDelay = (progress) => `${Math.round((0.3 + progress * VINE_DRAW) * 100) / 100}s`;
+
+export function AboutVine({ hostRef }) {
+  const [frame, setFrame] = useState(null);
+  const [settled, setSettled] = useState(false);
+  useEffect(() => {
+    const host = hostRef.current;
+    if (!host) return;
+    const measure = () => {
+      if (!host.offsetWidth) return;
+      const next = { w: host.offsetWidth, h: host.offsetHeight };
+      setFrame((last) => (last && last.w === next.w && last.h === next.h ? last : next));
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(host);
+    return () => observer.disconnect();
+  }, [hostRef]);
+  const shown = frame !== null;
+  useEffect(() => {
+    if (!shown) return;
+    // Once grown, a later re-layout redraws it in place instead of regrowing it.
+    const timer = setTimeout(() => setSettled(true), (VINE_DRAW + 1.4) * 1000);
+    return () => clearTimeout(timer);
+  }, [shown]);
+  const vine = useMemo(() => frame && growVine(frame), [frame]);
+  if (!vine) return null;
   return (
-    <g className="tradescantia-wreath">
-      {portraitTrails.map((trail, vineIndex) => {
-        const nodes = trail.flatMap(([curve, count]) =>
-          Array.from({ length: count }, (_, index) => {
-            const t = (index + 0.45) / count;
-            return { point: cubic(curve, t), tangent: cubicTangent(curve, t) };
-          }),
-        );
-        const tip = trail.at(-1)[0][3];
-        return (
-          <g key={vineIndex}>
-            <path
-              className="wreath-stem"
-              pathLength="1"
-              d={trail.map(([curve], index) => cubicD(curve, index === 0)).join(" ")}
-            />
-            {nodes.map(({ point, tangent }, index) => {
-              const side = (index + vineIndex) % 2 === 0 ? 1 : -1;
-              const size = r1(2.5 - 0.09 * index);
-              return (
-                <g key={index} transform={place(point, tangent + side * rad(48))}>
-                  <g className="tradescantia-wreath-growth" style={{ "--i": index }}>
-                    <circle r="1.4" fill="currentColor" />
-                    <g transform={`scale(${size})`}>
-                      <TradescantiaLeaf len={9.4} bend={side * 1.4} />
-                    </g>
-                  </g>
-                </g>
-              );
-            })}
-            <g transform={`translate(${tip.join(" ")}) scale(1.6)`}>
-              <g className="tradescantia-wreath-growth" style={{ "--i": nodes.length }}>
-                <TradescantiaFlower />
+    <svg
+      className="about-vine"
+      viewBox={`0 0 ${frame.w} ${frame.h}`}
+      width={frame.w}
+      height={frame.h}
+      data-settled={settled || undefined}
+      aria-hidden="true"
+      focusable="false"
+    >
+      <g className="tradescantia-wreath">
+        <path className="wreath-stem about-vine-stem" pathLength="1" d={vine.d} />
+        {vine.nodes.map(({ point, angle, side, size, flower, progress }, index) => (
+          <g key={index} transform={place(point, angle)}>
+            <g className="tradescantia-wreath-growth" style={{ "--d": growDelay(progress) }}>
+              <circle r={r1(1.4 * vine.k)} fill="currentColor" />
+              <g transform={`scale(${size})`}>
+                <TradescantiaLeaf len={9.4} bend={side * 1.4} />
               </g>
+              {flower && (
+                <g transform={`translate(0 ${r1(-size * 9.4)}) scale(${r1(1.5 * vine.k)})`}>
+                  <TradescantiaFlower />
+                </g>
+              )}
             </g>
           </g>
-        );
-      })}
-    </g>
+        ))}
+        <g transform={`translate(${vine.tip.map(r1).join(" ")}) scale(${r1(1.6 * vine.k)})`}>
+          <g className="tradescantia-wreath-growth" style={{ "--d": growDelay(1) }}>
+            <TradescantiaFlower />
+          </g>
+        </g>
+      </g>
+    </svg>
   );
 }
 
