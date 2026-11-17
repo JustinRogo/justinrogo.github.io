@@ -9,7 +9,8 @@
 //   opens them at the new one, until the new app moves the subscription over
 //   (account-notifications.js in the new repository). A push that shows no
 //   notification can get a subscription revoked, so the handlers stay.
-// Remove after May 2027, together with the redirect pages next to it.
+// The pages themselves are gone: 404.html forwards /Pages/Work/UCPEA/ links.
+// Remove this file after May 2027.
 
 const OLD_CACHE_PREFIX = 'ucpea-dashboard-';
 const oldScope = new URL(self.registration.scope);

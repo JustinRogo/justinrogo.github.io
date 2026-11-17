@@ -41,7 +41,7 @@ The site includes:
         ├── Library/
         │   ├── heatmap.html
         │   └── Timeline_LawLib.html
-        └── UCPEA/          (redirects to /UCPEA/, see below)
+        └── UCPEA/          (old dashboard address, see below)
 ```
 
 ## Main site features
@@ -196,7 +196,7 @@ Address: [justinrogo.github.io/UCPEA/](https://justinrogo.github.io/UCPEA/) · R
 
 A member-focused dashboard with current UCPEA updates, a searchable contract, contract history and comparison, benefits guides, a salary planner, Area bulletin boards, and member management. It has its own repository, build, Pages workflow, and Supabase backend. See its README for member, steward, staff, and admin workflows and technical setup.
 
-The dashboard lived at `Pages/Work/UCPEA/` until November 2026. That folder now holds only redirect stubs: each HTML page forwards to the same page, query string, and hash under `/UCPEA/`, and `sw.js` replaces the old service worker to clear its caches, redirect page loads, and keep showing alerts sent to old subscriptions until the new app moves them. Remove the folder after May 2027.
+The dashboard lived at `Pages/Work/UCPEA/` until November 2026. Links to the old address reach `404.html`, which forwards them to the same page, query string, and hash under `/UCPEA/`. The folder keeps only `sw.js`, which replaces the old service worker on devices that still have it: it clears the old caches, redirects page loads (including offline and on slow connections, when the old worker would otherwise show its saved copy), and keeps showing alerts sent to old subscriptions until the new app moves them. Remove `sw.js` after May 2027; the `404.html` redirect can stay.
 
 ### Murmuration
 
