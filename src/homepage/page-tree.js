@@ -2,6 +2,7 @@ export const PAGE_TREE_FALLBACK = [
   {
     title: 'For Fun',
     children: [
+      { title: "Fable's Extent", href: 'https://justinrogo.github.io/Fableous/' },
       { title: 'Murmuration', href: 'Pages/For Fun/Birds.html' },
       { title: 'Game of Life - Ultimate Cosmos', href: 'Pages/For Fun/Game-of-Life.html' },
       { title: 'Midnight Tarot', href: 'Pages/For Fun/Tarot/index.html' },

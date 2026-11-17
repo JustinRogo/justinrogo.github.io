@@ -24,6 +24,13 @@
     "captured": "2026-11-04T05:20:43.441Z"
   },
   {
+    "path": "Pages/For Fun/Fables-Extent.html",
+    "image": "for-fun-fables-extent.jpg",
+    "portraitImage": "for-fun-fables-extent-portrait.jpg",
+    "url": "https://justinrogo.github.io/Fableous/",
+    "captured": "2026-11-17T05:32:18.360Z"
+  },
+  {
     "path": "Pages/For Fun/StrategicFramework2.html",
     "image": "for-fun-strategicframework2.jpg",
     "portraitImage": "for-fun-strategicframework2-portrait.jpg",
@@ -70,7 +77,8 @@
     "path": "Pages/Work/UCPEA/UCPEA_Contract_Comparison.html",
     "image": "work-ucpea-ucpea-contract-comparison.jpg",
     "url": "http://127.0.0.1:4392/Pages/Work/UCPEA/UCPEA_Contract_Comparison.html",
-    "captured": "2026-11-04T05:21:05.695Z"
+    "captured": "2026-11-17T05:32:22.135Z",
+    "portraitImage": "work-ucpea-ucpea-contract-comparison-portrait.jpg"
   },
   {
     "path": "Pages/Work/UCPEA/UCPEAContract.html",

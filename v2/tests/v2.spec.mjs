@@ -61,7 +61,7 @@ test("all manifest destinations survive, with filtering, direct title links and 
     .getByRole("group", { name: "Project categories" })
     .getByRole("button", { name: /^For Fun/ })
     .click();
-  await expect(page.locator(".project-card")).toHaveCount(6);
+  await expect(page.locator(".project-card")).toHaveCount(7);
   await page.getByRole("searchbox", { name: "Search projects" }).fill("wave");
   await expect(page.locator(".project-card")).toHaveCount(1);
   await page
@@ -513,7 +513,7 @@ test("original Work, UCPEA and For Fun collections expose every page on desktop 
     [
       "For Fun",
       manifest.pages.filter((p) => p.path.startsWith("Pages/For Fun/")),
-      6,
+      7,
     ],
   ];
   for (const width of [1024, 375]) {

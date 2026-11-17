@@ -27,6 +27,13 @@
       "description": "Explore Conway's Game of Life in a customizable cosmic sandbox."
     },
     {
+      "path": "Pages/For Fun/Fables-Extent.html",
+      "title": "Fable's Extent",
+      "category": "Bell-Ringing Instrument",
+      "description": "Ring all 24 orders of four church bells exactly once and come home. Claude Fable 5.2 chose the subject and built it.",
+      "href": "https://justinrogo.github.io/Fableous/"
+    },
+    {
       "path": "Pages/For Fun/StrategicFramework2.html",
       "title": "Multi-Gen Strategic Framework",
       "category": "Experiment",
