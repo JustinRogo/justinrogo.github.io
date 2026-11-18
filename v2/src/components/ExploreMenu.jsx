@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import BranchedMenu from "../vendor/BranchedMenu.jsx";
 import Icon from "./Icon.jsx";
 import { newTabLink } from "./UI.jsx";
-import { resources, projectHref } from "../content.js";
+import { groupOf, resources, projectHref } from "../content.js";
 import { useBotanical } from "../botanical/siteStyle.js";
 
 const EMPTY_PAGES = [];
@@ -93,7 +93,7 @@ export default function ExploreMenu({
         children: pages
           .filter(
             (page) =>
-              !page.path.startsWith("Pages/For Fun/") &&
+              groupOf(page) !== "For Fun" &&
               !page.path.startsWith("Pages/Work/UCPEA/"),
           )
           .sort((a, b) => a.title.localeCompare(b.title))
@@ -114,7 +114,7 @@ export default function ExploreMenu({
         label: "For Fun",
         rowHeight: 64,
         children: pages
-          .filter((page) => page.path.startsWith("Pages/For Fun/"))
+          .filter((page) => groupOf(page) === "For Fun")
           .sort((a, b) => a.title.localeCompare(b.title))
           .map((page) => ({
             value: `page:${page.path}`,

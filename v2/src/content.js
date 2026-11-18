@@ -88,11 +88,11 @@ export const technologies = [
   "Canva",
 ];
 export const groupOf = (project) =>
-  project.path.includes("/For Fun/")
+  project.group || (project.path.includes("/For Fun/")
     ? "For Fun"
     : project.path.includes("/Library/")
       ? "Library"
-      : "Work";
+      : "Work");
 export const projectHref = (project) =>
   project.href ||
   `../${project.path.split("/").map(encodeURIComponent).join("/")}`;

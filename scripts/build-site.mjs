@@ -24,7 +24,7 @@ export async function vendorUpdates() {
 }
 
 const siteOrigin = 'https://justinrogo.github.io';
-const sitemapExclusions = new Set(['Pages/Work/Library/Desk Planner/index.html']);
+const sitemapExclusions = new Set(['Pages/Work/Library/Desk Planner/index.html', 'Pages/Personal/Daily-Activity/index.html']);
 // Hash routes share one URL, so the sitemap is the homepage plus same-site project pages.
 export async function writeDiscoveryFiles(output) {
   const { pages } = JSON.parse(await readFile(path.join(root, 'data/pages.json'), 'utf8'));

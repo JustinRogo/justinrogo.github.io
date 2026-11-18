@@ -89,9 +89,22 @@
 
       <section class="report analysis-panel scatterplot" aria-labelledby="scatter-title">
         <header class="report-heading">
-          <div><h2 id="scatter-title">Sleep and next-day steps</h2><p class="chart-hint" id="scatter-caption">Each dot pairs recorded sleep with steps on the wake date. Hover or tap for details.</p></div>
+          <div><h2 id="scatter-title">Sleep and next-day steps</h2><p class="chart-hint" id="scatter-caption">Each dot pairs recorded sleep with steps on the wake date. Color shows the year. Hover or tap for details.</p></div>
           <p id="scatter-count" class="scatter-count"></p>
         </header>
+        <fieldset class="scatter-years">
+          <legend>Year range</legend>
+          <div class="year-labels">
+            <label for="scatter-start">From <strong id="start-label"></strong></label>
+            <label for="scatter-end">Through <strong id="end-label"></strong></label>
+          </div>
+          <div class="year-slider">
+            <div class="year-track"><span></span></div>
+            <input id="scatter-start" type="range" aria-label="Starting year">
+            <input id="scatter-end" type="range" aria-label="Ending year">
+          </div>
+        </fieldset>
+        <ul id="scatter-legend" class="legend" aria-label="Years with paired records"></ul>
         <canvas id="sleep-scatter" role="img" aria-describedby="scatter-caption" tabindex="0"></canvas>
         <p id="scatter-detail" class="analysis-detail" role="status"></p>
       </section>
@@ -117,6 +130,12 @@
         </table>
       </details>
     </div>
+    <template id="sleep-mode-template">
+      <div class="range sleep-mode" role="group" aria-label="Sleep chart display">
+        <button type="button" aria-pressed="true">Sleep stages</button>
+        <button type="button" aria-pressed="false" data-total>Total Sleep</button>
+      </div>
+    </template>
     <template id="chart-template">
       <section class="metric">
         <header class="report-heading">

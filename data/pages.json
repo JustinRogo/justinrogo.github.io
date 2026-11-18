@@ -103,6 +103,13 @@
       "category": "Statutes Explorer",
       "description": "Browse and search Connecticut statutes, indexes, and infractions.",
       "href": "https://uconn-law-library.github.io/CGS/#/"
+    },
+    {
+      "path": "Pages/Personal/Daily-Activity/index.html",
+      "title": "Daily Activity",
+      "group": "For Fun",
+      "category": "Dashboard",
+      "description": "Explore my daily steps, sleep, and average heart rate over time."
     }
   ]
 }

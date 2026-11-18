@@ -31,13 +31,31 @@ function textElement(tag, className, text) {
   return element;
 }
 
-function initSleepScatter(rowsByDay, metrics, fullDate) {
+function initSleepScatter(rowsByDay, metrics, fullDate, firstYear, latestYear) {
   const canvas = document.getElementById('sleep-scatter');
   const ctx = canvas.getContext('2d');
   const detail = document.getElementById('scatter-detail');
   const count = document.getElementById('scatter-count');
   const steps = metrics.get('steps');
   const sleep = metrics.get('sleep_minutes');
+  const start = document.getElementById('scatter-start');
+  const end = document.getElementById('scatter-end');
+  const legend = document.getElementById('scatter-legend');
+  const slider = start.parentElement;
+  for (const input of [start, end]) {
+    input.min = firstYear;
+    input.max = latestYear;
+    input.value = input === start ? firstYear : latestYear;
+    input.disabled = firstYear === latestYear;
+  }
+  const pairs = [];
+  for (const [time, row] of rowsByDay) {
+    if (!Number.isFinite(row.sleep_minutes) || !Number.isFinite(row.steps)) continue;
+    const date = new Date(time);
+    pairs.push({ time, year: date.getUTCFullYear(), weekday: date.getUTCDay(), minutes: row.sleep_minutes, count: row.steps });
+  }
+  const hueForYear = (year) => (213 + (year - firstYear) * 137.508) % 360;
+  let weekdays = new Set();
   let points = [];
   let positions = [];
   let selected = -1;
@@ -87,15 +105,18 @@ function initSleepScatter(rowsByDay, metrics, fullDate) {
     ctx.fillText('Recorded sleep (hours)', (left + right) / 2, height - 15);
 
     positions = points.map(({ minutes, count }) => ({ x: x(minutes / 60), y: y(count) }));
-    ctx.fillStyle = color('--trend');
-    ctx.globalAlpha = points.length > 200 ? .36 : .75;
-    for (const point of positions) {
+    const lightness = color('--year-lightness');
+    const yearColor = (year) => `hsl(${hueForYear(year)} 65% ${lightness})`;
+    ctx.globalAlpha = points.length > 200 ? .58 : .85;
+    for (const [index, point] of positions.entries()) {
+      if (!index || points[index].year !== points[index - 1].year) ctx.fillStyle = yearColor(points[index].year);
       ctx.beginPath();
       ctx.arc(point.x, point.y, points.length > 200 ? 2.2 : 3.4, 0, 2 * Math.PI);
       ctx.fill();
     }
     ctx.globalAlpha = 1;
     const active = positions[selected];
+    ctx.fillStyle = yearColor(points[selected].year);
     ctx.beginPath();
     ctx.arc(active.x, active.y, 5.1, 0, 2 * Math.PI);
     ctx.fill();
@@ -139,20 +160,53 @@ function initSleepScatter(rowsByDay, metrics, fullDate) {
   matchMedia('(prefers-color-scheme: dark)').addEventListener('change', draw);
   document.fonts.ready.then(draw);
 
-  return (days) => {
+  function filterYears() {
     const previous = points[selected]?.time;
-    points = [];
-    for (const time of days) {
-      const row = rowsByDay.get(time);
-      if (Number.isFinite(row?.sleep_minutes) && Number.isFinite(row?.steps)) {
-        points.push({ time, minutes: row.sleep_minutes, count: row.steps });
-      }
-    }
+    const from = start.valueAsNumber;
+    const through = end.valueAsNumber;
+    document.getElementById('start-label').textContent = from;
+    document.getElementById('end-label').textContent = through;
+    const span = Math.max(1, latestYear - firstYear);
+    slider.style.setProperty('--start-gap', `calc((100% - var(--thumb)) * ${(from - firstYear) / span})`);
+    slider.style.setProperty('--end-gap', `calc((100% - var(--thumb)) * ${(latestYear - through) / span})`);
+    points = pairs.filter(({ year, weekday }) => year >= from && year <= through && weekdays.has(weekday));
+    const years = [...new Set(points.map(point => point.year))];
+    legend.replaceChildren(...years.map(year => {
+      const item = document.createElement('li');
+      const dot = textElement('span', 'swatch', '');
+      dot.style.setProperty('--year-hue', hueForYear(year));
+      item.append(dot, String(year));
+      return item;
+    }));
+    legend.hidden = !years.length;
     count.textContent = `${number.format(points.length)} paired ${points.length === 1 ? 'day' : 'days'}`;
     canvas.hidden = points.length === 0;
     canvas.setAttribute('aria-label', `Sleep and next-day steps, ${count.textContent}. Use the left and right arrows to explore days.`);
     const existing = points.findIndex(({ time }) => time === previous);
     select(existing < 0 ? points.length - 1 : existing);
+  }
+  function updateEndpoint(input) {
+    if (start.valueAsNumber > end.valueAsNumber) input.value = input === start ? end.value : start.value;
+    filterYears();
+  }
+  for (const input of [start, end]) input.addEventListener('input', () => updateEndpoint(input));
+  slider.addEventListener('pointerdown', event => {
+    if (event.target === start || event.target === end || firstYear === latestYear) return;
+    const thumb = parseFloat(getComputedStyle(slider).getPropertyValue('--thumb'));
+    const bounds = slider.getBoundingClientRect();
+    const travel = bounds.width - 2 * thumb;
+    const x = event.clientX - bounds.left - thumb / 2;
+    const span = latestYear - firstYear;
+    const lowX = (start.valueAsNumber - firstYear) / span * travel;
+    const highX = thumb + (end.valueAsNumber - firstYear) / span * travel;
+    const input = Math.abs(x - lowX) <= Math.abs(x - highX) ? start : end;
+    input.value = firstYear + Math.round((x - (input === end ? thumb : 0)) / travel * span);
+    input.focus();
+    updateEndpoint(input);
+  });
+  return (selectedWeekdays) => {
+    weekdays = selectedWeekdays;
+    filterYears();
   };
 }
 
@@ -167,11 +221,11 @@ export function initSummaryViews({ rowsByDay, metrics, dayMs, weekdayNames, full
   const heatDetail = document.getElementById('heat-detail');
   const heatSwatches = document.querySelectorAll('#heat-scale i');
   const metricsByKey = new Map(metrics.map((metric) => [metric.key, metric]));
-  const updateScatter = initSleepScatter(rowsByDay, metricsByKey, fullDate);
   const dates = Array.from(rowsByDay.keys());
   const latestDate = dates.at(-1);
   const firstYear = new Date(dates[0]).getUTCFullYear();
   const latestYear = new Date(latestDate).getUTCFullYear();
+  const updateScatter = initSleepScatter(rowsByDay, metricsByKey, fullDate, firstYear, latestYear);
   let weekdays = new Set();
   let selectedDays = [];
   let weekSelection;
@@ -331,7 +385,7 @@ export function initSummaryViews({ rowsByDay, metrics, dayMs, weekdayNames, full
     weekdays = selectedWeekdays;
     selectedDays = days;
     renderTypicalWeek();
-    updateScatter(days);
+    if (initial || changed) updateScatter(weekdays);
     if (initial || changed) renderHeatmap({ reveal: initial });
   };
 }

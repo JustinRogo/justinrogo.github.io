@@ -14,7 +14,7 @@ test("project previews and varied cards fit desktop, tablet, phone, filters, and
   for (const width of [1440, 921, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto("/v2/?intro=0#/projects");
-    await expect(page.locator(".project-card")).toHaveCount(16);
+    await expect(page.locator(".project-card")).toHaveCount(17);
     for (const image of await page.locator(".project-preview img:visible").all()) {
       await image.scrollIntoViewIfNeeded();
       await expect.poll(() => image.evaluate(el => el.complete && el.naturalWidth > 0)).toBe(true);

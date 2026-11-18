@@ -383,7 +383,7 @@ function tooltipLines(chart, row) {
       .map(({ field, label }) => `${label} ${bpm(row[field])}`);
   }
   return [`Total ${sleepTime(row.sleep_minutes)}`, ...series
-    .filter(({ field }) => row[field] > 0)
+    .filter(({ field }) => field !== metric.key && row[field] > 0)
     .map(({ field, label }) => `${label} ${sleepTime(row[field])}`)];
 }
 
@@ -455,6 +455,19 @@ function createChart(metric, rows) {
     guide: section.querySelector('.chart-guide'),
     live: section.querySelector('[role="status"]'),
   };
+  if (metric.key === 'sleep_minutes') {
+    const modes = id('sleep-mode-template').content.firstElementChild.cloneNode(true);
+    const total = [{ field: metric.key, label: 'Total Sleep', color: '--rem' }];
+    for (const button of modes.querySelectorAll('button')) {
+      button.addEventListener('click', () => {
+        for (const choice of modes.children) choice.setAttribute('aria-pressed', String(choice === button));
+        chart.series = button.hasAttribute('data-total') ? total : series;
+        legend.replaceChildren(...chart.series.map(legendItem));
+        drawChart(chart);
+      });
+    }
+    legend.before(modes);
+  }
   const point = (event) => {
     if (!chart.plot) return;
     const offset = event.clientX - canvas.getBoundingClientRect().left - chart.plot.left;
