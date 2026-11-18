@@ -11,12 +11,12 @@ $ErrorActionPreference = 'Stop'
 $env:GIT_TERMINAL_PROMPT = '0'
 $env:GCM_INTERACTIVE = 'Never'
 $env:GH_PROMPT_DISABLED = '1'
+$env:PATH = (Split-Path -Parent $GitHubCli) + ';' + $env:PATH
 $repo = Split-Path -Parent $PSScriptRoot
 $dataset = 'Pages/Personal/Daily-Activity/daily.json'
-$credentialHelper = 'credential.helper=!"' + $GitHubCli.Replace('\', '/') + '" auth git-credential'
 
 function Invoke-Git {
-  $result = & $Git -C $repo -c credential.helper= -c $credentialHelper @args
+  $result = & $Git -C $repo -c credential.helper= -c 'credential.helper=!gh auth git-credential' @args
   if ($LASTEXITCODE -ne 0) { throw "Git $($args[0]) failed with exit code $LASTEXITCODE." }
   return $result
 }

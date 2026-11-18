@@ -196,6 +196,12 @@ def validated_rows(rows):
     return rows
 
 
+def unique_fields(pairs):
+    row = dict(pairs)
+    require(len(row) == len(pairs), 'Repeated public summary field.')
+    return row
+
+
 def signature(path):
     info = path.stat()
     return info.st_size, info.st_mtime_ns
@@ -270,7 +276,9 @@ def main():
     if not args.check and (args.health_connect is None or args.samsung is None):
         parser.error('both export paths are required for import')
     try:
-        previous = validated_rows(json.loads(args.output.read_text(encoding='utf-8'))) if args.output.exists() else []
+        previous = []
+        if args.output.exists():
+            previous = validated_rows(json.loads(args.output.read_text(encoding='utf-8'), object_pairs_hook=unique_fields))
         if args.check:
             require(previous, 'Public summary file is missing.')
             rows = previous
