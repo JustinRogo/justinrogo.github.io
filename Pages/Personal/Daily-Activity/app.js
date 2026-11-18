@@ -1,10 +1,14 @@
 const dayMs = 86_400_000;
 const pageSize = 14;
+const weekdayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const easternDate = new Intl.DateTimeFormat('en-US', {
+  timeZone: 'America/New_York', year: 'numeric', month: 'numeric', day: 'numeric',
+});
 const fullDate = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeZone: 'UTC' });
 const shortDate = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
 const monthDate = new Intl.DateTimeFormat('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });
 const yearDate = new Intl.DateTimeFormat('en-US', { year: 'numeric', timeZone: 'UTC' });
-const whole = new Intl.NumberFormat('en-US');
+const whole = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
 const decimal = new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
 const compact = new Intl.NumberFormat('en-US', { notation: 'compact' });
 const sleepTime = (value) => {
@@ -27,7 +31,7 @@ const heartSeries = [
 const metrics = [
   {
     key: 'steps',
-    title: 'Daily steps',
+    title: 'Steps',
     display: (value) => `${whole.format(value)} steps`,
     cell: (value) => whole.format(value),
     tick: (value) => compact.format(value),
@@ -35,7 +39,7 @@ const metrics = [
   },
   {
     key: 'sleep_minutes',
-    title: 'Time in recorded sleep sessions',
+    title: 'Sleep',
     display: sleepTime,
     cell: sleepTime,
     tick: (value) => `${decimal.format(value / 60)}h`,
@@ -55,23 +59,93 @@ const id = (value) => document.getElementById(value);
 const dashboard = id('dashboard');
 const history = id('history');
 const ranges = document.querySelectorAll('button[data-range]');
+const weekdayFilter = id('weekday-filter');
+const weekdaySummary = weekdayFilter.querySelector('summary');
+const weekdayOptions = id('weekday-options');
+const weekdayInputs = [1, 2, 3, 4, 5, 6, 0].map((day) => {
+  const label = document.createElement('label');
+  const input = document.createElement('input');
+  input.type = 'checkbox';
+  input.checked = true;
+  input.value = day;
+  label.append(input, weekdayNames[day]);
+  weekdayOptions.insertBefore(label, weekdayOptions.querySelector('.weekday-actions'));
+  return input;
+});
 let range = '30';
 let page = 0;
 let rowsByDay;
-let start;
 let finish;
-let days;
+let filteredDays = [];
 let buckets = [];
 let charts = [];
 
-function startOfRange(first, last) {
-  if (range === 'all') return first;
-  if (range !== 'year') return last - (Number(range) - 1) * dayMs;
-  const date = new Date(last);
+function yearBefore(time) {
+  const date = new Date(time);
   const year = date.getUTCFullYear() - 1;
   const month = date.getUTCMonth();
   const daysInMonth = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
-  return Date.UTC(year, month, Math.min(date.getUTCDate(), daysInMonth)) + dayMs;
+  return Date.UTC(year, month, Math.min(date.getUTCDate(), daysInMonth));
+}
+
+function startOfRange(first, last) {
+  if (range === 'all') return first;
+  if (range === 'year') return yearBefore(last) + dayMs;
+  return last - (Number(range) - 1) * dayMs;
+}
+
+function renderComparison() {
+  const { year, month, day } = Object.fromEntries(easternDate.formatToParts(new Date())
+    .map(({ type, value }) => [type, value]));
+  const yesterday = Date.UTC(Number(year), Number(month) - 1, Number(day)) - dayMs;
+  const first = yearBefore(yesterday);
+  const previous = rowsByDay.get(yesterday);
+  const date = id('comparison-date');
+  date.dateTime = new Date(yesterday).toISOString().slice(0, 10);
+  date.textContent = shortDate.format(yesterday);
+  const items = metrics.map((metric) => {
+    const { key, title, cell } = metric;
+    let total = 0;
+    let count = 0;
+    for (let time = first; time < yesterday; time += dayMs) {
+      const value = rowsByDay.get(time)?.[key];
+      if (value === undefined) continue;
+      total += value;
+      count++;
+    }
+    const average = count ? total / count : undefined;
+    const value = previous?.[key];
+    const term = document.createElement('dt');
+    term.textContent = title;
+    const current = document.createElement('dd');
+    current.className = 'comparison-value';
+    current.textContent = value === undefined ? 'No record' : cell(value);
+    const reference = document.createElement('dd');
+    reference.className = 'comparison-reference';
+    if (average === undefined) {
+      reference.textContent = 'No year average';
+    } else {
+      const averageValue = document.createElement('span');
+      averageValue.textContent = cell(average);
+      reference.append('Year avg. ', averageValue);
+    }
+    const item = document.createElement('div');
+    item.append(term, current);
+    if (value !== undefined && average !== undefined) {
+      const difference = document.createElement('dd');
+      difference.className = 'comparison-difference';
+      const precision = key === 'heart_rate_bpm' ? 10 : 1;
+      const delta = (Math.round(value * precision) - Math.round(average * precision)) / precision;
+      const magnitude = key === 'sleep_minutes' && Math.round(Math.abs(delta)) < 60
+        ? `${Math.round(Math.abs(delta))}m` : cell(Math.abs(delta));
+      difference.textContent = delta === 0 ? 'At average' : `${delta < 0 ? '−' : '+'}${magnitude}`;
+      item.append(difference);
+    }
+    item.append(reference);
+    return item;
+  });
+  id('comparison-values').replaceChildren(...items);
+  id('comparison').hidden = false;
 }
 
 function sleepBreakdown(row) {
@@ -83,13 +157,10 @@ function sleepBreakdown(row) {
 
 function chartBuckets() {
   if (range !== 'all') {
-    return Array.from({ length: days }, (_, index) => {
-      const time = start + index * dayMs;
-      return { time, row: rowsByDay.get(time) ?? {} };
-    });
+    return filteredDays.map((time) => ({ time, row: rowsByDay.get(time) ?? {} }));
   }
   const months = new Map();
-  for (let time = start; time <= finish; time += dayMs) {
+  for (const time of filteredDays) {
     const date = new Date(time);
     const month = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1);
     if (!months.has(month)) months.set(month, {});
@@ -109,15 +180,30 @@ function chartBuckets() {
 
 function showSelection() {
   for (const button of ranges) button.setAttribute('aria-pressed', String(button.dataset.range === range));
-  start = startOfRange(rowsByDay.keys().next().value, finish);
-  days = Math.round((finish - start) / dayMs) + 1;
+  const start = startOfRange(rowsByDay.keys().next().value, finish);
+  const weekdays = new Set(weekdayInputs.filter((input) => input.checked).map((input) => Number(input.value)));
+  const filtered = weekdays.size < weekdayNames.length;
+  weekdayFilter.toggleAttribute('data-filtered', filtered);
+  id('weekday-label').textContent = filtered ? `Day of week · ${weekdays.size}` : 'Day of week';
+  filteredDays = [];
+  for (let time = start; time <= finish; time += dayMs) {
+    if (weekdays.has(new Date(time).getUTCDay())) filteredDays.push(time);
+  }
   buckets = chartBuckets();
   const period = `${fullDate.format(start)} – ${fullDate.format(finish)}`;
   id('view-dates').textContent = period;
   id('view-grain').textContent = range === 'all' ? 'Monthly averages' : '';
   for (const chart of charts) {
     const interval = range === 'all' ? 'monthly averages' : 'daily values';
-    chart.canvas.setAttribute('aria-label', `${chart.metric.title}, ${interval}, ${period}. Use the left and right arrows to explore the chart.`);
+    const latest = filteredDays.findLast((time) => rowsByDay.get(time)?.[chart.metric.key] !== undefined);
+    chart.latestValue.textContent = latest === undefined ? 'No matching records' : chart.metric.display(rowsByDay.get(latest)[chart.metric.key]);
+    chart.latestLabel.hidden = latest === undefined;
+    if (latest !== undefined) {
+      chart.latestTime.dateTime = rowsByDay.get(latest).date;
+      chart.latestTime.textContent = fullDate.format(latest);
+    }
+    const guidance = buckets.length ? 'Use the left and right arrows to explore the chart.' : 'No matching dates.';
+    chart.canvas.setAttribute('aria-label', `${chart.metric.title}, ${interval}, ${period}. ${guidance}`);
     drawChart(chart);
   }
   page = 0;
@@ -126,10 +212,11 @@ function showSelection() {
 
 function renderTable() {
   const fragment = document.createDocumentFragment();
+  const days = filteredDays.length;
   const firstRow = page * pageSize;
   const endRow = Math.min(firstRow + pageSize, days);
   for (let index = firstRow; index < endRow; index++) {
-    const day = finish - index * dayMs;
+    const day = filteredDays[days - 1 - index];
     const row = document.createElement('tr');
     const dateCell = document.createElement('th');
     dateCell.scope = 'row';
@@ -147,8 +234,17 @@ function renderTable() {
     }
     fragment.append(row);
   }
+  if (days === 0) {
+    const row = document.createElement('tr');
+    const cell = document.createElement('td');
+    cell.colSpan = 4;
+    cell.className = 'empty-table';
+    cell.textContent = 'No dates match your filters.';
+    row.append(cell);
+    fragment.append(row);
+  }
   id('daily-rows').replaceChildren(fragment);
-  id('page').textContent = `Page ${page + 1} of ${Math.ceil(days / pageSize)}`;
+  id('page').textContent = days ? `Page ${page + 1} of ${Math.ceil(days / pageSize)}` : '0 days';
   id('newer').disabled = page === 0;
   id('older').disabled = endRow === days;
 }
@@ -163,6 +259,14 @@ function plotChart(chart, width, height) {
   const { ctx, metric, series, canvas } = chart;
   const theme = getComputedStyle(canvas);
   const color = (name) => theme.getPropertyValue(name).trim();
+  if (!buckets.length) {
+    chart.plot = undefined;
+    ctx.font = '11px Geist, system-ui, sans-serif';
+    ctx.fillStyle = color('--muted');
+    ctx.textAlign = 'center';
+    ctx.fillText('No dates match your filters', width / 2, height / 2);
+    return;
+  }
   const sleeping = metric.key === 'sleep_minutes';
   const values = buckets.flatMap(({ row }) => sleeping
     ? [row.sleep_minutes]
@@ -255,7 +359,7 @@ function plotChart(chart, width, height) {
 function drawChart(chart) {
   const { canvas, ctx } = chart;
   const { width, height } = canvas.getBoundingClientRect();
-  if (!buckets.length || !ctx || !width) return;
+  if (!rowsByDay || !ctx || !width) return;
   hideTooltip(chart);
   const scale = window.devicePixelRatio || 1;
   canvas.width = Math.round(width * scale);
@@ -313,11 +417,6 @@ function hideTooltip(chart) {
 function createChart(metric, rows) {
   const section = id('chart-template').content.firstElementChild.cloneNode(true);
   section.querySelector('h2').textContent = metric.title;
-  const latest = rows.findLast((row) => row[metric.key] !== undefined);
-  section.querySelector('strong').textContent = metric.display(latest[metric.key]);
-  const time = section.querySelector('.latest time');
-  time.dateTime = latest.date;
-  time.textContent = fullDate.format(Date.parse(latest.date));
   const series = metric.series.filter(({ field }) => rows.some((row) => row[field] !== undefined));
   const legend = section.querySelector('.legend');
   for (const { label, color, style } of series) {
@@ -333,6 +432,9 @@ function createChart(metric, rows) {
   const canvas = section.querySelector('canvas');
   const chart = {
     canvas, metric, series, ctx: canvas.getContext('2d'),
+    latestValue: section.querySelector('.latest strong'),
+    latestLabel: section.querySelector('.latest span'),
+    latestTime: section.querySelector('.latest time'),
     tooltip: section.querySelector('.tooltip'),
     guide: section.querySelector('.chart-guide'),
     live: section.querySelector('[role="status"]'),
@@ -353,7 +455,7 @@ function createChart(metric, rows) {
       return;
     }
     const delta = { ArrowLeft: -1, ArrowRight: 1 }[event.key];
-    if (delta === undefined) return;
+    if (delta === undefined || !chart.plot) return;
     event.preventDefault();
     const index = chart.index === undefined ? buckets.length - 1 : chart.index + delta;
     showTooltip(chart, Math.max(0, Math.min(buckets.length - 1, index)), true);
@@ -369,6 +471,21 @@ for (const button of ranges) {
     showSelection();
   });
 }
+weekdayOptions.addEventListener('change', showSelection);
+for (const [button, checked] of [['all-weekdays', true], ['clear-weekdays', false]]) {
+  id(button).addEventListener('click', () => {
+    for (const input of weekdayInputs) input.checked = checked;
+    showSelection();
+  });
+}
+document.addEventListener('click', (event) => {
+  if (weekdayFilter.open && !weekdayFilter.contains(event.target)) weekdayFilter.open = false;
+});
+weekdayFilter.addEventListener('keydown', (event) => {
+  if (event.key !== 'Escape' || !weekdayFilter.open) return;
+  weekdayFilter.open = false;
+  weekdaySummary.focus();
+});
 id('newer').addEventListener('click', () => { page -= 1; renderTable(); });
 id('older').addEventListener('click', () => { page += 1; renderTable(); });
 history.addEventListener('toggle', () => { if (history.open) renderTable(); });
@@ -384,6 +501,7 @@ try {
   }
   rowsByDay = new Map(rows.map((row) => [Date.parse(row.date), row]));
   finish = Date.parse(rows.at(-1).date);
+  renderComparison();
   charts = metrics.map((metric) => createChart(metric, rows));
   dashboard.hidden = false;
   showSelection();

@@ -16,9 +16,18 @@
     <div class="frame"><a href="/">Justin Rogowski</a></div>
   </header>
   <main class="frame">
-    <header class="intro">
-      <h1>Daily Activity</h1>
-      <p>Steps, recorded sleep sessions, and average heart rate by day.</p>
+    <header class="overview">
+      <div class="intro">
+        <h1>Daily Activity</h1>
+        <p>Steps, recorded sleep sessions, and average heart rate by day.</p>
+      </div>
+      <section class="comparison" id="comparison" aria-labelledby="comparison-title" hidden>
+        <div class="comparison-heading">
+          <h2 id="comparison-title">Yesterday <time id="comparison-date"></time></h2>
+          <p>Compared with the rolling 1-year average</p>
+        </div>
+        <dl id="comparison-values"></dl>
+      </section>
     </header>
 
     <p id="status" class="status" role="status">Loading daily activity…</p>
@@ -32,7 +41,17 @@
           <button type="button" data-range="year" aria-pressed="false">1 year</button>
           <button type="button" data-range="all" aria-pressed="false">All time</button>
         </div>
-        <p class="view-period"><span id="view-dates"></span><span id="view-grain"></span></p>
+        <details class="weekday-filter" id="weekday-filter">
+          <summary><span id="weekday-label">Day of week</span></summary>
+          <fieldset id="weekday-options">
+            <legend>Show days of the week</legend>
+            <div class="weekday-actions">
+              <button type="button" id="all-weekdays">Select all</button>
+              <button type="button" id="clear-weekdays">Clear</button>
+            </div>
+          </fieldset>
+        </details>
+        <p class="view-period" role="status"><span id="view-dates"></span><span id="view-grain"></span></p>
       </div>
       <div class="report" id="charts"></div>
       <p class="chart-hint">Dates in Eastern Time. Hover, tap, or use the arrow keys on a chart to see values.</p>

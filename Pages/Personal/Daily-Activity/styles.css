@@ -59,12 +59,26 @@ h1, h2, p, figure, dl, dd { margin: 0; }
 .masthead a { display: inline-block; padding-block: .85rem; font-size: .875rem; font-weight: 650; }
 .masthead a:hover { color: var(--accent); }
 main { padding-block: 2rem 3rem; }
-.intro { margin-bottom: 1.15rem; }
+.overview { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); align-items: start; gap: 1rem 1.5rem; margin-bottom: 1.15rem; }
+.intro { grid-column: 1; }
 h1 { font-size: 3.2rem; line-height: 1.05; letter-spacing: -.04em; font-weight: 640; }
 .intro p { margin-top: .65rem; color: var(--muted); }
+.comparison { padding: .7rem .85rem; border: 1px solid var(--border); border-radius: .7rem; background: var(--surface); }
+.comparison-heading { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: .15rem .8rem; }
+.comparison-heading h2 { font-size: .93rem; letter-spacing: -.01em; }
+.comparison-heading time { margin-left: .24rem; color: var(--muted); font-size: .76rem; font-weight: 500; }
+.comparison-heading p { color: var(--muted); font-size: .75rem; }
+.comparison dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: .5rem; }
+.comparison dl > div { padding-inline: .65rem; font-variant-numeric: tabular-nums; }
+.comparison dl > div:first-child { padding-left: 0; }
+.comparison dl > div:last-child { padding-right: 0; }
+.comparison dl > div + div { border-left: 1px solid var(--grid); }
+.comparison dt, .comparison-reference { color: var(--muted); font-size: .73rem; }
+.comparison-value { font-size: 1.02rem; font-weight: 650; }
+.comparison-difference { color: var(--accent); font-size: .75rem; font-weight: 600; }
 .status { color: var(--muted); }
-.view-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .45rem 1rem; margin-bottom: .75rem; }
-.range button, .pager button {
+.view-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: .45rem 1rem; margin-bottom: .75rem; }
+.range button, .pager button, .weekday-actions button, .weekday-filter summary {
   min-height: 44px;
   color: var(--ink);
   border: 1px solid transparent;
@@ -72,7 +86,7 @@ h1 { font-size: 3.2rem; line-height: 1.05; letter-spacing: -.04em; font-weight: 
   font-weight: 580;
   cursor: pointer;
 }
-.range button:hover, .pager button:enabled:hover, .history summary:hover { background: var(--selection); }
+.range button:hover, .pager button:enabled:hover, .history summary:hover, .weekday-filter summary:hover, .weekday-actions button:hover { background: var(--selection); }
 
 .report { border: 1px solid var(--border); border-radius: .85rem; background: var(--surface); }
 .metric { padding: .85rem 1.15rem .65rem; }
@@ -84,8 +98,21 @@ h2 { font-size: 1.2rem; line-height: 1.22; letter-spacing: -.025em; font-weight:
 .range { display: flex; flex-wrap: wrap; gap: .25rem; }
 .range button, .pager button { border-radius: .4rem; padding: .35rem .72rem; font-size: .85rem; }
 .range button[aria-pressed="true"] { color: var(--accent); background: var(--selection); border-color: var(--accent); }
-.view-period { display: flex; gap: .15rem .7rem; flex-wrap: wrap; align-items: baseline; font-size: .8rem; color: var(--muted); }
+.view-period { display: flex; gap: .15rem .7rem; flex-wrap: wrap; align-items: baseline; margin-left: auto; font-size: .8rem; color: var(--muted); }
 #view-grain { color: var(--ink); font-weight: 620; }
+.weekday-filter { position: relative; }
+.weekday-filter summary { display: flex; align-items: center; gap: .6rem; padding: .35rem .65rem; border-color: var(--border); border-radius: .4rem; background: var(--surface); font-size: .85rem; }
+.weekday-filter summary::-webkit-details-marker { display: none; }
+.weekday-filter summary::after { content: ''; width: .35rem; height: .35rem; border: solid currentColor; border-width: 0 1.5px 1.5px 0; transform: translateY(-.1rem) rotate(45deg); }
+.weekday-filter[open] summary::after { transform: translateY(.1rem) rotate(225deg); }
+.weekday-filter[data-filtered] summary { background: var(--selection); border-color: var(--accent); color: var(--accent); }
+.weekday-filter fieldset { position: absolute; z-index: 2; inset: calc(100% + .35rem) auto auto 0; width: 14.75rem; margin: 0; padding: .4rem .55rem .55rem; border: 1px solid var(--border); border-radius: .6rem; background: var(--surface); }
+.weekday-filter legend { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.weekday-actions { display: flex; justify-content: space-between; gap: .25rem; border-top: 1px solid var(--grid); margin-top: .3rem; padding-top: .25rem; }
+.weekday-actions button { border-radius: .35rem; padding-inline: .5rem; color: var(--accent); font-size: .8rem; }
+.weekday-filter label { display: flex; align-items: center; gap: .6rem; min-height: 44px; padding: .15rem .45rem; border-radius: .3rem; cursor: pointer; font-size: .85rem; }
+.weekday-filter label:hover { background: var(--selection); }
+.weekday-filter input { margin: 0; width: 1rem; height: 1rem; accent-color: var(--accent); }
 .legend { display: flex; flex-wrap: wrap; gap: .2rem .8rem; padding: 0; margin: .4rem 0 0; list-style: none; color: var(--muted); font-size: .75rem; }
 .legend li { display: inline-flex; align-items: center; gap: .32rem; }
 .swatch { width: .63rem; height: .63rem; background: var(--series); }
@@ -129,14 +156,21 @@ thead th { vertical-align: bottom; border-bottom-color: var(--border); font-weig
 tbody th { font-weight: 525; }
 th:first-child { width: 29%; text-align: left; }
 .missing { color: var(--muted); }
+.empty-table { text-align: center; color: var(--muted); }
+
+@media (min-width: 621px) and (max-width: 800px) {
+  .weekday-filter fieldset { inset-inline: auto 0; }
+}
 
 @media (max-width: 620px) {
   .frame { width: calc(100% - 1.5rem); }
   main { padding-top: 1.55rem; }
   h1 { font-size: 2.55rem; }
-  .intro { margin-bottom: 1.25rem; }
+  .overview { grid-template-columns: 1fr; }
   .intro p { font-size: .9rem; }
-  .view-toolbar { align-items: start; flex-direction: column; }
+  .comparison-reference span { display: block; }
+  .view-toolbar { gap: .4rem .55rem; }
+  .view-period { margin-left: 0; }
   .range { width: 100%; }
   .range button { flex: 1 0 auto; padding-inline: .35rem; font-size: .78rem; }
   .metric { padding: .7rem .7rem .5rem; }
