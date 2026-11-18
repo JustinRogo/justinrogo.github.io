@@ -1,3 +1,5 @@
+import { initSummaryViews, trailingWeek } from './summary-views.js';
+
 const dayMs = 86_400_000;
 const pageSize = 14;
 const weekdayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -29,6 +31,7 @@ const heartSeries = [
   { field: 'heart_rate_max_bpm', label: 'Maximum', color: '--maximum', dash: [1, 3], style: 'dotted' },
   { field: 'heart_rate_bpm', label: 'Average', color: '--accent', dash: [], style: '' },
 ];
+const trendSeries = { field: 'trend', label: '7-day average', color: '--trend', dash: [7, 3], style: 'dashed' };
 const metrics = [
   {
     key: 'steps',
@@ -63,6 +66,7 @@ const ranges = document.querySelectorAll('button[data-range]');
 const weekdayFilter = id('weekday-filter');
 const weekdaySummary = weekdayFilter.querySelector('summary');
 const weekdayOptions = id('weekday-options');
+const trendInput = id('show-trend');
 const weekdayInputs = [1, 2, 3, 4, 5, 6, 0].map((day) => {
   const label = document.createElement('label');
   const input = document.createElement('input');
@@ -80,6 +84,7 @@ let finish;
 let filteredDays = [];
 let buckets = [];
 let charts = [];
+let updateSummaryViews;
 
 function yearBefore(time) {
   const date = new Date(time);
@@ -213,6 +218,7 @@ function showSelection() {
   const period = `${fullDate.format(start)} – ${fullDate.format(finish)}`;
   id('view-dates').textContent = period;
   id('view-grain').textContent = range === 'all' ? 'Monthly averages' : '';
+  id('trend-control').hidden = range === 'all';
   for (const chart of charts) {
     const interval = range === 'all' ? 'monthly averages' : 'daily values';
     const latest = filteredDays.findLast((time) => rowsByDay.get(time)?.[chart.metric.key] !== undefined);
@@ -224,8 +230,16 @@ function showSelection() {
     }
     const guidance = buckets.length ? 'Use the left and right arrows to explore the chart.' : 'No matching dates.';
     chart.canvas.setAttribute('aria-label', `${chart.metric.title}, ${interval}, ${period}. ${guidance}`);
+    chart.trend = new Map();
+    if (chart.trendLegend && range !== 'all') {
+      for (const { time } of buckets) {
+        const value = trailingWeek(rowsByDay, time, chart.metric.key, dayMs);
+        if (value !== undefined) chart.trend.set(time, value);
+      }
+    }
     drawChart(chart);
   }
+  updateSummaryViews(filteredDays, weekdays);
   page = 0;
   if (history.open) renderTable();
 }
@@ -276,7 +290,10 @@ function tickSize(span) {
 }
 
 function plotChart(chart, width, height) {
-  const { ctx, metric, series, canvas } = chart;
+  const { ctx, metric, canvas } = chart;
+  const series = chart.showTrend ? [...chart.series, trendSeries] : chart.series;
+  const valueAt = (index, field) => field === trendSeries.field
+    ? chart.trend.get(buckets[index]?.time) : buckets[index]?.row[field];
   const theme = getComputedStyle(canvas);
   const color = (name) => theme.getPropertyValue(name).trim();
   if (!buckets.length) {
@@ -288,9 +305,9 @@ function plotChart(chart, width, height) {
     return;
   }
   const sleeping = metric.key === 'sleep_minutes';
-  const values = buckets.flatMap(({ row }) => sleeping
+  const values = buckets.flatMap(({ row }, index) => sleeping
     ? [row.sleep_minutes]
-    : series.map(({ field }) => row[field])).filter(Number.isFinite);
+    : series.map(({ field }) => valueAt(index, field))).filter(Number.isFinite);
   const lowest = metric.key === 'heart_rate_bpm' && values.length ? Math.max(0, Math.min(...values) - 5) : 0;
   const highest = Math.max(lowest + 5, ...values);
   const step = sleeping ? Math.max(60, Math.ceil(highest / 240) * 60) : tickSize(highest - lowest);
@@ -352,21 +369,21 @@ function plotChart(chart, width, height) {
   }
   for (const { field, color: seriesColor, dash } of series) {
     ctx.strokeStyle = ctx.fillStyle = color(seriesColor);
-    ctx.lineWidth = dash.length ? 1.25 : 1.9;
+    ctx.lineWidth = field === trendSeries.field ? 1.9 : dash.length ? 1.25 : 1.9;
     ctx.setLineDash(dash);
     ctx.beginPath();
-    for (const [index, { row }] of buckets.entries()) {
-      const value = row[field];
+    for (let index = 0; index < buckets.length; index++) {
+      const value = valueAt(index, field);
       if (value === undefined) continue;
-      if (buckets[index - 1]?.row[field] !== undefined) ctx.lineTo(x(index), y(value));
+      if (valueAt(index - 1, field) !== undefined) ctx.lineTo(x(index), y(value));
       else ctx.moveTo(x(index), y(value));
     }
     ctx.stroke();
     ctx.setLineDash([]);
-    for (const [index, { row }] of buckets.entries()) {
-      const value = row[field];
+    for (let index = 0; index < buckets.length; index++) {
+      const value = valueAt(index, field);
       if (value === undefined) continue;
-      const isolated = buckets[index - 1]?.row[field] === undefined && buckets[index + 1]?.row[field] === undefined;
+      const isolated = valueAt(index - 1, field) === undefined && valueAt(index + 1, field) === undefined;
       if (isolated || buckets.length <= 14) {
         ctx.beginPath();
         ctx.arc(x(index), y(value), dash.length ? 1.6 : 2.2, 0, 2 * Math.PI);
@@ -380,6 +397,11 @@ function drawChart(chart) {
   const { canvas, ctx } = chart;
   const { width, height } = canvas.getBoundingClientRect();
   if (!rowsByDay || !ctx || !width) return;
+  chart.showTrend = Boolean(chart.trendLegend && trendInput.checked && chart.trend.size);
+  if (chart.trendLegend) {
+    chart.trendLegend.hidden = !chart.showTrend;
+    chart.legend.hidden = !chart.showTrend && !chart.series.some(({ label }) => label);
+  }
   hideTooltip(chart);
   const scale = window.devicePixelRatio || 1;
   canvas.width = Math.round(width * scale);
@@ -409,6 +431,7 @@ function showTooltip(chart, index, announce = false) {
   const { time, row } = buckets[index];
   const label = range === 'all' ? monthDate.format(time) : fullDate.format(time);
   const lines = tooltipLines(chart, row);
+  if (chart.showTrend && chart.trend.has(time)) lines.push(`7-day average ${chart.metric.display(chart.trend.get(time))}`);
   const date = document.createElement('time');
   date.textContent = label;
   const detail = lines.map((line) => {
@@ -434,24 +457,34 @@ function hideTooltip(chart) {
   chart.live.textContent = '';
 }
 
+function legendItem({ label, color, style }) {
+  const item = document.createElement('li');
+  const marker = document.createElement('span');
+  marker.className = style === undefined ? 'swatch' : `swatch line ${style}`;
+  marker.style.setProperty('--series', `var(${color})`);
+  item.append(marker, label);
+  return item;
+}
+
 function createChart(metric, rows) {
   const section = id('chart-template').content.firstElementChild.cloneNode(true);
   section.querySelector('h2').textContent = metric.title;
   const series = metric.series.filter(({ field }) => rows.some((row) => row[field] !== undefined));
   const legend = section.querySelector('.legend');
-  for (const { label, color, style } of series) {
-    if (!label) continue;
-    const item = document.createElement('li');
-    const marker = document.createElement('span');
-    marker.className = style === undefined ? 'swatch' : `swatch line ${style}`;
-    marker.style.setProperty('--series', `var(${color})`);
-    item.append(marker, label);
-    legend.append(item);
+  for (const definition of series) {
+    if (definition.label) legend.append(legendItem(definition));
   }
   legend.hidden = legend.childElementCount === 0;
+  let trendLegend;
+  if (metric.key !== 'sleep_minutes') {
+    trendLegend = legendItem(trendSeries);
+    trendLegend.hidden = true;
+    trendLegend.title = 'Average of all recorded days in the last 7 calendar days, with at least 4 days of data.';
+    legend.append(trendLegend);
+  }
   const canvas = section.querySelector('canvas');
   const chart = {
-    canvas, metric, series, ctx: canvas.getContext('2d'),
+    canvas, metric, series, legend, trendLegend, trend: new Map(), ctx: canvas.getContext('2d'),
     latestValue: section.querySelector('.latest strong'),
     latestLabel: section.querySelector('.latest span'),
     latestTime: section.querySelector('.latest time'),
@@ -492,6 +525,7 @@ for (const button of ranges) {
   });
 }
 weekdayOptions.addEventListener('change', showSelection);
+trendInput.addEventListener('change', () => charts.filter((chart) => chart.trendLegend).forEach(drawChart));
 for (const [button, checked] of [['all-weekdays', true], ['clear-weekdays', false]]) {
   id(button).addEventListener('click', () => {
     for (const input of weekdayInputs) input.checked = checked;
@@ -521,6 +555,7 @@ try {
   }
   rowsByDay = new Map(rows.map((row) => [Date.parse(row.date), row]));
   finish = Date.parse(rows.at(-1).date);
+  updateSummaryViews = initSummaryViews({ rowsByDay, metrics, dayMs, weekdayNames, fullDate });
   renderComparison();
   charts = metrics.map((metric) => createChart(metric, rows));
   dashboard.hidden = false;
