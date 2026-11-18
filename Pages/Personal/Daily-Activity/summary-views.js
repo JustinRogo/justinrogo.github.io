@@ -1,5 +1,7 @@
 const dayOrder = [1, 2, 3, 4, 5, 6, 0];
 const monthName = new Intl.DateTimeFormat('en-US', { month: 'short', timeZone: 'UTC' });
+const heatBandNames = ['Low', 'Lower middle', 'Upper middle', 'High'];
+const number = new Intl.NumberFormat('en-US');
 
 function quantile(sortedValues, fraction) {
   const position = (sortedValues.length - 1) * fraction;
@@ -29,6 +31,131 @@ function textElement(tag, className, text) {
   return element;
 }
 
+function initSleepScatter(rowsByDay, metrics, fullDate) {
+  const canvas = document.getElementById('sleep-scatter');
+  const ctx = canvas.getContext('2d');
+  const detail = document.getElementById('scatter-detail');
+  const count = document.getElementById('scatter-count');
+  const steps = metrics.get('steps');
+  const sleep = metrics.get('sleep_minutes');
+  let points = [];
+  let positions = [];
+  let selected = -1;
+
+  function draw() {
+    const { width, height } = canvas.getBoundingClientRect();
+    if (!ctx || !width) return;
+    const scale = window.devicePixelRatio || 1;
+    canvas.width = Math.round(width * scale);
+    canvas.height = Math.round(height * scale);
+    ctx.setTransform(scale, 0, 0, scale, 0, 0);
+    positions = [];
+    if (!points.length) return;
+
+    const theme = getComputedStyle(canvas);
+    const color = (key) => theme.getPropertyValue(key).trim();
+    const left = 42;
+    const right = width - 12;
+    const top = 23;
+    const bottom = height - 41;
+    const maxHours = Math.max(...points.map(({ minutes }) => minutes / 60));
+    const maxSteps = Math.max(...points.map(({ count }) => count));
+    const hourTick = Math.max(1, Math.ceil(maxHours / 4));
+    const stepTick = Math.max(1000, Math.ceil(maxSteps / 4000) * 1000);
+    const upperHours = Math.max(hourTick, Math.ceil(maxHours / hourTick) * hourTick);
+    const upperSteps = Math.max(stepTick, Math.ceil(maxSteps / stepTick) * stepTick);
+    const x = (hours) => left + hours / upperHours * (right - left);
+    const y = (stepsPerDay) => bottom - stepsPerDay / upperSteps * (bottom - top);
+
+    ctx.font = '11px Geist, system-ui, sans-serif';
+    ctx.fillStyle = color('--muted');
+    ctx.strokeStyle = color('--grid');
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    for (let tick = 0; tick <= upperSteps; tick += stepTick) {
+      ctx.fillText(steps.tick(tick), left - 6, y(tick));
+      ctx.beginPath();
+      ctx.moveTo(left, y(tick));
+      ctx.lineTo(right, y(tick));
+      ctx.stroke();
+    }
+    ctx.textBaseline = 'top';
+    ctx.textAlign = 'left';
+    ctx.fillText('Steps', left, 2);
+    ctx.textAlign = 'center';
+    for (let tick = 0; tick <= upperHours; tick += hourTick) ctx.fillText(String(tick), x(tick), bottom + 6);
+    ctx.fillText('Recorded sleep (hours)', (left + right) / 2, height - 15);
+
+    positions = points.map(({ minutes, count }) => ({ x: x(minutes / 60), y: y(count) }));
+    ctx.fillStyle = color('--trend');
+    ctx.globalAlpha = points.length > 200 ? .36 : .75;
+    for (const point of positions) {
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, points.length > 200 ? 2.2 : 3.4, 0, 2 * Math.PI);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    const active = positions[selected];
+    ctx.beginPath();
+    ctx.arc(active.x, active.y, 5.1, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.strokeStyle = color('--ink');
+    ctx.lineWidth = 1.4;
+    ctx.stroke();
+  }
+
+  function select(index) {
+    selected = index;
+    const point = points[index];
+    detail.textContent = point
+      ? `${fullDate.format(point.time)} · ${sleep.cell(point.minutes)} in recorded sleep sessions · ${steps.display(point.count)}`
+      : 'No dates with both sleep and step records in this view.';
+    draw();
+  }
+
+  function pointAt(event) {
+    const bounds = canvas.getBoundingClientRect();
+    let nearest = -1;
+    let distance = 20;
+    for (const [index, point] of positions.entries()) {
+      const candidate = Math.hypot(point.x - (event.clientX - bounds.left), point.y - (event.clientY - bounds.top));
+      if (candidate > distance) continue;
+      distance = candidate;
+      nearest = index;
+    }
+    if (nearest >= 0 && nearest !== selected) select(nearest);
+  }
+
+  canvas.addEventListener('pointermove', (event) => { if (event.pointerType === 'mouse') pointAt(event); });
+  canvas.addEventListener('click', pointAt);
+  canvas.addEventListener('keydown', (event) => {
+    if (!points.length) return;
+    const index = { ArrowLeft: selected - 1, ArrowRight: selected + 1, Home: 0, End: points.length - 1 }[event.key];
+    if (index === undefined) return;
+    event.preventDefault();
+    select(Math.min(points.length - 1, Math.max(0, index)));
+  });
+  new ResizeObserver(draw).observe(canvas);
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', draw);
+  document.fonts.ready.then(draw);
+
+  return (days) => {
+    const previous = points[selected]?.time;
+    points = [];
+    for (const time of days) {
+      const row = rowsByDay.get(time);
+      if (Number.isFinite(row?.sleep_minutes) && Number.isFinite(row?.steps)) {
+        points.push({ time, minutes: row.sleep_minutes, count: row.steps });
+      }
+    }
+    count.textContent = `${number.format(points.length)} paired ${points.length === 1 ? 'day' : 'days'}`;
+    canvas.hidden = points.length === 0;
+    canvas.setAttribute('aria-label', `Sleep and next-day steps, ${count.textContent}. Use the left and right arrows to explore days.`);
+    const existing = points.findIndex(({ time }) => time === previous);
+    select(existing < 0 ? points.length - 1 : existing);
+  };
+}
+
 export function initSummaryViews({ rowsByDay, metrics, dayMs, weekdayNames, fullDate }) {
   const weekMetric = document.getElementById('typical-metric');
   const week = document.getElementById('typical-week');
@@ -38,7 +165,9 @@ export function initSummaryViews({ rowsByDay, metrics, dayMs, weekdayNames, full
   const heatGrid = document.getElementById('heat-grid');
   const heatScroll = document.getElementById('heat-scroll');
   const heatDetail = document.getElementById('heat-detail');
+  const heatSwatches = document.querySelectorAll('#heat-scale i');
   const metricsByKey = new Map(metrics.map((metric) => [metric.key, metric]));
+  const updateScatter = initSleepScatter(rowsByDay, metricsByKey, fullDate);
   const dates = Array.from(rowsByDay.keys());
   const latestDate = dates.at(-1);
   const firstYear = new Date(dates[0]).getUTCFullYear();
@@ -110,6 +239,18 @@ export function initSummaryViews({ rowsByDay, metrics, dayMs, weekdayNames, full
     const datesInYear = Array.from({ length: (end - start) / dayMs }, (_, index) => start + index * dayMs);
     const positives = datesInYear.map((time) => rowsByDay.get(time)?.[metric.key]).filter((value) => value > 0).sort((a, b) => a - b);
     const breaks = positives.length ? [0.25, 0.5, 0.75].map((fraction) => quantile(positives, fraction)) : [];
+    for (const [index, swatch] of heatSwatches.entries()) {
+      if (!breaks.length) {
+        swatch.title = heatBandNames[index];
+        continue;
+      }
+      const upper = breaks[index];
+      const lower = breaks[index - 1];
+      const range = lower === undefined ? `up to about ${metric.cell(upper)}`
+        : upper === undefined ? `above about ${metric.cell(lower)}`
+          : `about ${metric.cell(lower)} to ${metric.cell(upper)}`;
+      swatch.title = `${heatBandNames[index]} · ${range}`;
+    }
     const offset = (new Date(start).getUTCDay() + 6) % 7;
     const cells = new Map();
     const fragment = document.createDocumentFragment();
@@ -134,13 +275,14 @@ export function initSummaryViews({ rowsByDay, metrics, dayMs, weekdayNames, full
       const value = rowsByDay.get(time)?.[metric.key];
       const included = weekdays.has(date.getUTCDay());
       const label = included ? (value === undefined ? 'No record' : metric.display(value)) : 'Filtered out';
+      const band = value > 0 ? breaks.filter((limit) => value > limit).length : undefined;
       const button = textElement('button', 'heat-day', '');
       button.type = 'button';
       button.style.gridArea = `${position % 7 + 2} / ${column}`;
       button.dataset.level = !included ? 'filtered'
-        : value === undefined ? 'missing' : value === 0 ? 'zero'
-          : 1 + breaks.filter((limit) => value > limit).length;
+        : value === undefined ? 'missing' : value === 0 ? 'zero' : band + 1;
       button.title = `${fullDate.format(time)} · ${label}`;
+      if (included && band !== undefined) button.title += ` · ${heatBandNames[band]}`;
       button.setAttribute('aria-label', button.title);
       button.setAttribute('aria-pressed', 'false');
       button.tabIndex = -1;
@@ -189,6 +331,7 @@ export function initSummaryViews({ rowsByDay, metrics, dayMs, weekdayNames, full
     weekdays = selectedWeekdays;
     selectedDays = days;
     renderTypicalWeek();
+    updateScatter(days);
     if (initial || changed) renderHeatmap({ reveal: initial });
   };
 }

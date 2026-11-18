@@ -23,10 +23,10 @@
   --minimum: #147a76;
   --maximum: #a24b2a;
   --trend: #7c359b;
-  --heat-1: #d2e2fc;
-  --heat-2: #9fbcf1;
-  --heat-3: #5e91e8;
-  --heat-4: #165abe;
+  --heat-1: #f4dcad;
+  --heat-2: #e9a151;
+  --heat-3: #c6663d;
+  --heat-4: #893748;
   font: 100%/1.5 Geist, system-ui, sans-serif;
 }
 
@@ -48,10 +48,10 @@
     --minimum: #68c9bd;
     --maximum: #f6ab84;
     --trend: #e4adff;
-    --heat-1: #213d65;
-    --heat-2: #305e9a;
-    --heat-3: #4f89d0;
-    --heat-4: #9dc9ff;
+    --heat-1: #67443c;
+    --heat-2: #a56849;
+    --heat-3: #ea9457;
+    --heat-4: #ffd684;
   }
 }
 
@@ -183,6 +183,7 @@ canvas { display: block; width: 100%; height: 145px; }
 .heat-legend, .heat-legend > span { display: flex; align-items: center; flex-wrap: wrap; gap: .25rem; color: var(--muted); font-size: .72rem; }
 .heat-legend { column-gap: .65rem; margin-top: .5rem; }
 .heat-legend i { display: inline-block; width: .65rem; height: .65rem; border-radius: 2px; border: 1px solid transparent; }
+.heat-scale i { width: .82rem; height: .82rem; }
 :is(.heat-day, .heat-legend i)[data-level="zero"] { background: var(--surface); border-color: var(--accent); }
 :is(.heat-day, .heat-legend i)[data-level="missing"] { background: var(--surface); border-color: var(--border); border-style: dotted; }
 :is(.heat-day, .heat-legend i)[data-level="filtered"] { background: var(--grid); opacity: .45; }
@@ -192,6 +193,9 @@ canvas { display: block; width: 100%; height: 145px; }
 :is(.heat-day, .heat-legend i)[data-level="4"] { background: var(--heat-4); }
 .heat-scroll-hint { display: none; }
 @media (max-width: 865px) { .heat-scroll-hint { display: block; } }
+
+.scatterplot canvas { height: 245px; margin-top: .65rem; }
+.scatter-count { color: var(--muted); font-size: .78rem; font-variant-numeric: tabular-nums; }
 
 .history { margin-top: 1rem; }
 .history summary { display: flex; align-items: center; justify-content: space-between; min-height: 48px; padding: .55rem .9rem; border: 1px solid var(--border); border-radius: .5rem; background: var(--surface); font-weight: 650; cursor: pointer; }
@@ -234,6 +238,7 @@ th:first-child { width: 29%; text-align: left; }
   canvas { height: 140px; }
   .analysis-panel { padding: .7rem; }
   .analysis-panel .report-heading { gap: .45rem; }
+  .scatterplot canvas { height: 225px; }
   .typical-row { min-height: 44px; }
   th, td { padding: .55rem .35rem; font-size: .75rem; }
   th:first-child { width: 30%; }
