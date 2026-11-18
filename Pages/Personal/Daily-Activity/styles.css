@@ -68,14 +68,20 @@ h1 { font-size: 3.2rem; line-height: 1.05; letter-spacing: -.04em; font-weight: 
 .comparison-heading h2 { font-size: .93rem; letter-spacing: -.01em; }
 .comparison-heading time { margin-left: .24rem; color: var(--muted); font-size: .76rem; font-weight: 500; }
 .comparison-heading p { color: var(--muted); font-size: .75rem; }
-.comparison dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: .5rem; }
-.comparison dl > div { padding-inline: .65rem; font-variant-numeric: tabular-nums; }
-.comparison dl > div:first-child { padding-left: 0; }
-.comparison dl > div:last-child { padding-right: 0; }
+.comparison dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: .65rem; }
+.comparison dl > div { --ring-color: var(--accent); padding-inline: .3rem; text-align: center; font-variant-numeric: tabular-nums; }
+.comparison dl > [data-metric="sleep_minutes"] { --ring-color: var(--rem); }
+.comparison dl > [data-metric="heart_rate_bpm"] { --ring-color: var(--minimum); }
 .comparison dl > div + div { border-left: 1px solid var(--grid); }
-.comparison dt, .comparison-reference { color: var(--muted); font-size: .73rem; }
+.comparison dt { font-weight: 600; font-size: .78rem; }
+.comparison-ring { position: relative; display: grid; place-items: center; width: 4rem; aspect-ratio: 1; margin: .18rem auto .12rem; }
+.comparison-ring svg { position: absolute; width: 100%; height: 100%; fill: none; stroke-width: 6; }
+.ring-track { stroke: var(--grid); }
+.ring-fill { stroke: var(--ring-color); stroke-linecap: round; transform: rotate(-90deg); transform-origin: center; }
+.ring-label { z-index: 1; color: var(--ink); font-size: .78rem; font-weight: 650; }
+.comparison-reference { color: var(--muted); font-size: .73rem; }
 .comparison-value { font-size: 1.02rem; font-weight: 650; }
-.comparison-difference { color: var(--accent); font-size: .75rem; font-weight: 600; }
+.comparison-difference { color: var(--muted); font-size: .75rem; font-weight: 600; }
 .status { color: var(--muted); }
 .view-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: .45rem 1rem; margin-bottom: .75rem; }
 .range button, .pager button, .weekday-actions button, .weekday-filter summary {
@@ -168,6 +174,7 @@ th:first-child { width: 29%; text-align: left; }
   h1 { font-size: 2.55rem; }
   .overview { grid-template-columns: 1fr; }
   .intro p { font-size: .9rem; }
+  .comparison-ring { width: 3.65rem; }
   .comparison-reference span { display: block; }
   .view-toolbar { gap: .4rem .55rem; }
   .view-period { margin-left: 0; }

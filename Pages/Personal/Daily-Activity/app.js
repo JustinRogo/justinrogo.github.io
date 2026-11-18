@@ -11,6 +11,7 @@ const yearDate = new Intl.DateTimeFormat('en-US', { year: 'numeric', timeZone: '
 const whole = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
 const decimal = new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
 const compact = new Intl.NumberFormat('en-US', { notation: 'compact' });
+const percentage = new Intl.NumberFormat('en-US', { style: 'percent' });
 const sleepTime = (value) => {
   const minutes = Math.round(value);
   return `${Math.floor(minutes / 60)}h ${minutes % 60}m`;
@@ -94,6 +95,24 @@ function startOfRange(first, last) {
   return last - (Number(range) - 1) * dayMs;
 }
 
+function comparisonRing(value, average) {
+  const ring = id('comparison-ring-template').content.firstElementChild.cloneNode(true);
+  const ratio = value !== undefined && average > 0 ? value / average : undefined;
+  if (ratio === undefined) {
+    ring.querySelector('.ring-label').textContent = '—';
+    ring.querySelector('.ring-description').textContent = ' Ratio unavailable';
+  } else {
+    ring.querySelector('.ring-label').textContent = percentage.format(ratio);
+    ring.querySelector('.ring-description').textContent = ' of rolling annual average';
+    if (ratio > 0) {
+      const fill = ring.querySelector('.ring-fill');
+      if (ratio < 1) fill.setAttribute('stroke-dasharray', `${100 * ratio} 100`);
+      fill.removeAttribute('hidden');
+    }
+  }
+  return ring;
+}
+
 function renderComparison() {
   const { year, month, day } = Object.fromEntries(easternDate.formatToParts(new Date())
     .map(({ type, value }) => [type, value]));
@@ -130,7 +149,8 @@ function renderComparison() {
       reference.append('Year avg. ', averageValue);
     }
     const item = document.createElement('div');
-    item.append(term, current);
+    item.dataset.metric = key;
+    item.append(term, comparisonRing(value, average), current);
     if (value !== undefined && average !== undefined) {
       const difference = document.createElement('dd');
       difference.className = 'comparison-difference';

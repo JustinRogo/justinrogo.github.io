@@ -24,7 +24,7 @@
       <section class="comparison" id="comparison" aria-labelledby="comparison-title" hidden>
         <div class="comparison-heading">
           <h2 id="comparison-title">Yesterday <time id="comparison-date"></time></h2>
-          <p>Compared with the rolling 1-year average</p>
+          <p>100% = rolling 1-year average</p>
         </div>
         <dl id="comparison-values"></dl>
       </section>
@@ -91,6 +91,15 @@
           <span class="sr-only" role="status"></span>
         </div>
       </section>
+    </template>
+    <template id="comparison-ring-template">
+      <dd class="comparison-ring">
+        <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+          <circle class="ring-track" cx="32" cy="32" r="27" />
+          <circle class="ring-fill" cx="32" cy="32" r="27" pathLength="100" hidden />
+        </svg>
+        <span class="ring-label"></span><span class="sr-only ring-description"></span>
+      </dd>
     </template>
   </main>
 </body>
