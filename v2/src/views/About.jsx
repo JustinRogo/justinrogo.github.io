@@ -5,6 +5,7 @@ import Icon from "../components/Icon.jsx";
 import ProfilePortrait from "../components/ProfilePortrait.jsx";
 import { useRef } from "react";
 import Strengths from "../components/Strengths.jsx";
+import DailyActivity from "../components/DailyActivity.jsx";
 import { AboutVine } from "../botanical/Flora.jsx";
 import { useBotanical } from "../botanical/siteStyle.js";
 
@@ -110,6 +111,7 @@ export default function About({ effects, fine }) {
         <p className="technology-list">{technologies.join(", ")}</p>
       </section>
       <Strengths effects={effects} fine={fine} />
+      <DailyActivity />
       <section
         className="contact-section"
         id="say-hello"

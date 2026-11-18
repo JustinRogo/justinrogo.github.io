@@ -1,0 +1,64 @@
+.about-activity {
+  margin-top: 48px;
+  padding: clamp(18px, 3vw, 32px);
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--glass-radius, 11px);
+  background: var(--glass-fill, var(--surface));
+  container-type: inline-size;
+}
+.about-activity > .section-title { margin: 0; }
+.about-activity-caption {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+.about-activity-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 24px 0 14px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.about-activity-metrics dt { font-weight: 600; }
+.about-activity-metrics dd {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.about-activity-metrics .about-activity-ring {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(100%, 96px);
+  aspect-ratio: 1;
+  margin: 10px auto;
+  color: var(--ink);
+  font-size: clamp(1rem, 5cqi, 1.4rem);
+  font-weight: 600;
+}
+.about-activity-ring svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  fill: none;
+  stroke: var(--blue);
+  stroke-width: 4;
+}
+.about-activity-metrics [data-metric="sleep_minutes"] svg { stroke: var(--b-ochre, var(--muted)); }
+.about-activity-metrics [data-metric="heart_rate_bpm"] svg { stroke: var(--orange); }
+.about-activity-ring .about-activity-track { stroke: var(--line); }
+.about-activity-metrics .about-activity-value {
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 600;
+}
+@container (max-width: 350px) {
+  .about-activity-metrics { gap: 6px; }
+  .about-activity-average { display: block; }
+  .about-activity-metrics dt, .about-activity-metrics .about-activity-value { font-size: 0.875rem; }
+}
+@media (forced-colors: active) {
+  .about-activity-ring svg circle { stroke: CanvasText; }
+  .about-activity-ring svg .about-activity-track { stroke: GrayText; }
+}

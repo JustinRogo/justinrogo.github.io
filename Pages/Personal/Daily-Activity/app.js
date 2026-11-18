@@ -1,24 +1,14 @@
 import { initSummaryViews, trailingWeek } from './summary-views.js';
+import { activityComparison, bpm, decimal, sleepTime, whole, yearBefore } from './comparison.js';
 
 const dayMs = 86_400_000;
 const pageSize = 14;
 const weekdayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-const easternDate = new Intl.DateTimeFormat('en-US', {
-  timeZone: 'America/New_York', year: 'numeric', month: 'numeric', day: 'numeric',
-});
 const fullDate = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeZone: 'UTC' });
 const shortDate = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
 const monthDate = new Intl.DateTimeFormat('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });
 const yearDate = new Intl.DateTimeFormat('en-US', { year: 'numeric', timeZone: 'UTC' });
-const whole = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
-const decimal = new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
 const compact = new Intl.NumberFormat('en-US', { notation: 'compact' });
-const percentage = new Intl.NumberFormat('en-US', { style: 'percent' });
-const sleepTime = (value) => {
-  const minutes = Math.round(value);
-  return `${Math.floor(minutes / 60)}h ${minutes % 60}m`;
-};
-const bpm = (value) => `${decimal.format(value)} bpm`;
 const stageSeries = [
   { field: 'sleep_deep_minutes', label: 'Deep', color: '--deep' },
   { field: 'sleep_rem_minutes', label: 'REM', color: '--rem' },
@@ -86,28 +76,19 @@ let buckets = [];
 let charts = [];
 let updateSummaryViews;
 
-function yearBefore(time) {
-  const date = new Date(time);
-  const year = date.getUTCFullYear() - 1;
-  const month = date.getUTCMonth();
-  const daysInMonth = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
-  return Date.UTC(year, month, Math.min(date.getUTCDate(), daysInMonth));
-}
-
 function startOfRange(first, last) {
   if (range === 'all') return first;
   if (range === 'year') return yearBefore(last) + dayMs;
   return last - (Number(range) - 1) * dayMs;
 }
 
-function comparisonRing(value, average) {
+function comparisonRing({ ratio, percent }) {
   const ring = id('comparison-ring-template').content.firstElementChild.cloneNode(true);
-  const ratio = value !== undefined && average > 0 ? value / average : undefined;
   if (ratio === undefined) {
     ring.querySelector('.ring-label').textContent = '—';
     ring.querySelector('.ring-description').textContent = ' Ratio unavailable';
   } else {
-    ring.querySelector('.ring-label').textContent = percentage.format(ratio);
+    ring.querySelector('.ring-label').textContent = percent;
     ring.querySelector('.ring-description').textContent = ' of rolling annual average';
     if (ratio > 0) {
       const fill = ring.querySelector('.ring-fill');
@@ -119,51 +100,33 @@ function comparisonRing(value, average) {
 }
 
 function renderComparison() {
-  const { year, month, day } = Object.fromEntries(easternDate.formatToParts(new Date())
-    .map(({ type, value }) => [type, value]));
-  const yesterday = Date.UTC(Number(year), Number(month) - 1, Number(day)) - dayMs;
-  const first = yearBefore(yesterday);
-  const previous = rowsByDay.get(yesterday);
+  const { yesterday, metrics } = activityComparison(rowsByDay);
   const date = id('comparison-date');
   date.dateTime = new Date(yesterday).toISOString().slice(0, 10);
   date.textContent = shortDate.format(yesterday);
   const items = metrics.map((metric) => {
-    const { key, title, cell } = metric;
-    let total = 0;
-    let count = 0;
-    for (let time = first; time < yesterday; time += dayMs) {
-      const value = rowsByDay.get(time)?.[key];
-      if (value === undefined) continue;
-      total += value;
-      count++;
-    }
-    const average = count ? total / count : undefined;
-    const value = previous?.[key];
+    const { key, title, value, average } = metric;
     const term = document.createElement('dt');
     term.textContent = title;
     const current = document.createElement('dd');
     current.className = 'comparison-value';
-    current.textContent = value === undefined ? 'No record' : cell(value);
+    current.textContent = value;
     const reference = document.createElement('dd');
     reference.className = 'comparison-reference';
     if (average === undefined) {
       reference.textContent = 'No year average';
     } else {
       const averageValue = document.createElement('span');
-      averageValue.textContent = cell(average);
+      averageValue.textContent = average;
       reference.append('Year avg. ', averageValue);
     }
     const item = document.createElement('div');
     item.dataset.metric = key;
-    item.append(term, comparisonRing(value, average), current);
-    if (value !== undefined && average !== undefined) {
+    item.append(term, comparisonRing(metric), current);
+    if (metric.difference) {
       const difference = document.createElement('dd');
       difference.className = 'comparison-difference';
-      const precision = key === 'heart_rate_bpm' ? 10 : 1;
-      const delta = (Math.round(value * precision) - Math.round(average * precision)) / precision;
-      const magnitude = key === 'sleep_minutes' && Math.round(Math.abs(delta)) < 60
-        ? `${Math.round(Math.abs(delta))}m` : cell(Math.abs(delta));
-      difference.textContent = delta === 0 ? 'At average' : `${delta < 0 ? '−' : '+'}${magnitude}`;
+      difference.textContent = metric.difference;
       item.append(difference);
     }
     item.append(reference);
