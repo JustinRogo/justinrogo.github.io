@@ -22,26 +22,9 @@
     </header>
 
     <p id="status" class="status" role="status">Loading daily activity…</p>
-    <noscript><p>Enable JavaScript to view the chart and daily table.</p></noscript>
+    <noscript><p>Enable JavaScript to view the charts and daily table.</p></noscript>
     <div id="dashboard" hidden>
-      <div class="metrics" role="group" aria-label="Metric">
-        <button type="button" data-metric="steps" aria-pressed="true">Steps</button>
-        <button type="button" data-metric="sleep_minutes" aria-pressed="false">Sleep sessions</button>
-        <button type="button" data-metric="heart_rate_bpm" aria-pressed="false">Heart rate</button>
-      </div>
-
-      <section class="report" aria-labelledby="metric-title">
-        <div class="report-heading">
-          <div class="metric-heading">
-            <h2 id="metric-title">Daily steps</h2>
-            <p id="metric-note"></p>
-          </div>
-          <dl class="latest" aria-live="polite" aria-atomic="true">
-            <dt>Latest recorded</dt>
-            <dd id="latest-date"></dd>
-            <dd id="latest-value"></dd>
-          </dl>
-        </div>
+      <div class="view-toolbar">
         <div class="range" role="group" aria-label="Date range">
           <button type="button" data-range="7" aria-pressed="false">7 days</button>
           <button type="button" data-range="30" aria-pressed="true">30 days</button>
@@ -49,26 +32,15 @@
           <button type="button" data-range="year" aria-pressed="false">1 year</button>
           <button type="button" data-range="all" aria-pressed="false">All time</button>
         </div>
-        <figure>
-          <div class="chart">
-            <canvas id="chart" role="img" aria-describedby="chart-caption"></canvas>
-            <div id="chart-guide" class="chart-guide" aria-hidden="true" hidden></div>
-            <div id="chart-tooltip" class="tooltip" aria-hidden="true" hidden></div>
-          </div>
-          <figcaption id="chart-caption">
-            <span id="chart-dates"></span>
-            <span class="chart-hint">Hover or tap for daily values</span>
-            <span>Calendar dates in Eastern Time</span>
-          </figcaption>
-        </figure>
-      </section>
+        <p class="view-period"><span id="view-dates"></span><span id="view-grain"></span></p>
+      </div>
+      <div class="report" id="charts"></div>
+      <p class="chart-hint">Dates in Eastern Time. Hover, tap, or use the arrow keys on a chart to see values.</p>
 
-      <section class="history" aria-labelledby="history-title">
+      <details class="history" id="history">
+        <summary><span id="history-title">Daily values</span></summary>
         <div class="history-heading">
-          <div>
-            <h2 id="history-title">Daily values</h2>
-            <p>A dash indicates a day without a record for that metric.</p>
-          </div>
+          <p>A dash indicates a day without a record for that metric.</p>
           <div class="pager" role="group" aria-label="Page of daily values">
             <button type="button" id="newer">Newer</button>
             <span id="page" role="status"></span>
@@ -78,14 +50,29 @@
         <table aria-labelledby="history-title">
           <thead><tr>
             <th scope="col">Date</th>
-            <th scope="col" data-column="steps">Steps</th>
-            <th scope="col" data-column="sleep_minutes">Sleep sessions</th>
-            <th scope="col" data-column="heart_rate_bpm">Avg. heart rate</th>
+            <th scope="col">Steps</th>
+            <th scope="col">Sleep sessions</th>
+            <th scope="col">Avg. heart rate</th>
           </tr></thead>
           <tbody id="daily-rows"></tbody>
         </table>
-      </section>
+      </details>
     </div>
+    <template id="chart-template">
+      <section class="metric">
+        <header class="report-heading">
+          <h2></h2>
+          <p class="latest"><strong></strong><span>Latest recorded <time></time></span></p>
+        </header>
+        <ul class="legend" hidden></ul>
+        <div class="chart">
+          <canvas role="img" tabindex="0"></canvas>
+          <div class="chart-guide" aria-hidden="true" hidden></div>
+          <div class="tooltip" aria-hidden="true" hidden></div>
+          <span class="sr-only" role="status"></span>
+        </div>
+      </section>
+    </template>
   </main>
 </body>
 </html>
