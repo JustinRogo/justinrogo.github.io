@@ -58,6 +58,9 @@ jobs:
       - name: Prepare static site
         run: npm run build -- --skip-feed
 
+      - name: Validate public activity summaries
+        run: python3 scripts/import-daily-activity.py --check --output dist/Pages/Personal/Daily-Activity/daily.json
+
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3
