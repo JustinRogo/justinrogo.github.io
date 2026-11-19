@@ -45,14 +45,20 @@
           p.theme === "dark" ||
           (p.theme !== "light" &&
             matchMedia("(prefers-color-scheme: dark)").matches);
-        // Botanical is the default; Original only for visitors who chose it.
-        const botanical = p.style !== "original";
+        // Botanical is the default; Original and Risograph only for visitors who chose them.
+        const style = ["original", "riso"].includes(p.style) ? p.style : "botanical";
         document.documentElement.dataset.theme = dark ? "dark" : "light";
-        document.documentElement.dataset.style = botanical ? "botanical" : "original";
-        document.querySelector('meta[name="theme-color"]').content = botanical
-          ? dark ? "#0c1b14" : "#efe8d8"
-          : dark ? "#060f23" : "#e6efff";
-        if (botanical) {
+        document.documentElement.dataset.style = style;
+        document.querySelector('meta[name="theme-color"]').content = {
+          botanical: dark ? "#0c1b14" : "#efe8d8",
+          original: dark ? "#060f23" : "#e6efff",
+          riso: dark ? "#1c1a18" : "#f2e9d4",
+        }[style];
+        const fonts = {
+          botanical: "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..700,0..100;1,9..144,300..700,0..100&display=swap",
+          riso: "https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap",
+        };
+        if (fonts[style]) {
           for (const origin of ["https://fonts.googleapis.com", "https://fonts.gstatic.com"]) {
             const hint = document.createElement("link");
             hint.rel = "preconnect";
@@ -61,9 +67,9 @@
             document.head.append(hint);
           }
           const font = document.createElement("link");
-          font.id = "botanical-fonts";
+          font.id = style + "-fonts";
           font.rel = "stylesheet";
-          font.href = "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..700,0..100;1,9..144,300..700,0..100&display=swap";
+          font.href = fonts[style];
           document.head.append(font);
         }
       } catch {}

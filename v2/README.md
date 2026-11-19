@@ -109,7 +109,7 @@ React Bits is copyright David Haz, under MIT + Commons Clause. The build include
 
 ## Botanical style
 
-**Botanical**, a conservatory/field-journal identity, is the default site style. Settings → **Site style** also offers **Original**, the blue/orange glass design, unchanged. Saved preferences without a `style` (including those from before Botanical existed) open in Botanical; only an explicit `style: "original"` keeps Original. Switching needs no reload; with motion allowed, the new style grows out of a leaf-shaped window opened at the chosen option (View Transitions API; browsers without it switch instantly). The pre-paint script in `index.html` applies the style before first render.
+**Botanical**, a conservatory/field-journal identity, is the default site style. Settings → **Site style** also offers **Original**, the blue/orange glass design, unchanged, and **Risograph** (below). Saved preferences without a `style` (including those from before Botanical existed) open in Botanical; only an explicit `style: "original"` keeps Original. Switching needs no reload; with motion allowed, the new style grows out of a leaf-shaped window opened at the chosen option (View Transitions API; browsers without it switch instantly). The pre-paint script in `index.html` applies the style before first render.
 
 - **Architecture.** `:root[data-style="botanical"]` scopes everything. `src/botanical/botanical.css` remaps the shared tokens (`--bg`, `--surface`, `--ink`, `--blue`, `--orange`, `--glass-*`…) for Sunlit (light) and Moonlit (dark), then restyles components: matte grained paper instead of glass, Fraunces serif headings over Geist body text, pill controls, leaf-cornered cards, and a deep-green rail that re-scopes its own tokens. Glass refraction is not mounted in Botanical.
 - **Illustrations.** `src/botanical/Flora.jsx` draws a monstera (slits cut through an SVG mask), sword fern, golden pothos, laurel wreath, sprigs, and a loading seedling procedurally, so they're small and crisp. They're placed deliberately: a plant corner in the hero, a wreath around the portrait, a flourish beside full-width section headings, a fern that unfurls after each page title, and a seedling in loading states.
@@ -118,6 +118,22 @@ React Bits is copyright David Haz, under MIT + Commons Clause. The build include
 - **Motion and access.** One-time flourishes run only when `data-flourish="on"` (not Calm mode, reduced motion, or contrast modes), so they don't replay when the tab is hidden and shown. Ambient background motion follows the existing moving/still policy. High contrast and forced colors drop the decoration and use plain surfaces.
 - **Fonts.** Fraunces loads from Google Fonts (with preconnect hints) while Botanical is in use. Visitors who choose Original make no font requests to Google. Fallbacks are Iowan Old Style, Palatino, and Georgia.
 - **Tests.** `tests/botanical.spec.mjs` covers the default, switching, Pip, reduced motion, and overflow at three widths in both themes. The other specs import `tests/original-style.mjs`, which pins preferences without a style to Original, so they keep guarding the Original design.
+
+## Style short links
+
+`/r`, `/b` and `/o` open the homepage in Risograph, Botanical or Original: for example, https://justinrogo.github.io/r. Each folder holds a tiny page that runs `v2/assets/style-link.js`. The script saves that style as the visitor's choice, keeping their other settings, then replaces the address with the homepage at the same hash, so `/r#/projects` lands on Projects. After that the plain address keeps whatever the visitor last chose in Settings, so a bookmarked short link never overrides a later change. The pages carry the homepage's link-preview tags, `noindex` and a canonical link to the homepage. Without JavaScript they fall through to the homepage in its default style. `scripts/build-site.mjs` copies the three folders into `dist/`.
+
+## Risograph style
+
+**Risograph** is the third option under Settings → **Site style**. It prints the site in three inks (fluorescent pink, cobalt and golden yellow) on warm, grained paper. Light/Dark become **Cream paper** and **Black paper**: the same inks, mixed to stay readable on near-black stock. Only an explicit `style: "riso"` selects it; unknown or missing styles fall back to Botanical. Switching to it feeds the new sheet through the press: a top-to-bottom wipe.
+
+- **Architecture.** `:root[data-style="riso"]` scopes everything in `src/riso/riso.css`, which remaps the shared tokens and restyles components the same way Botanical does. Panels become areas of one sheet divided by 1.5px ink rules with 2px corners, not raised cards, and no glass is mounted. The rail and the Fable's Extent spotlight are cobalt floods with paper type, and "How can I help?" is a yellow block. Headings, names and important numbers (AI Corner dates, Pocket Part numbers, Extent figures, temperatures, strength ranks) use Archivo at 62% width in heavy capitals; body text is Archivo at normal width.
+- **Print effects.** Display type carries a static ink speckle (a CSS mask from an SVG noise tile) and, on the big headlines, a pink plate offset by about 0.03em. The plate slides into register on hover, as does the portrait's pink plate. Controls stay flat. Overlapping inks overprint with `multiply` on cream and `screen` on black. The portrait is a two-plate duotone: a cobalt plate for shadows and a pink halftone plate for midtones. Project screenshots print in one ink and show full colour on hover or focus. Strength domain colours are data and stay unchanged.
+- **Art.** `src/riso/RisoArt.jsx` draws the wordmark mark, the hero print (cut block, half-disc, halftone patch, registration target), the shapes behind the portrait, and the settings sheet's corner. All of it is flat CSS/SVG and decorative.
+- **Backgrounds.** Cut shapes, Halftone, Press sheet (crop marks, registration targets, a colour bar) and None. All are static and stored separately as `risoBackground`, so the other styles' choices are kept.
+- **Motion and access.** With `data-flourish="on"`, Home prints in three passes (yellow, pink, cobalt) and page titles settle into register. Calm mode and reduced motion keep the print but drop moving plates. Contrast-more and forced colors remove textures, background art and off-register plates.
+- **Fonts.** Archivo (width 62–125, weight 100–900) loads from Google Fonts only while Risograph is in use. The fallback stack is condensed first (Archivo Narrow, Roboto Condensed, Arial Narrow), and headings may wrap mid-word on phones as a last resort, so a blocked webfont can't push the layout sideways.
+- **Tests.** `tests/riso.spec.mjs` covers the three-option picker, separate backgrounds, pre-paint, paper-not-glass rendering, contrast modes, the unknown-style fallback, and overflow at 375, 700 and 1440px in both themes.
 
 ## Architecture
 
@@ -129,6 +145,7 @@ React Bits is copyright David Haz, under MIT + Commons Clause. The build include
 - `src/views/`: five destinations; `src/components/`: shared controls, dialogs, icons, project rows and sketch.
 - `src/styles.css`: V2 layout and controls; `src/glass-theme.css`: the requested glass materials, blue/orange tokens, responsive hero and atmospheric motion.
 - `src/botanical/`: the Botanical site style: tokens and component styles, illustrations, Pip, backgrounds, and the style transition.
+- `src/riso/`: the Risograph site style: tokens and component styles, print art, and backgrounds. Style ids, font loading and the transition are shared in `src/botanical/siteStyle.js` and `styleTransition.js`.
 - `src/components/PageBackground.jsx` / `.css`: selected background host, device defaults, motion policy, and scoped host/settings styles.
 - `build.mjs`: independent esbuild pipeline, read-only strength extraction, and exposure of existing background components without V1’s application controller.
 - `serve.mjs`: local static preview with watch support.

@@ -13,6 +13,7 @@ import AgentCursor from "./AgentCursor.jsx";
 import { assemblyConfig, layoutTasks } from "./assemblyConfig.js";
 import { createAssemblyTimeline } from "./AssemblyTimeline.js";
 import Icon from "../components/Icon.jsx";
+import { fontSheetIds } from "../botanical/siteStyle.js";
 import "./assembly.css";
 
 const AssemblyContext = createContext(null);
@@ -44,12 +45,18 @@ function viewportDimensions() {
 // out the page, and ask for the faces the hero uses before trusting `ready`.
 async function fontsSettled(registry) {
   if (!document.fonts) return;
-  const sheet = document.getElementById("botanical-fonts");
-  if (sheet && !sheet.sheet)
-    await new Promise((resolve) => {
-      sheet.addEventListener("load", resolve, { once: true });
-      sheet.addEventListener("error", resolve, { once: true });
-    });
+  await Promise.all(
+    fontSheetIds
+      .map((id) => document.getElementById(id))
+      .filter((sheet) => sheet && !sheet.sheet)
+      .map(
+        (sheet) =>
+          new Promise((resolve) => {
+            sheet.addEventListener("load", resolve, { once: true });
+            sheet.addEventListener("error", resolve, { once: true });
+          }),
+      ),
+  );
   await new Promise((resolve) => requestAnimationFrame(resolve));
   const fonts = new Set(
     ["hero-title", "hero-role", "hero-description", "navigation"]

@@ -18,8 +18,9 @@ import LawEvents from "../components/LawEvents.jsx";
 import PocketPart from "../components/PocketPart.jsx";
 import { ProjectPreview } from "../components/Project.jsx";
 import ProfilePortrait from "../components/ProfilePortrait.jsx";
-import { useBotanical } from "../botanical/siteStyle.js";
+import { useSiteStyle } from "../botanical/siteStyle.js";
 import { HeroFlora } from "../botanical/Flora.jsx";
+import { HeroPrint, StatutesPrint } from "../riso/RisoArt.jsx";
 import "./Home.css";
 
 const helpLinks = [
@@ -29,12 +30,13 @@ const helpLinks = [
 ];
 
 function Name({ effects }) {
-  // Botanical sets the name in a serif, so the canvas text effect stays off.
-  const botanical = useBotanical();
+  // Botanical and Risograph set the name in their own display faces, so the
+  // canvas text effect stays off.
+  const canvasName = useSiteStyle() === "original";
   return (
     <AssembleReveal id="hero-title">
       <h1 tabIndex={-1} className="tech-heading">
-        {effects && !botanical ? (
+        {effects && canvasName ? (
           <>
             <span className="sr-only">Justin Rogowski</span>
             <span className="tech-name" aria-hidden="true">
@@ -78,7 +80,7 @@ function Name({ effects }) {
 }
 
 function FeaturedBento({ projects, effects, theme, fine }) {
-  const botanical = useBotanical();
+  const style = useSiteStyle();
   const items = useMemo(() => {
     const pages = projects.data?.pages || [];
     const featured = featuredPaths
@@ -101,7 +103,7 @@ function FeaturedBento({ projects, effects, theme, fine }) {
               <div className={`bento-project bento-project-${index}`}>
                 {index === 0 ? (
                   <div className="bento-statutes-art" aria-hidden="true">
-                    <span>§§</span>
+                    {style === "riso" ? <StatutesPrint /> : <span>§§</span>}
                   </div>
                 ) : null}
                 <ProjectPreview project={project} className="featured-project-preview" decorative sizes="270px" />
@@ -119,7 +121,7 @@ function FeaturedBento({ projects, effects, theme, fine }) {
           </>
         ),
       }));
-  }, [projects.data]);
+  }, [projects.data, style]);
   return (
     <MagicBento
       items={items}
@@ -129,7 +131,7 @@ function FeaturedBento({ projects, effects, theme, fine }) {
       gap={16}
       radius={6}
       theme={theme}
-      glowColor={botanical ? "#c5a46d" : "#ff8a36"}
+      glowColor={{ botanical: "#c5a46d", riso: "#ff4fa3" }[style] || "#ff8a36"}
       textAutoHide={false}
       enableBorderGlow={effects}
       enableSpotlight={effects && fine}
@@ -239,13 +241,14 @@ const BELOW_EVENTS = 24;
 
 export default function Home({ projects, effects, theme, fine }) {
   const [eventsColumn, eventsFit] = useFitsViewport(TOPBAR_CLEARANCE + BELOW_EVENTS);
-  const botanical = useBotanical();
+  const style = useSiteStyle();
   return (
     <>
       <AssembleReveal id="hero-frame">
         <section className="glass-hero glass-host">
           <GlassLayer />
-          {botanical && <HeroFlora />}
+          {style === "botanical" && <HeroFlora />}
+          {style === "riso" && <HeroPrint />}
           <div className="hero-copy">
             <Name effects={effects} />
             <AssembleReveal id="hero-role">

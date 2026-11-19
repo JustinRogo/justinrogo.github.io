@@ -1,6 +1,6 @@
 import "../../../src/homepage/vendor/GlassSurface.css";
 import { useMedia } from "../hooks.js";
-import { useBotanical } from "../botanical/siteStyle.js";
+import { useSiteStyle } from "../botanical/siteStyle.js";
 
 // The frosted glass behind V2's panels, kept behind the controls and never
 // around their content. This is Glass Surface's own frosted mode, rendered as
@@ -20,7 +20,8 @@ export function GlassLayer({ className = "" }) {
   const transparency = useMedia("(prefers-reduced-transparency: reduce)");
   const contrast = useMedia("(prefers-contrast: more)");
   const forced = useMedia("(forced-colors: active)");
-  const botanical = useBotanical();
+  // Botanical and Risograph surfaces are matte paper, so they skip the glass.
+  const paper = useSiteStyle() !== "original";
   const opaque = transparency || contrast || forced;
   return (
     <div
@@ -28,8 +29,7 @@ export function GlassLayer({ className = "" }) {
       aria-hidden="true"
       inert
     >
-      {/* Botanical surfaces are matte paper, so they skip the glass. */}
-      {!opaque && !botanical && (
+      {!opaque && !paper && (
         <div className="glass-surface glass-surface--fallback" style={frost}>
           {/* V2 draws its own rim (--glass-rim), so the surface's is omitted. */}
           <span className="glass-surface__sheen" />

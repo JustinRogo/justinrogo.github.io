@@ -1,0 +1,1649 @@
+/* =====================================================================
+   Risograph: the site as a three-colour print run.
+   Everything is scoped to :root[data-style="riso"] except the picker's
+   preview swatch and the backgrounds, so Botanical and Original are untouched.
+   1. Tokens (cream paper / black paper)   6. Home
+   2. Base, type, browser surfaces         7. Projects, tools, about, more
+   3. Sheet surfaces                       8. Art: hero print, portrait, marks
+   4. Rail, top bar, footer                9. Backgrounds
+   5. Controls and the settings sheet     10. Motion, transitions, accessibility
+   ===================================================================== */
+
+/* ---------- Shared: the picker's swatch (all styles) ---------- */
+.style-preview-riso {
+  background: #f2e9d4;
+}
+.style-preview-riso i {
+  mix-blend-mode: multiply;
+}
+.style-preview-riso i:nth-child(1) {
+  top: -16px;
+  right: 10px;
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  background: #ffc61a;
+}
+.style-preview-riso i:nth-child(2) {
+  right: -4px;
+  bottom: -2px;
+  width: 64px;
+  height: 46px;
+  background: #ff4fa3;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+.style-preview-riso i:nth-child(3) {
+  left: 44px;
+  bottom: 12px;
+  width: 58px;
+  height: 22px;
+  border-radius: 2px;
+  background: #2747c9;
+}
+
+/* =====================================================================
+   1. Tokens
+   ===================================================================== */
+:root[data-style="riso"] {
+  color-scheme: light;
+  /* Condensed fallbacks first, so a blocked webfont doesn't widen the type. */
+  --font-display: "Archivo", "Archivo Narrow", "Roboto Condensed", "Arial Narrow",
+    "Helvetica Neue", sans-serif;
+  --font-text: "Archivo", Geist, system-ui, sans-serif;
+  /* Inks. Fluorescent pink and yellow are for fills and shapes; text uses
+     the deeper "-display" and "-text" mixes so it stays readable. */
+  --r-paper: #f2e9d4;
+  --r-paper-hi: #f7f0de;
+  --r-pink: #ff4fa3;
+  --r-pink-display: #e5207f;
+  --r-pink-text: #b8125f;
+  --r-blue: #2747c9;
+  --r-blue-deep: #1b2a78;
+  --r-yellow: #ffc61a;
+  --r-ink-on-color: #141c50;
+  --r-blend: multiply;
+  --r-rule: 1.5px;
+  --r-offset: 0.034em;
+
+  /* Shared site tokens, remapped. */
+  --bg: var(--r-paper);
+  --surface: var(--r-paper-hi);
+  --ink: var(--r-blue-deep);
+  --muted: #4d5482;
+  --line: #9aa0c4;
+  --blue: var(--r-blue);
+  --blue-hover: var(--r-blue-deep);
+  --orange: var(--r-pink-text);
+  --tint: #fbe39b;
+  --nav: #e9dcbd;
+  --branch-line: #9aa0c4;
+  --wash: transparent;
+  --shadow: none;
+  --glass-fill: var(--r-paper);
+  --glass-edge: var(--r-blue);
+  --glass-inner-shadow: transparent;
+  --glass-rim: inset 0 0 0 var(--r-rule) var(--glass-edge);
+  --glass-radius: 2px;
+  --panel-shadow: none;
+  --accent-fill: var(--r-pink);
+  --accent-fill-hover: #ff6cb3;
+  --accent-ink: var(--r-ink-on-color);
+
+  /* Paper fibre and the ink's own speckle. */
+  --r-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .32 0 0 0 0 .26 0 0 0 0 .16 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --r-fibre: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.012 .2' numOctaves='2' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .36 0 0 0 0 .2 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
+  --r-speckle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.6 2.5'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s)'/%3E%3C/svg%3E");
+  /* Ink that didn't quite cover: sparse paper-coloured specks laid over
+     solid ink fields (the rail, colour blocks, buttons, stamps). */
+  --r-mottle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.72' numOctaves='3' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .97 0 0 0 0 .94 0 0 0 0 .87 0 0 0 -2.4 0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
+  font-family: var(--font-text);
+}
+:root[data-style="riso"][data-theme="dark"] {
+  color-scheme: dark;
+  /* Black stock: the same inks, mixed opaque so they sit on dark paper. */
+  --r-paper: #1c1a18;
+  --r-paper-hi: #232120;
+  --r-pink: #ff5fae;
+  --r-pink-display: #ff6cb5;
+  --r-pink-text: #ff8cc6;
+  --r-blue: #7189ff;
+  --r-blue-deep: #a9b8ff;
+  --r-yellow: #ffcf3a;
+  --r-ink-on-color: #141c50;
+  --r-blend: screen;
+
+  --bg: var(--r-paper);
+  --surface: var(--r-paper-hi);
+  --ink: #f1e8d6;
+  --muted: #c4bba8;
+  --line: #5d5850;
+  --blue: var(--r-blue-deep);
+  --blue-hover: #c9d2ff;
+  --orange: var(--r-pink-text);
+  --tint: #3a3220;
+  --nav: #2c2926;
+  --branch-line: #6d675e;
+  --glass-edge: #8a96d8;
+  --accent-fill: var(--r-pink);
+  --accent-fill-hover: #ff7fc0;
+  --r-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .95 0 0 0 0 .9 0 0 0 0 .8 0 0 0 .06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --r-fibre: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.012 .2' numOctaves='2' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .9 0 0 0 0 .85 0 0 0 0 .75 0 0 0 .04 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
+}
+
+/* =====================================================================
+   2. Base, type, browser surfaces
+   ===================================================================== */
+:root[data-style="riso"] body {
+  background: var(--r-grain), var(--r-fibre), var(--r-paper);
+  color: var(--ink);
+  font-family: var(--font-text);
+  scrollbar-color: var(--r-pink) var(--r-paper);
+}
+:root[data-style="riso"] ::selection {
+  background: var(--r-yellow);
+  color: var(--r-ink-on-color);
+}
+:root[data-style="riso"] :focus-visible {
+  outline: 2px solid var(--r-pink-text);
+  outline-offset: 3px;
+}
+:root[data-style="riso"] input,
+:root[data-style="riso"] textarea,
+:root[data-style="riso"] select,
+:root[data-style="riso"] button {
+  font-family: inherit;
+  caret-color: var(--r-pink-text);
+  accent-color: var(--r-blue);
+}
+:root[data-style="riso"] :is(h1, h2, h3, legend, .wordmark, .mobile-wordmark) {
+  font-family: var(--font-display);
+  font-stretch: 62%;
+  font-weight: 850;
+  text-transform: uppercase;
+  letter-spacing: 0.004em;
+  line-height: 0.95;
+  text-wrap: balance;
+}
+:root[data-style="riso"] h3 {
+  font-stretch: 75%;
+  font-weight: 760;
+  letter-spacing: 0.01em;
+  line-height: 1.02;
+}
+:root[data-style="riso"] .sheet legend,
+:root[data-style="riso"] .sheet h2 {
+  font-size: 1.2rem;
+  color: var(--r-blue-deep);
+}
+:root[data-style="riso"][data-theme="dark"] .sheet :is(legend, h2) {
+  color: var(--ink);
+}
+/* Small labels: semi-condensed caps. */
+:root[data-style="riso"] :is(.project-category, .hero-role, .results-label, .my-day-date, .calendar-count, .event-time, .event-place, .small.muted, .pocket-accession, .strength-instruction) {
+  font-stretch: 87%;
+  letter-spacing: 0.05em;
+}
+:root[data-style="riso"] :is(.project-category, .hero-role) {
+  text-transform: uppercase;
+  font-weight: 650;
+}
+:root[data-style="riso"] .title-dot {
+  color: var(--r-pink-display);
+}
+:root[data-style="riso"] a:not([class]) {
+  color: var(--r-blue);
+  text-decoration-color: var(--r-pink);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+}
+:root[data-style="riso"] .text-link,
+:root[data-style="riso"] .text-button {
+  color: var(--r-blue);
+  font-weight: 650;
+}
+:root[data-style="riso"] .text-link:hover,
+:root[data-style="riso"] .text-button:hover {
+  color: var(--r-pink-text);
+}
+:root[data-style="riso"] :is(time, .temperature, .event-leaf-day, .calendar-day-number, .strength-rank) {
+  font-variant-numeric: tabular-nums;
+}
+
+/* =====================================================================
+   3. Sheet surfaces: no glass, no shadows. Panels are areas of the same
+   sheet, divided by thin ink rules.
+   ===================================================================== */
+:root[data-style="riso"] .glass-layer,
+:root[data-style="riso"] .glass-layer-opaque {
+  background: var(--r-grain), var(--r-paper);
+  border-radius: var(--glass-radius);
+  box-shadow: var(--glass-rim);
+}
+:root[data-style="riso"] :is(.glass-host, .topbar, .selected-bento .magic-bento__card, .sidebar) {
+  box-shadow: none;
+  border-radius: var(--glass-radius);
+}
+:root[data-style="riso"] :is(.project-list, .tool-content, .about-intro, .about-columns, .activity-note, .weather-note, .search-field, .tool-nav, .more-feed-panel) {
+  background: var(--r-grain), var(--r-paper);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-radius: var(--glass-radius);
+}
+:root[data-style="riso"] :is(.project-list, .tool-content, .about-intro, .activity-note, .weather-note) {
+  box-shadow: var(--glass-rim);
+}
+
+/* =====================================================================
+   4. Rail, top bar, footer
+   ===================================================================== */
+/* The rail is a flood of cobalt ink with paper type reversed out of it. */
+:root[data-style="riso"] .sidebar {
+  --ink: #f7f0de;
+  --muted: #d9ddf4;
+  --line: rgba(247, 240, 222, 0.42);
+  --nav: rgba(247, 240, 222, 0.12);
+  --blue: var(--r-yellow);
+  --orange: var(--r-yellow);
+  --branch-line: rgba(247, 240, 222, 0.5);
+  color: #f7f0de;
+}
+:root[data-style="riso"] .sidebar > .glass-layer {
+  background: var(--r-mottle), var(--r-grain), #2747c9;
+  box-shadow: none;
+}
+:root[data-style="riso"][data-theme="dark"] .sidebar > .glass-layer {
+  background: var(--r-mottle), var(--r-grain), #2a3c9c;
+}
+:root[data-style="riso"] .sidebar :is(.text-button, .text-link) {
+  color: #f7f0de;
+}
+:root[data-style="riso"] .sidebar :is(.text-button, .text-link):hover {
+  color: var(--r-yellow);
+}
+:root[data-style="riso"] .catalog-tabs :is(button, a) {
+  border-radius: var(--glass-radius);
+}
+:root[data-style="riso"] .sidebar :focus-visible {
+  outline-color: var(--r-yellow);
+}
+:root[data-style="riso"] :is(.wordmark, .mobile-wordmark) {
+  font-size: 2.5rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+:root[data-style="riso"] .wordmark {
+  color: #f7f0de;
+}
+:root[data-style="riso"] .riso-mark {
+  width: 30px;
+  height: 28px;
+  overflow: visible;
+}
+:root[data-style="riso"] .riso-mark .ink-blue {
+  fill: var(--r-blue);
+}
+:root[data-style="riso"] .riso-mark .ink-pink {
+  fill: var(--r-pink);
+  mix-blend-mode: var(--r-blend);
+}
+/* On the cobalt rail the triangle prints in yellow instead. */
+:root[data-style="riso"] .sidebar .riso-mark .ink-blue {
+  fill: var(--r-yellow);
+}
+:root[data-style="riso"] .sidebar .riso-mark .ink-pink {
+  mix-blend-mode: normal;
+}
+:root[data-style="riso"] .sidebar-identity {
+  font-family: var(--font-display);
+  font-stretch: 75%;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+:root[data-style="riso"] .primary-nav > a {
+  border-radius: var(--glass-radius);
+  color: #f7f0de;
+  font-stretch: 87%;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.82rem;
+}
+:root[data-style="riso"] .primary-nav > a:hover {
+  transform: none;
+  background: rgba(247, 240, 222, 0.12);
+  color: #fff;
+}
+:root[data-style="riso"] .primary-nav > a[aria-current="page"] {
+  background: var(--r-yellow);
+  color: var(--r-ink-on-color);
+}
+/* The active marker: a small pink disc, overprinting the yellow. */
+:root[data-style="riso"] .nav-active-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--r-pink);
+  mix-blend-mode: multiply;
+}
+:root[data-style="riso"] .sidebar-contact {
+  border-color: rgba(247, 240, 222, 0.42);
+  border-radius: var(--glass-radius);
+  text-transform: uppercase;
+  font-stretch: 87%;
+  letter-spacing: 0.05em;
+  font-weight: 650;
+}
+:root[data-style="riso"] .sidebar-contact:hover {
+  background: var(--r-pink);
+  border-color: var(--r-pink);
+  color: var(--r-ink-on-color);
+}
+:root[data-style="riso"] .topbar > .glass-layer {
+  background: var(--r-grain), var(--r-paper);
+}
+:root[data-style="riso"] .topbar-donate {
+  border-radius: var(--glass-radius);
+  color: var(--r-pink-text);
+  font-weight: 650;
+}
+:root[data-style="riso"] .local-time {
+  font-stretch: 87%;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+}
+:root[data-style="riso"] .live-dot {
+  background: var(--r-pink);
+  box-shadow: none;
+}
+/* The footer is printed on its own strip of paper, so the background's
+   screens never run under the credit. */
+:root[data-style="riso"] .app-footer {
+  position: relative;
+  z-index: 1;
+  background: var(--r-grain), var(--r-paper);
+  flex-wrap: wrap;
+  align-items: center;
+  border-top: 2px solid var(--r-pink);
+  padding-top: 20px;
+  text-transform: uppercase;
+  font-stretch: 87%;
+  letter-spacing: 0.06em;
+  font-size: 0.74rem;
+  font-weight: 650;
+}
+
+/* =====================================================================
+   5. Controls and the settings sheet
+   ===================================================================== */
+:root[data-style="riso"] .button {
+  position: relative;
+  isolation: isolate;
+  border: var(--r-rule) solid var(--r-blue);
+  border-radius: var(--glass-radius);
+  background: var(--r-paper);
+  color: var(--r-blue-deep);
+  box-shadow: none;
+  text-transform: uppercase;
+  font-stretch: 87%;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+:root[data-style="riso"][data-theme="dark"] .button:not(.primary) {
+  border-color: var(--glass-edge);
+  color: var(--ink);
+}
+:root[data-style="riso"] .button:not(.primary):hover {
+  background: var(--tint);
+  color: var(--r-blue-deep);
+}
+:root[data-style="riso"][data-theme="dark"] .button:not(.primary):hover {
+  color: var(--ink);
+}
+/* The primary action: a flat, mottled pull of fluorescent pink. Off-register
+   plates stay on display type and prints, not on controls. */
+:root[data-style="riso"] .button.primary {
+  background: var(--r-mottle), var(--r-pink);
+  color: var(--r-ink-on-color);
+  border-color: transparent;
+}
+:root[data-style="riso"] .button.primary:hover {
+  background: var(--r-mottle), var(--accent-fill-hover);
+  color: var(--r-ink-on-color);
+}
+:root[data-style="riso"] .button:active {
+  transform: translateY(1px);
+}
+:root[data-style="riso"] .icon-button {
+  border-radius: var(--glass-radius);
+}
+:root[data-style="riso"] .icon-button:hover {
+  background: var(--tint);
+  color: var(--r-blue-deep);
+}
+:root[data-style="riso"][data-theme="dark"] .icon-button:hover {
+  color: var(--ink);
+}
+:root[data-style="riso"] .search-field {
+  border-radius: var(--glass-radius);
+  box-shadow: var(--glass-rim);
+}
+:root[data-style="riso"] :is(input, textarea, select):not([type="radio"], [type="checkbox"]) {
+  border-radius: var(--glass-radius);
+}
+:root[data-style="riso"] .filter-row > button,
+:root[data-style="riso"] .tool-nav > a {
+  border-radius: var(--glass-radius);
+  text-transform: uppercase;
+  font-stretch: 87%;
+  letter-spacing: 0.05em;
+  font-weight: 650;
+}
+:root[data-style="riso"] .filter-row > button[aria-pressed="true"],
+:root[data-style="riso"] .tool-nav > a[aria-current] {
+  background: var(--r-yellow);
+  color: var(--r-ink-on-color);
+  border-color: var(--r-yellow);
+}
+:root[data-style="riso"] .tool-nav {
+  box-shadow: var(--glass-rim);
+}
+:root[data-style="riso"] .sheet {
+  background: var(--r-grain), var(--r-paper);
+  border-radius: var(--glass-radius);
+  box-shadow: inset 0 0 0 var(--r-rule) var(--r-blue);
+}
+:root[data-style="riso"] .sheet::backdrop {
+  background: rgba(27, 42, 120, 0.42);
+  backdrop-filter: none;
+}
+:root[data-style="riso"] .sheet-print {
+  position: absolute;
+  top: 10px;
+  right: 60px;
+  width: 92px;
+  height: 70px;
+  z-index: -1;
+  pointer-events: none;
+}
+.sheet-print .ink-yellow {
+  fill: var(--r-yellow);
+}
+.sheet-print .ink-pink {
+  fill: var(--r-pink);
+}
+.sheet-print .ink-blue {
+  fill: var(--r-blue);
+}
+.sheet-print .overprint {
+  mix-blend-mode: var(--r-blend);
+}
+:root[data-style="riso"] .style-options > label,
+:root[data-style="riso"] .background-options > label {
+  border-radius: var(--glass-radius);
+  border-color: var(--line);
+}
+:root[data-style="riso"] .style-options > label:has(input:checked),
+:root[data-style="riso"] .background-options > label:has(input:checked) {
+  border-color: var(--r-pink-text);
+  background: var(--r-paper-hi);
+  box-shadow: inset 0 0 0 1px var(--r-pink-text);
+}
+:root[data-style="riso"] .style-preview {
+  border-radius: 1px;
+}
+:root[data-style="riso"] .preview-light {
+  background: #f2e9d4;
+}
+:root[data-style="riso"] .preview-dark {
+  background: #1c1a18;
+}
+:root[data-style="riso"] .preview-system {
+  background: linear-gradient(120deg, #f2e9d4 50%, #1c1a18 50%);
+}
+:root[data-style="riso"] .theme-preview {
+  border-radius: 1px;
+}
+:root[data-style="riso"] .switch-row input[role="switch"] {
+  accent-color: var(--r-pink-text);
+}
+
+/* =====================================================================
+   6. Home
+   ===================================================================== */
+/* The hero is a poster: one giant two-ink name over cut shapes. */
+:root[data-style="riso"] .glass-hero {
+  position: relative;
+  isolation: isolate;
+  padding: clamp(22px, 3vw, 44px) clamp(20px, 3vw, 44px);
+}
+@media (min-width: 801px) {
+  :root[data-style="riso"] .glass-hero {
+    grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+  }
+}
+:root[data-style="riso"] .glass-hero > .glass-layer {
+  box-shadow: inset 0 0 0 var(--r-rule) var(--r-pink);
+}
+:root[data-style="riso"] .hero-copy {
+  container-type: inline-size;
+  position: relative;
+  z-index: 1;
+}
+:root[data-style="riso"] .tech-heading {
+  height: auto;
+  min-height: 0;
+  width: auto;
+  margin: 0 0 clamp(14px, 2vw, 24px);
+  font-size: clamp(3.4rem, 24cqi, 11rem);
+  font-weight: 900;
+  font-stretch: 62%;
+  line-height: 0.84;
+  letter-spacing: -0.005em;
+}
+:root[data-style="riso"] .tech-heading > span:not(.sr-only, .tech-name) {
+  display: block;
+  padding: 0;
+  -webkit-mask: var(--r-speckle);
+  mask: var(--r-speckle);
+}
+:root[data-style="riso"] .tech-heading > span:first-child:not(.sr-only, .tech-name) {
+  color: var(--r-pink-display);
+}
+/* ROGOWSKI in cobalt, its pink plate printed a hair off register. */
+:root[data-style="riso"] .tech-heading > span:last-child:not(.tech-name) {
+  color: var(--r-blue);
+  text-shadow: var(--r-offset) calc(var(--r-offset) * 0.8) 0 var(--r-pink);
+  transition: text-shadow 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+:root[data-style="riso"] .glass-hero:hover .tech-heading > span:last-child:not(.tech-name) {
+  text-shadow: 0.006em 0.005em 0 var(--r-pink);
+}
+:root[data-style="riso"] .hero-role {
+  font-size: 0.8rem;
+  color: var(--r-pink-text);
+  margin-bottom: 14px;
+}
+:root[data-style="riso"] .hero-role > span {
+  color: var(--ink);
+  font-size: 0.86rem;
+  text-transform: none;
+  letter-spacing: 0;
+  font-stretch: 100%;
+  font-weight: 500;
+}
+:root[data-style="riso"] .hero-description {
+  color: var(--ink);
+  font-size: 0.98rem;
+  line-height: 1.6;
+  max-width: 50ch;
+}
+:root[data-style="riso"] .hero-actions .button {
+  font-size: 0.82rem;
+  padding: 12px 17px;
+}
+/* Section titles: oversized condensed caps over a pink rule. */
+:root[data-style="riso"] .section-title {
+  justify-content: flex-start;
+  gap: 16px;
+}
+:root[data-style="riso"] .section-title > :last-child:not(h2) {
+  margin-left: auto;
+}
+:root[data-style="riso"] .section-title.glass-host {
+  padding: 0 0 6px;
+  min-height: 0;
+  border-bottom: var(--r-rule) solid var(--r-pink);
+  border-radius: 0;
+  align-items: flex-end;
+}
+:root[data-style="riso"] .section-title.glass-host > .glass-layer {
+  display: none;
+}
+:root[data-style="riso"] .view-home > .section-title h2 {
+  font-size: clamp(2.2rem, 4vw, 3.4rem);
+  color: var(--r-blue);
+}
+:root[data-style="riso"] :is(.my-day, .ai-corner, .home-help, .law-events, .home-pocket-part) .section-title h2,
+:root[data-style="riso"] .home-help > h2 {
+  font-size: 1.9rem;
+}
+/* "How can I help?" is a flood of yellow. */
+:root[data-style="riso"] .home-help > .glass-layer {
+  background: var(--r-mottle), var(--r-grain), var(--r-yellow);
+  box-shadow: none;
+}
+:root[data-style="riso"] .home-help {
+  color: var(--r-ink-on-color);
+  --ink: var(--r-ink-on-color);
+  --muted: #3a3e66;
+}
+:root[data-style="riso"] .home-help > h2 {
+  color: var(--r-ink-on-color);
+}
+:root[data-style="riso"] .home-help ul a {
+  border: 0;
+  border-top: 1px solid rgba(20, 28, 80, 0.32);
+  border-radius: 0;
+  color: var(--r-ink-on-color);
+}
+:root[data-style="riso"] .home-help ul li:first-child a {
+  border-top: 0;
+}
+:root[data-style="riso"] .home-help ul a:hover {
+  background: rgba(255, 79, 163, 0.32);
+}
+:root[data-style="riso"] .home-help ul a > svg {
+  color: var(--r-ink-on-color);
+}
+:root[data-style="riso"] .home-help ul strong {
+  font-family: var(--font-display);
+  font-stretch: 75%;
+  font-weight: 800;
+  font-size: 1.15rem;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+:root[data-style="riso"] .home-help ul small {
+  color: #3a3e66;
+}
+:root[data-style="riso"] .home-help :focus-visible {
+  outline-color: var(--r-ink-on-color);
+}
+/* My Day and AI Corner: big numerals, cobalt and pink frames. */
+:root[data-style="riso"] .ai-corner > .glass-layer {
+  box-shadow: inset 0 0 0 var(--r-rule) var(--r-pink);
+}
+:root[data-style="riso"] :is(.my-day, .ai-corner) .section-title {
+  border-bottom: 0;
+}
+:root[data-style="riso"] .ai-corner-posts time {
+  display: block;
+  font-family: var(--font-display);
+  font-stretch: 62%;
+  font-weight: 850;
+  font-size: 1.5rem;
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--r-pink-text);
+  letter-spacing: 0.01em;
+}
+:root[data-style="riso"] .ai-corner-posts li + li {
+  border-top: 1px solid var(--line);
+}
+:root[data-style="riso"] .my-day-date {
+  text-transform: uppercase;
+  font-weight: 650;
+}
+:root[data-style="riso"] .my-day-schedule :is(dt, strong, .entry-time) {
+  font-family: var(--font-display);
+  font-stretch: 62%;
+}
+/* Fable's Extent: a full cobalt flood with paper type and yellow figures. */
+:root[data-style="riso"] .extent-spotlight {
+  --ink: #f7f0de;
+  --muted: #dfe3f8;
+  --line: rgba(247, 240, 222, 0.5);
+  color: #f7f0de;
+}
+:root[data-style="riso"] .extent-spotlight > .glass-layer {
+  background: var(--r-mottle), var(--r-grain), #2747c9;
+  box-shadow: none;
+}
+:root[data-style="riso"][data-theme="dark"] .extent-spotlight > .glass-layer {
+  background: var(--r-mottle), var(--r-grain), #2a3c9c;
+}
+:root[data-style="riso"] .extent-spotlight :focus-visible {
+  outline-color: var(--r-yellow);
+}
+:root[data-style="riso"] .extent-spotlight h2 {
+  font-size: clamp(3rem, 6.4vw, 6rem);
+  color: #f7f0de;
+  text-shadow: var(--r-offset) calc(var(--r-offset) * 0.8) 0 var(--r-pink);
+  -webkit-mask: var(--r-speckle);
+  mask: var(--r-speckle);
+}
+:root[data-style="riso"] .extent-eyebrow,
+:root[data-style="riso"] .extent-subtitle {
+  color: var(--r-yellow);
+  text-transform: uppercase;
+  font-stretch: 87%;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}
+:root[data-style="riso"] .extent-lede,
+:root[data-style="riso"] .extent-story p {
+  color: #f1ecdf;
+}
+:root[data-style="riso"] .extent-spotlight .button:not(.primary) {
+  background: transparent;
+  border-color: #f7f0de;
+  color: #f7f0de;
+}
+:root[data-style="riso"] .extent-spotlight .button:not(.primary):hover {
+  background: rgba(247, 240, 222, 0.14);
+  color: #fff;
+}
+:root[data-style="riso"] .extent-figures dd {
+  font-family: var(--font-display);
+  font-stretch: 62%;
+  font-weight: 900;
+  font-size: clamp(2.6rem, 5vw, 4.4rem);
+  line-height: 0.9;
+  color: var(--r-yellow);
+}
+:root[data-style="riso"] .extent-figures dt {
+  color: #f1ecdf;
+  text-transform: uppercase;
+  font-stretch: 87%;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+:root[data-style="riso"] .extent-preview {
+  border-radius: var(--glass-radius);
+  box-shadow: 0 0 0 var(--r-rule) #f7f0de;
+}
+/* Featured work and the project grid: numbered prints in thin frames.
+   Screenshots print as one-colour duotones and come up in full colour,
+   in register, on hover or focus. */
+:root[data-style="riso"] :is(.selected-bento, .project-bento) {
+  --mb-radius: 2px !important;
+  --mb-shadow: none !important;
+  --mb-focus: var(--r-pink-text) !important;
+}
+:root[data-style="riso"] .selected-bento .magic-bento__card,
+:root[data-style="riso"] .project-bento .magic-bento__card {
+  border-radius: var(--glass-radius);
+}
+:root[data-style="riso"] .bento-project h3,
+:root[data-style="riso"] .project-copy h3 {
+  font-size: 1.45rem;
+  color: var(--r-blue-deep);
+}
+:root[data-style="riso"][data-theme="dark"] :is(.bento-project, .project-copy) h3 {
+  color: var(--ink);
+}
+:root[data-style="riso"] .project-category {
+  color: var(--r-pink-text);
+  font-size: 0.7rem;
+}
+:root[data-style="riso"] .bento-statutes-art > span {
+  font-family: var(--font-display);
+  font-stretch: 62%;
+  font-weight: 900;
+  color: var(--r-pink);
+}
+:root[data-style="riso"] .project-preview {
+  --riso-duo: var(--r-yellow);
+  border-radius: 1px;
+  background: var(--riso-duo);
+  box-shadow: 0 0 0 1px var(--line);
+}
+:root[data-style="riso"] .magic-bento__cell:nth-child(3n + 2) .project-preview,
+:root[data-style="riso"] .project-card:nth-of-type(3n + 2) .project-preview {
+  --riso-duo: var(--r-pink);
+}
+:root[data-style="riso"] .magic-bento__cell:nth-child(3n) .project-preview,
+:root[data-style="riso"] .project-card:nth-of-type(3n) .project-preview {
+  --riso-duo: #8fa4f0;
+}
+:root[data-style="riso"] .project-preview img {
+  filter: grayscale(1) contrast(1.15) brightness(1.04);
+  mix-blend-mode: multiply;
+  transition: filter 0.4s ease, opacity 0.4s ease;
+}
+:root[data-style="riso"] :is(.magic-bento__cell, .project-card, .extent-preview-link):is(:hover, :focus-within) .project-preview img {
+  filter: none;
+  mix-blend-mode: normal;
+}
+/* The Pocket Part posts and the events carousel. */
+:root[data-style="riso"] .scroll-stack-card,
+:root[data-style="riso"] .pocket-post {
+  background: var(--r-grain), var(--r-paper);
+  color: var(--ink);
+  border-radius: var(--glass-radius);
+  box-shadow: inset 0 0 0 var(--r-rule) var(--r-blue);
+}
+:root[data-style="riso"] .pocket-stack {
+  --pocket-plate: var(--r-grain), var(--r-paper-hi);
+  --pocket-plate-rule: var(--line);
+  --pocket-mat: var(--r-paper);
+  --pocket-mat-edge: var(--line);
+  --pocket-corner: var(--r-pink);
+}
+:root[data-style="riso"] .pocket-post-copy h3 {
+  font-size: 1.4rem;
+}
+:root[data-style="riso"] .pocket-accession {
+  text-transform: uppercase;
+}
+:root[data-style="riso"] .pocket-accession b {
+  margin-left: 0.15em;
+  font-family: var(--font-display);
+  font-stretch: 62%;
+  font-weight: 900;
+  font-size: 2rem;
+  line-height: 0.9;
+  color: var(--r-pink-display);
+  letter-spacing: 0;
+}
+:root[data-style="riso"] .pocket-read {
+  color: var(--r-blue);
+  text-transform: uppercase;
+  font-stretch: 87%;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+:root[data-style="riso"] .pocket-read svg {
+  color: var(--r-pink-text);
+}
+:root[data-style="riso"] .law-events .carousel-container {
+  --carousel-frame: var(--r-paper) !important;
+  --carousel-tile: var(--r-paper) !important;
+  --carousel-ink: var(--ink) !important;
+  --carousel-muted: var(--muted) !important;
+  --carousel-faint: var(--line) !important;
+  --carousel-soft: var(--r-pink) !important;
+  --carousel-badge: var(--tint) !important;
+}
+:root[data-style="riso"] .law-events :is(.carousel-arrow, .event-playback) {
+  background: var(--r-paper);
+  border-radius: var(--glass-radius);
+  box-shadow: inset 0 0 0 var(--r-rule) var(--r-blue);
+}
+:root[data-style="riso"] .law-events .carousel-card img {
+  border-radius: 1px;
+}
+:root[data-style="riso"] .law-events {
+  --leaf-paper: #f7f0de;
+  --leaf-strip: var(--r-blue);
+  --leaf-strip-ink: #f7f0de;
+  --leaf-edge: var(--r-blue);
+}
+:root[data-style="riso"] .event-leaf {
+  color: var(--r-pink-display);
+  border-radius: 1px;
+}
+:root[data-style="riso"] .event-leaf-day {
+  font-family: var(--font-display);
+  font-stretch: 62%;
+  font-weight: 900;
+  color: #c41a72;
+}
+:root[data-style="riso"] .event-leaf-weekday {
+  color: #1b2a78;
+}
+:root[data-style="riso"] .event-card-body h3 {
+  font-size: 1.3rem;
+}
+
+/* =====================================================================
+   7. Projects, tools, about, more
+   ===================================================================== */
+/* Each view's title is a poster headline with its pink plate off register. */
+:root[data-style="riso"] .page-heading > h1 {
+  font-size: clamp(3.6rem, 8vw, 7.4rem);
+  font-weight: 900;
+  line-height: 0.86;
+  color: var(--r-blue);
+  text-shadow: var(--r-offset) calc(var(--r-offset) * 0.8) 0 var(--r-pink);
+  -webkit-mask: var(--r-speckle);
+  mask: var(--r-speckle);
+}
+:root[data-style="riso"] .page-heading > h1 .title-dot {
+  color: var(--r-pink-display);
+}
+:root[data-style="riso"] :is(.view-about, .view-more, .view-tools, .view-projects) h2 {
+  color: var(--r-blue);
+  font-size: clamp(1.8rem, 2.6vw, 2.4rem);
+}
+:root[data-style="riso"][data-theme="dark"] :is(.view-about, .view-more, .view-tools, .view-projects) h2,
+:root[data-style="riso"][data-theme="dark"] .view-home > .section-title h2 {
+  color: var(--r-blue-deep);
+}
+:root[data-style="riso"] .about-greeting em {
+  color: var(--r-pink-text);
+  font-style: normal;
+}
+:root[data-style="riso"] .about-intro > .portrait-stage .portrait-photo,
+:root[data-style="riso"] .about-portrait .portrait-photo {
+  border-radius: 50%;
+}
+:root[data-style="riso"] .experience-list > li {
+  border-color: var(--line);
+}
+:root[data-style="riso"] .technology {
+  border-radius: var(--glass-radius);
+}
+:root[data-style="riso"] .temperature {
+  font-family: var(--font-display);
+  font-stretch: 62%;
+  font-weight: 900;
+  color: var(--r-pink-display);
+  line-height: 0.9;
+}
+:root[data-style="riso"] .calendar-day-number {
+  font-family: var(--font-display);
+  font-stretch: 75%;
+  font-weight: 750;
+}
+:root[data-style="riso"] .calendar-cell[aria-current],
+:root[data-style="riso"] .calendar-cell[aria-pressed="true"] {
+  border-radius: var(--glass-radius);
+}
+:root[data-style="riso"] .strength-rank,
+:root[data-style="riso"] .strength-tile-rank {
+  font-family: var(--font-display);
+  font-stretch: 62%;
+  font-weight: 900;
+}
+:root[data-style="riso"] .strength-rank {
+  color: var(--r-pink-text);
+}
+:root[data-style="riso"] .branched-menu__marker {
+  border-radius: 50%;
+}
+
+/* =====================================================================
+   8. Art: hero print, portrait, marks
+   ===================================================================== */
+.glass-host > .hero-print,
+.hero-print {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.hero-print > * {
+  position: absolute;
+}
+/* A cut pink block under the name's second line. */
+/* Placed to catch the end of the name and clear the introduction. */
+.hp-block {
+  left: 48.5%;
+  top: 29%;
+  width: 17%;
+  height: 27%;
+  background: var(--r-pink);
+  clip-path: polygon(8% 0, 100% 14%, 92% 100%, 0 82%);
+  mix-blend-mode: var(--r-blend);
+  opacity: 0.9;
+  -webkit-mask: var(--r-speckle);
+  mask: var(--r-speckle);
+}
+.hp-half {
+  left: -70px;
+  bottom: -105px;
+  width: 170px;
+  height: 170px;
+  border-radius: 50%;
+  background: var(--r-blue);
+  mix-blend-mode: var(--r-blend);
+  -webkit-mask: var(--r-speckle);
+  mask: var(--r-speckle);
+}
+.hp-dots {
+  right: 30%;
+  bottom: -10px;
+  width: 260px;
+  height: 120px;
+  background: radial-gradient(circle, var(--r-blue) 34%, transparent 37%) 0 0 / 8px 8px;
+  -webkit-mask: linear-gradient(100deg, #000, transparent 75%);
+  mask: linear-gradient(100deg, #000, transparent 75%);
+  opacity: 0.55;
+  mix-blend-mode: var(--r-blend);
+}
+.riso-target {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.2;
+}
+.hp-target {
+  top: 14px;
+  right: 14px;
+  width: 26px;
+  height: 26px;
+  color: var(--r-blue);
+  opacity: 0.8;
+}
+.riso-colorbar {
+  display: flex;
+  height: 9px;
+}
+.riso-colorbar > i {
+  display: block;
+  width: 13px;
+  height: 100%;
+}
+.cb-pink { background: var(--r-pink); }
+.cb-blue { background: var(--r-blue); }
+.cb-yellow { background: var(--r-yellow); }
+.cb-pink-blue { background: linear-gradient(var(--r-pink), var(--r-pink)), var(--r-blue); background-blend-mode: var(--r-blend); }
+.cb-pink-yellow { background: linear-gradient(var(--r-pink), var(--r-pink)), var(--r-yellow); background-blend-mode: var(--r-blend); }
+.cb-blue-yellow { background: linear-gradient(var(--r-blue), var(--r-blue)), var(--r-yellow); background-blend-mode: var(--r-blend); }
+.cb-tint-70 { background: color-mix(in srgb, var(--r-blue) 70%, var(--r-paper)); }
+.cb-tint-40 { background: color-mix(in srgb, var(--r-blue) 40%, var(--r-paper)); }
+.cb-tint-15 { background: color-mix(in srgb, var(--r-blue) 15%, var(--r-paper)); }
+.hp-colorbar {
+  left: 14px;
+  bottom: 14px;
+  opacity: 0;
+}
+
+/* The portrait: a two-colour print set into a yellow sun. */
+:root[data-style="riso"] .hero-portrait {
+  position: relative;
+  z-index: 1;
+}
+:root[data-style="riso"] .portrait-orbit {
+  display: none;
+}
+.portrait-inks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.portrait-inks > i {
+  position: absolute;
+  display: block;
+  mix-blend-mode: var(--r-blend);
+  -webkit-mask: var(--r-speckle);
+  mask: var(--r-speckle);
+}
+.pi-sun {
+  inset: 6% 4% 14% 14%;
+  border-radius: 50%;
+  background: var(--r-yellow);
+}
+.pi-quarter {
+  right: -1%;
+  top: 38%;
+  width: 24%;
+  aspect-ratio: 1;
+  border-radius: 0 100% 0 0;
+  background: var(--r-pink);
+}
+.pi-tri {
+  left: 38%;
+  bottom: 1%;
+  width: 20%;
+  aspect-ratio: 1;
+  background: var(--r-blue);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+:root[data-style="riso"] .riso-photo {
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  border-radius: 50%;
+  background: #f7f0de;
+  box-shadow: none;
+  isolation: isolate;
+}
+.riso-plate {
+  position: absolute;
+  inset: 0;
+  display: block;
+  mix-blend-mode: multiply;
+  isolation: isolate;
+  border-radius: 50%;
+  overflow: hidden;
+}
+.riso-plate img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  mix-blend-mode: screen;
+}
+:root[data-style="riso"] .riso-plate-blue {
+  background: #2747c9;
+}
+:root[data-style="riso"] .riso-plate-blue img {
+  filter: grayscale(1) contrast(1.35) brightness(1.12);
+}
+:root[data-style="riso"] .riso-plate-pink {
+  background: #ff4fa3;
+  translate: 4px -3px;
+  transition: translate 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+:root[data-style="riso"] .riso-plate-pink img {
+  filter: grayscale(1) contrast(0.95) brightness(1.32);
+}
+/* The pink plate's halftone screen. */
+:root[data-style="riso"] .riso-plate-pink::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, transparent 42%, #fff 46%) 0 0 / 4px 4px;
+  mix-blend-mode: lighten;
+  opacity: 0.6;
+}
+:root[data-style="riso"] .hero-portrait:hover .riso-plate-pink,
+:root[data-style="riso"] .about-portrait:hover .riso-plate-pink {
+  translate: 0 0;
+}
+/* Contact actions: ink stamps around the sun. */
+:root[data-style="riso"] .orbit-action {
+  border: 0;
+  border-radius: var(--glass-radius);
+  box-shadow: none;
+  background: var(--r-mottle), var(--r-blue);
+  color: #f7f0de;
+}
+:root[data-style="riso"] .orbit-action.orbit-mail {
+  background: var(--r-mottle), var(--r-pink);
+  color: var(--r-ink-on-color);
+}
+:root[data-style="riso"] .orbit-action.orbit-teams {
+  background: var(--r-mottle), var(--r-yellow);
+  color: var(--r-ink-on-color);
+}
+:root[data-style="riso"] .orbit-action:hover {
+  transform: translate(-2px, -2px);
+  background: var(--r-blue-deep);
+  color: #fff;
+}
+:root[data-style="riso"] .orbit-action:is(.orbit-mail, .orbit-teams):hover {
+  background: var(--r-ink-on-color);
+  color: #fff;
+}
+:root[data-style="riso"] .orbit-action .orbit-label {
+  color: inherit;
+  text-transform: uppercase;
+  font-stretch: 87%;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+}
+:root[data-style="riso"] .strengths-preview {
+  color: var(--ink);
+  font-stretch: 87%;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 650;
+}
+
+/* Loading: an ink roller. */
+:root[data-style="riso"] .load-state[role="status"]::before {
+  content: "";
+  display: inline-block;
+  width: 26px;
+  height: 8px;
+  margin-right: 10px;
+  vertical-align: 1px;
+  background: linear-gradient(90deg, var(--r-pink) 33%, var(--r-yellow) 33% 66%, var(--r-blue) 66%);
+}
+:root[data-style="riso"] :is(.load-state, .empty-state) {
+  font-stretch: 87%;
+  font-weight: 600;
+}
+
+/* =====================================================================
+   9. Backgrounds (the page's own paper grain is always on)
+   ===================================================================== */
+.page-background-riso {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.riso-background,
+.riso-background > * {
+  position: absolute;
+}
+.riso-background {
+  inset: 0;
+}
+.riso-shapes > *,
+.riso-halftone > * {
+  mix-blend-mode: var(--r-blend);
+  -webkit-mask: var(--r-speckle);
+  mask: var(--r-speckle);
+}
+/* Shapes print as tint screens: full-strength ink dots at a set coverage,
+   the way a riso renders a lighter tone. */
+.rs-sun {
+  top: -18vmin;
+  right: -10vmin;
+  width: 52vmin;
+  height: 52vmin;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--r-yellow) 47%, transparent 51%) 0 0 / 6px 6px;
+}
+.rs-tri {
+  left: -6vmin;
+  bottom: -8vmin;
+  width: 44vmin;
+  height: 38vmin;
+  background: radial-gradient(circle, var(--r-pink) 33%, transparent 37%) 0 0 / 7px 7px;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+.rs-half {
+  right: -16vmin;
+  bottom: 18vh;
+  width: 34vmin;
+  height: 34vmin;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--r-blue) 27%, transparent 31%) 0 0 / 7px 7px;
+}
+.rs-bar {
+  left: 30%;
+  bottom: -2px;
+  width: 22vw;
+  height: 18px;
+  background: radial-gradient(circle, var(--r-blue) 38%, transparent 42%) 0 0 / 5px 5px;
+}
+:root[data-theme="dark"] .riso-shapes > * {
+  opacity: 0.5;
+}
+.riso-halftone > * {
+  inset: 0;
+}
+.rh-pink {
+  background: radial-gradient(circle, var(--r-pink) 30%, transparent 33%) 0 0 / 11px 11px;
+  -webkit-mask: radial-gradient(70vmax 60vmax at 100% 0, #000, transparent 70%);
+  mask: radial-gradient(70vmax 60vmax at 100% 0, #000, transparent 70%);
+  opacity: 0.4;
+}
+.rh-blue {
+  background: radial-gradient(circle, var(--r-blue) 28%, transparent 31%) 5px 5px / 11px 11px;
+  -webkit-mask: radial-gradient(60vmax 55vmax at 0 100%, #000, transparent 70%);
+  mask: radial-gradient(60vmax 55vmax at 0 100%, #000, transparent 70%);
+  opacity: 0.3;
+}
+.rh-yellow {
+  background: radial-gradient(circle, var(--r-yellow) 36%, transparent 39%) 2px 7px / 14px 14px;
+  -webkit-mask: radial-gradient(40vmax 30vmax at 70% 100%, #000, transparent 70%);
+  mask: radial-gradient(40vmax 30vmax at 70% 100%, #000, transparent 70%);
+  opacity: 0.5;
+}
+:root[data-theme="dark"] .riso-halftone > * {
+  opacity: 0.22;
+}
+.riso-press-sheet {
+  --crop: color-mix(in srgb, var(--r-blue) 70%, transparent);
+  color: var(--r-blue);
+}
+.crop {
+  width: 34px;
+  height: 34px;
+  border: 0 solid var(--crop);
+}
+.crop-tl { top: 10px; left: 10px; border-top-width: 1px; border-left-width: 1px; }
+.crop-tr { top: 10px; right: 10px; border-top-width: 1px; border-right-width: 1px; }
+.crop-bl { bottom: 10px; left: 10px; border-bottom-width: 1px; border-left-width: 1px; }
+.crop-br { bottom: 10px; right: 10px; border-bottom-width: 1px; border-right-width: 1px; }
+.rp-target {
+  width: 24px;
+  height: 24px;
+  opacity: 0.7;
+}
+.rp-target-top {
+  top: 4px;
+  left: calc(50% - 12px);
+}
+.rp-target-side {
+  right: 4px;
+  top: calc(50% - 12px);
+}
+.rp-colorbar {
+  right: 56px;
+  bottom: 14px;
+}
+.rp-slug {
+  left: 56px;
+  bottom: 12px;
+  font-size: 0.6rem;
+  font-stretch: 87%;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--r-blue) 75%, transparent);
+  white-space: nowrap;
+}
+@media (max-width: 800px) {
+  .rp-slug,
+  .rp-target-side {
+    display: none;
+  }
+}
+
+/* Compact screens: the dock is the cobalt rail, the wordmark stays on one
+   line, and the cut block steps out of the way of the introduction. */
+@media (max-width: 800px) {
+  .hp-block {
+    left: auto;
+    right: -6%;
+    top: -4%;
+    width: 46%;
+    height: 22%;
+    opacity: 0.55;
+  }
+  .hp-dots {
+    display: none;
+  }
+}
+@media (max-width: 600px) {
+  :root[data-style="riso"] .mobile-wordmark {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+    font-size: 1.8rem;
+    color: var(--r-blue-deep);
+  }
+  :root[data-style="riso"][data-theme="dark"] .mobile-wordmark {
+    color: var(--ink);
+  }
+  :root[data-style="riso"] .mobile-wordmark > .riso-mark {
+    width: 20px;
+    height: 19px;
+  }
+  :root[data-style="riso"] .primary-nav > .dock-glass,
+  :root[data-style="riso"] .primary-nav > .dock-glass:not(.glass-layer-opaque) {
+    background: var(--r-grain), #2747c9;
+    box-shadow: none;
+  }
+  :root[data-style="riso"][data-theme="dark"] .primary-nav > .dock-glass {
+    background: var(--r-grain), #2a3c9c;
+  }
+  :root[data-style="riso"] .sidebar {
+    box-shadow: none;
+  }
+  :root[data-style="riso"] .primary-nav > a {
+    font-size: 0.66rem;
+    letter-spacing: 0.04em;
+  }
+  :root[data-style="riso"] .primary-nav > a[aria-current="page"] {
+    color: var(--r-ink-on-color);
+    background: var(--r-yellow);
+  }
+  :root[data-style="riso"] .tech-heading {
+    font-size: clamp(2.4rem, 23.5cqi, 6rem);
+  }
+  :root[data-style="riso"] :is(.view-about, .view-more, .view-tools, .view-projects) h2 {
+    font-size: 1.7rem;
+  }
+  /* A last resort for very long words in a fallback face. The name is
+     sized to fit instead, so it never breaks mid-word. */
+  :root[data-style="riso"] :is(h1:not(.tech-heading), h2, h3) {
+    overflow-wrap: anywhere;
+  }
+  /* The top bar's labels tighten so the bar fits a 375px phone. */
+  :root[data-style="riso"] .local-time {
+    font-stretch: 75%;
+    letter-spacing: 0.01em;
+  }
+  :root[data-style="riso"] .topbar-donate {
+    font-stretch: 87%;
+  }
+}
+
+/* The compact rail (601–800px) is narrow: its labels drop to a small,
+   tighter cut so "Projects" fits. */
+@media (min-width: 601px) and (max-width: 800px) {
+  :root[data-style="riso"] .primary-nav > a {
+    font-size: 0.6rem;
+    font-stretch: 75%;
+    letter-spacing: 0.01em;
+  }
+}
+
+/* Fable's Extent: the credit line prints under the actions, not above
+   the title. */
+:root[data-style="riso"] .extent-copy {
+  display: flex;
+  flex-direction: column;
+}
+:root[data-style="riso"] .extent-eyebrow {
+  order: 10;
+  margin: 18px 0 0;
+  font-size: 0.7rem;
+}
+
+/* Pocket Part: the date is the big figure; the running number goes. */
+:root[data-style="riso"] .pocket-accession {
+  display: none;
+}
+:root[data-style="riso"] .pocket-label time {
+  font-family: var(--font-display);
+  font-stretch: 62%;
+  font-weight: 900;
+  font-size: 1.7rem;
+  line-height: 0.9;
+  text-transform: uppercase;
+  color: var(--r-pink-text);
+}
+:root[data-style="riso"] .pocket-post {
+  border-radius: var(--glass-radius);
+}
+:root[data-style="riso"] :is(.pocket-mount, .pocket-mount img) {
+  border-radius: 1px;
+}
+:root[data-style="riso"] .pocket-plate::before {
+  border-radius: 1px;
+}
+:root[data-style="riso"] .pocket-stack {
+  --pocket-plate-rule: var(--r-blue);
+}
+
+/* Featured statutes card: an authored three-volume print, not a glyph. */
+:root[data-style="riso"] .selected-bento .bento-project-0 .bento-statutes-art {
+  height: 84px;
+}
+.statutes-print {
+  display: block;
+  height: 100%;
+  width: auto;
+}
+.statutes-print .ink-blue { fill: var(--r-blue); }
+.statutes-print .ink-pink { fill: var(--r-pink); }
+.statutes-print .ink-yellow { fill: var(--r-yellow); }
+.statutes-print .overprint { mix-blend-mode: var(--r-blend); }
+
+/* Old-style leftovers, re-inked. */
+:root[data-style="riso"] .topbar-donate {
+  border: var(--r-rule) solid var(--r-pink-text);
+}
+:root[data-style="riso"] .topbar-donate:hover {
+  background: var(--r-pink);
+  color: var(--r-ink-on-color);
+}
+:root[data-style="riso"] .catalog-search {
+  border: var(--r-rule) solid var(--r-blue);
+  border-radius: var(--glass-radius);
+  background: var(--r-paper);
+}
+:root[data-style="riso"] .catalog-tabs {
+  border-bottom: var(--r-rule) solid var(--r-blue);
+}
+:root[data-style="riso"] .catalog-tabs [role="tab"] {
+  border: var(--r-rule) solid var(--line);
+  color: var(--r-blue-deep);
+  text-transform: uppercase;
+  font-stretch: 87%;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+}
+:root[data-style="riso"][data-theme="dark"] .catalog-tabs [role="tab"] {
+  color: var(--ink);
+}
+:root[data-style="riso"] .catalog-tabs [role="tab"][aria-selected="true"] {
+  background: var(--r-yellow);
+  border-color: var(--r-yellow);
+  color: var(--r-ink-on-color);
+}
+:root[data-style="riso"] :is(input, textarea, select):not([type="radio"], [type="checkbox"], [role="switch"]) {
+  border: var(--r-rule) solid var(--r-blue);
+  background-color: var(--r-paper-hi);
+}
+:root[data-style="riso"][data-theme="dark"] :is(input, textarea, select):not([type="radio"], [type="checkbox"], [role="switch"]) {
+  border-color: var(--glass-edge);
+}
+:root[data-style="riso"] .search-field input {
+  border: 0;
+  background-color: transparent;
+}
+
+/* Strengths keep their four original domain colours (a product
+   requirement in PRODUCT.md); cards and tiles take the print's square
+   corners and ink rules. */
+:root[data-style="riso"] :is(.strength-overview, .strength-reflection-card .flip-card__face, .strength-board-frame, .strength-tile .flip-card__face, .strength-tile-front) {
+  border-radius: var(--glass-radius);
+}
+:root[data-style="riso"] :is(.strength-overview, .strength-reflection-card .flip-card__face) {
+  box-shadow: inset 0 0 0 var(--r-rule) var(--r-blue);
+  background: var(--r-grain), var(--r-paper);
+}
+:root[data-style="riso"] .about-activity-metrics [data-metric="heart_rate_bpm"] svg {
+  stroke: var(--r-pink);
+}
+:root[data-style="riso"] .about-activity-metrics [data-metric="sleep_minutes"] svg {
+  stroke: var(--r-yellow);
+}
+:root[data-style="riso"] .about-activity-value {
+  font-family: var(--font-display);
+  font-stretch: 62%;
+  font-weight: 850;
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+/* More: Hartford's weather becomes a yellow block with the temperature
+   as its big figure; the activity note takes a pink rule. */
+:root[data-style="riso"] .weather-note {
+  --ink: var(--r-ink-on-color);
+  --muted: #3a3e66;
+  background: var(--r-mottle), var(--r-grain), var(--r-yellow);
+  box-shadow: none;
+  color: var(--r-ink-on-color);
+}
+:root[data-style="riso"] .weather-note h2 {
+  color: var(--r-ink-on-color);
+}
+:root[data-style="riso"][data-theme="dark"] .weather-note h2 {
+  color: var(--r-ink-on-color);
+}
+:root[data-style="riso"] .weather-note :is(.text-link, .text-button) {
+  color: var(--r-ink-on-color);
+}
+:root[data-style="riso"] .weather-note :focus-visible {
+  outline-color: var(--r-ink-on-color);
+}
+:root[data-style="riso"] .weather-note .temperature {
+  font-size: clamp(4.5rem, 9vw, 7.5rem);
+  color: #2747c9;
+  text-shadow: var(--r-offset) calc(var(--r-offset) * 0.8) 0 var(--r-pink);
+}
+:root[data-style="riso"] .activity-note {
+  box-shadow: inset 0 0 0 var(--r-rule) var(--r-pink);
+}
+
+/* =====================================================================
+   10. Motion, transitions, accessibility
+   ===================================================================== */
+/* The style switch feeds the new sheet through the press, top to bottom. */
+html[data-reveal="press"]::view-transition-new(root) {
+  animation: var(--vt-duration, 0.75s) cubic-bezier(0.7, 0, 0.25, 1) both reveal-press;
+}
+@keyframes reveal-press {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+/* Home loads in three passes, one ink per drum: yellow, pink, then cobalt,
+   and the name's plate settles into its near-register. */
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-style="riso"][data-flourish="on"] {
+    & .pi-sun {
+      animation: riso-pass 0.5s cubic-bezier(0.7, 0, 0.25, 1) 0.1s both;
+    }
+    & :is(.pi-quarter, .hp-block) {
+      animation: riso-pass 0.5s cubic-bezier(0.7, 0, 0.25, 1) 0.32s both;
+    }
+    & :is(.pi-tri, .hp-half, .hp-dots) {
+      animation: riso-pass 0.5s cubic-bezier(0.7, 0, 0.25, 1) 0.54s both;
+    }
+    & .tech-heading > span:last-child:not(.sr-only, .tech-name) {
+      animation: riso-register 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both;
+    }
+    & .view:not([hidden]) .page-heading > h1 {
+      animation: riso-register 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+  }
+}
+@keyframes riso-pass {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes riso-register {
+  from {
+    text-shadow: 0.14em 0.1em 0 var(--r-pink);
+  }
+}
+
+/* Calm and reduced motion keep the print but drop the moving plates. */
+:root[data-style="riso"][data-calm="true"] .riso-plate-pink,
+:root[data-style="riso"][data-calm="true"] .tech-heading > span {
+  transition: none;
+}
+
+/* High contrast and forced colors: solid ink, no texture or off-register plates. */
+@media (prefers-contrast: more) {
+  :root[data-style="riso"] {
+    --muted: #2f3566;
+    --line: #2747c9;
+  }
+  :root[data-style="riso"][data-theme="dark"] {
+    --muted: #e6dfcf;
+    --line: #c9d2ff;
+  }
+}
+@media (prefers-contrast: more), (forced-colors: active) {
+  :root[data-style="riso"] :is(.hero-print, .portrait-inks, .sheet-print, .page-background-riso) {
+    display: none;
+  }
+  :root[data-style="riso"] :is(.tech-heading > span, .page-heading > h1, .extent-spotlight h2),
+  :root[data-style="riso"] .tech-heading > span:last-child:not(.tech-name) {
+    text-shadow: none;
+    -webkit-mask: none;
+    mask: none;
+    animation: none;
+  }
+  :root[data-style="riso"] .tech-heading > span:first-child:not(.sr-only, .tech-name) {
+    color: var(--r-pink-text);
+  }
+  :root[data-style="riso"] body {
+    background: var(--r-paper);
+  }
+  :root[data-style="riso"] .button.primary {
+    background: var(--r-pink);
+  }
+}
+@media (forced-colors: active) {
+  :root[data-style="riso"] .glass-layer,
+  :root[data-style="riso"] .sidebar > .glass-layer,
+  :root[data-style="riso"] .home-help > .glass-layer,
+  :root[data-style="riso"] .extent-spotlight > .glass-layer {
+    background: Canvas;
+  }
+  :root[data-style="riso"] :is(.sidebar, .home-help, .extent-spotlight) {
+    --ink: CanvasText;
+    --muted: CanvasText;
+    color: CanvasText;
+  }
+  :root[data-style="riso"] .riso-plate-pink {
+    display: none;
+  }
+}

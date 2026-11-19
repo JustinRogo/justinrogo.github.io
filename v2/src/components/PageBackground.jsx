@@ -8,6 +8,7 @@ import { useMedia } from "../hooks.js";
 import { useAssemblyBusy } from "../assembly/HomepageAssembly.jsx";
 import { Atmosphere } from "./Glass.jsx";
 import BotanicalBackground from "../botanical/BotanicalBackground.jsx";
+import RisoBackground from "../riso/RisoBackground.jsx";
 import "./PageBackground.css";
 
 export const backgroundOptions = [
@@ -70,6 +71,22 @@ export default function PageBackground({
   // Reduced transparency controls glass surfaces, not the chosen page artwork.
   const animated = moving && !busy && !suppressed;
   const light = theme === "light";
+  if (siteStyle === "riso") {
+    // Risograph keeps its own choice too.
+    const variant = preferences.risoBackground || "shapes";
+    return (
+      <div
+        className="page-background page-background-riso"
+        data-background={`riso-${variant}`}
+        data-theme={theme}
+        data-motion={animated ? "moving" : "still"}
+        aria-hidden="true"
+        inert
+      >
+        {!suppressed && variant !== "none" && <RisoBackground variant={variant} />}
+      </div>
+    );
+  }
   if (siteStyle === "botanical") {
     // Botanical keeps its own choice, so the Original selection is untouched.
     const variant = preferences.botanicalBackground || "conservatory";

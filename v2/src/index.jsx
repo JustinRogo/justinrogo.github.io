@@ -30,17 +30,22 @@ import HomepageAssembly, {
 import {
   SiteStyleContext,
   botanicalBackgrounds,
-  loadBotanicalFonts,
+  loadStyleFonts,
+  resolveStyle,
+  risoBackgrounds,
+  styleIds,
   themeColors,
 } from "./botanical/siteStyle.js";
 import { transitionStyle } from "./botanical/styleTransition.js";
 import { centerOf, reveal } from "./botanical/reveal.js";
 import LivingPothos from "./botanical/LivingPothos.jsx";
 import { LeafGlyph, WordmarkSprig } from "./botanical/Flora.jsx";
+import { RisoMark } from "./riso/RisoArt.jsx";
 import "./styles.css";
 import "./glass-theme.css";
 import "./layout.css";
 import "./botanical/botanical.css";
+import "./riso/riso.css";
 
 const destinations = [
   ["home", "Home"],
@@ -81,13 +86,23 @@ function App() {
       (p.intro === undefined || typeof p.intro === "boolean") &&
       (p.background === undefined ||
         backgroundOptions.some(({ id }) => id === p.background)) &&
-      (p.style === undefined || ["original", "botanical"].includes(p.style)) &&
+      (p.style === undefined || styleIds.includes(p.style)) &&
       (p.botanicalBackground === undefined ||
-        botanicalBackgrounds.some(({ id }) => id === p.botanicalBackground)),
+        botanicalBackgrounds.some(({ id }) => id === p.botanicalBackground)) &&
+      (p.risoBackground === undefined ||
+        risoBackgrounds.some(({ id }) => id === p.risoBackground)),
   );
-  // Botanical is the default; Original applies only to visitors who chose it.
-  const siteStyle = preferences.style === "original" ? "original" : "botanical";
+  // Botanical is the default; the others apply only to visitors who chose them.
+  const siteStyle = resolveStyle(preferences.style);
   const botanical = siteStyle === "botanical";
+  const riso = siteStyle === "riso";
+  const wordmarkMark = botanical ? (
+    <WordmarkSprig />
+  ) : riso ? (
+    <RisoMark />
+  ) : (
+    <Icon name="external" size={28} />
+  );
   const [saved, setSaved] = useStored(
     "jr-v2-saved",
     [],
@@ -145,8 +160,8 @@ function App() {
       themeColors[siteStyle][theme === "dark" ? "dark" : "light"];
   }, [theme, siteStyle, effects, preferences.atmosphere, preferences.calm, reduced, highContrast, forcedColors]);
   useEffect(() => {
-    if (botanical) loadBotanicalFonts();
-  }, [botanical]);
+    loadStyleFonts(siteStyle);
+  }, [siteStyle]);
   const changeStyle = (style, origin) =>
     transitionStyle(
       style,
@@ -275,7 +290,7 @@ function App() {
             aria-label="Justin Rogowski home"
           >
             jr
-            {botanical ? <WordmarkSprig /> : <Icon name="external" size={28} />}
+            {wordmarkMark}
           </a>
           <button
             className="icon-button sidebar-toggle"
@@ -370,7 +385,7 @@ function App() {
             <GlassLayer />
             <a className="mobile-wordmark" href="#/home">
               jr
-              {botanical ? <WordmarkSprig /> : <Icon name="external" size={28} />}
+              {wordmarkMark}
             </a>
             <a className="topbar-donate" href={donationUrl} target="_blank"
               rel="noopener noreferrer" aria-label="Donate to the Law Library"
@@ -411,8 +426,8 @@ function App() {
                   {
                     animate: effects,
                     origin: centerOf(event.currentTarget),
-                    shape: botanical ? "leaf" : "circle",
-                    duration: botanical ? "0.9s" : "0.7s",
+                    shape: botanical ? "leaf" : riso ? "press" : "circle",
+                    duration: botanical ? "0.9s" : riso ? "0.65s" : "0.7s",
                   },
                 )
               }
@@ -444,6 +459,8 @@ function App() {
                 <LeafGlyph size={13} className="footer-leaf" />
                 <span className="sr-only">care</span> by Justin
               </span>
+            ) : riso ? (
+              <span>Printed by Justin, in three inks</span>
             ) : (
               <span>Built with ✨ by Justin</span>
             )}
