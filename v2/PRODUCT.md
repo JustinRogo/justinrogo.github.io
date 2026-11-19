@@ -4,6 +4,8 @@ An independent, functional React prototype of Justin Rogowski’s personal site,
 
 The user delegates design selection and requests an intentional app experience on phones and an editorial desktop experience. The user’s revision explicitly pins the React glass aesthetic, blue/orange palette, and a flashy interactive experience using Tech Text, Branched Menu, Glass Surface and Magic Bento. That direction replaces the earlier warm-gray working notebook. This context applies only to `v2/`.
 
+Visitors choose among three site styles in Settings: Botanical (the default conservatory style), Original (the pinned blue/orange glass design above), and Risograph, which the user pinned on 2026-11-18 to the Risograph Web System direction: warm textured paper, pink/cobalt/yellow inks, oversized condensed type, thin rules, halftone and misregistration, flat geometric art and colour blocks. Each style keeps the same content, routes and behaviour, and has its own backgrounds and Light/Dark naming.
+
 ## Routes and tasks
 
 - `#/home`: identity, introduction, a “How can I help?” panel (booking, requests, library search) with My Day and AI Corner (the three newest posts from the Updates feed) beside it, selected projects, interactive Tech Text name and Magic Bento featured work, contact actions.

@@ -2,14 +2,34 @@ import { Dialog, newTabNote } from "./UI.jsx";
 import { backgroundOptions } from "./PageBackground.jsx";
 import {
   botanicalBackgrounds,
-  loadBotanicalFonts,
+  loadStyleFonts,
+  resolveStyle,
+  risoBackgrounds,
   siteStyles,
 } from "../botanical/siteStyle.js";
 import { Fern } from "../botanical/Flora.jsx";
+import { SheetPrint } from "../riso/RisoArt.jsx";
 
 const themeNames = {
   original: { system: "System", light: "Light", dark: "Dark" },
   botanical: { system: "System", light: "Sunlit", dark: "Moonlit" },
+  riso: { system: "System", light: "Cream paper", dark: "Black paper" },
+};
+const lightLegend = { original: "Appearance", botanical: "Light", riso: "Paper" };
+// Botanical and Risograph keep their own background choices, so switching
+// styles never overwrites another style's selection.
+const ownBackgrounds = {
+  botanical: {
+    key: "botanicalBackground",
+    fallback: "conservatory",
+    options: botanicalBackgrounds,
+  },
+  riso: { key: "risoBackground", fallback: "shapes", options: risoBackgrounds },
+};
+const backgroundNotes = {
+  original: "Botanical and Risograph have their own backgrounds; this choice is kept for Original.",
+  botanical: "Your Original and Risograph background choices are kept for when you switch back.",
+  riso: "Your Original and Botanical background choices are kept for when you switch back.",
 };
 
 export default function Settings({
@@ -20,8 +40,9 @@ export default function Settings({
   onClose,
 }) {
   const set = (changes) => setPreferences((p) => ({ ...p, ...changes }));
-  const style = preferences.style === "original" ? "original" : "botanical";
+  const style = resolveStyle(preferences.style);
   const botanical = style === "botanical";
+  const own = ownBackgrounds[style];
   return (
     <Dialog title="Make yourself at home" onClose={onClose}>
       {botanical && (
@@ -29,20 +50,21 @@ export default function Settings({
           <Fern length={230} curve={60} pinnae={15} reach={40} />
         </svg>
       )}
+      {style === "riso" && <SheetPrint />}
       <fieldset>
         <legend>Site style</legend>
         <div className="style-options">
           {siteStyles.map(({ id, name, description }) => (
             <label
               key={id}
-              onPointerEnter={id === "botanical" ? loadBotanicalFonts : undefined}
+              onPointerEnter={() => loadStyleFonts(id)}
             >
               <input
                 type="radio"
                 name="site-style"
                 value={id}
                 checked={style === id}
-                onFocus={id === "botanical" ? loadBotanicalFonts : undefined}
+                onFocus={() => loadStyleFonts(id)}
                 onChange={(event) => {
                   const box = event.currentTarget
                     .closest("label")
@@ -67,7 +89,7 @@ export default function Settings({
         </div>
       </fieldset>
       <fieldset>
-        <legend>{botanical ? "Light" : "Appearance"}</legend>
+        <legend>{lightLegend[style]}</legend>
         <div className="theme-options">
           {["system", "light", "dark"].map((theme) => (
             <label key={theme}>
@@ -117,17 +139,17 @@ export default function Settings({
       </label>
       <fieldset>
         <legend>Page background</legend>
-        {botanical ? (
+        {own ? (
           <div className="background-options">
-            {botanicalBackgrounds.map(({ id, name, description }) => (
+            {own.options.map(({ id, name, description }) => (
               <label key={id}>
                 <input
                   type="radio"
-                  name="botanical-background"
+                  name={`${style}-background`}
                   value={id}
                   aria-label={name}
-                  checked={(preferences.botanicalBackground || "conservatory") === id}
-                  onChange={() => set({ botanicalBackground: id })}
+                  checked={(preferences[own.key] || own.fallback) === id}
+                  onChange={() => set({ [own.key]: id })}
                 />
                 <span>
                   <strong>{name}</strong>
@@ -163,9 +185,7 @@ export default function Settings({
           </div>
         )}
         <p className="small muted background-note">
-          {botanical
-            ? "Your Original background choice is kept for when you switch back."
-            : "Botanical has its own backgrounds; this choice is kept for Original."}
+          {backgroundNotes[style]}
         </p>
       </fieldset>
       <p className="small muted">

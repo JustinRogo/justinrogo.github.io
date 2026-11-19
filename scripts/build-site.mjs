@@ -55,7 +55,8 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   const excluded = new Set(['node_modules', '.git', '.claude', '.agents', '.codex', '.openai', '.impeccable']);
   const activityRoot = path.join(root, 'Pages/Personal/Daily-Activity');
   const activityFiles = new Set(['index.html', 'styles.css', 'app.js', 'summary-views.js', 'month-by-year.js', 'comparison.js', 'daily.json']);
-  for (const entry of ['assets', 'data', 'Maps', 'Pages', 'favicon.svg', 'index.html', '404.html', 'original.html', 'main.js', 'style.css']) {
+  // r/, b/ and o/ are the style short links (see v2/README.md).
+  for (const entry of ['assets', 'data', 'Maps', 'Pages', 'favicon.svg', 'index.html', '404.html', 'original.html', 'main.js', 'style.css', 'r', 'b', 'o']) {
     await access(path.join(root, entry));
     await cp(path.join(root, entry), path.join(dist, entry), {
       recursive: true,

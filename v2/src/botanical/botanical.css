@@ -9,10 +9,10 @@
    5. Controls                      10. Pip, transitions, motion & a11y
    ===================================================================== */
 
-/* ---------- Shared: the Site style picker (both styles) ---------- */
+/* ---------- Shared: the Site style picker (all styles) ---------- */
 .style-options {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
 }
 .style-options > label {
@@ -132,9 +132,17 @@
 .background-note {
   margin-top: 10px;
 }
-@media (max-width: 420px) {
+/* Narrow sheets: one card per row, swatch beside the copy. */
+@media (max-width: 520px) {
   .style-options {
     grid-template-columns: 1fr;
+  }
+  .style-options > label {
+    grid-template-columns: 104px minmax(0, 1fr);
+    align-items: center;
+  }
+  .style-preview {
+    height: 62px;
   }
 }
 
