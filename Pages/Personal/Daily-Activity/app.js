@@ -10,18 +10,18 @@ const monthDate = new Intl.DateTimeFormat('en-US', { month: 'short', year: 'nume
 const yearDate = new Intl.DateTimeFormat('en-US', { year: 'numeric', timeZone: 'UTC' });
 const compact = new Intl.NumberFormat('en-US', { notation: 'compact' });
 const stageSeries = [
-  { field: 'sleep_deep_minutes', label: 'Deep', color: '--deep' },
-  { field: 'sleep_rem_minutes', label: 'REM', color: '--rem' },
-  { field: 'sleep_light_minutes', label: 'Light', color: '--light' },
-  { field: 'sleep_awake_minutes', label: 'Awake', color: '--awake' },
+  { field: 'sleep_deep_minutes', label: 'Deep', color: '--metric-4' },
+  { field: 'sleep_rem_minutes', label: 'REM', color: '--metric-3' },
+  { field: 'sleep_light_minutes', label: 'Light', color: '--metric-2' },
+  { field: 'sleep_awake_minutes', label: 'Awake', color: '--metric-1' },
   { field: 'unclassified', label: 'Unclassified', color: '--unclassified' },
 ];
 const heartSeries = [
-  { field: 'heart_rate_min_bpm', label: 'Minimum', color: '--minimum', dash: [5, 4], style: 'dashed' },
-  { field: 'heart_rate_max_bpm', label: 'Maximum', color: '--maximum', dash: [1, 3], style: 'dotted' },
-  { field: 'heart_rate_bpm', label: 'Average', color: '--accent', dash: [], style: '' },
+  { field: 'heart_rate_min_bpm', label: 'Minimum', color: '--metric-soft', dash: [5, 4], style: 'dashed' },
+  { field: 'heart_rate_max_bpm', label: 'Maximum', color: '--metric-soft', dash: [1, 3], style: 'dotted' },
+  { field: 'heart_rate_bpm', label: 'Average', color: '--metric', dash: [], style: '' },
 ];
-const trendSeries = { field: 'trend', label: '7-day average', color: '--trend', dash: [7, 3], style: 'dashed' };
+const trendSeries = { field: 'trend', label: '7-day average', color: '--metric-strong', dash: [7, 3], style: 'dashed' };
 const metrics = [
   {
     key: 'steps',
@@ -29,7 +29,7 @@ const metrics = [
     display: (value) => `${whole.format(value)} steps`,
     cell: (value) => whole.format(value),
     tick: (value) => compact.format(value),
-    series: [{ field: 'steps', color: '--accent', dash: [] }],
+    series: [{ field: 'steps', color: '--metric', dash: [] }],
   },
   {
     key: 'sleep_minutes',
@@ -318,13 +318,15 @@ function plotChart(chart, width, height) {
   }
   if (sleeping) {
     const barWidth = Math.min(34, spacing * 0.8);
+    const gap = series.length > 1 && barWidth >= 6 ? 2 : 0;
     for (const [index, { row }] of buckets.entries()) {
       let total = 0;
       for (const { field, color: seriesColor } of series) {
         const value = row[field] ?? 0;
         if (value <= 0) continue;
+        const height = y(total) - y(total + value);
         ctx.fillStyle = color(seriesColor);
-        ctx.fillRect(x(index) - barWidth / 2, y(total + value), barWidth, y(total) - y(total + value));
+        if (height > gap) ctx.fillRect(x(index) - barWidth / 2, y(total + value), barWidth, height - (total > 0 ? gap : 0));
         total += value;
       }
     }
@@ -431,6 +433,7 @@ function legendItem({ label, color, style }) {
 
 function createChart(metric, rows) {
   const section = id('chart-template').content.firstElementChild.cloneNode(true);
+  section.dataset.metric = metric.key;
   section.querySelector('h2').textContent = metric.title;
   const series = metric.series.filter(({ field }) => rows.some((row) => row[field] !== undefined));
   const legend = section.querySelector('.legend');
@@ -457,7 +460,7 @@ function createChart(metric, rows) {
   };
   if (metric.key === 'sleep_minutes') {
     const modes = id('sleep-mode-template').content.firstElementChild.cloneNode(true);
-    const total = [{ field: metric.key, label: 'Total Sleep', color: '--rem' }];
+    const total = [{ field: metric.key, label: 'Total Sleep', color: '--metric' }];
     for (const button of modes.querySelectorAll('button')) {
       button.addEventListener('click', () => {
         for (const choice of modes.children) choice.setAttribute('aria-pressed', String(choice === button));

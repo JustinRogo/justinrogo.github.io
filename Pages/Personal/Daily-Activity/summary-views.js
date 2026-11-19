@@ -1,3 +1,5 @@
+import { initMonthByYear } from './month-by-year.js';
+
 const dayOrder = [1, 2, 3, 4, 5, 6, 0];
 const monthName = new Intl.DateTimeFormat('en-US', { month: 'short', timeZone: 'UTC' });
 const heatBandNames = ['Low', 'Lower middle', 'Upper middle', 'High'];
@@ -226,6 +228,7 @@ export function initSummaryViews({ rowsByDay, metrics, dayMs, weekdayNames, full
   const firstYear = new Date(dates[0]).getUTCFullYear();
   const latestYear = new Date(latestDate).getUTCFullYear();
   const updateScatter = initSleepScatter(rowsByDay, metricsByKey, fullDate, firstYear, latestYear);
+  const updateMonthly = initMonthByYear({ rowsByDay, metrics, firstYear, latestYear });
   let weekdays = new Set();
   let selectedDays = [];
   let weekSelection;
@@ -238,6 +241,7 @@ export function initSummaryViews({ rowsByDay, metrics, dayMs, weekdayNames, full
 
   function renderTypicalWeek() {
     const metric = metricsByKey.get(weekMetric.value);
+    week.closest('section').dataset.metric = metric.key;
     const groups = Array.from({ length: 7 }, () => []);
     for (const time of selectedDays) {
       const value = rowsByDay.get(time)?.[metric.key];
@@ -288,6 +292,7 @@ export function initSummaryViews({ rowsByDay, metrics, dayMs, weekdayNames, full
   function renderHeatmap({ reveal = false } = {}) {
     const year = Number(heatYear.value);
     const metric = metricsByKey.get(heatMetric.value);
+    heatGrid.closest('section').dataset.metric = metric.key;
     const start = Date.UTC(year, 0, 1);
     const end = Date.UTC(year + 1, 0, 1);
     const datesInYear = Array.from({ length: (end - start) / dayMs }, (_, index) => start + index * dayMs);
@@ -386,6 +391,7 @@ export function initSummaryViews({ rowsByDay, metrics, dayMs, weekdayNames, full
     selectedDays = days;
     renderTypicalWeek();
     if (initial || changed) updateScatter(weekdays);
+    if (initial || changed) updateMonthly(weekdays);
     if (initial || changed) renderHeatmap({ reveal: initial });
   };
 }

@@ -54,7 +54,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   // Match the existing site's public roots, without exposing source, SQL, or env files.
   const excluded = new Set(['node_modules', '.git', '.claude', '.agents', '.codex', '.openai', '.impeccable']);
   const activityRoot = path.join(root, 'Pages/Personal/Daily-Activity');
-  const activityFiles = new Set(['index.html', 'styles.css', 'app.js', 'summary-views.js', 'comparison.js', 'daily.json']);
+  const activityFiles = new Set(['index.html', 'styles.css', 'app.js', 'summary-views.js', 'month-by-year.js', 'comparison.js', 'daily.json']);
   for (const entry of ['assets', 'data', 'Maps', 'Pages', 'favicon.svg', 'index.html', '404.html', 'original.html', 'main.js', 'style.css']) {
     await access(path.join(root, entry));
     await cp(path.join(root, entry), path.join(dist, entry), {

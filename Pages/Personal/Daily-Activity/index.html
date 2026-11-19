@@ -87,6 +87,19 @@
         </div>
       </section>
 
+      <section class="report analysis-panel monthly" aria-labelledby="monthly-title">
+        <header class="report-heading">
+          <div><h2 id="monthly-title">Year over year</h2><p class="chart-hint" id="monthly-caption">Average per recorded day in each month, one line per year. Darker lines are more recent. Select a line or pick a year to highlight it.</p></div>
+          <div class="analysis-controls">
+            <label class="analysis-control">Metric <select id="monthly-metric"></select></label>
+            <label class="analysis-control">Year <select id="monthly-year"></select></label>
+          </div>
+        </header>
+        <ul id="monthly-legend" class="legend" aria-label="Chart key"></ul>
+        <canvas id="monthly-chart" role="img" aria-describedby="monthly-caption" tabindex="0"></canvas>
+        <p id="monthly-detail" class="analysis-detail" role="status"></p>
+      </section>
+
       <section class="report analysis-panel scatterplot" aria-labelledby="scatter-title">
         <header class="report-heading">
           <div><h2 id="scatter-title">Sleep and next-day steps</h2><p class="chart-hint" id="scatter-caption">Each dot pairs recorded sleep with steps on the wake date. Color shows the year. Hover or tap for details.</p></div>
@@ -122,9 +135,9 @@
         <table aria-labelledby="history-title">
           <thead><tr>
             <th scope="col">Date</th>
-            <th scope="col">Steps</th>
-            <th scope="col">Sleep sessions</th>
-            <th scope="col">Avg. heart rate</th>
+            <th scope="col" data-metric="steps">Steps</th>
+            <th scope="col" data-metric="sleep_minutes">Sleep sessions</th>
+            <th scope="col" data-metric="heart_rate_bpm">Avg. heart rate</th>
           </tr></thead>
           <tbody id="daily-rows"></tbody>
         </table>
