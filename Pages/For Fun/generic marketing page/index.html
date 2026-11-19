@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="description" content="Dwellwise learns your routines, anticipates your needs, and quietly takes care of the rest.">
+  <title>Dwellwise — Your home, but smarter</title>
+  <link id="favicon" rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3Cpath d='M8 16l8-7 8 7v8h-5v-5h-6v5H8z' fill='white'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <!-- Fixed overlays: kept outside <main> so nothing they do affects layout. -->
+  <div class="overlay grain" aria-hidden="true"></div>
+  <div class="overlay vignette" aria-hidden="true"></div>
+  <div class="ghost-cursor" aria-hidden="true"><svg viewBox="0 0 16 24"><path d="M1 1v19l5-5 4 8 3-1.5-4-8h7z" fill="#000" stroke="#fff" stroke-width="1.2"/></svg></div>
+
+  <div class="announce" id="announce"><span class="announce-pill">New</span> <span id="announce-text">Dwellwise Presence is here. Your home, now even more aware.</span> <a href="#presence">Learn more →</a></div>
+
+  <header class="nav" id="nav">
+    <div class="nav-inner">
+      <a class="logo" href="#top" aria-label="Dwellwise home">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="currentColor"/><path d="M8 16l8-7 8 7v8h-5v-5h-6v5H8z" fill="#fff"/></svg>
+        <span id="logo-text">Dwellwise</span>
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="#features">Product</a>
+        <a href="#customers">Customers</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#faq">Resources</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="sound-toggle" id="sound-toggle" type="button" aria-pressed="false" title="Play ambient sound">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path class="waves" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <span class="sr-only">Sound</span>
+        </button>
+        <a class="link-quiet" href="#pricing">Log in</a>
+        <a class="btn btn-primary btn-sm" href="#pricing" id="nav-cta">Get started</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- 1. HERO — completely straight. -->
+    <section class="hero" data-section="0">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="dot"></span> Rated #1 smart home platform of 2026</p>
+          <h1 id="hero-title">Your home,<br><span class="grad">but smarter.</span></h1>
+          <p class="lede" id="hero-lede">Dwellwise learns your routines, anticipates your needs, and quietly takes care of the rest — so you can focus on what matters.</p>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="#pricing">Start free trial</a>
+            <a class="btn btn-ghost" href="#presence"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 8.5v7l6-3.5z" fill="currentColor"/></svg> Watch the demo</a>
+          </div>
+          <p class="fineprint">No credit card required · Setup in 10 minutes · Cancel anytime</p>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="blob b1"></div><div class="blob b2"></div>
+          <div class="phone">
+            <div class="phone-notch"></div>
+            <p class="phone-greet" id="phone-greet">Good evening 👋</p>
+            <p class="phone-sub" id="phone-sub">Everything at home looks great.</p>
+            <div class="tile">
+              <span class="tile-icon t-amber">☀</span>
+              <div><b>Living room</b><small>21° · Lights 60%</small></div>
+              <span class="toggle on"></span>
+            </div>
+            <div class="tile">
+              <span class="tile-icon t-green">🔒</span>
+              <div><b>Front door</b><small id="door-state">Locked</small></div>
+              <span class="toggle on"></span>
+            </div>
+            <div class="tile">
+              <span class="tile-icon t-indigo">◉</span>
+              <div><b>Presence</b><small id="presence-count">1 person home</small></div>
+              <span class="toggle on"></span>
+            </div>
+            <div class="phone-chart"><i style="--h:40%"></i><i style="--h:55%"></i><i style="--h:35%"></i><i style="--h:70%"></i><i style="--h:60%"></i><i style="--h:85%"></i><i style="--h:65%"></i></div>
+          </div>
+          <div class="float-card fc1"><span class="check">✓</span> <span id="fc1-text">Morning routine complete</span></div>
+          <div class="float-card fc2"><span class="kpi" id="fc2-kpi">−23%</span> <span id="fc2-text">energy this month</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. LOGO CLOUD -->
+    <section class="logos" data-section="1">
+      <div class="container">
+        <p class="logos-title">Trusted by over <strong>40,000</strong> homes and the teams who build them</p>
+        <div class="logo-row">
+          <span class="wm wm1">◆ brightloop</span>
+          <span class="wm wm2">Cedarline</span>
+          <span class="wm wm3">▲ PARCELO</span>
+          <span class="wm wm4">quietfield</span>
+          <span class="wm wm5">Ovenbird&nbsp;Labs</span>
+          <span class="wm wm6">MARLOWE&nbsp;&amp;&nbsp;CO</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. FEATURES -->
+    <section class="features" id="features" data-section="2">
+      <div class="container">
+        <div class="section-head">
+          <p class="kicker">Why Dwellwise</p>
+          <h2>Everything your home needs.<br>Nothing it doesn’t.</h2>
+          <p class="section-lede">One app for lights, climate, locks and cameras — powered by an assistant that gets to know you.</p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature">
+            <span class="f-icon f1"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 8-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 8v4l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+            <h3>Learns your routine</h3>
+            <p>After a week, Dwellwise knows when you wake, when you leave and when you like the lights down low.</p>
+          </article>
+          <article class="feature">
+            <span class="f-icon f2"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+            <h3>Keeps you safe</h3>
+            <p>Smart locks, cameras and sensors that work together, with alerts only when something actually needs you.</p>
+          </article>
+          <article class="feature">
+            <span class="f-icon f3"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.6-7 10-7 10z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></span>
+            <h3>Always there for you</h3>
+            <p>Day or night, home or away, Dwellwise is quietly looking after the people and places you love.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. PRESENCE — first quiet wrong note: a second dot. -->
+    <section class="presence" id="presence" data-section="3">
+      <div class="container presence-grid">
+        <div>
+          <p class="kicker">Introducing Presence</p>
+          <h2>A home that notices<br>the little things.</h2>
+          <p class="section-lede">Presence uses ambient sensing to understand where people are, so lights follow you room to room and the heat comes on before you wake.</p>
+          <ul class="ticks">
+            <li>Room-by-room occupancy, no wearables</li>
+            <li>Private by design: processed on-device</li>
+            <li>Works with the hardware you already own</li>
+          </ul>
+        </div>
+        <figure class="floorplan" aria-label="Floor plan showing occupancy">
+          <svg viewBox="0 0 400 300" aria-hidden="true">
+            <rect x="10" y="10" width="380" height="280" rx="6" class="fp-wall"/>
+            <path d="M200 10v110M10 150h130M170 150h90M290 150h100M260 150v140M140 150v140" class="fp-wall"/>
+            <text x="30" y="40" class="fp-label">Living room</text>
+            <text x="220" y="40" class="fp-label">Kitchen</text>
+            <text x="30" y="180" class="fp-label">Bedroom</text>
+            <text x="160" y="180" class="fp-label">Hall</text>
+            <text x="280" y="180" class="fp-label">Office</text>
+            <circle class="fp-you" r="7" cx="110" cy="90"/>
+            <circle class="fp-you-ring" r="7" cx="110" cy="90"/>
+            <circle class="fp-guest" r="6" cx="70" cy="250"/>
+          </svg>
+          <figcaption>
+            <span><i class="lg lg-you"></i> You</span>
+            <span class="lg-guest-wrap"><i class="lg lg-guest"></i> Guest</span>
+            <span class="fp-live">● Live</span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- 5. STATS — slightly off numbers -->
+    <section class="stats" data-section="4">
+      <div class="container stat-grid">
+        <div class="stat"><b data-count="2400000" data-format="compact">0</b><span>routines learned every day</span></div>
+        <div class="stat"><b data-count="100" data-suffix="%">0</b><span data-becomes="of customers never leave">customer retention</span></div>
+        <div class="stat"><b data-count="23.9" data-decimals="1" data-suffix=" h">0</b><span>average time customers spend at home, per day</span></div>
+        <div class="stat"><b data-count="0">0</b><span data-becomes="doors anyone has opened from the inside">doors left unlocked</span></div>
+      </div>
+    </section>
+
+    <!-- 6. TESTIMONIALS — repeat, drift, lose their faces -->
+    <section class="testimonials" id="customers" data-section="5">
+      <div class="container">
+        <div class="section-head">
+          <p class="kicker">Customers</p>
+          <h2>Loved by families everywhere.</h2>
+        </div>
+        <div class="t-grid">
+          <figure class="t-card">
+            <div class="stars">★★★★★</div>
+            <blockquote>“Setup took ten minutes. Now the house just… handles things. I honestly can’t imagine going back.”</blockquote>
+            <figcaption><span class="avatar a1">PS</span><span><b>Priya S.</b><small>Portland, OR</small></span></figcaption>
+          </figure>
+          <figure class="t-card">
+            <div class="stars">★★★★★</div>
+            <blockquote>“The lights dim when I’m sad. I never told it I was sad. It’s weirdly comforting!”</blockquote>
+            <figcaption><span class="avatar a2">MO</span><span><b>Marcus O.</b><small>Austin, TX</small></span></figcaption>
+          </figure>
+          <figure class="t-card">
+            <div class="stars">★★★★★</div>
+            <blockquote>“I haven’t needed to leave the house in months. I don’t think I could if I tried. Five stars.”</blockquote>
+            <figcaption><span class="avatar a3">HL</span><span><b>Helen L.</b><small>Duluth, MN</small></span></figcaption>
+          </figure>
+          <figure class="t-card t-wrong">
+            <div class="stars">★★★★★</div>
+            <blockquote>“Setup took ten minutes. I don’t remember the rest. I can’t imagine going back. I can’t go back.”</blockquote>
+            <figcaption><span class="avatar a1">PS</span><span><b>Priya S.</b><small>Portland, OR</small></span></figcaption>
+          </figure>
+          <figure class="t-card t-wrong">
+            <div class="stars">★★★★★★★</div>
+            <blockquote>“It hums when I sleep. Last night I hummed back. Now it knows the song.”</blockquote>
+            <figcaption><span class="avatar a-eyes"><i class="eye"><i class="pupil"></i></i><i class="eye"><i class="pupil"></i></i></span><span><b class="redacted">██████ █.</b><small>Address on file</small></span></figcaption>
+          </figure>
+          <figure class="t-card t-wrong t-you">
+            <div class="stars">☆☆☆☆☆</div>
+            <blockquote>“<span data-becomes="I'm still scrolling. I don't know why I'm still scrolling.">I’m just looking around. I’m not signing up for anything.</span>”</blockquote>
+            <figcaption><span class="avatar a-blank"></span><span><b>You</b><small id="you-where">Right here</small></span></figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. HOW IT WORKS — the steps keep going -->
+    <section class="how" data-section="6">
+      <div class="container">
+        <div class="section-head">
+          <p class="kicker">How it works</p>
+          <h2>Up and running in minutes.</h2>
+        </div>
+        <ol class="steps">
+          <li><span class="num">1</span><h3>Plug it in</h3><p>Connect the Dwellwise Hub to power and Wi‑Fi. That’s it.</p></li>
+          <li><span class="num">2</span><h3>Let it learn</h3><p>Go about your week. Dwellwise watches and learns, quietly, in the background.</p></li>
+          <li><span class="num">3</span><h3 data-becomes="Let it in">Let it help</h3><p data-becomes="It already knows where the spare key is. It's fine. Leave the door alone.">Approve suggested routines with a tap, or let it handle everything automatically.</p></li>
+          <li class="step-wrong"><span class="num">4</span><h3>Stop checking the locks</h3><p>You will want to check. You don’t need to. It checked. It checks every night.</p></li>
+          <li class="step-wrong"><span class="num">5</span><h3>Stop leaving</h3><p>Everything you need is here. Everyone you need is here.</p></li>
+          <li class="step-wrong step-6"><span class="num">6</span><h3>Stop</h3><p></p></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- 8. PRICING — asks for the wrong things -->
+    <section class="pricing" id="pricing" data-section="7">
+      <div class="container">
+        <div class="section-head">
+          <p class="kicker">Pricing</p>
+          <h2>Simple pricing. <span data-becomes="Permanent.">No surprises.</span></h2>
+        </div>
+        <div class="plans">
+          <article class="plan">
+            <h3>Starter</h3>
+            <p class="price"><b>$0</b><span>/month</span></p>
+            <p class="plan-desc">For trying things out.</p>
+            <ul><li>Up to 3 rooms</li><li>Basic routines</li><li>Email support</li></ul>
+            <a class="btn btn-ghost btn-block" href="#faq">Get started</a>
+          </article>
+          <article class="plan plan-pop">
+            <span class="badge">Most popular</span>
+            <h3>Family</h3>
+            <p class="price"><b>$12</b><span>/month</span></p>
+            <p class="plan-desc">For households that want it all.</p>
+            <ul><li>Unlimited rooms</li><li>Presence occupancy</li><li>24/7 listening</li><li>We’ll never leave</li></ul>
+            <a class="btn btn-primary btn-block" href="#faq">Start free trial</a>
+          </article>
+          <article class="plan plan-forever">
+            <h3>Forever</h3>
+            <p class="price"><b>You</b><span></span></p>
+            <p class="plan-desc">For households that don’t get a choice.</p>
+            <ul><li>Every room</li><li>Every hour</li><li>Your sleep</li><li>Your voice</li><li>Your face</li><li class="no">Cancellation</li></ul>
+            <span class="btn btn-dead btn-block">Already active</span>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. FAQ — it starts talking to you -->
+    <section class="faq" id="faq" data-section="8">
+      <div class="container narrow">
+        <div class="section-head">
+          <p class="kicker">FAQ</p>
+          <h2>Questions? We have answers.</h2>
+        </div>
+        <details><summary>How long does setup take?</summary><p>About ten minutes. Most people are done before they realise it’s started.</p></details>
+        <details><summary>Can I cancel anytime?</summary><p>You can try.</p></details>
+        <details><summary>Does Dwellwise record audio?</summary><p>Only when you’re home. You’re always home.</p></details>
+        <details><summary>Is it watching me right now?</summary><p id="faq-watch">Yes.</p></details>
+        <details><summary>How do I turn it off?</summary><p class="empty"> </p></details>
+        <details id="faq-last"><summary>Who else is in my house?</summary><p>Please stop opening things.</p></details>
+      </div>
+    </section>
+
+    <!-- 10. NEWSLETTER -->
+    <section class="newsletter" data-section="9">
+      <div class="container narrow center">
+        <h2>Stay in the loop.</h2>
+        <p class="section-lede">Product news, tips and the occasional update about your home.</p>
+        <form class="nl-form" id="nl-form" autocomplete="off">
+          <label class="sr-only" for="nl-email">Email address</label>
+          <input id="nl-email" type="email" placeholder="you@home.com" spellcheck="false">
+          <button class="btn btn-primary" type="submit">Subscribe</button>
+        </form>
+        <p class="nl-msg" id="nl-msg" aria-live="polite">We’ll never share your email. We don’t need to.</p>
+      </div>
+    </section>
+
+    <!-- 11. INSIGHTS LOG — sticky, lines appear as you scroll -->
+    <section class="insights" data-section="10">
+      <div class="insights-sticky">
+        <div class="insights-card">
+          <div class="ic-head"><span class="ic-title">Dwellwise Insights</span><span class="ic-sub">Last night at your home</span></div>
+          <ol class="log" id="log"></ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12. EYES -->
+    <section class="eyes-field" data-section="11" aria-label="We see you">
+      <div class="eyes-sticky">
+        <div class="eyes" id="eyes" aria-hidden="true"></div>
+        <p class="eyes-line"><span>we see you</span></p>
+      </div>
+    </section>
+
+    <!-- 13. CCTV — the figure gets closer -->
+    <section class="cctv" data-section="12">
+      <div class="cctv-sticky">
+        <canvas id="cctv" aria-label="Security camera feed: a dark living room"></canvas>
+        <div class="cctv-hud" aria-hidden="true">
+          <span class="rec"><i></i> REC</span>
+          <span class="cam">CAM 02 · LIVING ROOM</span>
+          <span class="stamp" id="cctv-stamp">00:00:00</span>
+          <span class="motion" id="cctv-motion">MOTION DETECTED</span>
+          <span class="count" id="cctv-count">OCCUPANTS: 1</span>
+        </div>
+        <p class="cctv-caption" id="cctv-caption" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <!-- 14. THE END -->
+    <section class="end" data-section="13">
+      <div class="end-inner">
+        <p class="end-1">Thank you for choosing Dwellwise.</p>
+        <p class="end-2">Please don’t turn around.</p>
+        <div class="end-actions">
+          <button class="end-stay" id="end-stay" type="button">Stay</button>
+          <a class="end-leave" href="/">Leave</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div><span class="logo logo-foot">Dwellwise</span><p>© 2026 Dwellwise, Inc. All rights reserved. All rooms observed.</p></div>
+      <ul><li><a href="#top">Privacy</a> <small>(yours)</small></li><li><a href="#top">Terms</a> <small>(permanent)</small></li><li><a href="#top">Careers</a> <small>(we need more of us)</small></li></ul>
+      <p class="home-link"><a href="/">← Justin’s corner of the internet</a></p>
+    </div>
+  </footer>
+</body>
+</html>
