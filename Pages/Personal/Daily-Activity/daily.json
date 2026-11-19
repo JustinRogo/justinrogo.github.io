@@ -3653,5 +3653,6 @@
   {"date":"2026-11-14","steps":2389,"sleep_minutes":319.5,"heart_rate_bpm":76.0,"sleep_deep_minutes":60.0,"sleep_rem_minutes":65.0,"sleep_light_minutes":169.5,"sleep_awake_minutes":25.0,"heart_rate_min_bpm":54,"heart_rate_max_bpm":129},
   {"date":"2026-11-15","steps":14328,"sleep_minutes":367.0,"heart_rate_bpm":114.2,"sleep_deep_minutes":58.0,"sleep_rem_minutes":140.0,"sleep_light_minutes":144.0,"sleep_awake_minutes":25.0,"heart_rate_min_bpm":56,"heart_rate_max_bpm":162},
   {"date":"2026-11-16","steps":3275,"sleep_minutes":337.0,"heart_rate_bpm":76.1,"sleep_deep_minutes":45.0,"sleep_rem_minutes":102.0,"sleep_light_minutes":156.0,"sleep_awake_minutes":34.0,"heart_rate_min_bpm":51,"heart_rate_max_bpm":118},
-  {"date":"2026-11-17","steps":2113,"sleep_minutes":199.5,"heart_rate_bpm":74.2,"sleep_deep_minutes":65.5,"sleep_rem_minutes":41.0,"sleep_light_minutes":78.0,"sleep_awake_minutes":15.0,"heart_rate_min_bpm":55,"heart_rate_max_bpm":120}
+  {"date":"2026-11-17","steps":3535,"sleep_minutes":199.5,"heart_rate_bpm":77.1,"sleep_deep_minutes":65.5,"sleep_rem_minutes":41.0,"sleep_light_minutes":78.0,"sleep_awake_minutes":15.0,"heart_rate_min_bpm":55,"heart_rate_max_bpm":120},
+  {"date":"2026-11-18","steps":3105,"sleep_minutes":257.0,"heart_rate_bpm":78.7,"sleep_deep_minutes":79.5,"sleep_rem_minutes":67.0,"sleep_light_minutes":85.0,"sleep_awake_minutes":25.5,"heart_rate_min_bpm":52,"heart_rate_max_bpm":134}
 ]
