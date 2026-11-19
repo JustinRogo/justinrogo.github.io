@@ -261,7 +261,7 @@ function plotChart(chart, width, height) {
   const color = (name) => theme.getPropertyValue(name).trim();
   if (!buckets.length) {
     chart.plot = undefined;
-    ctx.font = '11px Geist, system-ui, sans-serif';
+    ctx.font = color('--chart-font') || '11px Geist, system-ui, sans-serif';
     ctx.fillStyle = color('--muted');
     ctx.textAlign = 'center';
     ctx.fillText('No dates match your filters', width / 2, height / 2);
@@ -284,7 +284,7 @@ function plotChart(chart, width, height) {
   const x = (index) => left + (index + 0.5) * spacing;
   const y = (value) => bottom - (value - floor) / (ceiling - floor) * (bottom - top);
   chart.plot = { left, right, top, bottom, spacing, x };
-  ctx.font = '11px Geist, system-ui, sans-serif';
+  ctx.font = color('--chart-font') || '11px Geist, system-ui, sans-serif';
   ctx.fillStyle = color('--muted');
   ctx.strokeStyle = color('--grid');
   ctx.textAlign = 'right';
@@ -522,7 +522,7 @@ weekdayFilter.addEventListener('keydown', (event) => {
 id('newer').addEventListener('click', () => { page -= 1; renderTable(); });
 id('older').addEventListener('click', () => { page += 1; renderTable(); });
 history.addEventListener('toggle', () => { if (history.open) renderTable(); });
-matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => charts.forEach(drawChart));
+addEventListener('site-style-change', () => charts.forEach(drawChart));
 document.fonts.ready.then(() => charts.forEach(drawChart));
 
 try {

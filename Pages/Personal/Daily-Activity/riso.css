@@ -1,0 +1,244 @@
+/* Daily Activity in the Risograph site style. Scoped to
+   :root[data-style="riso"]; styles.css stays the Original design. Matches
+   v2/src/riso/riso.css: grained cream (or black) paper, a cobalt masthead,
+   Archivo condensed caps for the title, headings and figures, 1.5px ink
+   rules, 2px corners and no shadows. Each metric is one ink: steps in
+   cobalt, sleep in pink, heart rate in the pink-over-yellow overprint. */
+:root[data-style="riso"] :where(.activity) {
+  --paper: #f2e9d4;
+  --surface: #f2e9d4;
+  --ink: #1b2a78;
+  --muted: #4d5482;
+  --border: #2747c9;
+  --grid: #dcd1b8;
+  --accent: #2747c9;
+  --selection: #fbe39b;
+  --steps: #2747c9;
+  --sleep: #e5207f;
+  --heart: #d9380e;
+  --unclassified: #8b8796;
+  --year-lightness: 40%;
+  --pink: #ff4fa3;
+  --yellow: #ffc61a;
+  --cobalt: #2747c9;
+  --on-ink: #141c50;
+  --rule: 1.5px;
+  --chart-font: 600 11px Archivo, "Arial Narrow", system-ui, sans-serif;
+  --font-display: "Archivo", "Archivo Narrow", "Roboto Condensed", "Arial Narrow", "Helvetica Neue", sans-serif;
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .32 0 0 0 0 .26 0 0 0 0 .16 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --mottle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.72' numOctaves='3' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .97 0 0 0 0 .94 0 0 0 0 .87 0 0 0 -2.4 0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
+  --speckle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.6 2.5'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s)'/%3E%3C/svg%3E");
+  font-family: "Archivo", Geist, system-ui, sans-serif;
+}
+:root[data-style="riso"][data-theme="dark"] :where(.activity) {
+  --paper: #1c1a18;
+  --surface: #1c1a18;
+  --ink: #f1e8d6;
+  --muted: #c4bba8;
+  --border: #8a96d8;
+  --grid: #3a3631;
+  --accent: #a9b8ff;
+  --selection: #3a3220;
+  --steps: #8fa2ff;
+  --sleep: #ff6cb5;
+  --heart: #ff8a52;
+  --unclassified: #8f8a80;
+  --year-lightness: 70%;
+  --pink: #ff5fae;
+  --yellow: #ffcf3a;
+  --cobalt: #2a3c9c;
+}
+
+:root[data-style="riso"] :where(.activity) ::selection {
+  background: var(--yellow);
+  color: var(--on-ink);
+}
+:root[data-style="riso"] :where(.activity) :focus-visible {
+  outline-color: var(--sleep);
+}
+:root[data-style="riso"] :where(.activity) :is(h1, h2, .history summary, .masthead a) {
+  font-family: var(--font-display);
+  font-stretch: 62%;
+  text-transform: uppercase;
+  letter-spacing: 0.005em;
+}
+/* The title is a poster headline: cobalt with its pink plate off register. */
+:root[data-style="riso"] :where(.activity) h1 {
+  font-size: clamp(3.4rem, 9vw, 6.4rem);
+  font-weight: 900;
+  line-height: 0.86;
+  color: var(--steps);
+  text-shadow: 0.034em 0.027em 0 var(--pink);
+  -webkit-mask: var(--speckle);
+  mask: var(--speckle);
+}
+:root[data-style="riso"] :where(.activity) h2 {
+  font-size: 1.55rem;
+  font-weight: 850;
+  line-height: 1;
+  letter-spacing: 0.01em;
+}
+:root[data-style="riso"] :where(.activity) .comparison-heading h2 {
+  font-size: 1.25rem;
+}
+:root[data-style="riso"] :where(.activity) .comparison-heading time {
+  font-family: var(--font-display);
+  font-stretch: 87%;
+  text-transform: none;
+}
+
+/* The masthead is a flood of cobalt with paper type reversed out. */
+:root[data-style="riso"] .masthead {
+  border-bottom: 0;
+  background: var(--mottle), var(--grain), var(--cobalt);
+  color: #f7f0de;
+}
+:root[data-style="riso"] .masthead a {
+  font-size: 1.15rem;
+  font-weight: 850;
+}
+:root[data-style="riso"] .masthead a:hover {
+  color: var(--yellow);
+}
+:root[data-style="riso"] .masthead a:focus-visible {
+  outline-color: var(--yellow);
+}
+
+/* Panels are areas of the same sheet, divided by ink rules. */
+:root[data-style="riso"] :where(.activity) :is(.report, .comparison, .history summary, .weekday-filter fieldset, .tooltip) {
+  border: var(--rule) solid var(--border);
+  border-radius: 2px;
+  background: var(--grain), var(--surface);
+}
+:root[data-style="riso"] :where(.activity) .comparison {
+  border-color: var(--sleep);
+}
+:root[data-style="riso"] :where(.activity) .metric + .metric {
+  border-top: var(--rule) solid var(--grid);
+}
+:root[data-style="riso"] :where(.activity) table {
+  background: transparent;
+}
+:root[data-style="riso"] :where(.activity) thead th {
+  border-bottom: var(--rule) solid var(--border);
+}
+:root[data-style="riso"] :where(.activity) .history summary {
+  font-size: 1.3rem;
+  font-weight: 850;
+}
+
+/* Controls: semi-condensed caps; the selected range is a yellow block. */
+:root[data-style="riso"] :where(.activity) :is(.range button, .pager button, .weekday-filter summary, .weekday-actions button, .analysis-control select) {
+  border-radius: 2px;
+  font-stretch: 87%;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+:root[data-style="riso"] :where(.activity) :is(.pager button, .weekday-filter summary, .analysis-control select) {
+  border: var(--rule) solid var(--border);
+}
+:root[data-style="riso"] :where(.activity) .range button[aria-pressed="true"] {
+  background: var(--mottle), var(--yellow);
+  border-color: var(--yellow);
+  color: var(--on-ink);
+}
+:root[data-style="riso"] :where(.activity) .weekday-filter[data-filtered] summary {
+  background: var(--yellow);
+  border-color: var(--yellow);
+  color: var(--on-ink);
+}
+:root[data-style="riso"] :where(.activity) :is(.analysis-control, .trend-toggle, .view-period, .legend, .chart-hint, .heat-legend, .year-labels, .scatter-count) {
+  font-stretch: 87%;
+}
+:root[data-style="riso"] :where(.activity) .typical-row,
+:root[data-style="riso"] :where(.activity) .weekday-filter label {
+  border-radius: 2px;
+}
+
+/* Figures: oversized condensed numerals. */
+:root[data-style="riso"] :where(.activity) .latest strong {
+  font-family: var(--font-display);
+  font-stretch: 62%;
+  font-weight: 900;
+  font-size: 1.7rem;
+  line-height: 0.9;
+  color: var(--metric);
+}
+:root[data-style="riso"] :where(.activity) .comparison-value {
+  font-family: var(--font-display);
+  font-stretch: 62%;
+  font-weight: 900;
+  font-size: 1.45rem;
+  line-height: 1;
+}
+:root[data-style="riso"] :where(.activity) .ring-label {
+  font-family: var(--font-display);
+  font-stretch: 75%;
+  font-weight: 800;
+  font-size: 0.86rem;
+}
+:root[data-style="riso"] :where(.activity) .ring-fill {
+  stroke-linecap: butt;
+}
+/* Metric markers become flat ink squares. */
+:root[data-style="riso"] :where(.activity) :is(.metric h2, thead th[data-metric])::before {
+  border-radius: 0;
+}
+:root[data-style="riso"] :where(.activity) .heat-day,
+:root[data-style="riso"] :where(.activity) .heat-legend i {
+  border-radius: 1px;
+}
+/* Quiet structure stays in the paper's own rule colour, not full ink. */
+:root[data-style="riso"] :where(.activity) .typical-track {
+  background: var(--grid);
+}
+:root[data-style="riso"] :where(.activity) :is(.heat-day, .heat-legend i)[data-level="missing"] {
+  border-color: var(--muted);
+}
+:root[data-style="riso"] :where(.activity) .typical-band {
+  border-radius: 1px;
+}
+:root[data-style="riso"] :where(.activity) .typical-dot {
+  border-radius: 1px;
+}
+:root[data-style="riso"] :where(.activity) .year-track span {
+  background: var(--sleep);
+}
+:root[data-style="riso"] :where(.activity) .year-slider input::-webkit-slider-thumb {
+  border-radius: 2px;
+  border-color: var(--border);
+}
+:root[data-style="riso"] :where(.activity) .year-slider input::-moz-range-thumb {
+  border-radius: 2px;
+  border-color: var(--border);
+}
+
+@media (max-width: 620px) {
+  :root[data-style="riso"] :where(.activity) h1 {
+    font-size: clamp(2.6rem, 17vw, 4.4rem);
+  }
+  :root[data-style="riso"] :where(.activity) h2 {
+    font-size: 1.3rem;
+  }
+}
+
+@media (prefers-contrast: more), (forced-colors: active) {
+  :root[data-style="riso"] :where(.activity) h1 {
+    text-shadow: none;
+    -webkit-mask: none;
+    mask: none;
+  }
+  :root[data-style="riso"] :where(.activity) :is(.report, .comparison, .history summary, .weekday-filter fieldset, .tooltip) {
+    background: var(--surface);
+  }
+  :root[data-style="riso"] .masthead {
+    background: var(--cobalt);
+  }
+}
+@media (forced-colors: active) {
+  :root[data-style="riso"] .masthead {
+    background: Canvas;
+    color: CanvasText;
+  }
+}

@@ -119,6 +119,25 @@ React Bits is copyright David Haz, under MIT + Commons Clause. The build include
 - **Fonts.** Fraunces loads from Google Fonts (with preconnect hints) while Botanical is in use. Visitors who choose Original make no font requests to Google. Fallbacks are Iowan Old Style, Palatino, and Georgia.
 - **Tests.** `tests/botanical.spec.mjs` covers the default, switching, Pip, reduced motion, and overflow at three widths in both themes. The other specs import `tests/original-style.mjs`, which pins preferences without a style to Original, so they keep guarding the Original design.
 
+## Daily Activity and the site shell
+
+`Pages/Personal/Daily-Activity/` keeps its own address and code, but wears the homepage's left rail (the bottom dock on phones), top bar and Settings sheet.
+
+- **The shell.** `src/shell.jsx` is a second esbuild entry, built to `assets/shell.js` and `assets/shell.css`. It renders the same `Sidebar` and `Topbar` components as the homepage (`src/components/Shell.jsx`).
+- **Links.** A `LinkBaseContext` of `/` rewrites hash routes and project paths (see `src/links.js`). For example, `#/about` becomes `/#/about` and `../Pages/…` becomes `/Pages/…`.
+- **Page markup.** The page provides `#site-shell` for the rail and dialog, and a `.workspace` wrapper holding `#site-topbar` (`display: contents`) and its `main`. If the shell script fails, the page shows its original masthead link instead.
+- **Styles.** The page imports `shell.css` into a cascade layer, `@import … layer(site)`, so its own unlayered rules always win. Its tokens and element rules are scoped to `:where(.activity)` (no added specificity), so they never restyle the shell and the shell's same-named tokens never reach in. The shell paints the page ground.
+- **Style and theme.** `site-style.js` paints the saved style and light/dark choice before first render. With nothing saved, it uses Botanical and the system theme. The shell then owns changes made from its toggle, its Settings sheet or another tab, and fires `site-style-change` so the canvas charts redraw.
+- **Page styles.** `styles.css` is the Original design. `botanical.css` and `riso.css` override its tokens and type. Charts read their colours, and a `--chart-font` variable, from CSS each time they draw. Each metric keeps one ink per style:
+
+| Style | Steps | Sleep | Heart rate |
+| --- | --- | --- | --- |
+| Original | blue | magenta | teal |
+| Botanical | green | terracotta | ochre |
+| Risograph | cobalt | pink | pink-over-yellow overprint orange |
+
+`tests/activity-styles.spec.mjs` covers each style, the default, live updates from another tab, the shell's links and Settings, the fallback masthead and phone overflow.
+
 ## Style short links
 
 `/r`, `/b` and `/o` open the homepage in Risograph, Botanical or Original: for example, https://justinrogo.github.io/r. Each folder holds a tiny page that runs `v2/assets/style-link.js`. The script saves that style as the visitor's choice, keeping their other settings, then replaces the address with the homepage at the same hash, so `/r#/projects` lands on Projects. After that the plain address keeps whatever the visitor last chose in Settings, so a bookmarked short link never overrides a later change. The pages carry the homepage's link-preview tags, `noindex` and a canonical link to the homepage. Without JavaScript they fall through to the homepage in its default style. `scripts/build-site.mjs` copies the three folders into `dist/`.
@@ -145,6 +164,7 @@ React Bits is copyright David Haz, under MIT + Commons Clause. The build include
 - `src/views/`: five destinations; `src/components/`: shared controls, dialogs, icons, project rows and sketch.
 - `src/styles.css`: V2 layout and controls; `src/glass-theme.css`: the requested glass materials, blue/orange tokens, responsive hero and atmospheric motion.
 - `src/botanical/`: the Botanical site style: tokens and component styles, illustrations, Pip, backgrounds, and the style transition.
+- `src/components/Shell.jsx`, `src/shell.jsx`, `src/links.js`, `src/preferences.js`: the rail and top bar, shared with standalone pages through the shell bundle.
 - `src/riso/`: the Risograph site style: tokens and component styles, print art, and backgrounds. Style ids, font loading and the transition are shared in `src/botanical/siteStyle.js` and `styleTransition.js`.
 - `src/components/PageBackground.jsx` / `.css`: selected background host, device defaults, motion policy, and scoped host/settings styles.
 - `build.mjs`: independent esbuild pipeline, read-only strength extraction, and exposure of existing background components without V1’s application controller.

@@ -6,16 +6,30 @@
   <meta name="description" content="Justin Rogowski’s daily steps, time in recorded sleep sessions, and average heart rate.">
   <meta name="robots" content="noindex">
   <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#efe8d8">
   <title>Daily Activity | Justin Rogowski</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <script src="site-style.js"></script>
+  <!-- The site shell (rail and top bar) shares the homepage's styles. They sit
+       in a lower cascade layer, so this page's own rules always win. -->
+  <style>@import url("/v2/assets/shell.css") layer(site);</style>
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="botanical.css">
+  <link rel="stylesheet" href="riso.css">
   <script type="module" src="app.js"></script>
+  <script type="module" src="/v2/assets/shell.js" onerror="document.documentElement.classList.remove('has-shell')"></script>
 </head>
 <body>
-  <header class="masthead">
+  <div id="site-shell"></div>
+  <div class="workspace" id="workspace">
+  <div id="site-topbar" style="display: contents"></div>
+  <!-- Shown only if the site shell can't load. -->
+  <header class="masthead activity">
     <div class="frame"><a href="/">Justin Rogowski</a></div>
   </header>
-  <main class="frame">
+  <main class="frame activity" id="main" tabindex="-1">
     <header class="overview">
       <div class="intro">
         <h1>Daily Activity</h1>
@@ -174,5 +188,6 @@
       </dd>
     </template>
   </main>
+  </div>
 </body>
 </html>

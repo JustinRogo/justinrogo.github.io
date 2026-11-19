@@ -5,8 +5,11 @@
   font-weight: 100 900;
 }
 
-:root {
-  color-scheme: light dark;
+/* Tokens and element rules are scoped to the page's content (.activity), so
+   they never restyle the site shell around it, and the shell's tokens of the
+   same names never reach in here. */
+:root { color-scheme: light dark; }
+:where(.activity) {
   --paper: #e6efff;
   --surface: #f8faff;
   --ink: #112847;
@@ -20,11 +23,15 @@
   --heart: #147a76;
   --unclassified: #68778d;
   --year-lightness: 39%;
+  /* Canvas labels read this, so each site style can set its own face. */
+  --chart-font: 11px Geist, system-ui, sans-serif;
   font: 100%/1.5 Geist, system-ui, sans-serif;
+  color: var(--ink);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
+/* site-style.js sets data-theme from the saved preference or the system. */
+:root[data-theme="dark"] { color-scheme: dark; }
+:root[data-theme="dark"] :where(.activity) {
     --paper: #060f23;
     --surface: #0e203b;
     --ink: #eef5ff;
@@ -38,11 +45,11 @@
     --heart: #68c9bd;
     --unclassified: #8494ae;
     --year-lightness: 69%;
-  }
 }
+:root[data-theme="light"] { color-scheme: light; }
 
 /* Each metric carries one hue; its shades mix that hue toward the surface (softer) or the ink (stronger). */
-[data-metric] {
+:where(.activity) [data-metric] {
   --metric: var(--steps);
   --metric-1: color-mix(in oklab, var(--metric) 30%, var(--surface));
   --metric-2: color-mix(in oklab, var(--metric) 54%, var(--surface));
@@ -51,26 +58,31 @@
   --metric-soft: color-mix(in oklab, var(--metric) 72%, var(--surface));
   --metric-strong: color-mix(in oklab, var(--metric) 58%, var(--ink));
 }
-[data-metric="sleep_minutes"] { --metric: var(--sleep); }
-[data-metric="heart_rate_bpm"] { --metric: var(--heart); }
+:where(.activity) [data-metric="sleep_minutes"] { --metric: var(--sleep); }
+:where(.activity) [data-metric="heart_rate_bpm"] { --metric: var(--heart); }
 
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
-body { margin: 0; background: var(--paper); color: var(--ink); }
-::selection { background: var(--accent); color: var(--surface); }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-button { font: inherit; }
-a { color: inherit; text-underline-offset: .22em; }
-h1, h2, p, figure, dl, dd { margin: 0; }
+/* The body's ground comes from the site shell (or this paper without it). */
+body { margin: 0; }
+html:not(.has-shell) body { background: #e6efff; }
+:where(.activity) ::selection { background: var(--accent); color: var(--surface); }
+:where(.activity) :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+:where(.activity) button { font: inherit; }
+:where(.activity) a { color: inherit; text-underline-offset: .22em; }
+:where(.activity) :is(h1, h2, p, figure, dl, dd) { margin: 0; }
+:where(.activity) p { max-width: none; }
+:where(.activity) label { display: revert; flex-direction: row; gap: normal; font-size: inherit; font-weight: inherit; }
 
 .frame { width: min(100% - 3rem, 69rem); margin-inline: auto; }
 .masthead { border-bottom: 1px solid var(--border); }
 .masthead a { display: inline-block; padding-block: .85rem; font-size: .875rem; font-weight: 650; }
 .masthead a:hover { color: var(--accent); }
-main { padding-block: 2rem 3rem; }
+main:where(.activity) { max-width: none; min-height: 0; padding: 2rem 0 3rem; }
+.has-shell .masthead { display: none; }
 .overview { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); align-items: start; gap: 1rem 1.5rem; margin-bottom: 1.15rem; }
 .intro { grid-column: 1; }
-h1 { font-size: 3.2rem; line-height: 1.05; letter-spacing: -.04em; font-weight: 640; }
+:where(.activity) h1 { font-size: 3.2rem; line-height: 1.05; letter-spacing: -.04em; font-weight: 640; }
 .intro p { margin-top: .65rem; color: var(--muted); }
 .comparison { padding: .7rem .85rem; border: 1px solid var(--border); border-radius: .7rem; background: var(--surface); }
 .comparison-heading { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: .15rem .8rem; }
@@ -108,7 +120,7 @@ h1 { font-size: 3.2rem; line-height: 1.05; letter-spacing: -.04em; font-weight: 
 :is(.metric h2, thead th[data-metric])::before { content: ''; flex: none; width: .55rem; height: .55rem; border-radius: 50%; background: var(--metric); }
 thead th[data-metric]::before { display: inline-block; margin-right: .4rem; vertical-align: .05em; }
 .report-heading { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: .25rem 1rem; }
-h2 { font-size: 1.2rem; line-height: 1.22; letter-spacing: -.025em; font-weight: 650; }
+:where(.activity) h2 { font-size: 1.2rem; line-height: 1.22; letter-spacing: -.025em; font-weight: 650; }
 .latest { display: flex; align-items: baseline; flex-wrap: wrap; gap: .15rem .55rem; font-size: .78rem; color: var(--muted); }
 .latest strong { color: var(--ink); font-variant-numeric: tabular-nums; font-size: .95rem; }
 .range { display: flex; flex-wrap: wrap; gap: .25rem; }
@@ -139,7 +151,7 @@ h2 { font-size: 1.2rem; line-height: 1.22; letter-spacing: -.025em; font-weight:
 .trend-toggle input { margin: 0; width: 1rem; height: 1rem; accent-color: var(--accent); }
 
 .chart { position: relative; margin-top: .25rem; }
-canvas { display: block; width: 100%; height: 145px; }
+:where(.activity) canvas { display: block; width: 100%; height: 145px; }
 .chart-guide { position: absolute; width: 1px; background: var(--metric); opacity: .55; pointer-events: none; }
 .tooltip {
   position: absolute;
@@ -163,7 +175,7 @@ canvas { display: block; width: 100%; height: 145px; }
 .analysis-panel .chart-hint { margin-top: .25rem; }
 .analysis-controls { display: flex; flex-wrap: wrap; gap: .45rem; }
 .analysis-control { display: inline-flex; align-items: center; gap: .35rem; color: var(--muted); font-size: .8rem; }
-.analysis-control select { min-height: 44px; padding: .3rem .4rem; border: 1px solid var(--border); border-radius: .4rem; background: var(--surface); color: var(--ink); font: 600 .8rem Geist, system-ui, sans-serif; }
+.analysis-control select { min-height: 44px; padding: .3rem .4rem; border: 1px solid var(--border); border-radius: .4rem; background: var(--surface); color: var(--ink); font-family: inherit; font-size: .8rem; font-weight: 600; }
 .typical-week { display: grid; gap: .1rem; margin-top: .65rem; }
 .typical-row { display: grid; grid-template-columns: 2.45rem minmax(0, 1fr) 5.5rem; align-items: center; gap: .55rem; min-height: 38px; padding: .3rem .55rem; border: 1px solid transparent; border-radius: .4rem; background: transparent; color: var(--ink); text-align: left; font-size: .8rem; cursor: pointer; }
 .typical-row:hover, .typical-row[aria-pressed="true"] { background: color-mix(in oklab, var(--metric) 14%, var(--surface)); }
@@ -205,7 +217,7 @@ canvas { display: block; width: 100%; height: 145px; }
 .year-slider { position: relative; height: 36px; --thumb: 20px; }
 .year-track { position: absolute; inset: calc(50% - 2px) calc(var(--thumb) / 2) auto; height: 4px; background: var(--grid); border-radius: 2px; }
 .year-track span { position: absolute; inset: 0 var(--end-gap) 0 var(--start-gap); background: var(--accent); }
-.year-slider input { position: absolute; top: 0; width: calc(100% - var(--thumb)); height: 100%; margin: 0; appearance: none; background: transparent; pointer-events: none; }
+.year-slider input { padding: 0; border: 0; border-radius: 0; position: absolute; top: 0; width: calc(100% - var(--thumb)); height: 100%; margin: 0; appearance: none; background: transparent; pointer-events: none; }
 #scatter-start { left: 0; }
 #scatter-end { right: 0; }
 .year-slider input::-webkit-slider-thumb { appearance: none; width: var(--thumb); height: var(--thumb); pointer-events: auto; cursor: grab; border: 2px solid var(--accent); border-radius: 50%; background: var(--surface); }
@@ -225,11 +237,11 @@ canvas { display: block; width: 100%; height: 145px; }
 .pager { display: flex; gap: .5rem; align-items: center; color: var(--muted); font-size: .78rem; }
 .pager button { border-color: var(--border); background: var(--surface); }
 .pager button:disabled { opacity: .55; cursor: default; }
-table { width: 100%; table-layout: fixed; border-collapse: collapse; background: var(--surface); font-size: .875rem; }
-th, td { padding: .6rem .8rem; border-bottom: 1px solid var(--grid); text-align: right; font-variant-numeric: tabular-nums; }
-thead th { vertical-align: bottom; border-bottom-color: var(--border); font-weight: 650; }
-tbody th { font-weight: 525; }
-th:first-child { width: 29%; text-align: left; }
+:where(.activity) table { width: 100%; table-layout: fixed; border-collapse: collapse; background: var(--surface); font-size: .875rem; }
+:where(.activity) :is(th, td) { padding: .6rem .8rem; border-bottom: 1px solid var(--grid); text-align: right; font-variant-numeric: tabular-nums; }
+:where(.activity) thead th { vertical-align: bottom; border-bottom-color: var(--border); font-weight: 650; }
+:where(.activity) tbody th { font-weight: 525; }
+:where(.activity) th:first-child { width: 29%; text-align: left; }
 .missing { color: var(--muted); }
 .empty-table { text-align: center; color: var(--muted); }
 
@@ -239,8 +251,8 @@ th:first-child { width: 29%; text-align: left; }
 
 @media (max-width: 620px) {
   .frame { width: calc(100% - 1.5rem); }
-  main { padding-top: 1.55rem; }
-  h1 { font-size: 2.55rem; }
+  main:where(.activity) { padding-top: 1.55rem; }
+  :where(.activity) h1 { font-size: 2.55rem; }
   .overview { grid-template-columns: 1fr; }
   .intro p { font-size: .9rem; }
   .comparison-ring { width: 3.65rem; }
@@ -251,16 +263,16 @@ th:first-child { width: 29%; text-align: left; }
   .range button { flex: 1 0 auto; padding-inline: .35rem; font-size: .78rem; }
   .metric { padding: .7rem .7rem .5rem; }
   .report-heading { gap: .17rem 1rem; }
-  h2 { font-size: 1.075rem; }
+  :where(.activity) h2 { font-size: 1.075rem; }
   .latest { flex-basis: 100%; }
   .latest strong { font-size: .87rem; }
-  canvas { height: 140px; }
+  :where(.activity) .chart canvas { height: 140px; }
   .analysis-panel { padding: .7rem; }
   .analysis-panel .report-heading { gap: .45rem; }
   .scatterplot canvas { height: 225px; }
   .typical-row { min-height: 44px; }
-  th, td { padding: .55rem .35rem; font-size: .75rem; }
-  th:first-child { width: 30%; }
-  th:last-child { width: 26%; }
-  td:last-child { white-space: nowrap; }
+  :where(.activity) :is(th, td) { padding: .55rem .35rem; font-size: .75rem; }
+  :where(.activity) th:first-child { width: 30%; }
+  :where(.activity) th:last-child { width: 26%; }
+  :where(.activity) td:last-child { white-space: nowrap; }
 }

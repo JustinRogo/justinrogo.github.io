@@ -87,7 +87,7 @@ function initSleepScatter(rowsByDay, metrics, fullDate, firstYear, latestYear) {
     const x = (hours) => left + hours / upperHours * (right - left);
     const y = (stepsPerDay) => bottom - stepsPerDay / upperSteps * (bottom - top);
 
-    ctx.font = '11px Geist, system-ui, sans-serif';
+    ctx.font = color('--chart-font') || '11px Geist, system-ui, sans-serif';
     ctx.fillStyle = color('--muted');
     ctx.strokeStyle = color('--grid');
     ctx.textAlign = 'right';
@@ -159,7 +159,7 @@ function initSleepScatter(rowsByDay, metrics, fullDate, firstYear, latestYear) {
     select(Math.min(points.length - 1, Math.max(0, index)));
   });
   new ResizeObserver(draw).observe(canvas);
-  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', draw);
+  addEventListener('site-style-change', draw);
   document.fonts.ready.then(draw);
 
   function filterYears() {

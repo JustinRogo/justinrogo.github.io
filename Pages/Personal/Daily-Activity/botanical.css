@@ -1,0 +1,168 @@
+/* Daily Activity in the Botanical site style (the site's default).
+   Scoped to :root[data-style="botanical"]; styles.css stays the Original
+   design. Matches v2/src/botanical/botanical.css: grained parchment, matte
+   paper panels, Fraunces headings over Geist, a forest-green masthead, and
+   pill controls. Each metric keeps one hue: steps in conservatory green,
+   sleep in terracotta, heart rate in ochre. */
+:root[data-style="botanical"] :where(.activity) {
+  --paper: #ece4d3;
+  --surface: #f8f4ea;
+  --ink: #1b3125;
+  --muted: #4f5d48;
+  --border: #d3c7ae;
+  --grid: #e4dac6;
+  --accent: #2f6045;
+  --selection: #e2e5cf;
+  --steps: #2f6045;
+  --sleep: #a4532f;
+  --heart: #8a6417;
+  --unclassified: #7c7866;
+  --year-lightness: 36%;
+  --forest: #18392b;
+  --rail-ink: #f3ecdb;
+  --ochre: #c5a46d;
+  --font-display: "Fraunces", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .36 0 0 0 0 .27 0 0 0 0 .12 0 0 0 .075 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --panel-shadow: 0 1px 1px rgba(70, 52, 22, 0.06), 0 16px 34px -24px rgba(60, 44, 18, 0.42);
+}
+:root[data-style="botanical"][data-theme="dark"] :where(.activity) {
+  --paper: #0c1b14;
+  --surface: #15291f;
+  --ink: #efe8d6;
+  --muted: #b4bfa5;
+  --border: #3b5644;
+  --grid: #23392c;
+  --accent: #a9cc98;
+  --selection: #1c3a2a;
+  --steps: #a9cc98;
+  --sleep: #e5a982;
+  --heart: #d9bd7f;
+  --unclassified: #8f9a86;
+  --year-lightness: 70%;
+  --forest: #0a1711;
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .9 0 0 0 0 .85 0 0 0 0 .7 0 0 0 .045 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --panel-shadow: 0 1px 0 rgba(197, 164, 109, 0.06) inset, 0 18px 40px -24px rgba(0, 0, 0, 0.75);
+}
+
+:root[data-style="botanical"] :where(.activity) ::selection {
+  background: #a8b89a;
+  color: #18392b;
+}
+:root[data-style="botanical"] :where(.activity) :is(h1, h2) {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  font-variation-settings: "SOFT" 50, "WONK" 0;
+  letter-spacing: -0.012em;
+}
+:root[data-style="botanical"] :where(.activity) h1 {
+  font-weight: 420;
+  font-size: 3.5rem;
+  font-variation-settings: "SOFT" 100, "WONK" 1;
+}
+:root[data-style="botanical"] :where(.activity) h2 {
+  font-weight: 480;
+}
+:root[data-style="botanical"] :where(.activity) .intro p {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.05rem;
+}
+
+/* The masthead is the rail's deep-green binding. */
+:root[data-style="botanical"] .masthead {
+  border-bottom: 0;
+  background: var(--grain), linear-gradient(180deg, #1d4433, var(--forest));
+  color: var(--rail-ink);
+}
+:root[data-style="botanical"][data-theme="dark"] .masthead {
+  background: var(--grain), linear-gradient(180deg, #102419, var(--forest));
+  box-shadow: inset 0 -1px 0 rgba(197, 164, 109, 0.22);
+}
+:root[data-style="botanical"] .masthead a {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 450;
+  font-size: 1rem;
+}
+:root[data-style="botanical"] .masthead a:hover {
+  color: #e2c48c;
+}
+:root[data-style="botanical"] .masthead a:focus-visible {
+  outline-color: #e2c48c;
+}
+
+/* Panels are matte paper with a printed plate's inner rule. */
+:root[data-style="botanical"] :where(.activity) :is(.report, .comparison, .history summary, table) {
+  background: var(--grain), var(--surface);
+  border-color: rgba(92, 74, 40, 0.2);
+  box-shadow: var(--panel-shadow);
+}
+:root[data-style="botanical"][data-theme="dark"] :where(.activity) :is(.report, .comparison, .history summary, table) {
+  border-color: rgba(197, 164, 109, 0.2);
+}
+:root[data-style="botanical"] :where(.activity) .report {
+  border-radius: 14px;
+}
+:root[data-style="botanical"] :where(.activity) .comparison {
+  border-radius: 14px;
+}
+:root[data-style="botanical"] :where(.activity) table {
+  box-shadow: none;
+}
+:root[data-style="botanical"] :where(.activity) .history summary {
+  border-radius: 12px 3px 12px 3px;
+  font-family: var(--font-display);
+  font-weight: 480;
+  font-size: 1.05rem;
+}
+
+/* Controls: pills, with the selected range in solid green. */
+:root[data-style="botanical"] :where(.activity) :is(.range button, .pager button, .weekday-filter summary, .analysis-control select) {
+  border-radius: 999px;
+}
+:root[data-style="botanical"] :where(.activity) .range button[aria-pressed="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--surface);
+}
+:root[data-style="botanical"] :where(.activity) .weekday-filter fieldset,
+:root[data-style="botanical"] :where(.activity) .tooltip {
+  border-radius: 12px 3px 12px 3px;
+  background: var(--grain), var(--surface);
+  box-shadow: var(--panel-shadow);
+}
+:root[data-style="botanical"] :where(.activity) .typical-row {
+  border-radius: 12px 3px 12px 3px;
+}
+
+/* Metric markers become small leaves. */
+:root[data-style="botanical"] :where(.activity) :is(.metric h2, thead th[data-metric])::before {
+  border-radius: 0 80% 0 80%;
+  transform: rotate(-8deg);
+}
+:root[data-style="botanical"] :where(.activity) .latest strong,
+:root[data-style="botanical"] :where(.activity) .comparison-value {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.1rem;
+}
+:root[data-style="botanical"] :where(.activity) .heat-day,
+:root[data-style="botanical"] :where(.activity) .heat-legend i {
+  border-radius: 4px 1px 4px 1px;
+}
+
+@media (prefers-contrast: more), (forced-colors: active) {
+  :root[data-style="botanical"] :where(.activity) :is(.report, .comparison, .history summary, table) {
+    background: var(--surface);
+    box-shadow: none;
+  }
+  :root[data-style="botanical"] .masthead {
+    background: var(--forest);
+  }
+}
+@media (forced-colors: active) {
+  :root[data-style="botanical"] .masthead {
+    background: Canvas;
+    color: CanvasText;
+  }
+}

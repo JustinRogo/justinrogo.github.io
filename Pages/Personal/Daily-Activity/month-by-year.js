@@ -84,7 +84,7 @@ export function initMonthByYear({ rowsByDay, metrics, firstYear, latestYear }) {
     const color = (name) => theme.getPropertyValue(name).trim();
     const { key, tick } = metric();
     const values = [...series.values()].flat().filter(Number.isFinite);
-    ctx.font = '11px Geist, system-ui, sans-serif';
+    ctx.font = color('--chart-font') || '11px Geist, system-ui, sans-serif';
     ctx.fillStyle = color('--muted');
     if (!values.length) {
       plot = undefined;
@@ -235,7 +235,7 @@ export function initMonthByYear({ rowsByDay, metrics, firstYear, latestYear }) {
     render();
   });
   new ResizeObserver(draw).observe(canvas);
-  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', draw);
+  addEventListener('site-style-change', draw);
   document.fonts.ready.then(draw);
 
   return (selectedWeekdays) => {
