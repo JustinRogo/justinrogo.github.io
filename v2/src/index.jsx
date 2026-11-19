@@ -8,7 +8,7 @@ import {
   useScrolledFlag,
   useStored,
 } from "./hooks.js";
-import { donationUrl, integrations, profile } from "./content.js";
+import { integrations } from "./content.js";
 import Home from "./views/Home.jsx";
 import Projects from "./views/Projects.jsx";
 import Tools from "./views/Tools.jsx";
@@ -16,44 +16,35 @@ import About from "./views/About.jsx";
 import More, { parseManifest } from "./views/More.jsx";
 import Settings from "./components/Settings.jsx";
 import Icon from "./components/Icon.jsx";
-import { GlassLayer } from "./components/Glass.jsx";
 import { newTabNote } from "./components/UI.jsx";
-import PageBackground, {
-  backgroundOptions,
-} from "./components/PageBackground.jsx";
-import ExploreMenu from "./components/ExploreMenu.jsx";
-import SidebarResize, { useSidebarWidth } from "./components/SidebarResize.jsx";
+import PageBackground from "./components/PageBackground.jsx";
+import { useSidebarWidth } from "./components/SidebarResize.jsx";
+import { Sidebar, Topbar, destinations, themeReveal } from "./components/Shell.jsx";
 import HomepageAssembly, {
   AssembleReveal,
   ReplayAssembly,
 } from "./assembly/HomepageAssembly.jsx";
 import {
   SiteStyleContext,
-  botanicalBackgrounds,
   loadStyleFonts,
   resolveStyle,
-  risoBackgrounds,
-  styleIds,
   themeColors,
 } from "./botanical/siteStyle.js";
+import {
+  PREFERENCES_KEY,
+  defaultPreferences,
+  validPreferences,
+} from "./preferences.js";
 import { transitionStyle } from "./botanical/styleTransition.js";
 import { centerOf, reveal } from "./botanical/reveal.js";
 import LivingPothos from "./botanical/LivingPothos.jsx";
-import { LeafGlyph, WordmarkSprig } from "./botanical/Flora.jsx";
-import { RisoMark } from "./riso/RisoArt.jsx";
+import { LeafGlyph } from "./botanical/Flora.jsx";
 import "./styles.css";
 import "./glass-theme.css";
 import "./layout.css";
 import "./botanical/botanical.css";
 import "./riso/riso.css";
 
-const destinations = [
-  ["home", "Home"],
-  ["projects", "Projects"],
-  ["tools", "Tools"],
-  ["about", "About"],
-  ["more", "More"],
-];
 const viewTitle = (view) =>
   view === "home"
     ? "Justin Rogowski · UConn Law Library"
@@ -68,41 +59,14 @@ function App() {
   const [visited, setVisited] = useState(new Set([active]));
   if (!visited.has(active)) setVisited(new Set([...visited, active]));
   const [preferences, setPreferences] = useStored(
-    "jr-v2-preferences",
-    {
-      theme: "system",
-      calm: false,
-      atmosphere: true,
-      intro: true,
-      background: "auto",
-      style: "botanical",
-      botanicalBackground: "conservatory",
-    },
-    (p) =>
-      p &&
-      ["system", "light", "dark"].includes(p.theme) &&
-      typeof p.calm === "boolean" &&
-      typeof p.atmosphere === "boolean" &&
-      (p.intro === undefined || typeof p.intro === "boolean") &&
-      (p.background === undefined ||
-        backgroundOptions.some(({ id }) => id === p.background)) &&
-      (p.style === undefined || styleIds.includes(p.style)) &&
-      (p.botanicalBackground === undefined ||
-        botanicalBackgrounds.some(({ id }) => id === p.botanicalBackground)) &&
-      (p.risoBackground === undefined ||
-        risoBackgrounds.some(({ id }) => id === p.risoBackground)),
+    PREFERENCES_KEY,
+    defaultPreferences,
+    validPreferences,
   );
   // Botanical is the default; the others apply only to visitors who chose them.
   const siteStyle = resolveStyle(preferences.style);
   const botanical = siteStyle === "botanical";
   const riso = siteStyle === "riso";
-  const wordmarkMark = botanical ? (
-    <WordmarkSprig />
-  ) : riso ? (
-    <RisoMark />
-  ) : (
-    <Icon name="external" size={28} />
-  );
   const [saved, setSaved] = useStored(
     "jr-v2-saved",
     [],
@@ -129,8 +93,6 @@ function App() {
         ? "dark"
         : "light"
       : preferences.theme;
-  const nextTheme = theme === "dark" ? "light" : "dark";
-  const themeAction = `Switch to ${nextTheme} mode`;
   const effects =
     !reduced && !preferences.calm && !highContrast && !forcedColors && visible;
   const projects = useResource("../data/pages.json", parseManifest);
@@ -281,161 +243,47 @@ function App() {
       >
         Skip to content
       </a>
-      <AssembleReveal id="shell">
-        <aside className="sidebar">
-          <GlassLayer />
-          <a
-            href="#/home"
-            className="wordmark"
-            aria-label="Justin Rogowski home"
-          >
-            jr
-            {wordmarkMark}
-          </a>
-          <button
-            className="icon-button sidebar-toggle"
-            aria-label={sidebar.collapsed ? "Expand navigation" : "Collapse navigation"}
-            aria-expanded={!sidebar.collapsed}
-            aria-controls="sidebar-navigation"
-            title={sidebar.collapsed ? "Expand navigation" : "Collapse navigation"}
-            onClick={sidebar.toggle}
-          >
-            <Icon name={sidebar.collapsed ? "expand" : "collapse"} />
-          </button>
-          {/* Home's hero already shows this. Hiding it keeps the navigation from jumping between views. */}
-          <div className="sidebar-identity" data-concealed={active === "home" || undefined}>
-            Justin Rogowski
-            <span>{profile.role}</span>
-          </div>
-          <div className="sidebar-scroll" id="sidebar-navigation">
-            <AssembleReveal id="navigation">
-              <nav className="primary-nav" aria-label="Primary navigation">
-                <GlassLayer className="dock-glass" />
-                {destinations.map(([id, label]) => (
-                  <a
-                    key={id}
-                    href={`#/${id}`}
-                    aria-label={label}
-                    title={label}
-                    aria-current={id === active ? "page" : undefined}
-                  >
-                    <Icon name={id} size={21} />
-                    <span>{label}</span>
-                    <span className="nav-active-dot" />
-                  </a>
-                ))}
-              </nav>
-            </AssembleReveal>
-            <AssembleReveal id="branches">
-              <div className="sidebar-branches">
-                <ExploreMenu
-                  collapseOnShortScreens
-                  route={route}
-                  effects={effects}
-                  pages={projects.data?.pages}
-                />
-              </div>
-            </AssembleReveal>
-          </div>
-          {botanical && !compact && (
-            <LivingPothos placement="sidebar" moving={effects} />
-          )}
-          <div className="sidebar-bottom">
-            <a
-              href="#/about?section=contact"
-              className="sidebar-contact"
-              aria-label="Contact"
-              title="Contact"
-              onClick={(event) => {
-                if (
-                  aboutSection !== "contact" ||
-                  event.ctrlKey ||
-                  event.metaKey ||
-                  event.shiftKey ||
-                  event.altKey
-                )
-                  return;
-                event.preventDefault();
-                const section = main.current?.querySelector("#say-hello");
-                section?.scrollIntoView({
-                  block: "start",
-                  behavior: "instant",
-                });
-                section?.querySelector("h2")?.focus({ preventScroll: true });
-              }}
-            >
-              <span>Contact</span> <Icon name="arrow" size={17} />
-            </a>
-            <div className="sidebar-settings">
-              <button
-                className="text-button sidebar-settings-button"
-                onClick={() => setSettings(true)}
-                aria-label="Appearance and motion settings"
-              >
-                <Icon name="settings" /> <span>Settings</span>
-              </button>
-            </div>
-          </div>
-          {!sidebar.collapsed && <SidebarResize {...sidebar} />}
-        </aside>
-      </AssembleReveal>
+      <Sidebar
+        sidebar={sidebar}
+        active={active}
+        route={route}
+        effects={effects}
+        pages={projects.data?.pages}
+        compact={compact}
+        onSettings={() => setSettings(true)}
+        onContact={(event) => {
+          if (
+            aboutSection !== "contact" ||
+            event.ctrlKey ||
+            event.metaKey ||
+            event.shiftKey ||
+            event.altKey
+          )
+            return;
+          event.preventDefault();
+          const section = main.current?.querySelector("#say-hello");
+          section?.scrollIntoView({
+            block: "start",
+            behavior: "instant",
+          });
+          section?.querySelector("h2")?.focus({ preventScroll: true });
+        }}
+      />
       <div className="workspace" id="workspace">
-        <AssembleReveal id="topbar">
-          <header className="topbar">
-            <GlassLayer />
-            <a className="mobile-wordmark" href="#/home">
-              jr
-              {wordmarkMark}
-            </a>
-            <a className="topbar-donate" href={donationUrl} target="_blank"
-              rel="noopener noreferrer" aria-label="Donate to the Law Library"
-              aria-describedby={newTabNote}
-              title="Donate to the Law Library">
-              <Icon name="heart" size={16} />
-              <span>
-                Donate<span className="topbar-donate-more"> to the Law Library</span>
-              </span>
-            </a>
-            <div className="local-time">
-              <span className="live-dot" />
-              <span className="topbar-location">Hartford, CT</span>
-              <time dateTime={time.toISOString()}>
-                {time.toLocaleTimeString("en-US", {
-                  hour: "numeric",
-                  minute: "2-digit",
-                  timeZone: "America/New_York",
-                })}
-              </time>
-              {weather.data?.current && (
-                <span className="topbar-weather">
-                  {Math.round(weather.data.current.temperature_2m)}°F
-                </span>
-              )}
-            </div>
-            <ReplayAssembly />
-            <button
-              type="button"
-              className="icon-button"
-              aria-label={themeAction}
-              title={themeAction}
-              onClick={(event) =>
-                // The new theme radiates out from this button.
-                reveal(
-                  () =>
-                    setPreferences((current) => ({ ...current, theme: nextTheme })),
-                  {
-                    animate: effects,
-                    origin: centerOf(event.currentTarget),
-                    shape: botanical ? "leaf" : riso ? "press" : "circle",
-                    duration: botanical ? "0.9s" : riso ? "0.65s" : "0.7s",
-                  },
-                )
-              }
-            >
-              <Icon name={nextTheme === "light" ? "sun" : "moon"} size={19} />
-            </button>
-          </header>
-        </AssembleReveal>
+        <Topbar
+          weather={weather}
+          time={time}
+          theme={theme}
+          onToggleTheme={(next, button) =>
+            // The new theme radiates out from this button.
+            reveal(
+              () => setPreferences((current) => ({ ...current, theme: next })),
+              { animate: effects, origin: centerOf(button), ...themeReveal(siteStyle) },
+            )
+          }
+        >
+          <ReplayAssembly />
+        </Topbar>
         <main id="main" tabIndex={-1} ref={main}>
           {[...visited].map((view) => (
             <div

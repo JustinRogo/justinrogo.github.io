@@ -1,7 +1,4 @@
 import {
-  Children,
-  cloneElement,
-  createContext,
   useCallback,
   useContext,
   useLayoutEffect,
@@ -14,9 +11,13 @@ import { assemblyConfig, layoutTasks } from "./assemblyConfig.js";
 import { createAssemblyTimeline } from "./AssemblyTimeline.js";
 import Icon from "../components/Icon.jsx";
 import { fontSheetIds } from "../botanical/siteStyle.js";
+import { AssemblyContext } from "./context.js";
 import "./assembly.css";
 
-const AssemblyContext = createContext(null);
+// Re-exported so existing imports keep working; they live in context.js so
+// the site shell on other pages can use them without the assembly timeline.
+export { AssembleReveal, useAssemblyBusy } from "./context.js";
+
 const seenKey = "jr-v2-assembly-seen";
 
 // Storage can be blocked. Those visitors fall back to once per document load.
@@ -68,27 +69,6 @@ async function fontsSettled(registry) {
     [...fonts].map((font) => document.fonts.load(font).catch(() => {})),
   );
   await document.fonts.ready;
-}
-
-export function useAssemblyBusy() {
-  return useContext(AssemblyContext)?.busy || false;
-}
-
-// A slot: attach a ref to the existing node without adding layout wrappers.
-export function AssembleReveal({ id, closest, children }) {
-  const context = useContext(AssemblyContext);
-  const child = Children.only(children);
-  const originalRef = child.props.ref;
-  const register = context?.register;
-  const ref = useCallback(
-    (node) => {
-      if (typeof originalRef === "function") originalRef(node);
-      else if (originalRef) originalRef.current = node;
-      register?.(id, closest && node ? node.closest(closest) : node);
-    },
-    [register, id, closest, originalRef],
-  );
-  return cloneElement(child, { ref, "data-assembly-id": id });
 }
 
 export function ReplayAssembly() {

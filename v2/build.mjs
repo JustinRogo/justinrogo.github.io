@@ -148,12 +148,20 @@ export async function buildV2({ watch = false } = {}) {
       },
     ],
   };
+  // The site shell (rail and top bar) for standalone pages such as Daily
+  // Activity: the same components and styles, without the homepage views.
+  const shell = {
+    ...options,
+    entryPoints: ["v2/src/shell.jsx"],
+    outfile: "v2/assets/shell.js",
+  };
   if (watch) {
     const ctx = await context(options);
-    await ctx.watch();
+    const shellCtx = await context(shell);
+    await Promise.all([ctx.watch(), shellCtx.watch()]);
     return ctx;
   }
-  await build(options);
+  await Promise.all([build(options), build(shell)]);
   console.log("V2 built independently in v2/assets/.");
 }
 if (

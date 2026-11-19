@@ -1,5 +1,9 @@
 import { useResource } from "../hooks.js";
-import { integrations, projectTitles } from "../content.js";
+import { integrations } from "../content.js";
+import { parseManifest } from "../manifest.js";
+
+// Kept here for existing imports; the parser lives in manifest.js.
+export { parseManifest };
 import {
   ExternalLink,
   LinkRow,
@@ -12,29 +16,6 @@ import { GlassLayer } from "../components/Glass.jsx";
 import { parseEvents } from "../events.js";
 import { parsePocketPart } from "../pocketPart.js";
 
-export function parseManifest(text) {
-  const value = JSON.parse(text);
-  if (
-    !Array.isArray(value.pages) ||
-    !value.pages.length ||
-    !value.pages.every(
-      (p) =>
-        typeof p.title === "string" &&
-        typeof p.path === "string" &&
-        p.path.startsWith("Pages/") &&
-        !p.path.includes("..") &&
-        (!p.href || /^https:\/\//.test(p.href)),
-    )
-  )
-    throw new Error("Invalid project index");
-  return {
-    ...value,
-    pages: value.pages.map((page) => ({
-      ...page,
-      title: projectTitles[page.path] || page.title,
-    })),
-  };
-}
 const safeUrl = (value) => {
   try {
     const url = new URL(value);

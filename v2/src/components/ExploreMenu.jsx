@@ -1,9 +1,10 @@
-import { useMemo } from "react";
+import { useContext, useMemo } from "react";
 import BranchedMenu from "../vendor/BranchedMenu.jsx";
 import Icon from "./Icon.jsx";
 import { newTabLink } from "./UI.jsx";
 import { groupOf, resources, projectHref } from "../content.js";
 import { useBotanical } from "../botanical/siteStyle.js";
+import { LinkBaseContext, resolveHref } from "../links.js";
 
 const EMPTY_PAGES = [];
 const SHORT_SCREEN = 900;
@@ -13,6 +14,15 @@ const contractLabels = [
   ["UCPEA_Contract_History.html", "Contract History"],
   ["UCPEA_Contract_Comparison.html", "Contract Comparison"],
 ];
+// Off the homepage, hash routes and project paths point back to it.
+function rebase(item, base) {
+  if (!base) return item;
+  return {
+    ...item,
+    ...(item.href && { href: resolveHref(item.href, base) }),
+    ...(item.children && { children: item.children.map((child) => rebase(child, base)) }),
+  };
+}
 function ucpeaLinks(pages) {
   const scoped = pages.filter((page) => page.path.startsWith(UCPEA_ROOT));
   const link = (page, label = page.title) => ({
@@ -56,6 +66,7 @@ export default function ExploreMenu({
   collapseOnShortScreens = false,
 }) {
   const botanical = useBotanical();
+  const base = useContext(LinkBaseContext);
   const items = useMemo(
     () => [
       {
@@ -157,8 +168,8 @@ export default function ExploreMenu({
           icon: <Icon name="external" size={16} />,
         })),
       },
-    ],
-    [pages],
+    ].map((group) => rebase(group, base)),
+    [pages, base],
   );
   const selected =
     route?.view === "tools"

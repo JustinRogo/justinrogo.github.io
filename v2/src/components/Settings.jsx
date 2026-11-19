@@ -1,5 +1,5 @@
 import { Dialog, newTabNote } from "./UI.jsx";
-import { backgroundOptions } from "./PageBackground.jsx";
+import { backgroundOptions } from "./backgroundOptions.js";
 import {
   botanicalBackgrounds,
   loadStyleFonts,
