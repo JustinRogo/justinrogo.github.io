@@ -1,6 +1,6 @@
-# Law Library Occupancy Heatmap
+# Law Library Heatmap
 
-The Law Library Occupancy Heatmap is a static, installable web application for recording patron locations across five library floors and reviewing historical occupancy patterns. It is built as a single HTML file with plain CSS and JavaScript, plus a web app manifest and service worker for installation and offline use.
+The Law Library Heatmap is a static, installable web application for recording patron locations across five library floors and reviewing where and when the library is busiest. It is built as a single HTML file with plain CSS and JavaScript, plus a web app manifest and service worker for installation and offline use.
 
 - Application: [`heatmap.html`](heatmap.html)
 - Live page: <https://justinrogo.github.io/Pages/Work/Library/heatmap.html>
@@ -102,7 +102,7 @@ After loading sessions, the application can:
 - filter by date range, time range, and weekdays;
 - show total, average, and peak counts;
 - chart total and per-floor counts over time;
-- calculate average occupancy by weekday and hour;
+- calculate the average patron count by weekday and hour;
 - show each floor's share of all loaded points; and
 - export the filtered totals to CSV.
 
@@ -217,10 +217,10 @@ Installation is offered by supported browsers when the site meets their PWA crit
 
 ## Privacy and data handling
 
-An occupancy submission includes exact point coordinates, timestamps, the aggregate count, and any note entered by the user. The configured flow sends that data to an external Microsoft Power Automate endpoint. The page also loads Google Analytics.
+A submission includes exact point coordinates, timestamps, the aggregate count, and any note entered by the user. The configured flow sends that data to an external Microsoft Power Automate endpoint. The page also loads Google Analytics.
 
 - Do not enter names, contact information, or other personally identifying details in notes.
-- Use the points to represent approximate occupancy, not to track identifiable individuals.
+- Use the points to show roughly where patrons are, not to track identifiable individuals.
 - Confirm that retention, access, and deletion rules for submitted files match the library's policies.
 - Review the Google Analytics configuration and privacy notice before deploying the page to a new audience.
 

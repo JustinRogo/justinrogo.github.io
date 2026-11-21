@@ -1,8 +1,8 @@
 {
   "id": "./heatmap.html",
-  "name": "Library Occupancy Heatmap",
-  "short_name": "Occupancy",
-  "description": "Record and review library occupancy across five floors, online or offline.",
+  "name": "Law Library Heatmap",
+  "short_name": "Heatmap",
+  "description": "Record and review where patrons are across five library floors, online or offline.",
   "start_url": "./heatmap.html",
   "scope": "./",
   "display": "standalone",

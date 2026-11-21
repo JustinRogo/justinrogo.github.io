@@ -178,11 +178,11 @@ Live site: `https://uconn-law-library.github.io/CGS/#/`
 
 A static, installable web app for browsing and searching the Connecticut General Statutes, subject index, and infractions schedule. It lives in its own repository (`UConn-Law-Library/CGS`); this site only links to it.
 
-### Occupancy Heatmap Dashboard
+### Law Library Heatmap
 
 Path: `Pages/Work/Library/heatmap.html`
 
-A visual dashboard prototype for library occupancy or space-use data.
+An installable app for recording where patrons are on each of the Law Library’s five floors and reviewing where and when the library is busiest.
 
 ### UConn School of Law Library Centennial Timeline
 

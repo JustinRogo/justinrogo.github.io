@@ -61,7 +61,7 @@
       "path": "Pages/Work/Library/heatmap.html",
       "title": "Law Library Heatmap",
       "category": "Dashboard",
-      "description": "Record library occupancy while walking through the Law Library."
+      "description": "Record where patrons are while walking through the Law Library."
     },
     {
       "path": "Pages/Work/Library/Timeline_LawLib.html",
