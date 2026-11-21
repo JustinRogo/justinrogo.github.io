@@ -11,7 +11,7 @@
       gtag('config', 'G-19YT1QBYXV');
     </script>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="description" content="Record and review library occupancy across five floors, online or offline.">
     <meta name="theme-color" content="#0f172a">
     <meta name="mobile-web-app-capable" content="yes">
@@ -47,6 +47,9 @@
             --chart-grid: rgba(255, 255, 255, 0.08);
             --primary: #3b82f6;       /* Blue 500 */
             --primary-hover: #2563eb; /* Blue 600 */
+            --accent-fill: #2563eb;   /* filled controls with white text */
+            --accent-fill-hover: #1d4ed8;
+            --done: #15803d;          /* checked-floor badge */
             --danger: #ef4444;        /* Red 500 */
             --text-main: #f1f5f9;     /* Slate 100 */
             --text-muted: #94a3b8;    /* Slate 400 */
@@ -68,6 +71,9 @@
             --chart-grid: rgba(15, 23, 42, 0.12);
             --primary: #2563eb;
             --primary-hover: #1d4ed8;
+            --accent-fill: #2563eb;
+            --accent-fill-hover: #1d4ed8;
+            --done: #15803d;
             --danger: #dc2626;
             --text-main: #0f172a;
             --text-muted: #64748b;
@@ -88,6 +94,9 @@
             --chart-grid: rgba(255, 255, 255, 0.12);
             --primary: #60a5fa;
             --primary-hover: #3b82f6;
+            --accent-fill: #2563eb;
+            --accent-fill-hover: #1d4ed8;
+            --done: #15803d;
             --danger: #f87171;
             --text-main: #fff;
             --text-muted: #a3a3a3;
@@ -281,9 +290,13 @@
             gap: 0.5rem;
         }
 
-        .tab:hover {
-            background: var(--bg-subtle);
-            color: var(--text-main);
+        /* Hover only for real pointers: iPad Safari keeps :hover stuck
+           on whatever was last tapped. */
+        @media (hover: hover) {
+            .tab:hover {
+                background: var(--bg-subtle);
+                color: var(--text-main);
+            }
         }
 
         .tab.active {
@@ -325,13 +338,13 @@
             cursor: grabbing;
         }
 
-        #floor, #heat {
+        #floor, #heat, #marks {
             position: absolute;
             top: 0; left: 0;
             width: 100%; height: 100%;
             display: block;
         }
-        #heat { pointer-events: none; }
+        #heat, #marks { pointer-events: none; }
 
         .map-controls {
             position: absolute;
@@ -422,8 +435,10 @@
             min-height: 44px;
         }
 
-        button:hover:not(:disabled) {
-            background: var(--bg-hover);
+        @media (hover: hover) {
+            button:hover:not(:disabled) {
+                background: var(--bg-hover);
+            }
         }
         button:active:not(:disabled) {
             transform: scale(0.97);
@@ -821,13 +836,11 @@
             .header-left { gap: 0.5rem; }
             .header-actions { gap: 0.4rem; }
             .stat-badge { padding-inline: 0.5rem; }
-            .stat-label { display: none; }
 
             .map-controls {
                 top: 0.5rem;
                 right: 0.5rem;
             }
-            .map-controls .wide-control { display: none; }
             footer {
                 grid-template-columns: 1fr 1fr; /* Two columns */
                 grid-template-areas: 
@@ -835,7 +848,8 @@
                     "notes notes";
             }
             .toolbar-group { grid-area: tools; }
-            .submitbtn { grid-area: submit; width: 100%; }
+            .footer-actions { grid-area: submit; }
+            .footer-actions button { flex: 1; }
             .notes-wrap { grid-area: notes; margin-top: 0.5rem; }
             
             #notes:focus {
@@ -852,6 +866,7 @@
         @media (max-width: 430px) {
             .tutorial-trigger-label { display: none; }
             .tutorial-trigger { min-width: 36px; padding-inline: 0.45rem; }
+            .stat-label { display: none; }
             .sync-status { padding-inline: 0.5rem; }
         }
 
@@ -925,6 +940,172 @@
                 margin-bottom: 0.25rem;
             }
         }
+
+        /* ================================================================
+           iPad (Count mode) refinements
+           ================================================================ */
+
+        /* Touch behaviour: no long-press text selection or callouts, no
+           double-tap zoom delay on controls, no grey tap flash. */
+        body {
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        textarea, input {
+            -webkit-user-select: text;
+            user-select: text;
+        }
+        button, .tab, input, textarea { touch-action: manipulation; }
+
+        /* Installed to the home screen, the status bar overlays the page. */
+        header { padding-top: calc(0.5rem + env(safe-area-inset-top, 0px)); }
+        footer { padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px)); }
+
+        #notes { font-size: 16px; }
+
+        .sr-only {
+            position: absolute;
+            width: 1px; height: 1px;
+            margin: -1px; padding: 0;
+            overflow: hidden;
+            clip: rect(0 0 0 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Floor tabs: filled active state and a checked badge. */
+        @media (min-width: 601px) {
+            .tab { min-height: 48px; font-size: 1rem; }
+        }
+        .tab.active,
+        .tab.active:hover:not(:disabled) {
+            background: var(--accent-fill);
+            border-color: var(--accent-fill);
+            color: #fff;
+        }
+        .tab .badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            min-width: 1.75em;
+            padding: 0.15rem 0.45rem;
+            font-variant-numeric: tabular-nums;
+            color: var(--text-main);
+        }
+        .tab.active .badge { background: rgba(255, 255, 255, 0.22); color: #fff; }
+        .tab-check { display: none; flex: 0 0 auto; }
+        body[data-mode="count"] .tab.visited .tab-check { display: block; }
+        body[data-mode="count"] .tab.visited .badge { background: var(--done); color: #fff; }
+
+        .submitbtn { background: var(--accent-fill); border-color: var(--accent-fill-hover); }
+        .submitbtn:hover:not(:disabled) { background: var(--accent-fill-hover); }
+
+        /* Unchecked-floors dialog shown before submitting. */
+        .confirm-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            background: rgba(2, 6, 23, 0.6);
+        }
+        .confirm-overlay[hidden] { display: none; }
+        .confirm-card {
+            width: min(420px, 100%);
+            padding: 1.25rem;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: var(--bg-overlay);
+            color: var(--text-main);
+            box-shadow: 0 18px 48px rgba(0, 0, 0, 0.48);
+        }
+        .confirm-card h2 { margin: 0 0 0.5rem; font-size: 1.2rem; }
+        .confirm-card p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        .confirm-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-top: 1.1rem;
+        }
+        .confirm-actions .confirm-primary {
+            grid-column: 1 / -1;
+            background: var(--accent-fill);
+            border-color: var(--accent-fill-hover);
+            color: #fff;
+            font-weight: 600;
+        }
+        .confirm-actions .confirm-cancel {
+            background: transparent;
+            color: var(--text-muted);
+        }
+
+        .footer-actions { display: flex; gap: 0.5rem; }
+
+        /* Zoom controls */
+        .map-controls .wide-control { min-width: 44px; padding-inline: 0.55rem; }
+        @media (orientation: landscape) {
+            /* Landscape: a narrow column on the right edge; the plan is
+               fitted beside it. */
+            .map-controls {
+                top: 50%;
+                right: 0.5rem;
+                transform: translateY(-50%);
+                flex-direction: column;
+            }
+            #zoomIn { order: 1; }
+            #zoomReadout { order: 2; min-width: 0; }
+            #zoomOut { order: 3; }
+            #zoomFit { order: 4; }
+            #zoomActual { order: 5; }
+        }
+
+        /* Portrait tablets: five equal, full-height floor tabs. */
+        @media (min-width: 601px) and (max-width: 1200px) and (orientation: portrait) {
+            .tabs {
+                display: grid;
+                grid-template-columns: repeat(5, minmax(0, 1fr));
+                max-width: 760px;
+                margin-inline: auto;
+            }
+            .tab { padding-inline: 0.4rem; }
+        }
+
+        /* Landscape tablets: one header row so the plan gets the height. */
+        @media (min-width: 1000px) and (max-width: 1200px) and (orientation: landscape) {
+            header {
+                display: flex;
+                padding-inline: 0.75rem;
+                gap: 0.5rem;
+            }
+            .header-left { display: flex; gap: 0.5rem; }
+            .tabs-container {
+                flex: 1;
+                overflow-x: auto;
+            }
+            .tabs {
+                flex-wrap: nowrap;
+                gap: 0.2rem;
+                /* Centred when it fits; scrolls from the start if not. */
+                width: max-content;
+                margin-inline: auto;
+            }
+            .tab { padding-inline: 0.55rem; gap: 0.35rem; font-size: 0.95rem; }
+            .tab .badge { padding-inline: 0.35rem; }
+            .header-actions { gap: 0.4rem; }
+            .tutorial-trigger-label { display: none; }
+            .tutorial-trigger { min-width: 44px; min-height: 44px; padding-inline: 0.5rem; }
+            .sync-detail { display: none; }
+        }
     </style>
 </head>
 
@@ -947,11 +1128,11 @@
             </button>
             <div id="syncStatus" class="sync-status" data-state="ready" role="status" aria-live="polite">
                 <span class="sync-dot" aria-hidden="true"></span>
-                <span id="syncStatusText">Ready</span>
+                <span><span id="syncStatusText">Ready</span><span id="syncStatusDetail" class="sync-detail"></span></span>
             </div>
             <div class="stat-badge">
-                <span id="totalLabel" class="stat-label">Current count:</span>
-                <strong id="totalCount" style="color: var(--primary); margin-left:4px;">0</strong>
+                <span id="totalLabel" class="stat-label">Count:</span>
+                <strong id="totalCount" style="margin-left:4px;">0</strong>
             </div>
         </div>
     </header>
@@ -959,12 +1140,13 @@
     <div id="wrap">
         <canvas id="floor"></canvas>
         <canvas id="heat"></canvas>
+        <canvas id="marks"></canvas>
         <div class="map-controls" aria-label="Map view controls">
             <button id="zoomOut" type="button" class="icon-only" aria-label="Zoom out" title="Zoom out">−</button>
-            <span id="zoomReadout" class="zoom-readout" aria-live="polite">Fit</span>
+            <span id="zoomReadout" class="zoom-readout" aria-live="polite">1×</span>
             <button id="zoomIn" type="button" class="icon-only" aria-label="Zoom in" title="Zoom in">+</button>
-            <button id="zoomFit" type="button" class="wide-control" title="Fit the whole floor plan">Fit floor</button>
-            <button id="zoomActual" type="button" class="wide-control" title="Show one image pixel per screen pixel">100%</button>
+            <button id="zoomFit" type="button" class="wide-control" aria-label="Fit the whole floor plan" title="Fit the whole floor plan">Fit</button>
+            <button id="zoomActual" type="button" class="wide-control" aria-label="Actual size" title="Actual size: one image pixel per screen pixel">1:1</button>
         </div>
         <div id="clearToast" class="undo-toast" role="status" aria-live="polite" hidden>
             <span id="clearToastText">Floor cleared.</span>
@@ -997,8 +1179,22 @@
             <textarea id="notes" placeholder="Add optional notes here..."></textarea>
         </div>
 
-        <button id="submit" class="submitbtn">Submit</button>
+        <div class="footer-actions">
+            <button id="submit" type="button" class="submitbtn">Submit</button>
+        </div>
     </footer>
+
+    <div id="submitCheck" class="confirm-overlay" hidden>
+        <section class="confirm-card" role="alertdialog" aria-modal="true" aria-labelledby="submitCheckTitle" aria-describedby="submitCheckText">
+            <h2 id="submitCheckTitle">Some floors haven’t been checked</h2>
+            <p id="submitCheckText"></p>
+            <div class="confirm-actions">
+                <button id="submitCheckGo" type="button" class="confirm-primary">Go to floor</button>
+                <button id="submitCheckSend" type="button">Submit anyway</button>
+                <button id="submitCheckCancel" type="button" class="confirm-cancel">Cancel</button>
+            </div>
+        </section>
+    </div>
 
     <div id="tutorialOverlay" class="tutorial-overlay" hidden>
         <div id="tutorialBackdrop" class="tutorial-backdrop" aria-hidden="true"></div>
@@ -1171,6 +1367,11 @@
                 { id: '5F', label: '5th Floor', img: new Image(), imgSrc: null, points: [], view: { zoom: 1, panX: 0, panY: 0 } },
             ];
             let current = DEFAULT_FLOOR_INDEX;
+            let viewW = 1, viewH = 1, pixelRatio = 1;
+            // Space kept clear of the zoom controls when the plan is fitted.
+            let mapInset = { right: 0, top: 0 };
+            // Floors opened in Count mode during the current count.
+            const visited = new Set();
             let appMode = 'count';
             let theme = THEMES.includes(document.documentElement.dataset.theme)
                 ? document.documentElement.dataset.theme
@@ -1188,6 +1389,8 @@
             const heat = document.getElementById('heat');
             const fctx = floor.getContext('2d');
             const hctx = heat.getContext('2d');
+            const marks = document.getElementById('marks');
+            const mctx = marks.getContext('2d');
             const undoBtn = document.getElementById('undo');
             const clearBtn = document.getElementById('clear');
             const resetAll = document.getElementById('resetAll');
@@ -1206,6 +1409,7 @@
             const tutorialNextBtn = document.getElementById('tutorialNext');
             const syncStatusEl = document.getElementById('syncStatus');
             const syncStatusTextEl = document.getElementById('syncStatusText');
+            const syncStatusDetailEl = document.getElementById('syncStatusDetail');
             const clearToastEl = document.getElementById('clearToast');
             const clearToastTextEl = document.getElementById('clearToastText');
             const restoreClearBtn = document.getElementById('restoreClear');
@@ -1230,6 +1434,13 @@
             const zoomFitBtn = document.getElementById('zoomFit');
             const zoomActualBtn = document.getElementById('zoomActual');
             const zoomReadoutEl = document.getElementById('zoomReadout');
+            const mapControlsEl = document.querySelector('.map-controls');
+            const submitCheckEl = document.getElementById('submitCheck');
+            const submitCheckTitleEl = document.getElementById('submitCheckTitle');
+            const submitCheckTextEl = document.getElementById('submitCheckText');
+            const submitCheckGoBtn = document.getElementById('submitCheckGo');
+            const submitCheckSendBtn = document.getElementById('submitCheckSend');
+            const submitCheckCancelBtn = document.getElementById('submitCheckCancel');
             const DRAFT_KEY = 'multi-floor-heatmap-embedded';
             const FLOW_URL = "https://default17f1a87e2a254eaab9df9d439034b0.80.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/8a4d2abd61de4fceb5cb6d2a4b2b31a8/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=EhX0b_ECMsXs08oSiwPJKO3H5KMRI3O0l3V1lLtdM6Q";
 
@@ -1262,15 +1473,41 @@
             const tabs = document.getElementById('tabs');
             FLOORS.forEach((fl, i) => {
                 const b = document.createElement('button');
+                b.type = 'button';
                 b.className = 'tab' + (i === current ? ' active' : '');
-                // Using div to allow flex styling
-                b.innerHTML = `<span>${fl.label}</span> <span class="badge" id="count-${fl.id}">0</span>`;
-                b.onclick = () => { current = i; updateTabs(); fitCanvas(); redraw(); };
+                b.innerHTML = `<span class="tab-label">${fl.label}</span>` +
+                    `<span class="badge"><svg class="tab-check" width="12" height="12" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="count-${fl.id}">0</span></span>` +
+                    `<span class="sr-only tab-status"></span>`;
+                b.onclick = () => showFloor(i);
                 tabs.appendChild(b);
             });
+
+            function showFloor(i) {
+                current = i;
+                markVisited(i);
+                updateTabs();
+                fitCanvas();
+                redraw();
+            }
+
+            function markVisited(i) {
+                if (appMode !== 'count' || visited.has(FLOORS[i].id)) return;
+                visited.add(FLOORS[i].id);
+                saveDraft();
+            }
+
+            function resetVisited() {
+                visited.clear();
+                visited.add(FLOORS[current].id);
+            }
+
             function updateTabs() {
                 tabs.querySelectorAll('.tab').forEach((el, idx) => {
+                    const isVisited = appMode === 'count' && visited.has(FLOORS[idx].id);
                     el.classList.toggle('active', idx === current);
+                    el.classList.toggle('visited', isVisited);
+                    el.setAttribute('aria-pressed', String(idx === current));
+                    el.querySelector('.tab-status').textContent = isVisited ? ', checked' : '';
                     // scroll into view if needed
                     if (idx === current) {
                         el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
@@ -1288,6 +1525,8 @@
                 analyzeModeBtn.setAttribute('aria-pressed', String(mode === 'analyze'));
                 if (mode === 'count') stopTimer();
                 if (mode === 'analyze') dismissClearUndo();
+                markVisited(current);
+                updateTabs();
                 updatePlaybackUI();
                 redraw();
             }
@@ -1316,7 +1555,7 @@
                 {
                     target: () => tabs,
                     title: 'Check all five floors',
-                    text: 'Visit every floor before submitting. If a floor has no patrons, check the map and leave its badge at 0; that still counts as completing the floor check.',
+                    text: 'Visit every floor before submitting. A floor’s badge turns green with a check once you have opened it, in whatever order you walk the building. If a floor has no patrons, leave its count at 0; that still counts as completing the floor check.',
                 },
                 {
                     target: () => submitBtn,
@@ -1456,8 +1695,15 @@
                 fl.img.onload = () => { if (FLOORS[current] === fl) { fitCanvas(); redraw(); } persist(); };
             });
 
-            // Resize handling
-            window.addEventListener('resize', () => { fitCanvas(); redraw(); });
+            // Resize handling: watch the map area itself, so rotating the
+            // iPad, switching modes or the footer changing height all refit.
+            if ('ResizeObserver' in window) {
+                // Draw in the same frame: resizing the canvas clears it, and
+                // observer callbacks run after this frame's queued redraws.
+                new ResizeObserver(() => { fitCanvas(); drawFrame(); }).observe(wrap);
+            } else {
+                window.addEventListener('resize', () => { fitCanvas(); redraw(); });
+            }
 
             // Map gestures: a stationary single-pointer release adds a point in
             // Count mode. Dragging pans; two pointers pan and pinch in either mode.
@@ -1479,8 +1725,8 @@
                 pinchGesture = {
                     distance: Math.max(1, distance),
                     zoom: view.zoom,
-                    localX: (center.x - floor.width / 2 - view.panX) / view.zoom,
-                    localY: (center.y - floor.height / 2 - view.panY) / view.zoom,
+                    localX: (center.x - mapCenter().x - view.panX) / view.zoom,
+                    localY: (center.y - mapCenter().y - view.panY) / view.zoom,
                 };
                 activePointers.forEach(p => { p.cancelTap = true; });
             }
@@ -1544,8 +1790,8 @@
                     const distance = Math.max(1, Math.hypot(b.x - a.x, b.y - a.y));
                     const view = FLOORS[current].view;
                     view.zoom = clampZoom(pinchGesture.zoom * distance / pinchGesture.distance);
-                    view.panX = center.x - floor.width / 2 - pinchGesture.localX * view.zoom;
-                    view.panY = center.y - floor.height / 2 - pinchGesture.localY * view.zoom;
+                    view.panX = center.x - mapCenter().x - pinchGesture.localX * view.zoom;
+                    view.panY = center.y - mapCenter().y - pinchGesture.localY * view.zoom;
                     clampView();
                     wrap.classList.add('is-panning');
                     redraw();
@@ -1635,7 +1881,8 @@
                 if(confirm("Are you sure you want to clear all data from ALL floors?")) {
                     dismissClearUndo();
                     FLOORS.forEach(fl => fl.points = []);
-                    persist(); redraw();
+                    resetVisited();
+                    persist(); updateTabs(); redraw();
                 }
             };
 
@@ -1646,16 +1893,19 @@
             function updateSyncStatus() {
                 let state = syncState;
                 let text = 'Ready';
+                let detail = '';
 
                 if (!navigator.onLine && state !== 'sending') {
                     state = 'offline';
-                    text = hasDraft() ? 'Offline · draft saved' : 'Offline';
+                    text = 'Offline';
+                    if (hasDraft()) detail = ' · draft saved';
                 } else if (state === 'sending') {
                     text = 'Sending…';
                 } else if (state === 'sent') {
                     text = 'Submitted';
                 } else if (state === 'error') {
-                    text = 'Send failed · draft saved';
+                    text = 'Send failed';
+                    detail = ' · draft saved';
                 } else if (hasDraft()) {
                     state = 'saved';
                     text = 'Draft saved';
@@ -1665,6 +1915,7 @@
 
                 syncStatusEl.dataset.state = state;
                 syncStatusTextEl.textContent = text;
+                syncStatusDetailEl.textContent = detail;
             }
 
             function setSyncState(state, resetAfter = 0) {
@@ -1689,7 +1940,83 @@
                 return r; 
             }
 
-            submitBtn.onclick = async () => {
+            // In-app check before submitting with unopened floors. A native
+            // confirm() is easy to miss and some embedded browsers dismiss it
+            // without showing it.
+            let submitCheckReturnFocus = null;
+
+            function openSubmitCheck(uncheckedIdx) {
+                const labels = uncheckedIdx.map(i => FLOORS[i].label);
+                // "Go to" offers the unchecked floor closest to this one
+                // (the lower floor on a tie); people walk different routes.
+                const nearest = uncheckedIdx.reduce((best, i) =>
+                    Math.abs(i - current) < Math.abs(best - current) ? i : best);
+                const list = labels.length === 1
+                    ? labels[0]
+                    : `${labels.slice(0, -1).join(', ')} and ${labels[labels.length - 1]}`;
+                submitCheckTitleEl.textContent = labels.length === 1
+                    ? '1 floor hasn’t been checked'
+                    : `${labels.length} floors haven’t been checked`;
+                submitCheckTextEl.textContent = `You haven’t opened ${list} during this count. Check ${labels.length === 1 ? 'it' : 'them'} first, or submit the count as it is.`;
+                submitCheckGoBtn.textContent = `Go to ${FLOORS[nearest].label}`;
+                submitCheckGoBtn.dataset.floor = String(nearest);
+                submitCheckReturnFocus = document.activeElement;
+                submitCheckEl.hidden = false;
+                submitCheckGoBtn.focus();
+            }
+
+            function closeSubmitCheck(restoreFocus = true) {
+                if (submitCheckEl.hidden) return;
+                submitCheckEl.hidden = true;
+                if (!restoreFocus) return;
+                // Safari doesn't focus tapped buttons, so fall back to Submit.
+                const target = submitCheckReturnFocus instanceof HTMLElement && submitCheckReturnFocus !== document.body
+                    ? submitCheckReturnFocus
+                    : submitBtn;
+                target.focus();
+            }
+
+            submitCheckGoBtn.onclick = () => {
+                closeSubmitCheck(false);
+                showFloor(+submitCheckGoBtn.dataset.floor);
+            };
+            submitCheckSendBtn.onclick = () => {
+                closeSubmitCheck();
+                sendCount();
+            };
+            submitCheckCancelBtn.onclick = () => closeSubmitCheck();
+            submitCheckEl.addEventListener('click', (e) => {
+                if (e.target === submitCheckEl) closeSubmitCheck();
+            });
+            document.addEventListener('keydown', (e) => {
+                if (submitCheckEl.hidden) return;
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    closeSubmitCheck();
+                } else if (e.key === 'Tab') {
+                    const focusable = [submitCheckGoBtn, submitCheckSendBtn, submitCheckCancelBtn];
+                    const i = focusable.indexOf(document.activeElement);
+                    if (e.shiftKey && i <= 0) { e.preventDefault(); focusable[focusable.length - 1].focus(); }
+                    else if (!e.shiftKey && i === focusable.length - 1) { e.preventDefault(); focusable[0].focus(); }
+                }
+            });
+
+            submitBtn.onclick = () => {
+                if (!navigator.onLine) {
+                    updateSyncStatus();
+                    return;
+                }
+
+                // Unopened floors, in building order.
+                const unchecked = FLOORS.map((fl, i) => i).filter(i => !visited.has(FLOORS[i].id));
+                if (unchecked.length) {
+                    openSubmitCheck(unchecked);
+                    return;
+                }
+                sendCount();
+            };
+
+            async function sendCount() {
                 if (!navigator.onLine) {
                     updateSyncStatus();
                     return;
@@ -1715,7 +2042,9 @@
                     dismissClearUndo();
                     FLOORS.forEach(fl => fl.points = []);
                     notesEl.value = "";
+                    resetVisited();
                     persist();
+                    updateTabs();
                     redraw();
                     setSyncState('sent', 2500);
 
@@ -1729,7 +2058,7 @@
                     alert(`Flow error: ${e.message}`);
                     submitBtn.disabled = false;
                 }
-            };
+            }
 
             // Load a single JSON
             loadJSON.onchange = e => {
@@ -1759,9 +2088,28 @@
 
             function fitCanvas() {
                 const rect = wrap.getBoundingClientRect();
-                floor.width = Math.max(1, Math.floor(rect.width));
-                floor.height = Math.max(1, Math.floor(rect.height));
-                heat.width = floor.width; heat.height = floor.height;
+                // Geometry stays in CSS pixels (viewW/viewH). Only the floor
+                // canvas backing store is scaled up so the plan and markers
+                // are sharp on Retina iPads; capped at 2x to bound the cost.
+                viewW = Math.max(1, Math.floor(rect.width));
+                viewH = Math.max(1, Math.floor(rect.height));
+                pixelRatio = Math.min(2, Math.max(1, window.devicePixelRatio || 1));
+                floor.width = Math.round(viewW * pixelRatio);
+                floor.height = Math.round(viewH * pixelRatio);
+                marks.width = floor.width;
+                marks.height = floor.height;
+                // The heat layer is soft by design, so it stays at 1x.
+                heat.width = viewW; heat.height = viewH;
+                // Controls stacked down the right edge (landscape) reserve a
+                // column; a row across the top (portrait) reserves a band.
+                const cr = mapControlsEl.getBoundingClientRect();
+                if (cr.width && cr.height) {
+                    mapInset = cr.height > cr.width
+                        ? { right: Math.ceil(rect.right - cr.left) + 8, top: 0 }
+                        : { right: 0, top: Math.ceil(cr.bottom - rect.top) + 8 };
+                } else {
+                    mapInset = { right: 0, top: 0 };
+                }
                 fctx.imageSmoothingEnabled = true;
                 fctx.imageSmoothingQuality = 'high';
                 clampView();
@@ -1783,18 +2131,49 @@
                 return Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, zoom));
             }
 
+            // The plan is fitted into the map area minus the strip the zoom
+            // controls sit in, so at "Fit" they never cover the drawing.
+            function mapArea() {
+                return {
+                    x: 0,
+                    y: mapInset.top,
+                    w: Math.max(1, viewW - mapInset.right),
+                    h: Math.max(1, viewH - mapInset.top),
+                };
+            }
+
+            function mapCenter() {
+                const area = mapArea();
+                return { x: area.x + area.w / 2, y: area.y + area.h / 2 };
+            }
+
+            function baseImageRect(fl) {
+                const area = mapArea();
+                return imageFitRect(fl.img.naturalWidth, fl.img.naturalHeight, area.w, area.h);
+            }
+
             function currentImageRect() {
                 const fl = FLOORS[current];
-                const base = imageFitRect(fl.img.naturalWidth, fl.img.naturalHeight, floor.width, floor.height);
+                const base = baseImageRect(fl);
                 const view = fl.view;
+                const c = mapCenter();
                 const w = base.w * view.zoom;
                 const h = base.h * view.zoom;
                 return {
-                    x: (floor.width - w) / 2 + view.panX,
-                    y: (floor.height - h) / 2 + view.panY,
+                    x: c.x - w / 2 + view.panX,
+                    y: c.y - h / 2 + view.panY,
                     w,
                     h,
                 };
+            }
+
+            // Allowed pan range on one axis. With no inset this is the usual
+            // "keep the plan covering the view" rule; with an inset it eases
+            // from centred-in-the-area at Fit to edge-to-edge when zoomed.
+            function panRange(viewLen, centre, size) {
+                const lo = Math.min(centre, viewLen - size / 2) - centre;
+                const hi = Math.max(centre, size / 2) - centre;
+                return [lo, hi];
             }
 
             function clampView() {
@@ -1802,22 +2181,24 @@
                 const view = fl.view;
                 view.zoom = clampZoom(view.zoom);
                 if (!fl.img.naturalWidth) return;
-                const base = imageFitRect(fl.img.naturalWidth, fl.img.naturalHeight, floor.width, floor.height);
-                const maxX = Math.max(0, (base.w * view.zoom - floor.width) / 2);
-                const maxY = Math.max(0, (base.h * view.zoom - floor.height) / 2);
-                view.panX = Math.max(-maxX, Math.min(maxX, view.panX));
-                view.panY = Math.max(-maxY, Math.min(maxY, view.panY));
+                const base = baseImageRect(fl);
+                const c = mapCenter();
+                const [loX, hiX] = panRange(viewW, c.x, base.w * view.zoom);
+                const [loY, hiY] = panRange(viewH, c.y, base.h * view.zoom);
+                view.panX = Math.max(loX, Math.min(hiX, view.panX));
+                view.panY = Math.max(loY, Math.min(hiY, view.panY));
             }
 
-            function zoomAt(nextZoom, screenX = floor.width / 2, screenY = floor.height / 2) {
+            function zoomAt(nextZoom, screenX = mapCenter().x, screenY = mapCenter().y) {
                 const view = FLOORS[current].view;
                 const oldZoom = view.zoom;
+                const c = mapCenter();
                 nextZoom = clampZoom(nextZoom);
-                const localX = (screenX - floor.width / 2 - view.panX) / oldZoom;
-                const localY = (screenY - floor.height / 2 - view.panY) / oldZoom;
+                const localX = (screenX - c.x - view.panX) / oldZoom;
+                const localY = (screenY - c.y - view.panY) / oldZoom;
                 view.zoom = nextZoom;
-                view.panX = screenX - floor.width / 2 - localX * nextZoom;
-                view.panY = screenY - floor.height / 2 - localY * nextZoom;
+                view.panX = screenX - c.x - localX * nextZoom;
+                view.panY = screenY - c.y - localY * nextZoom;
                 clampView();
                 redraw();
             }
@@ -1833,14 +2214,14 @@
             function showActualSize() {
                 const fl = FLOORS[current];
                 if (!fl.img.naturalWidth) return;
-                const base = imageFitRect(fl.img.naturalWidth, fl.img.naturalHeight, floor.width, floor.height);
+                const base = baseImageRect(fl);
                 const baseScale = base.w / fl.img.naturalWidth;
                 zoomAt(baseScale ? 1 / baseScale : 1);
             }
 
             function updateZoomControls() {
                 const zoom = FLOORS[current].view.zoom;
-                zoomReadoutEl.textContent = Math.abs(zoom - 1) < 0.01 ? 'Fit' : `${Math.round(zoom * 100)}%`;
+                zoomReadoutEl.textContent = Math.abs(zoom - 1) < 0.01 ? '1×' : `${zoom < 10 ? zoom.toFixed(1) : Math.round(zoom)}×`;
                 zoomOutBtn.disabled = zoom <= MIN_ZOOM + 0.001;
                 zoomInBtn.disabled = zoom >= MAX_ZOOM - 0.001;
             }
@@ -1883,7 +2264,44 @@
                 }).sort((a, b) => a.ts - b.ts);
             }
 
+            // Scratch canvases and lookup tables are reused between frames so a
+            // pinch on an older iPad does not allocate canvases or colour
+            // arrays for every pointer move.
+            const heatAcc = document.createElement('canvas');
+            const heatActx = heatAcc.getContext('2d', { willReadFrequently: true });
+            const heatBlurBuf = document.createElement('canvas');
+            const heatBlurCtx = heatBlurBuf.getContext('2d');
+            // Canvas filters are missing in Safari before 18 (iPadOS 17 is the
+            // last release for the 6th-generation iPad); blur the heat layer
+            // with CSS there instead.
+            const CANVAS_FILTER = typeof heatBlurCtx.filter === 'string';
+            const RAMP_LUT = new Uint8ClampedArray(256 * 3);
+            for (let i = 0; i < 256; i++) RAMP_LUT.set(ramp(i / 255), i * 3);
+            let spriteCache = { R: 0, sR: 0, canvas: null };
+            let redrawQueued = false;
+
+            function scaledKernelSprite(R, sR) {
+                if (spriteCache.R !== R || spriteCache.sR !== sR) {
+                    const spr = makeKernelSprite(R);
+                    const c = document.createElement('canvas');
+                    c.width = c.height = sR * 2;
+                    c.getContext('2d').drawImage(spr, 0, 0, c.width, c.height);
+                    spriteCache = { R, sR, canvas: c };
+                }
+                return spriteCache.canvas;
+            }
+
+            // Batch redraw requests to one per animation frame.
             function redraw() {
+                if (redrawQueued) return;
+                redrawQueued = true;
+                requestAnimationFrame(() => {
+                    redrawQueued = false;
+                    drawFrame();
+                });
+            }
+
+            function drawFrame() {
                 const fl = FLOORS[current];
 
                 const aggPoints = appMode === 'count' ? [...fl.points] : [];
@@ -1895,10 +2313,13 @@
                 undoBtn.disabled = appMode !== 'count' || fl.points.length === 0;
                 clearBtn.disabled = appMode !== 'count' || fl.points.length === 0;
 
-                fctx.clearRect(0, 0, floor.width, floor.height);
+                fctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+                fctx.clearRect(0, 0, viewW, viewH);
+                mctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+                mctx.clearRect(0, 0, viewW, viewH);
                 hctx.clearRect(0, 0, heat.width, heat.height);
 
-                if (!fl.img.naturalWidth) { updateCounts(); return; }
+                if (!fl.img.naturalWidth) { updateCounts(); updateZoomControls(); return; }
 
                 const fit = currentImageRect();
                 fctx.save();
@@ -1906,61 +2327,90 @@
                 fctx.drawImage(fl.img, 0, 0, fl.img.naturalWidth, fl.img.naturalHeight, fit.x, fit.y, fit.w, fit.h);
                 fctx.restore();
 
-                const down = 0.5;
-                // Keep the heat buffer viewport-sized so pinch gestures stay
-                // responsive even when the floor plan is deeply zoomed.
-                const hw = Math.max(1, (floor.width * down) | 0);
-                const hh = Math.max(1, (floor.height * down) | 0);
-                const acc = document.createElement('canvas'); acc.width = hw; acc.height = hh;
-                const actx = acc.getContext('2d', { willReadFrequently: true });
-                actx.clearRect(0, 0, hw, hh);
-                actx.globalCompositeOperation = 'lighter';
-
-                const R = +radiusEl.value, I = +intenEl.value, k = down;
-
-                const spr = makeKernelSprite(R);
-                const sR = Math.max(2, Math.round(R * k));
-                const sprScaled = document.createElement('canvas');
-                sprScaled.width = sR * 2; sprScaled.height = sR * 2;
-                sprScaled.getContext('2d').drawImage(spr, 0, 0, sprScaled.width, sprScaled.height);
-
                 const iw = fl.img.naturalWidth, ih = fl.img.naturalHeight;
                 const sx = fit.w / iw, sy = fit.h / ih;
-
-                for (const p of aggPoints) {
-                    const x = (fit.x + p.x * sx) * k;
-                    const y = (fit.y + p.y * sy) * k;
-                    actx.globalAlpha = Math.min(1, I / 100);
-                    actx.drawImage(sprScaled, x - sR, y - sR);
-                }
-
-                const imgData = actx.getImageData(0, 0, hw, hh);
-                const data = imgData.data;
-                for (let i = 0; i < data.length; i += 4) {
-                    const a = data[i + 3] / 255;
-                    const [r, g, b] = ramp(a);
-                    data[i] = r; data[i + 1] = g; data[i + 2] = b;
-                    data[i + 3] = Math.round(255 * (+opacEl.value / 100) * Math.min(1, a * 1.5));
-                }
-                actx.putImageData(imgData, 0, 0);
-
                 const blurPx = +blurEl.value;
-                if (blurPx > 0) {
-                    const tmp = document.createElement('canvas'); tmp.width = hw; tmp.height = hh;
-                    const bctx = tmp.getContext('2d'); bctx.filter = `blur(${blurPx}px)`; bctx.drawImage(acc, 0, 0);
-                    actx.clearRect(0, 0, hw, hh); actx.drawImage(tmp, 0, 0);
+                heat.style.filter = !CANVAS_FILTER && blurPx > 0 ? `blur(${blurPx * 2}px)` : '';
+
+                if (aggPoints.length) {
+                    const down = 0.5;
+                    // Keep the heat buffer viewport-sized so pinch gestures stay
+                    // responsive even when the floor plan is deeply zoomed.
+                    const hw = Math.max(1, (viewW * down) | 0);
+                    const hh = Math.max(1, (viewH * down) | 0);
+                    const acc = heatAcc, actx = heatActx;
+                    if (acc.width !== hw || acc.height !== hh) { acc.width = hw; acc.height = hh; }
+                    actx.globalCompositeOperation = 'source-over';
+                    actx.globalAlpha = 1;
+                    actx.clearRect(0, 0, hw, hh);
+                    actx.globalCompositeOperation = 'lighter';
+
+                    const R = +radiusEl.value, I = +intenEl.value, k = down;
+                    const sR = Math.max(2, Math.round(R * k));
+                    const sprScaled = scaledKernelSprite(R, sR);
+
+                    actx.globalAlpha = Math.min(1, I / 100);
+                    for (const p of aggPoints) {
+                        const x = (fit.x + p.x * sx) * k;
+                        const y = (fit.y + p.y * sy) * k;
+                        actx.drawImage(sprScaled, x - sR, y - sR);
+                    }
+                    actx.globalAlpha = 1;
+                    actx.globalCompositeOperation = 'source-over';
+
+                    const imgData = actx.getImageData(0, 0, hw, hh);
+                    const data = imgData.data;
+                    const alphaScale = 255 * (+opacEl.value / 100);
+                    const alphaLut = new Uint8ClampedArray(256);
+                    for (let a = 0; a < 256; a++) alphaLut[a] = Math.round(alphaScale * Math.min(1, (a / 255) * 1.5));
+                    for (let i = 0; i < data.length; i += 4) {
+                        const a = data[i + 3];
+                        if (!a) continue;
+                        const c = a * 3;
+                        data[i] = RAMP_LUT[c]; data[i + 1] = RAMP_LUT[c + 1]; data[i + 2] = RAMP_LUT[c + 2];
+                        data[i + 3] = alphaLut[a];
+                    }
+                    actx.putImageData(imgData, 0, 0);
+
+                    if (CANVAS_FILTER && blurPx > 0) {
+                        if (heatBlurBuf.width !== hw || heatBlurBuf.height !== hh) { heatBlurBuf.width = hw; heatBlurBuf.height = hh; }
+                        heatBlurCtx.filter = 'none';
+                        heatBlurCtx.clearRect(0, 0, hw, hh);
+                        heatBlurCtx.filter = `blur(${blurPx}px)`;
+                        heatBlurCtx.drawImage(acc, 0, 0);
+                        actx.clearRect(0, 0, hw, hh); actx.drawImage(heatBlurBuf, 0, 0);
+                    }
+
+                    hctx.drawImage(acc, 0, 0, hw, hh, 0, 0, viewW, viewH);
                 }
 
-                hctx.drawImage(acc, 0, 0, hw, hh, 0, 0, floor.width, floor.height);
-
-                // QA markers - improved visibility
-                fctx.fillStyle = '#0f172a'; // dark center
-                fctx.strokeStyle = '#3b82f6'; // blue ring
-                fctx.lineWidth = 1.5;
-                for (const p of aggPoints) {
-                    const mx = fit.x + p.x * sx;
-                    const my = fit.y + p.y * sy;
-                    fctx.beginPath(); fctx.arc(mx, my, 3, 0, Math.PI * 2); fctx.fill(); fctx.stroke();
+                if (appMode === 'count') {
+                    // Count markers: large enough to see under a fingertip, with
+                    // a halo on the newest point so Undo's target is obvious. They
+                    // sit on their own canvas above the heat so it can't hide them.
+                    const last = fl.points.length - 1;
+                    fl.points.forEach((p, i) => {
+                        const mx = fit.x + p.x * sx;
+                        const my = fit.y + p.y * sy;
+                        if (i === last) {
+                            mctx.beginPath(); mctx.arc(mx, my, 11, 0, Math.PI * 2);
+                            mctx.fillStyle = 'rgba(37, 99, 235, 0.18)'; mctx.fill();
+                            mctx.lineWidth = 2; mctx.strokeStyle = '#2563eb'; mctx.stroke();
+                        }
+                        mctx.beginPath(); mctx.arc(mx, my, 5.5, 0, Math.PI * 2);
+                        mctx.fillStyle = '#2563eb'; mctx.fill();
+                        mctx.lineWidth = 2; mctx.strokeStyle = '#fff'; mctx.stroke();
+                    });
+                } else {
+                    // Analyze markers (unchanged)
+                    fctx.fillStyle = '#0f172a'; // dark center
+                    fctx.strokeStyle = '#3b82f6'; // blue ring
+                    fctx.lineWidth = 1.5;
+                    for (const p of aggPoints) {
+                        const mx = fit.x + p.x * sx;
+                        const my = fit.y + p.y * sy;
+                        fctx.beginPath(); fctx.arc(mx, my, 3, 0, Math.PI * 2); fctx.fill(); fctx.stroke();
+                    }
                 }
 
                 updateCounts();
@@ -2018,7 +2468,7 @@
                 const t = document.getElementById('totalCount');
                 if (t) t.textContent = total;
                 if (appMode === 'count') {
-                    totalLabelEl.textContent = 'Current count:';
+                    totalLabelEl.textContent = 'Count:';
                 } else if (!SESSIONS.length) {
                     totalLabelEl.textContent = 'Loaded total:';
                 } else if (playback.active) {
@@ -2028,13 +2478,20 @@
                 }
             }
 
-            function persist() {
+            function saveDraft() {
                 const minimal = FLOORS.map(fl => ({ id: fl.id, points: fl.points }));
-                localStorage.setItem(DRAFT_KEY, JSON.stringify({
-                    floors: minimal,
-                    note: notesEl.value,
-                    updated_at: new Date().toISOString(),
-                }));
+                try {
+                    localStorage.setItem(DRAFT_KEY, JSON.stringify({
+                        floors: minimal,
+                        note: notesEl.value,
+                        visited: [...visited],
+                        updated_at: new Date().toISOString(),
+                    }));
+                } catch { }
+            }
+
+            function persist() {
+                saveDraft();
                 if (syncState !== 'sending') {
                     clearTimeout(syncResetTimer);
                     syncState = 'ready';
@@ -2045,8 +2502,19 @@
                 try {
                     const saved = JSON.parse(localStorage.getItem(DRAFT_KEY) || "[]");
                     const arr = Array.isArray(saved) ? saved : (saved.floors || []);
-                    arr.forEach((o, i) => { if (FLOORS[i]) FLOORS[i].points = o.points || []; });
+                    arr.forEach((o, i) => {
+                        const fl = FLOORS.find(f => f.id === o?.id) || FLOORS[i];
+                        if (fl) fl.points = Array.isArray(o?.points) ? o.points : [];
+                    });
                     if (!Array.isArray(saved) && typeof saved.note === 'string') notesEl.value = saved.note;
+                    // An empty draft starts a fresh checklist. Older drafts
+                    // have no visited list: treat floors with points as opened.
+                    const hasContent = FLOORS.some(fl => fl.points.length) || Boolean(notesEl.value.trim());
+                    const ids = !hasContent ? []
+                        : Array.isArray(saved.visited)
+                        ? saved.visited
+                        : FLOORS.filter(fl => fl.points.length).map(fl => fl.id);
+                    ids.forEach(id => { if (FLOORS.some(fl => fl.id === id)) visited.add(id); });
                 } catch { }
             }
 
@@ -2495,6 +2963,8 @@
 
             setTheme(theme, false);
             restore();
+            markVisited(current);
+            updateTabs();
             fitCanvas();
             redraw();
             updateSyncStatus();
@@ -2523,6 +2993,10 @@
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && !controlsPanel.hasAttribute('hidden')) closePanel();
         });
+
+        // iOS Safari: a stray two-finger pinch on the header or footer zooms
+        // the whole app. The floor plan handles its own pinch-zoom.
+        document.addEventListener('gesturestart', (e) => e.preventDefault());
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {

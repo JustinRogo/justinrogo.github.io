@@ -10,9 +10,10 @@ The Law Library Occupancy Heatmap is a static, installable web application for r
 
 - Record one point for each patron on floor plans for floors 1–5.
 - Track per-floor and total counts as points are added.
+- See which floors have been opened during the current count, in any order, and get a warning before submitting with floors unchecked.
 - Add an optional note to a count.
 - Undo the last point, clear one floor with a seven-second undo option, or reset all floors.
-- Zoom, pan, pinch, fit the floor plan, or view it at 100% image size.
+- Zoom, pan, pinch, fit the floor plan, or view it at actual image size (**1:1**). At **Fit**, the plan is sized so the zoom controls never cover it.
 - Adjust heat radius, intensity, opacity, and blur.
 - Switch among dark, light, and OLED themes.
 - Save an unfinished count in the browser, including while offline.
@@ -63,10 +64,10 @@ Demo sessions exist only in memory and are not submitted. Stop the local server 
 
 1. Select a floor tab.
 2. Tap or click once at each patron's location on the floor plan.
-3. Use **Undo** to remove the most recent point or **Clear** to remove all points from the current floor.
-4. Repeat the check on all five floors. A checked floor may correctly have a count of zero.
+3. Use **Undo** to remove the most recent point (it is drawn with a halo) or **Clear** to remove all points from the current floor.
+4. Select another floor tab and repeat on all five floors, in whatever order you walk the building. A floor's badge turns green with a check once it has been opened in Count mode; a checked floor may correctly have a count of zero.
 5. Add a note if an event, closure, or unusual condition needs context.
-6. Select **Submit** while online.
+6. Select **Submit** while online. If any floor has not been opened, a dialog names those floors and offers **Go to** the nearest unchecked floor, **Submit anyway**, or **Cancel**.
 7. Wait for the status to change to **Submitted** before beginning another count.
 
 Each point is stored in the source floor plan's pixel coordinate system, so it remains aligned with the map when the canvas is resized or zoomed.
@@ -166,10 +167,10 @@ The application uses browser-local storage for the following data:
 
 | Storage | Key/database | Contents |
 | --- | --- | --- |
-| `localStorage` | `multi-floor-heatmap-embedded` | Current floor points, note, and last update time. |
+| `localStorage` | `multi-floor-heatmap-embedded` | Current floor points, note, floors opened during this count (`visited`), and last update time. The `visited` list stays on the device and is not part of the submission. |
 | `localStorage` | `occupancy-heatmap-theme` | Selected dark, light, or OLED theme. |
 | IndexedDB | `heatmap-fs` | Previously selected directory handle, when supported. |
-| Cache Storage | `library-occupancy-heatmap-v1` | Application shell, icons, and floor plans. |
+| Cache Storage | `library-occupancy-heatmap-v2` | Application shell, icons, and floor plans. |
 
 Clearing site data removes the saved draft, theme, remembered folder handle, and offline cache.
 
@@ -249,7 +250,7 @@ GitHub Pages satisfies these static-hosting requirements.
 Before deploying a change:
 
 1. Load all five floor plans and place points on each one.
-2. Test mouse, touch, zoom, pan, Undo, Clear, and Reset All Floors.
+2. Test mouse, touch, zoom, pan, Undo, Clear, the unchecked-floors warning, and Reset All Floors in portrait and landscape on the iPad.
 3. Reload the page and confirm that the current draft and note are restored.
 4. Test a successful submission and a failed or offline submission without losing the draft.
 5. Import a single session, multiple sessions, and a folder of JSON files.
