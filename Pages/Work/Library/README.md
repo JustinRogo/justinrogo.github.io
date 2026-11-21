@@ -1,6 +1,6 @@
-# Law Library Occupancy Heatmap
+# Law Library Heatmap
 
-The Law Library Occupancy Heatmap is a static, installable web application for recording patron locations across five library floors and reviewing historical occupancy patterns. It is built as a single HTML file with plain CSS and JavaScript, plus a web app manifest and service worker for installation and offline use.
+The Law Library Heatmap is a static, installable web application for recording patron locations across five library floors and reviewing where and when the library is busiest. It is built as a single HTML file with plain CSS and JavaScript, plus a web app manifest and service worker for installation and offline use.
 
 - Application: [`heatmap.html`](heatmap.html)
 - Live page: <https://justinrogo.github.io/Pages/Work/Library/heatmap.html>
@@ -10,9 +10,10 @@ The Law Library Occupancy Heatmap is a static, installable web application for r
 
 - Record one point for each patron on floor plans for floors 1–5.
 - Track per-floor and total counts as points are added.
+- See which floors have been opened during the current count, in any order, and get a warning before submitting with floors unchecked.
 - Add an optional note to a count.
 - Undo the last point, clear one floor with a seven-second undo option, or reset all floors.
-- Zoom, pan, pinch, fit the floor plan, or view it at 100% image size.
+- Zoom, pan, pinch, fit the floor plan, or view it at actual image size (**1:1**). At **Fit**, the plan is sized so the zoom controls never cover it.
 - Adjust heat radius, intensity, opacity, and blur.
 - Switch among dark, light, and OLED themes.
 - Save an unfinished count in the browser, including while offline.
@@ -63,10 +64,10 @@ Demo sessions exist only in memory and are not submitted. Stop the local server 
 
 1. Select a floor tab.
 2. Tap or click once at each patron's location on the floor plan.
-3. Use **Undo** to remove the most recent point or **Clear** to remove all points from the current floor.
-4. Repeat the check on all five floors. A checked floor may correctly have a count of zero.
+3. Use **Undo** to remove the most recent point (it is drawn with a halo) or **Clear** to remove all points from the current floor.
+4. Select another floor tab and repeat on all five floors, in whatever order you walk the building. A floor's badge turns green with a check once it has been opened in Count mode; a checked floor may correctly have a count of zero.
 5. Add a note if an event, closure, or unusual condition needs context.
-6. Select **Submit** while online.
+6. Select **Submit** while online. If any floor has not been opened, a dialog names those floors and offers **Go to** the nearest unchecked floor, **Submit anyway**, or **Cancel**.
 7. Wait for the status to change to **Submitted** before beginning another count.
 
 Each point is stored in the source floor plan's pixel coordinate system, so it remains aligned with the map when the canvas is resized or zoomed.
@@ -101,7 +102,7 @@ After loading sessions, the application can:
 - filter by date range, time range, and weekdays;
 - show total, average, and peak counts;
 - chart total and per-floor counts over time;
-- calculate average occupancy by weekday and hour;
+- calculate the average patron count by weekday and hour;
 - show each floor's share of all loaded points; and
 - export the filtered totals to CSV.
 
@@ -166,10 +167,10 @@ The application uses browser-local storage for the following data:
 
 | Storage | Key/database | Contents |
 | --- | --- | --- |
-| `localStorage` | `multi-floor-heatmap-embedded` | Current floor points, note, and last update time. |
+| `localStorage` | `multi-floor-heatmap-embedded` | Current floor points, note, floors opened during this count (`visited`), and last update time. The `visited` list stays on the device and is not part of the submission. |
 | `localStorage` | `occupancy-heatmap-theme` | Selected dark, light, or OLED theme. |
 | IndexedDB | `heatmap-fs` | Previously selected directory handle, when supported. |
-| Cache Storage | `library-occupancy-heatmap-v1` | Application shell, icons, and floor plans. |
+| Cache Storage | `library-occupancy-heatmap-v2` | Application shell, icons, and floor plans. |
 
 Clearing site data removes the saved draft, theme, remembered folder handle, and offline cache.
 
@@ -216,10 +217,10 @@ Installation is offered by supported browsers when the site meets their PWA crit
 
 ## Privacy and data handling
 
-An occupancy submission includes exact point coordinates, timestamps, the aggregate count, and any note entered by the user. The configured flow sends that data to an external Microsoft Power Automate endpoint. The page also loads Google Analytics.
+A submission includes exact point coordinates, timestamps, the aggregate count, and any note entered by the user. The configured flow sends that data to an external Microsoft Power Automate endpoint. The page also loads Google Analytics.
 
 - Do not enter names, contact information, or other personally identifying details in notes.
-- Use the points to represent approximate occupancy, not to track identifiable individuals.
+- Use the points to show roughly where patrons are, not to track identifiable individuals.
 - Confirm that retention, access, and deletion rules for submitted files match the library's policies.
 - Review the Google Analytics configuration and privacy notice before deploying the page to a new audience.
 
@@ -249,7 +250,7 @@ GitHub Pages satisfies these static-hosting requirements.
 Before deploying a change:
 
 1. Load all five floor plans and place points on each one.
-2. Test mouse, touch, zoom, pan, Undo, Clear, and Reset All Floors.
+2. Test mouse, touch, zoom, pan, Undo, Clear, the unchecked-floors warning, and Reset All Floors in portrait and landscape on the iPad.
 3. Reload the page and confirm that the current draft and note are restored.
 4. Test a successful submission and a failed or offline submission without losing the draft.
 5. Import a single session, multiple sessions, and a folder of JSON files.
