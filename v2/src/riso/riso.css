@@ -681,24 +681,24 @@
   font-family: var(--font-display);
   font-stretch: 62%;
 }
-/* Fable's Extent: a full cobalt flood with paper type and yellow figures. */
-:root[data-style="riso"] .extent-spotlight {
+/* Project spotlights: a full cobalt flood with paper type and yellow figures. */
+:root[data-style="riso"] .project-spotlight {
   --ink: #f7f0de;
   --muted: #dfe3f8;
   --line: rgba(247, 240, 222, 0.5);
   color: #f7f0de;
 }
-:root[data-style="riso"] .extent-spotlight > .glass-layer {
+:root[data-style="riso"] .project-spotlight > .glass-layer {
   background: var(--r-mottle), var(--r-grain), #2747c9;
   box-shadow: none;
 }
-:root[data-style="riso"][data-theme="dark"] .extent-spotlight > .glass-layer {
+:root[data-style="riso"][data-theme="dark"] .project-spotlight > .glass-layer {
   background: var(--r-mottle), var(--r-grain), #2a3c9c;
 }
-:root[data-style="riso"] .extent-spotlight :focus-visible {
+:root[data-style="riso"] .project-spotlight :focus-visible {
   outline-color: var(--r-yellow);
 }
-:root[data-style="riso"] .extent-spotlight h2 {
+:root[data-style="riso"] .project-spotlight h2 {
   font-size: clamp(3rem, 6.4vw, 6rem);
   color: #f7f0de;
   text-shadow: var(--r-offset) calc(var(--r-offset) * 0.8) 0 var(--r-pink);
@@ -717,12 +717,12 @@
 :root[data-style="riso"] .extent-story p {
   color: #f1ecdf;
 }
-:root[data-style="riso"] .extent-spotlight .button:not(.primary) {
+:root[data-style="riso"] .project-spotlight .button:not(.primary) {
   background: transparent;
   border-color: #f7f0de;
   color: #f7f0de;
 }
-:root[data-style="riso"] .extent-spotlight .button:not(.primary):hover {
+:root[data-style="riso"] .project-spotlight .button:not(.primary):hover {
   background: rgba(247, 240, 222, 0.14);
   color: #fff;
 }
@@ -1614,7 +1614,7 @@ html[data-reveal="press"]::view-transition-new(root) {
   :root[data-style="riso"] :is(.hero-print, .portrait-inks, .sheet-print, .page-background-riso) {
     display: none;
   }
-  :root[data-style="riso"] :is(.tech-heading > span, .page-heading > h1, .extent-spotlight h2),
+  :root[data-style="riso"] :is(.tech-heading > span, .page-heading > h1, .project-spotlight h2),
   :root[data-style="riso"] .tech-heading > span:last-child:not(.tech-name) {
     text-shadow: none;
     -webkit-mask: none;
@@ -1635,10 +1635,10 @@ html[data-reveal="press"]::view-transition-new(root) {
   :root[data-style="riso"] .glass-layer,
   :root[data-style="riso"] .sidebar > .glass-layer,
   :root[data-style="riso"] .home-help > .glass-layer,
-  :root[data-style="riso"] .extent-spotlight > .glass-layer {
+  :root[data-style="riso"] .project-spotlight > .glass-layer {
     background: Canvas;
   }
-  :root[data-style="riso"] :is(.sidebar, .home-help, .extent-spotlight) {
+  :root[data-style="riso"] :is(.sidebar, .home-help, .project-spotlight) {
     --ink: CanvasText;
     --muted: CanvasText;
     color: CanvasText;

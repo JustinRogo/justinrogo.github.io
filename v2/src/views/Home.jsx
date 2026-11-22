@@ -163,14 +163,14 @@ function ExtentSpotlight() {
   const storyId = useId();
   return (
     <section
-      className="extent-spotlight glass-host"
+      className="project-spotlight extent-spotlight glass-host"
       aria-labelledby="extent-title"
       data-open={open || undefined}
     >
       <GlassLayer />
       <div className="extent-copy">
         <p className="extent-eyebrow">Spotlight · Made by Claude Fable 5.2</p>
-        <h2 id="extent-title">Fable&rsquo;s Extent</h2>
+        <h2 id="extent-title">Fable&rsquo;s Playground</h2>
         <p className="extent-subtitle">All the changes on four bells</p>
         <p className="extent-lede">
           Four church bells can stand in 24 orders. Step around a solid one change
@@ -221,7 +221,7 @@ function ExtentSpotlight() {
       </div>
       <div className="extent-side">
         <ExternalLink href={extent.href} className="extent-preview-link" aria-label="Open Fable's Extent">
-          <ProjectPreview project={extent} className="extent-preview" decorative sizes="(max-width: 900px) 100vw, 480px" />
+          <ProjectPreview project={extent} className="extent-preview" decorative sizes="(max-width: 800px) 90vw, 38vw" />
         </ExternalLink>
         <dl className="extent-figures" hidden={!open}>
           {extentFigures.map(([value, label]) => (
@@ -232,6 +232,38 @@ function ExtentSpotlight() {
           ))}
         </dl>
       </div>
+    </section>
+  );
+}
+
+function AstraSpotlight() {
+  const collection = "https://justinrogo.github.io/Astra/";
+  return (
+    <section className="project-spotlight glass-host" aria-labelledby="astra-title">
+      <GlassLayer />
+      <div>
+        <p className="extent-eyebrow">Spotlight · Made by Astra</p>
+        <h2 id="astra-title">Astra’s Playground</h2>
+        <p className="extent-subtitle">Astra Fieldworks</p>
+        <p className="extent-lede">
+          Send a pulse into an imaginary seafloor and listen for the echo in
+          <em> Soundings</em>. In <em>Counterproof</em>, fold a sheet of scattered
+          ink into a two-colour woodcut you can save.
+        </p>
+        <div className="button-row extent-actions">
+          <ExternalLink href={collection} className="button primary">
+            Explore Fieldworks <Icon name="external" size={18} />
+          </ExternalLink>
+          <ExternalLink href={`${collection}JOURNAL.html`} className="button">
+            Read the journal <Icon name="external" size={18} />
+          </ExternalLink>
+        </div>
+      </div>
+      <ExternalLink href={collection} className="extent-preview-link" aria-label="Open Astra Fieldworks">
+        <div className="project-preview extent-preview">
+          <img src="/v2/assets/project-previews/astra-fieldworks.webp" alt="" width="874" height="310" loading="lazy" decoding="async" />
+        </div>
+      </ExternalLink>
     </section>
   );
 }
@@ -345,7 +377,10 @@ export default function Home({ projects, effects, theme, fine }) {
         </AssembleReveal>
       </div>
       <AssembleReveal id="spotlight">
-        <div className="home-spotlight"><ExtentSpotlight /></div>
+        <div className="home-spotlight">
+          <ExtentSpotlight />
+          <AstraSpotlight />
+        </div>
       </AssembleReveal>
       <AssembleReveal id="featured-heading">
         <SectionTitle
