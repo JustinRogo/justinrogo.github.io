@@ -17,6 +17,7 @@ const types = {
   ".jpg": "image/jpeg",
   ".svg": "image/svg+xml",
   ".webp": "image/webp",
+  ".mp4": "video/mp4",
   ".woff2": "font/woff2",
   ".txt": "text/plain",
 };

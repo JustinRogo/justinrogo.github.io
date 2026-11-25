@@ -636,6 +636,10 @@
   height: 26px;
   margin-left: 4px;
 }
+:root[data-style="botanical"] .home-slopcore .section-flourish {
+  flex-shrink: 1;
+  min-width: 0;
+}
 /* Narrow columns keep their headings on one line instead. */
 :root[data-style="botanical"] :is(.home-feeds, .my-day, .ai-corner, .tool-content) .section-flourish {
   display: none;

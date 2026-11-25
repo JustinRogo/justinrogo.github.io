@@ -2,6 +2,13 @@
   "version": 2,
   "pages": [
     {
+      "path": "Pages/Personal/Slopcore.html",
+      "title": "Slopcore",
+      "group": "For Fun",
+      "category": "Music",
+      "description": "Watch Justin’s lyric videos and read along."
+    },
+    {
       "path": "Pages/Updates/index.html",
       "title": "AI Corner Blog",
       "category": "Posts & Discussion",

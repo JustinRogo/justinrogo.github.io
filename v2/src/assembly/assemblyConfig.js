@@ -35,7 +35,6 @@ export const assemblyTasks = [
   { id: "help", cursor: 2, at: 0.61, duration: 0.02, effect: "place" },
   { id: "my-day", cursor: 3, at: 0.63, duration: 0.02, effect: "place" },
   { id: "ai-corner", cursor: 1, at: 0.65, duration: 0.02, effect: "place" },
-  { id: "spotlight", cursor: 1, at: 0.68, duration: 0.03, effect: "place" },
   {
     id: "featured-heading",
     cursor: 4,
@@ -57,6 +56,7 @@ export const assemblyTasks = [
   { id: "featured-2", cursor: 4, at: 0.82, duration: 0.05, effect: "place" },
   { id: "notes", cursor: 1, at: 0.83, duration: 0.06, effect: "place" },
   { id: "featured-3", cursor: 3, at: 0.88, duration: 0.04, effect: "place" },
+  { id: "spotlight", cursor: 1, at: 0.92, duration: 0.03, effect: "place" },
   { id: "footer", cursor: 1, at: 0.93, duration: 0.025, effect: "surface" },
   { id: "pocket-part", cursor: 5, at: 0.94, duration: 0.025, effect: "place" },
 ];

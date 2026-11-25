@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#efe8d8">
+  <meta name="description" content="Watch Justin Rogowski’s lyric videos and read along.">
+  <title>Slopcore | Justin Rogowski</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <script src="./Daily-Activity/site-style.js"></script>
+  <link rel="stylesheet" href="/v2/assets/shell.css">
+  <link rel="stylesheet" href="./Lyric-Videos/styles.css">
+  <script type="module" src="/v2/assets/shell.js" onerror="document.documentElement.classList.remove('has-shell')"></script>
+  <script type="module" src="./Lyric-Videos/gallery.js"></script>
+</head>
+<body>
+  <div id="site-shell"></div>
+  <div class="workspace">
+    <div id="site-topbar" style="display: contents"></div>
+    <main class="collection" id="main" tabindex="-1">
+      <a class="projects-link" href="/#/projects">All projects</a>
+      <header class="collection-heading">
+        <h1>Slopcore</h1>
+        <a class="button" href="https://lifehacker.com/entertainment/what-is-slopcore">What is Slopcore?</a>
+      </header>
+      <section class="collection-section" aria-labelledby="music-video-title">
+        <h2 id="music-video-title">Music &amp; Video</h2>
+        <p class="collection-attribution">Lyrics mostly generated, Music definitely generated, videos made with ChatGPT &amp; Claude</p>
+        <ul class="films" aria-label="Videos"></ul>
+        <noscript>Enable JavaScript to open the video player and lyrics.</noscript>
+      </section>
+      <section class="collection-section" aria-labelledby="web-title">
+        <h2 id="web-title">Web</h2>
+        <p class="web-intro">I gave Fable and Astra the same open brief: build whatever you want. These playgrounds are what they chose to make.</p>
+        <details class="full-prompt">
+          <summary>Full prompt</summary>
+          <blockquote>
+            <p>This repo is yours.</p>
+            <p>Build something you genuinely find interesting. Not a showcase of a common pattern, not something you think I want to see, but something distinctive that you'd be proud of.</p>
+            <p>You have complete creative freedom. Choose the concept, direction, technologies, aesthetics, and interactions yourself. Don't ask me to make creative decisions for you.</p>
+            <p><strong>Constraints:</strong></p>
+            <ul>
+              <li>It should run entirely in the browser. I'll host it on GitHub Pages.</li>
+              <li>It should be finished and polished rather than sprawling.</li>
+              <li>It should not require paid APIs, external credentials, or a backend.</li>
+              <li>Favor originality, depth, and thoughtful details over an abundance of features.</li>
+            </ul>
+            <p><strong>Your process:</strong></p>
+            <p>Keep a JOURNAL.md as you go. Document what you're making, why you're making it, the decisions you encounter, and ideas you tried and abandoned. I'm interested in how the project evolves, not just the result.</p>
+            <p>Commit often with meaningful messages.</p>
+            <p>Give yourself permission to experiment, reconsider an approach, or pursue an unexpected idea. Don't feel obligated to stick with your first concept if you discover something more compelling.</p>
+            <p>Once you have something working, spend meaningful effort actually experiencing it, testing it, and refining it. Pay attention to the small details. Don't confuse feature completeness with a finished experience.</p>
+            <p>When you're done, tell me what you made, what surprised you during development, what you decided not to build, and what you'd explore next.</p>
+            <p>One final thought: This isn't an evaluation or a benchmark. There is no predetermined correct answer. I want to see what you choose to create when the direction is yours.</p>
+            <p>Surprise me.</p>
+          </blockquote>
+        </details>
+        <div id="playground-spotlights"></div>
+      </section>
+    </main>
+  </div>
+  <dialog class="screening" aria-labelledby="song-title">
+    <header class="screening-header">
+      <h2 id="song-title"></h2>
+      <form method="dialog"><button class="close" autofocus>Close</button></form>
+    </header>
+    <div class="screening-body">
+      <div class="player">
+        <video controls playsinline preload="none"></video>
+        <p id="playback-status" role="status" hidden></p>
+      </div>
+      <section class="lyrics" aria-labelledby="lyrics-heading">
+        <h3 id="lyrics-heading">Lyrics</h3>
+        <p id="lyrics-text"></p>
+      </section>
+    </div>
+  </dialog>
+</body>
+</html>

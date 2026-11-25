@@ -440,14 +440,14 @@ main {
 .portrait-note > span {
   color: var(--orange);
 }
-.view-home > .section-title {
+:is(.view-home, .home-slopcore) > .section-title {
   margin-top: 32px;
 }
 .section-title.glass-host {
   min-height: 52px;
   padding: 8px 14px;
 }
-.view-home > .section-title h2 {
+:is(.view-home, .home-slopcore) > .section-title h2 {
   font-size: 1.3rem;
 }
 .selected-bento {
@@ -919,7 +919,7 @@ main {
   .now-panel > p {
     font-size: 1.13rem;
   }
-  .view-home > .section-title h2 {
+  :is(.view-home, .home-slopcore) > .section-title h2 {
     font-size: 1.1rem;
     max-width: 24ch;
   }
@@ -1068,15 +1068,15 @@ main {
   .portrait-orbit {
     border-width: 1px;
   }
-  .view-home > .section-title {
+  :is(.view-home, .home-slopcore) > .section-title {
     margin: 26px 0 17px;
   }
-  .view-home > .section-title h2 {
+  :is(.view-home, .home-slopcore) > .section-title h2 {
     font-size: 1.25rem;
     max-width: 19ch;
     line-height: 1.25;
   }
-  .view-home > .section-title .text-link {
+  :is(.view-home, .home-slopcore) > .section-title .text-link {
     font-size: 0.7rem;
     white-space: nowrap;
     gap: 5px;

@@ -17,6 +17,7 @@ import { useClock, useMedia, useResource, useScrolledFlag, useStored } from "./h
 import { integrations } from "./content.js";
 import { parseManifest } from "./manifest.js";
 import Settings from "./components/Settings.jsx";
+import PlaygroundSpotlights from "./components/PlaygroundSpotlights.jsx";
 import { newTabNote } from "./components/UI.jsx";
 import { useSidebarWidth } from "./components/SidebarResize.jsx";
 import { Sidebar, Topbar, themeReveal } from "./components/Shell.jsx";
@@ -42,7 +43,7 @@ import "./riso/riso.css";
 
 const TOPBAR_DOCK_SCROLL = 12;
 
-function SiteShell({ topbarSlot }) {
+function SiteShell({ topbarSlot, playgroundsSlot }) {
   const sidebar = useSidebarWidth();
   const [preferences, setPreferences] = useStored(
     PREFERENCES_KEY,
@@ -139,6 +140,7 @@ function SiteShell({ topbarSlot }) {
           />,
           topbarSlot,
         )}
+        {playgroundsSlot && createPortal(<PlaygroundSpotlights headingTag="h3" />, playgroundsSlot)}
         {settings && (
           <Settings
             preferences={preferences}
@@ -161,4 +163,7 @@ function SiteShell({ topbarSlot }) {
 
 const host = document.getElementById("site-shell");
 const topbarSlot = document.getElementById("site-topbar");
-if (host && topbarSlot) createRoot(host).render(<SiteShell topbarSlot={topbarSlot} />);
+const playgroundsSlot = document.getElementById("playground-spotlights");
+if (host && topbarSlot) {
+  createRoot(host).render(<SiteShell topbarSlot={topbarSlot} playgroundsSlot={playgroundsSlot} />);
+}

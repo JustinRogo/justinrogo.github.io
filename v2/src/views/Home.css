@@ -45,34 +45,3 @@
   .selected-bento .magic-bento__cell:first-child { min-height: 340px; }
   .selected-bento .bento-project { gap: 12px; }
 }
-/* Pair the spotlights when the content area has room, including after a rail resize. */
-.home-spotlight { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 25rem), 1fr)); gap: 16px; margin-top: 16px; }
-.project-spotlight { display: flex; flex-direction: column; gap: 20px; min-width: 0; padding: clamp(18px, 2vw, 30px); }
-.project-spotlight > .extent-side, .project-spotlight > .extent-preview-link { margin-top: auto; }
-.extent-spotlight[data-open] + .project-spotlight { align-self: start; }
-.extent-copy { min-width: 0; }
-.extent-eyebrow { margin: 0 0 8px; color: var(--orange); font-size: 0.78rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
-.project-spotlight h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); line-height: 1.1; letter-spacing: -0.02em; }
-.extent-subtitle { margin: 4px 0 14px; color: var(--muted); font-style: italic; }
-.extent-lede { margin: 0 0 18px; font-size: 1.02rem; line-height: 1.55; max-width: 62ch; }
-.extent-spotlight h3 { margin: 0 0 8px; font-size: 1rem; font-weight: 600; }
-.extent-story p { margin: 0 0 10px; color: var(--muted); font-size: 0.92rem; line-height: 1.6; max-width: 62ch; }
-.extent-story { margin-bottom: 8px; }
-.extent-actions { margin-top: 18px; }
-.extent-toggle svg { transition: rotate 200ms var(--ease); }
-.extent-toggle[aria-expanded="true"] svg { rotate: 180deg; }
-@media (prefers-reduced-motion: no-preference) {
-  .extent-spotlight[data-open] :is(.extent-story, .extent-figures) { animation: extent-reveal 280ms var(--ease) both; }
-}
-@keyframes extent-reveal { from { opacity: 0; translate: 0 -6px; } }
-.extent-side { display: grid; align-content: start; gap: 16px; min-width: 0; }
-.extent-preview-link { display: block; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; transition: border-color 160ms var(--ease); }
-.extent-preview-link:hover, .extent-preview-link:focus-visible { border-color: var(--blue); }
-.project-spotlight .extent-preview { aspect-ratio: 2.8; background: #f2ead8; }
-.extent-spotlight[data-open] .extent-preview { aspect-ratio: 16 / 10; }
-.extent-preview img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
-.extent-figures { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 0; }
-.extent-figures > div { display: flex; flex-direction: column-reverse; gap: 2px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 5px; }
-.extent-figures dd { margin: 0; font-size: 1.35rem; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.1; color: var(--ink); }
-.extent-figures dt { color: var(--muted); font-size: 0.76rem; line-height: 1.35; }
-.extent-figures[hidden] { display: none; }
